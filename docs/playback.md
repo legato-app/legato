@@ -390,7 +390,7 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
 
 - **Local files and previews**: `crates/dsp` (`music-dsp`, pure Rust) in the native engine. `crates/player` `live.rs`
   wraps every decoded file in a rodio `Source` that runs blocks of 256 frames through the `Processor`: BS.1770 meter
-  (K-weighting, momentary 400 ms, short-term 3 s, true peak), Adaptive Sound gain, peak limiter. Settings and levels go
+  (K-weighting, momentary 400 ms, short-term 3 s, true peak; the song's gated loudness), Adaptive Sound gain, peak limiter. Settings and levels go
   through one shared `Control` (mutex + version, `try_lock` on the audio thread: it never waits). IPC `player_live`,
   `player_levels`.
 - **YouTube**: `crates/shield` `live.js`, injected into the embed and the watch page. The video's sound is taken with
@@ -405,13 +405,20 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
 - **Volume mixer** (2026-10-23): YouTube's sound plays in WebView2's own processes, so Windows listed it as "Microsoft
   Edge WebView2". `src-tauri/src/mixer.rs` gives our WebView2 audio sessions (only processes this app started) Music
   App's name, icon and grouping every 3 s. Label only: the sound is never taken out of the player (no extraction).
-- **Adaptive Sound**: gain heads for `target − short-term loudness`, clamped −12..+9 dB, 2.5 s glide, held while the
-  momentary loudness is under −45 LUFS (silence) or 10 dB under the short-term (the music falling away: a song's own
-  fade-out, a stop), and while the app fades the song out (`ending`, sent when the fade out begins). The fades are the
-  app's: before 2026-10-28 the gain rose ~5 dB under a fade out and the next song started from it, loud. A new song
-  starts from the last one's gain; across the two YouTube embeds of an overlap the app sends it (`gain`, used once by
-  the next track). Limiter (ceiling 0.97) only while boosting: off, the sound is bit-identical (test). Targets: Quiet
-  −20, Normal −14, Loud −11 LUFS.
+- **Adaptive Sound** (one steady gain per song since 2026-11-19; before, it followed the short-term loudness and
+  flattened a song: quiet verses up, choruses down; the owner wanted "the song as it is, only its volume steadied"):
+  gain = `target − the song's loudness so far`, integrated and gated as BS.1770 (every 100 ms the momentary loudness
+  counts if over −70 LUFS and over the loudness so far − 10 dB: silence, fade-outs and quiet passages don't), clamped
+  −12..+9 dB, 0.6 s glide for the first 3 s then 2.5 s. An average over the whole song barely moves once it has started
+  (test: a song whose verses are 12 dB under its choruses keeps those 12 dB; the gain moves under 1.5 dB after 24 s).
+  No compression, no EQ. Held while the app fades the song out (`ending`) and before anything was heard. A new song
+  starts from the last one's gain; a YouTube song heard before (its loudness kept by `ytLevel.ts`, measured while
+  levelling or Adaptive Sound is on) starts at its own (`gain`, used once by the next track; across the two embeds of
+  an overlap the app sends it). Limiter (ceiling 0.97) only while boosting: off, the sound is bit-identical (test).
+  Targets: Quiet −20, Normal −14, Loud −11 LUFS. With Volume levelling: local files come in levelled (the engine's gain
+  before the processor), Adaptive Sound measures that and lands on its target all the same; YouTube's `level` is
+  ignored while it is on. Settings › Sound processing: one switch and the level (the player bar's switch and line went,
+  2026-11-19).
 - **CPU** (2026-10-28): every recursive state (filters, reverb, echo, compressor, meter) puts values under −400 dB
   to 0. Decaying into denormal floats once the music stopped, the meter cost 1.4 s of CPU per minute of silence
   (21 ms from a clean start) and the reverb 3.3 s (77 ms); now ~35 and ~100 ms. Biquads clear both states together
@@ -419,7 +426,7 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
   glides per frame: 600 s of music 1.43 s → 0.49 s of CPU.
 - **Moving cover**: scale from the momentary loudness, up fast and down slow (`player/pulse.ts`), transform only,
   none with reduced motion or Animations off.
-- UI: `player/live.ts` (settings out, levels in, only from what plays now), `liveSync.ts`, `AdaptiveBar.tsx`.
+- UI: `player/live.ts` (settings out, levels in, only from what plays now), `liveSync.ts`.
   Settings › Playback › Sound processing; "Process YouTube's sound" turns the YouTube side off.
 - **Visualizer data, 60 Hz** (Visualizer v2 step 1, 2026-10-31; spec `docs/notes/ideas/visualizer.md`). 61 bands of 1/6
   octave (base 10, 19.95 Hz to 19.95 kHz), left and right, plus left / right rms and peak, in a packed frame: 8 bytes
