@@ -218,6 +218,7 @@ const SHOWN: Record<MenuPreset, ReadonlySet<Level>> = {
 
 interface Shapeable {
   id?: string
+  items?: unknown[]
 }
 type Entry<T> = T | '-'
 
@@ -239,6 +240,8 @@ export function shapeMenu<T extends Shapeable>(kind: MenuKind, entries: (Entry<T
   const aside: T[] = []
   for (const e of all) {
     if (e === '-') inline.push(e)
+    // A More… already made (a shaped menu put in another): its items join this one's, one More… per menu (2026-11-19).
+    else if (e.id === 'more') aside.push(...((e.items ?? []).filter((x) => x !== '-') as T[]))
     else if (e.id && hidden.has(e.id)) continue
     else if (shown.has(e.id ? (defs.get(e.id)?.level ?? 'standard') : 'standard')) inline.push(e)
     else aside.push(e)

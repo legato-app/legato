@@ -24,6 +24,15 @@ describe('menu shapes', () => {
     expect(labels(shapeMenu('track', track, layout({ preset: 'essentials' }), more))).toEqual(['play', '-', 'addTo', '-', 'More[playNext,saveCover,credits,copyLink]'])
   })
 
+  it('one More… per menu, a shaped menu put in another too, whatever the preset', () => {
+    const inner: Item = { id: 'more', label: 'More…', items: [item('credits'), '-', item('copyLink')] }
+    for (const preset of ['standard', 'full', 'essentials'] as const) {
+      const out = shapeMenu('track', [item('play'), item('saveCover'), '-', inner], layout({ preset }), more)
+      expect(out.filter((e) => e !== '-' && e.items).length, preset).toBe(1)
+    }
+    expect(labels(shapeMenu('track', [item('play'), item('saveCover'), '-', inner], DEFAULT_MENU_LAYOUT, more))).toEqual(['play', '-', 'More[saveCover,credits,copyLink]'])
+  })
+
   it('hides what the user took out and follows their order', () => {
     const l = layout({ preset: 'full', hidden: { track: ['credits', 'gone-long-ago'] }, order: { track: ['copyLink', 'addTo'] } })
     expect(labels(shapeMenu('track', track, l, more))).toEqual(['copyLink', 'addTo', 'play', 'playNext', 'saveCover'])
