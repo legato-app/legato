@@ -231,7 +231,7 @@ const orderLabels: Record<PlaylistCover['order'], string> = { playlist: msg('Pla
 /** "Cover ›": service logo, first song, grid of 4, picked image; songs taken in which order. */
 function coverMenu(p: LibraryPlaylist): MenuEntry {
   const key = playlistKey(p)
-  const cur = useSettings.getState().settings.playlistCovers[key] ?? { mode: 'source', order: 'playlist' }
+  const cur = useSettings.getState().settings.playlistCovers[key] ?? { mode: 'grid', order: 'playlist' }
   const set = (patch: Partial<PlaylistCover>) => {
     const all = useSettings.getState().settings.playlistCovers
     useSettings.getState().update({ playlistCovers: { ...all, [key]: { ...cur, ...patch } } })

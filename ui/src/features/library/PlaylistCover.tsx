@@ -10,7 +10,7 @@ import { SourceIcon } from '../../shared/ui/SourceIcon'
 import { coverTracks } from './covers'
 
 /**
- * Playlist icon as chosen (right-click › Cover): service logo, first song, grid of 4, or a picked image. big = page
+ * Playlist icon as chosen (right-click › Cover): service logo, first song, grid of 4 (the default), or a picked image. big = page
  * header: the logo there falls back to the first song's cover.
  */
 export function PlaylistCover({ p, size, big = false }: { p: LibraryPlaylist; size: number; big?: boolean }) {
@@ -18,7 +18,8 @@ export function PlaylistCover({ p, size, big = false }: { p: LibraryPlaylist; si
   const ids = useStore((s) => s.orders[p.id])
   const tracks = useStore((s) => s.tracks)
   const byId = useMemo(() => new Map(tracks.map((t) => [t.id, t])), [tracks])
-  const mode = pick?.mode ?? (big ? 'first' : 'source')
+  // 2026-11-19, the owner: a grid of 4 by default (fewer songs: the first one's cover).
+  const mode = pick?.mode ?? 'grid'
   const order = pick?.order ?? 'playlist'
   const songs = useMemo(() => (mode === 'first' || mode === 'grid' || (big && mode === 'source') ? coverTracks(ids, byId, order, mode === 'grid' ? 4 : 1) : []), [mode, big, ids, byId, order])
   const round = big ? '' : 'rounded-[4px]!'
