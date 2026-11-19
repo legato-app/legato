@@ -550,8 +550,10 @@ impl Connector for YouTubeMusic {
         let mut out = Vec::new();
         for item in all(&page, "musicTwoRowItemRenderer") {
             let Some(id) = item.pointer("/navigationEndpoint/browseEndpoint/browseId").and_then(Value::as_str).and_then(|b| b.strip_prefix("VL")) else { continue };
-            // SE = Episodes for Later (podcasts, not music).
-            if id == "SE" {
+            // SE = Episodes for Later (podcasts, not music). RD = a mix YouTube makes up again at each request (a radio,
+            // "My Supermix", a mood mix saved to the library): synced, it brought ~1,000 songs never chosen into Songs at
+            // every sync (2026-11-19). Opened from Home instead. RDCLAK = YouTube's own playlists: fixed, kept.
+            if id == "SE" || (id.starts_with("RD") && !id.starts_with("RDCLAK")) {
                 continue;
             }
             let mut name = item.get("title").and_then(text).unwrap_or_else(|| id.to_string());
@@ -658,6 +660,17 @@ mod tests {
         let found = YouTubeMusic::anonymous_with_api(&s.url()).search_songs("paper lanterns").await.unwrap();
         assert_eq!(found.iter().map(|t| (t.title.as_str(), t.artist.as_str(), t.album.as_deref(), t.duration_ms)).collect::<Vec<_>>(), [("Paper Lanterns", "Glass Harbour", Some("Lanterns"), Some(201_000)), ("Tidewater", "Glass Harbour", Some("Lanterns"), Some(245_000))]);
         assert!(found.iter().all(|t| t.musicness == Some(music_core::musicness::Musicness::Music)), "{found:?}");
+    }
+
+    #[tokio::test]
+    async fn the_library_lists_leave_out_mixes_made_up_at_each_request() {
+        let mut s = Server::new_async().await;
+        let card = |id: &str, title: &str| json!({ "musicTwoRowItemRenderer": { "title": { "runs": [{ "text": title }] }, "navigationEndpoint": { "browseEndpoint": { "browseId": format!("VL{id}") } } } });
+        let page = json!({ "contents": [card("PLmine1", "Mine"), card("RDATmix1", "Workout Mix"), card("RDTMAK5uy_x", "My Supermix"), card("RDCLAK5uy_y", "Chill hits"), card("SE", "Episodes")] });
+        s.mock("POST", "/browse").match_query(Matcher::Any).with_body(page.to_string()).create_async().await;
+        let yt = YouTubeMusic::with_api(&s.url(), COOKIE).unwrap();
+        let ids: Vec<String> = yt.list_playlists().await.unwrap().into_iter().map(|p| p.id).collect();
+        assert_eq!(ids, ["PLmine1", "RDCLAK5uy_y"]);
     }
 
     #[tokio::test]
