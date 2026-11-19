@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock(import('./live'), async (real) => ({ ...(await real()), setLevel: vi.fn() }))
+vi.mock(import('./live'), async (real) => ({ ...(await real()), setLevel: vi.fn(), setKnownLoudness: vi.fn() }))
 
 const { levelDb, rememberLoudness, startLevelling } = await import('./ytLevel')
-const { setLevel, useLive } = await import('./live')
+const { setKnownLoudness, setLevel, useLive } = await import('./live')
 const { usePlayer } = await import('./store')
 
 describe('YouTube songs levelled', () => {
@@ -41,6 +41,24 @@ describe('YouTube songs levelled', () => {
     usePlayer.setState({ now: yt('measured001') })
     expect(levelDb('other000001', 'track')).toBe(0)
     expect(setLevel).toHaveBeenLastCalledWith(8)
+    stop()
+  })
+
+  it('measures for Adaptive Sound with levelling off, and gives it the known loudness as a head start', () => {
+    let t = 0
+    vi.spyOn(performance, 'now').mockImplementation(() => t)
+    const yt = (id: string) => ({ via: 'youtube', youtubeId: id, title: id, artist: '' }) as never
+    usePlayer.setState({ now: yt('adaptive001'), playing: true })
+    const stop = startLevelling(() => 'off', () => true)
+    for (let i = 0; i < 400; i++) {
+      t += 100
+      useLive.setState({ levels: { fast: -18, momentary: -18, short: -18, peak: 0.1, gain: 0 } as never })
+    }
+    usePlayer.setState({ now: yt('adaptive002') })
+    expect(setKnownLoudness).toHaveBeenLastCalledWith(undefined)
+    usePlayer.setState({ now: yt('adaptive001') })
+    expect(setKnownLoudness).toHaveBeenLastCalledWith(-18)
+    expect(setLevel).toHaveBeenLastCalledWith(0)
     stop()
   })
 })

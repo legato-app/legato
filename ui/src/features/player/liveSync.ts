@@ -50,7 +50,8 @@ export function useLiveSync() {
   useEffect(() => startLive(playing), [])
   useEffect(() => startEditor(), [])
   // Volume levelling: YouTube songs measured as they play, levelled from their second play on.
-  useEffect(() => startLevelling(() => levelling), [levelling])
+  // Adaptive Sound measures them too: a song heard before starts at its gain.
+  useEffect(() => startLevelling(() => levelling, () => levelling !== 'off' || adaptiveSound), [levelling, adaptiveSound])
   // Fade out under way: Adaptive Sound holds. Synchronous with the position, so the playing frame hears it before an
   // overlap hands the live link to the next song's embed.
   useEffect(() => usePlayer.subscribe((s) => setEnding(overlapDue(s.positionMs, s.durationMs, songFade(s)))), [])

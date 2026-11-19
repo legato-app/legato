@@ -1,5 +1,5 @@
 import { type Levelling } from '../../shared/api'
-import { setLevel, useLive } from './live'
+import { setKnownLoudness, setLevel, useLive } from './live'
 import { usePlayer } from './store'
 import { createLoudness } from './vizLoud'
 
@@ -49,8 +49,11 @@ export function rememberLoudness(video: string, lufs: number) {
   }
 }
 
-/** Measures each YouTube song while `mode()` levels and sends live.js the gain of the one playing. Returns the stop. */
-export function startLevelling(mode: () => Levelling): () => void {
+/**
+ * Measures each YouTube song while `measure()` (by default: while `mode()` levels) and sends live.js the gain of the one
+ * playing, and Adaptive Sound its known loudness (its head start). Returns the stop.
+ */
+export function startLevelling(mode: () => Levelling, measure = () => mode() !== 'off'): () => void {
   const meter = createLoudness()
   let video: string | undefined
   let heard = 0
@@ -70,6 +73,7 @@ export function startLevelling(mode: () => Levelling): () => void {
       heard = 0
     }
     setLevel(levelDb(video, mode()))
+    setKnownLoudness(video ? known[video] : undefined)
   }
   follow()
   const offSong = usePlayer.subscribe((s, prev) => void (s.now !== prev.now && follow()))
@@ -78,7 +82,7 @@ export function startLevelling(mode: () => Levelling): () => void {
     const t = performance.now()
     const ms = usePlayer.getState().playing ? Math.min(250, t - last) : 0
     last = t
-    if (!video || mode() === 'off') return
+    if (!video || !measure()) return
     meter.push(s.levels, ms)
     heard += ms
   })

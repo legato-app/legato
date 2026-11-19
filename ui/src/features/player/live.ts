@@ -78,6 +78,8 @@ let frame: HTMLIFrameElement | null = null
 let ending = false
 // Volume levelling's gain for the YouTube song playing, dB (ytLevel.ts); live.js leaves it to Adaptive Sound when that is on.
 let level = 0
+// The YouTube song playing's loudness measured on an earlier play, LUFS (ytLevel.ts): Adaptive Sound starts there.
+let knownLufs: number | undefined
 
 type FrameSettings = ReturnType<typeof frameSettings> & { ending: boolean; gain: number | null; level: number }
 const post = (settings: FrameSettings, effects: Effects) => frame?.contentWindow?.postMessage(JSON.stringify({ legato: 'live', settings, effects }), YT_ORIGIN)
@@ -91,7 +93,7 @@ export function sendLive(next?: LiveWish, newSong = false) {
   if (next) wish = next
   void api.playerLive({ adaptive: wish.adaptive, targetLufs: wish.targetLufs, ending }).catch(() => {})
   void api.playerEffects(wish.effects).catch(() => {})
-  const s = { ...frameSettings(wish), ending, gain: newSong ? (useLive.getState().levels?.gain ?? null) : null, level }
+  const s = { ...frameSettings(wish), ending, gain: newSong ? startGain() : null, level }
   if (watching()) {
     void api.ytwatchCmd({ type: 'live', ...s, effects: wish.effects }).catch(() => {})
     // The embed stopped for the watch page: no second processing in the background.
@@ -99,6 +101,15 @@ export function sendLive(next?: LiveWish, newSong = false) {
   } else post(s, wish.effects)
   if (!s.on) useLive.setState({ attached: false, error: undefined })
 }
+
+/** Where a new YouTube song's Adaptive Sound gain starts, dB: from its known loudness, else the last song's gain. */
+function startGain(): number | null {
+  if (knownLufs !== undefined) return Math.min(9, Math.max(-12, wish.targetLufs - knownLufs))
+  return useLive.getState().levels?.gain ?? null
+}
+
+/** The YouTube song playing's loudness from an earlier play (LUFS), or undefined. */
+export const setKnownLoudness = (lufs: number | undefined) => void (knownLufs = lufs)
 
 /** The app's fade out began (true) or is over (false): sent once per change. */
 export function setEnding(on: boolean) {
