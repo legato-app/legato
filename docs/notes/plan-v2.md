@@ -14,10 +14,10 @@ the order; a line leaves only when it ships or the user drops it.
 
 - [ ] `M` Songs filled with songs never played (the owner, 2026-11-19: « dans songs ya full songs que je n'ai JAMAIS
       ecouter [...] trouve cde bug »). Cause: a YouTube Music mix saved to the library (id `RD…`: a radio YouTube makes
-      up again at each request) was synced every 15 min; each sync put ~1,000 other songs in it, and the ones it dropped
+      up again at each request) was synced every 15 min; each sync put other songs in it, and the ones it dropped
       stayed in the library (`save_playlist` replaces a list's songs, never their rows). Fixed 2026-11-19: the library
       listing skips `RD…` lists except YouTube's own fixed playlists (`RDCLAK…`), `ytmusic.rs` `list_playlists`; the mix
-      already imported stays as it is. NOT done, the owner's call: the thousands of rows already added (no playlist,
+      already imported stays as it is. NOT done, the owner's call: the rows already added (no playlist,
       never played) are not removed; a visible "Clean up songs" with undo would be the way.
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
