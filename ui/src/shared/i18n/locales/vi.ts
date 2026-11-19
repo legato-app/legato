@@ -2220,6 +2220,7 @@ const vi: Record<string, string> = {
   'Legato {version} is available': 'Đã có Legato {version}',
   'Install update': 'Cài đặt bản cập nhật',
   'Couldn’t download the update': 'Không thể tải bản cập nhật',
+  'The update installs as this song ends': 'Bản cập nhật sẽ được cài khi bài này kết thúc',
   'Performance improved': 'Cải thiện hiệu năng',
   'Glow': 'Phát sáng',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Ánh sáng dịu quanh những gì đang phát: nút phát, bài đang phát, phần đã phát, dòng đang hát và ảnh bìa. Rõ nhất ở giao diện tối',

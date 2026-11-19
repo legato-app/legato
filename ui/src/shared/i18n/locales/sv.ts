@@ -2220,6 +2220,7 @@ const sv: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} finns tillgänglig',
   'Install update': 'Installera uppdateringen',
   'Couldn’t download the update': 'Det gick inte att ladda ned uppdateringen',
+  'The update installs as this song ends': 'Uppdateringen installeras när den här låten är slut',
   'Performance improved': 'Förbättrad prestanda',
   'Glow': 'Glöd',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Ett mjukt ljus runt det som spelas: spelaknappen, låten som spelas, den spelade delen, raden som sjungs och omslaget. Starkast i mörka teman',

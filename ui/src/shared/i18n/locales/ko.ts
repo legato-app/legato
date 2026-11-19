@@ -2220,6 +2220,7 @@ const ko: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} 사용 가능',
   'Install update': '업데이트 설치',
   'Couldn’t download the update': '업데이트를 다운로드하지 못했습니다',
+  'The update installs as this song ends': '이 곡이 끝나면 업데이트가 설치됩니다',
   'Performance improved': '성능 개선',
   'Glow': '글로우',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': '재생 중인 것 주위의 부드러운 빛: 재생 버튼, 재생 중인 곡, 재생된 부분, 부르는 가사 줄, 커버. 어두운 테마에서 가장 강합니다',

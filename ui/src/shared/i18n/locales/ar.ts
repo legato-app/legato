@@ -2160,6 +2160,7 @@ const ar: Record<string, string> = {
   'Legato {version} is available': 'الإصدار {version} من Legato متاح',
   'Install update': 'تثبيت التحديث',
   'Couldn’t download the update': 'تعذّر تنزيل التحديث',
+  'The update installs as this song ends': 'يُثبَّت التحديث عند انتهاء هذه الأغنية',
   'Performance improved': 'تحسّن الأداء',
   'Glow': 'توهّج',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'ضوء ناعم حول ما يُشغَّل: زر التشغيل والأغنية الجارية والجزء المُشغَّل والسطر المغنّى والغلاف. أقوى في السمات الداكنة',

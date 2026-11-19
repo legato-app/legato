@@ -2220,6 +2220,7 @@ const it: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} è disponibile',
   'Install update': 'Installa l’aggiornamento',
   'Couldn’t download the update': 'Impossibile scaricare l’aggiornamento',
+  'The update installs as this song ends': 'L’aggiornamento si installa alla fine di questo brano',
   'Performance improved': 'Prestazioni migliorate',
   'Glow': 'Bagliore',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Una luce morbida intorno a ciò che suona: il pulsante di riproduzione, il brano in corso, la parte ascoltata, la riga cantata e la copertina. Più intensa nei temi scuri',

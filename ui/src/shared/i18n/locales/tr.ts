@@ -2220,6 +2220,7 @@ const tr: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} kullanılabilir',
   'Install update': 'Güncellemeyi yükle',
   'Couldn’t download the update': 'Güncelleme indirilemedi',
+  'The update installs as this song ends': 'Güncelleme bu şarkı bitince yüklenir',
   'Performance improved': 'Performans iyileştirildi',
   'Glow': 'Parıltı',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Çalan şeyin etrafında yumuşak bir ışık: oynat düğmesi, çalan şarkı, çalınan kısım, söylenen satır ve kapak. En belirgin hali koyu temalarda',

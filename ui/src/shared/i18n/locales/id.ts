@@ -2220,6 +2220,7 @@ const id: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} tersedia',
   'Install update': 'Pasang pembaruan',
   'Couldn’t download the update': 'Pembaruan tidak dapat diunduh',
+  'The update installs as this song ends': 'Pembaruan dipasang saat lagu ini selesai',
   'Performance improved': 'Performa ditingkatkan',
   'Glow': 'Cahaya',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Cahaya lembut di sekitar yang diputar: tombol putar, lagu yang diputar, bagian yang sudah diputar, baris yang dinyanyikan, dan sampul. Paling terasa di tema gelap',

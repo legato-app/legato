@@ -8,7 +8,7 @@ vi.mock('../../shared/api', () => ({ api: {} }))
 vi.mock('../player/session', () => ({ saveSessionNow: () => {}, saveSessionAtNext: () => {} }))
 vi.mock('../player/store', () => ({ usePlayer: {}, onSongEnd: () => {} }))
 
-const { betweenSongs, quietNow, phoneStep } = await import('./updates')
+const { atSongEnd, betweenSongs, quietNow, phoneStep } = await import('./updates')
 
 it('installs only when nothing plays and nobody touched the app lately', () => {
   const now = 1_000_000
@@ -42,4 +42,12 @@ it('offers a new version once on the phone, and installs only a download asked f
   expect(phoneStep(failed, true, new Set())).toBe('failed')
   // A background check that failed says nothing.
   expect(phoneStep(failed, false, new Set())).toBe(null)
+})
+
+it('says what a ready update does as a song ends', () => {
+  expect(atSongEnd(true, true, true, 3)).toBe('install')
+  expect(atSongEnd(false, true, true, 3)).toBe('not ready')
+  expect(atSongEnd(true, false, true, 3)).toBe('automatic updates off')
+  expect(atSongEnd(true, true, false, 3)).toBe('touched lately')
+  expect(atSongEnd(true, true, true, null)).toBe('no next song')
 })

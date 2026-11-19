@@ -7,6 +7,7 @@ import { saveSessionAtNext, saveSessionNow, thawSession } from '../player/sessio
 import { vias } from '../player/sources'
 import { onSongEnd, usePlayer } from '../player/store'
 import { tr } from '../../shared/i18n/i18n'
+import { note } from '../../shared/diag'
 import { phoneApp } from '../../shared/platform'
 
 /** What the background updater is doing (Settings › About). */
@@ -22,6 +23,9 @@ const LOOK_EVERY = 5_000
 let wanted = false
 // Versions already offered this run.
 const offered = new Set<string>()
+// The phone: downloaded while a song played, Android's installer waits for its end (2026-11-19, the owner: the update
+// between two songs didn't seem to work there; it opened over the song).
+let atEnd = false
 
 /** The phone: download the version found (announced first), then Android's installer; already downloaded: the installer. */
 export function downloadUpdate() {
@@ -50,7 +54,11 @@ function onPhone(s: UpdateStatus) {
     offered.add(s.version)
     notify(tr('Legato {version} is available', { version: s.version }), { kind: 'info', action: { label: tr('Update'), run: downloadUpdate } })
   } else if (step === 'download') void api.updateCheck().catch(() => {})
-  else if (step === 'install') void installUpdate()
+  else if (step === 'install' && usePlayer.getState().playing) {
+    atEnd = true
+    note('update', 'downloaded on the phone: installs as this song ends')
+    notify(tr('The update installs as this song ends'), { kind: 'info' })
+  } else if (step === 'install') void installUpdate()
   else if (step === 'failed') {
     wanted = false
     notify(tr('Couldn’t download the update'), { kind: 'error' })
@@ -82,6 +90,14 @@ export function betweenSongs(now: number, lastInput: number): boolean {
   return now - lastInput >= UNTOUCHED_MS
 }
 
+/** Pure: what a ready update does as a song ends on its own (the PC). */
+export function atSongEnd(ready: boolean, automatic: boolean, untouched: boolean, next: number | null): 'install' | 'not ready' | 'automatic updates off' | 'touched lately' | 'no next song' {
+  if (!ready) return 'not ready'
+  if (!automatic) return 'automatic updates off'
+  if (!untouched) return 'touched lately'
+  return next === null ? 'no next song' : 'install'
+}
+
 /** Pure: may an update install now? */
 export function quietNow(now: number, { playing, lastSound, lastInput }: { playing: boolean; lastSound: number; lastInput: number }): boolean {
   return !playing && now - lastSound >= SILENT_MS && now - lastInput >= UNTOUCHED_MS
@@ -99,11 +115,25 @@ export function startUpdates(): () => void {
     .then(set)
     .catch(() => {})
   const off = api.onUpdate(set)
-  const stop = phoneApp ? () => {} : startInstalling()
+  const stop = phoneApp ? startPhone() : startInstalling()
   return () => {
     stop()
     void off.then((f) => f())
   }
+}
+
+/** The phone: an update downloaded during a song goes to Android's installer as the song ends; the next song plays on
+ * meanwhile (the installer asks first, and may be cancelled). Returns cleanup. */
+function startPhone(): () => void {
+  onSongEnd(() => {
+    if (!atEnd) return false
+    atEnd = false
+    note('update', 'between two songs: Android’s installer opens')
+    // After the step: the session saved is the next song's.
+    setTimeout(() => void installUpdate(), 0)
+    return false
+  })
+  return () => onSongEnd(null)
 }
 
 /** The PC: a ready update installs between two songs or at a quiet moment, automatic updates on. Returns cleanup. */
@@ -119,11 +149,13 @@ function startInstalling(): () => void {
   // A song ended on its own: install there, the next song starts once the app is back (a few seconds of silence, never
   // a cut in a song).
   onSongEnd(() => {
-    const ready = useUpdate.getState().status?.state === 'ready'
-    if (!ready || !useSettings.getState().settings.autoUpdate || !betweenSongs(Date.now(), lastInput)) return false
+    const state = useUpdate.getState().status?.state
     const { order, index, repeat, list } = usePlayer.getState()
     const next = nextIndex(order, index, 1, repeat, true, (j) => !list[j] || !vias(list[j]).length)
-    if (next === null) return false
+    const step = atSongEnd(state === 'ready', useSettings.getState().settings.autoUpdate, betweenSongs(Date.now(), lastInput), next)
+    // Said when there is an update to speak of: found, coming or there.
+    if (state === 'ready' || state === 'available' || state === 'downloading') note('update', `a song ended: ${step === 'install' ? 'installing' : step}`)
+    if (step !== 'install' || next === null) return false
     void installUpdate(next)
     return true
   })

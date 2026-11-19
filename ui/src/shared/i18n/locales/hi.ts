@@ -2220,6 +2220,7 @@ const hi: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} उपलब्ध है',
   'Install update': 'अपडेट इंस्टॉल करें',
   'Couldn’t download the update': 'अपडेट डाउनलोड नहीं हो सका',
+  'The update installs as this song ends': 'अपडेट इस गाने के ख़त्म होने पर इंस्टॉल होगा',
   'Performance improved': 'प्रदर्शन में सुधार',
   'Glow': 'चमक',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'जो बज रहा है उसके चारों ओर हल्की रोशनी: प्ले बटन, बजता गाना, बजा हुआ हिस्सा, गाई जा रही पंक्ति और कवर। गहरे थीम में सबसे ज़्यादा',

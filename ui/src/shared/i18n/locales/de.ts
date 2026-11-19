@@ -2220,6 +2220,7 @@ const de: Record<string, string> = {
   'Legato {version} is available': 'Legato {version} ist verfügbar',
   'Install update': 'Update installieren',
   'Couldn’t download the update': 'Das Update konnte nicht heruntergeladen werden',
+  'The update installs as this song ends': 'Das Update wird am Ende dieses Songs installiert',
   'Performance improved': 'Leistung verbessert',
   'Glow': 'Leuchten',
   'A soft light around what plays: the play button, the playing song, the played part, the sung line and the cover. Strongest in dark themes': 'Ein sanftes Licht um das, was läuft: die Wiedergabetaste, der laufende Song, der gespielte Teil, die gesungene Zeile und das Cover. Am stärksten in dunklen Designs',
