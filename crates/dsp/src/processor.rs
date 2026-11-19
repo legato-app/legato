@@ -1,9 +1,10 @@
 //! The chain one source plays through: meter, Adaptive Sound gain, peak limiter. Blocks of interleaved frames.
 //!
-//! Adaptive Sound (an automatic gain control): the gain heads for `target - short-term loudness`, clamped to
-//! -12..+9 dB, moving slowly (a few seconds) so the music breathes instead of pumping, frozen in silence, quiet
-//! passages, a song's own ending and the app's fade out (fades are the app's: never bent, never brought up). A peak
-//! limiter right after keeps a boosted song from clipping.
+//! Adaptive Sound (2026-11-19, the owner: the song as it is, only its volume steadied at the chosen level): ONE gain per
+//! song, `target - the song's loudness so far` (integrated and gated as BS.1770: silence and passages 10 dB under it don't
+//! count), clamped to -12..+9 dB. It settles in the first seconds, then hardly moves (an average over the whole song), so
+//! a quiet verse stays quieter than its chorus: no compression, no EQ. Held during the app's fade out (fades are the
+//! app's). A peak limiter right after keeps a boosted song from clipping; at the levels offered it almost never acts.
 
 use crate::control::{Control, Levels, Live};
 use crate::{Meter, db_to_gain};
@@ -14,11 +15,11 @@ const MAX_BOOST_DB: f32 = 9.0;
 const GLIDE_S: f32 = 2.5;
 const GLIDE_START_S: f32 = 0.6;
 const START_S: f32 = 3.0;
-/// Below this momentary loudness the gain holds (silence, fade-outs, intros).
-const HOLD_BELOW_LUFS: f32 = -45.0;
-/// Momentary this far under short-term: the music is falling away (a song's own fade-out, a stop), the gain holds.
-/// A steady quieter part catches up within seconds and is followed again.
-const FALLING_DB: f32 = 10.0;
+/// BS.1770 gates: blocks under -70 LUFS, or 10 dB under the loudness so far, don't count. Twin: live.js `gate`.
+const ABSOLUTE_GATE_LUFS: f32 = -70.0;
+const RELATIVE_GATE_DB: f32 = 10.0;
+/// The momentary loudness is taken into the song's this often, seconds.
+const BLOCK_S: f32 = 0.1;
 const CEILING: f32 = 0.97;
 /// Limiter release, seconds.
 const RELEASE_S: f32 = 0.12;
@@ -40,6 +41,11 @@ pub struct Processor {
     glide_start: f32,
     /// Nothing processed yet: the gain starts where the last song's ended.
     fresh: bool,
+    /// The song's loudness so far: momentary mean squares of the blocks that passed the gates, summed, and how many.
+    gated: f64,
+    blocks: u32,
+    since_block: usize,
+    block_frames: usize,
     /// Limiter gain now, 0..1.
     limit: f32,
     /// Live Editor effects run before: they may push peaks over, limiter always on.
@@ -62,6 +68,10 @@ impl Processor {
             glide: 1.0 - (-1.0 / (GLIDE_S * r)).exp(),
             glide_start: 1.0 - (-1.0 / (GLIDE_START_S * r)).exp(),
             fresh: true,
+            gated: 0.0,
+            blocks: 0,
+            since_block: 0,
+            block_frames: (BLOCK_S * r) as usize,
             limit: 1.0,
             edited: false,
             release: 1.0 - (-1.0 / (RELEASE_S * r)).exp(),
@@ -74,18 +84,31 @@ impl Processor {
         self.channels
     }
 
+    /// The song's integrated loudness so far, LUFS; None before any block passed the gates.
+    pub fn integrated_lufs(&self) -> Option<f32> {
+        (self.blocks > 0).then(|| lufs(self.gated / self.blocks as f64))
+    }
+
+    /// One block's momentary loudness into the song's, if it passes the gates.
+    fn gate(&mut self) {
+        let m = self.meter.momentary_lufs();
+        if m > ABSOLUTE_GATE_LUFS && self.integrated_lufs().is_none_or(|i| m > i - RELATIVE_GATE_DB) {
+            self.gated += 10f64.powf((m as f64 + 0.691) / 10.0);
+            self.blocks += 1;
+        }
+    }
+
     /// Where the gain wants to go now.
     fn wanted_db(&self) -> f32 {
         if !self.live.adaptive {
             return 0.0;
         }
-        // The app fading the song out, silence, or the music falling away: hold (2026-10-28: the gain rose under the
-        // fade out and the next song started from it, loud).
-        let (momentary, short) = (self.meter.momentary_lufs(), self.meter.short_lufs());
-        if self.live.ending || momentary < HOLD_BELOW_LUFS || momentary < short - FALLING_DB {
-            return self.gain_db;
+        // The app fading the song out, or nothing heard yet: hold (2026-10-28: the gain rose under the fade out and
+        // the next song started from it, loud).
+        match self.integrated_lufs() {
+            Some(i) if !self.live.ending => (self.live.target_lufs - i).clamp(MAX_CUT_DB, MAX_BOOST_DB),
+            _ => self.gain_db,
         }
-        (self.live.target_lufs - short).clamp(MAX_CUT_DB, MAX_BOOST_DB)
     }
 
     /// Effects before this stage (Live Editor): a bass boost can clip with no gain from here.
@@ -121,6 +144,11 @@ impl Processor {
         let step = (db_to_gain(self.gain_db) - from) / frames.max(1) as f32;
         for (i, frame) in block.chunks_exact_mut(self.channels).enumerate() {
             self.meter.frame(frame);
+            self.since_block += 1;
+            if self.since_block >= self.block_frames {
+                self.since_block = 0;
+                self.gate();
+            }
             let g = from + step * (i + 1) as f32;
             let peak = frame.iter().fold(0f32, |m, x| m.max((x * g).abs()));
             // Limiter, only while boosting or edited (a cut can't clip; untouched otherwise): down at once, back up slowly.
@@ -136,11 +164,16 @@ impl Processor {
         }
     }
 
-    /// After a seek: loudness measured again from there (the gain keeps its place).
+    /// After a seek: loudness windows measured again from there; the song's loudness so far and the gain stay.
     pub fn reset(&mut self) {
         self.meter.reset();
         self.limit = 1.0;
     }
+}
+
+/// Mean square → LUFS (BS.1770), as the meter.
+fn lufs(ms: f64) -> f32 {
+    if ms <= 1e-12 { -120.0 } else { (-0.691 + 10.0 * ms.log10()) as f32 }
 }
 
 #[cfg(test)]
@@ -212,6 +245,55 @@ mod tests {
         // 21.6 dB apart at the source; about 3.5 once adapted (the boost stops at +9 dB).
         assert!((loud - quiet).abs() < 4.0, "loud {loud} quiet {quiet}");
         assert!(level(0.6) <= gain_to_db(CEILING));
+    }
+
+    /// A song whose verses are 12 dB under its choruses, 8 s each.
+    fn verses_and_choruses(secs: usize) -> Vec<f32> {
+        (0..secs / 8).flat_map(|i| tone(if i % 2 == 0 { 0.1 } else { 0.4 }, 8.0, 48_000)).collect()
+    }
+
+    #[test]
+    fn a_song_keeps_its_quiet_verses_and_loud_choruses() {
+        let c = Control::default();
+        c.set(Live { adaptive: true, target_lufs: -14.0, ..Live::default() });
+        let mut p = Processor::new(48_000, 2);
+        let mut out = verses_and_choruses(64);
+        p.process(&mut out, &c);
+        // The last verse and chorus (48..56 s, 56..64 s), their middles: 12 dB apart at the source, still 12 here.
+        let s = 48_000 * 2;
+        let (verse, chorus) = (rms(&out[50 * s..54 * s]), rms(&out[58 * s..62 * s]));
+        let apart = gain_to_db(chorus / verse);
+        assert!((apart - 12.04).abs() < 1.0, "{apart}");
+    }
+
+    #[test]
+    fn the_gain_hardly_moves_once_the_song_has_started() {
+        let c = Control::default();
+        c.set(Live { adaptive: true, target_lufs: -14.0, ..Live::default() });
+        let mut p = Processor::new(48_000, 2);
+        let song = verses_and_choruses(80);
+        let (start, rest) = song.split_at(24 * 48_000 * 2);
+        p.process(&mut start.to_vec(), &c);
+        let (mut low, mut high) = (f32::MAX, f32::MIN);
+        for part in rest.chunks(48_000) {
+            p.process(&mut part.to_vec(), &c);
+            (low, high) = (low.min(p.gain_db), high.max(p.gain_db));
+        }
+        // Following the last 3 s, it swung about 12 dB with each chorus.
+        assert!(high - low < 1.5, "{low}..{high}");
+    }
+
+    #[test]
+    fn songs_of_different_loudness_both_land_on_the_level_asked() {
+        let c = Control::default();
+        c.set(Live { adaptive: true, target_lufs: -14.0, ..Live::default() });
+        for amp in [0.1, 0.4] {
+            let mut p = Processor::new(48_000, 2);
+            let mut out = tone(amp, 20.0, 48_000);
+            p.process(&mut out, &c);
+            let heard = p.integrated_lufs().unwrap() + p.gain_db;
+            assert!((heard + 14.0).abs() < 0.3, "{amp}: {heard}");
+        }
     }
 
     #[test]

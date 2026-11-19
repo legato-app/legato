@@ -21,9 +21,6 @@
   // Adaptive Sound, same as crates/dsp processor.rs.
   const MAX_CUT = -12
   const MAX_BOOST = 9
-  const HOLD_BELOW = -45
-  // Momentary this far under short-term: the music is falling away (an ending), the gain holds.
-  const FALLING_DB = 10
   // Gain time constant; quicker while a song is new (first seconds), so it settles fast.
   const GLIDE_S = 2.5
   const GLIDE_START_S = 0.6
@@ -492,7 +489,7 @@
       await ctx.resume()
       if (ctx.state !== 'running') throw new Error('Sound processing is waiting for a click in the app')
       if (!settings.on || g || document.querySelector('video') !== video || full === settings.listen) return void ctx.close()
-      const s = { ctx, video, stream, input, tap, full, fx: null, post, direct, gain, limiter, gate, proven: false, told: false, k, raw, buf: new Float32Array(fft), every, lag: 0, beat: false, track: null, src: null, wanted: video.muted, momentary: 0, short: 0, peak: 0, gainDb: full ? startGain(0) : 0, elapsed: 0, at: performance.now(), time: video.currentTime, silent: 0, quietAt: null, endSaid: false, leadFrom: null, leadQuiet: 0, leadSaid: false }
+      const s = { ctx, video, stream, input, tap, full, fx: null, post, direct, gain, limiter, gate, proven: false, told: false, k, raw, buf: new Float32Array(fft), every, lag: 0, beat: false, track: null, src: null, wanted: video.muted, momentary: 0, short: 0, gated: 0, gatedS: 0, peak: 0, gainDb: full ? startGain(0) : 0, elapsed: 0, at: performance.now(), time: video.currentTime, silent: 0, quietAt: null, endSaid: false, leadFrom: null, leadQuiet: 0, leadSaid: false }
       // The captured track changes with each video (new metadata): follow it.
       s.plug = () => {
         // Newest live track: the next video in the same element adds one, the old one stays "live" but silent
@@ -500,7 +497,7 @@
         const track = stream.getAudioTracks().filter((t) => t.readyState === 'live').at(-1) ?? null
         if (track === s.track) return
         // Next song: loudness measured afresh, the gain carries on from the last one (the app's, across embeds).
-        s.momentary = s.short = s.elapsed = s.silent = 0
+        s.momentary = s.short = s.elapsed = s.silent = s.gated = s.gatedS = 0
         s.quietAt = null
         s.endSaid = false
         s.leadFrom = null
@@ -650,6 +647,16 @@
     const soFar = g.elapsed > 0 ? span / g.elapsed : 1
     g.momentary += (ms - g.momentary) * Math.max(soFar, 1 - Math.exp(-span / 0.4))
     g.short += (ms - g.short) * Math.max(soFar, 1 - Math.exp(-span / 3))
+  }
+
+  // Adaptive Sound's measure (processor.rs `gate`): the song's loudness so far, the momentary mean squares that pass
+  // BS.1770's gates (-70 LUFS, 10 dB under the loudness so far), weighted by time. Silence and quiet passages don't count.
+  function gate(g, span) {
+    const m = lufs(g.momentary)
+    if (m > -70 && (g.gatedS === 0 || m > lufs(g.gated / g.gatedS) - 10)) {
+      g.gated += g.momentary * span
+      g.gatedS += span
+    }
   }
   // lv:end
 
@@ -878,13 +885,15 @@
       report('No sound could be taken from this video')
     }
     smooth(g, ms, span)
+    gate(g, span)
     g.peak = Math.max(peak, g.peak * 10 ** -span)
     const mom = lufs(g.momentary)
     const short = lufs(g.short)
     if (g.full) {
       let want = 0
-      // The app fading the song out, silence, or the music falling away: hold (processor.rs `wanted_db`).
-      if (settings.adaptive) want = settings.ending || mom < HOLD_BELOW || mom < short - FALLING_DB ? g.gainDb : Math.min(MAX_BOOST, Math.max(MAX_CUT, settings.targetLufs - short))
+      // One gain for the song, to its loudness so far; held while the app fades it out or nothing was heard yet
+      // (processor.rs `wanted_db`).
+      if (settings.adaptive) want = settings.ending || g.gatedS === 0 ? g.gainDb : Math.min(MAX_BOOST, Math.max(MAX_CUT, settings.targetLufs - lufs(g.gated / g.gatedS)))
       g.gainDb += (want - g.gainDb) * (1 - Math.exp(-span / (g.elapsed < START_S ? GLIDE_START_S : GLIDE_S)))
       setGain()
     }

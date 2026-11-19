@@ -40,7 +40,7 @@ pub struct Levels {
     pub fast: f32,
     /// Over the last 400 ms, LUFS.
     pub momentary: f32,
-    /// Over the last 3 s (Adaptive Sound), LUFS.
+    /// Over the last 3 s, LUFS.
     pub short: f32,
     /// True peak (BS.1770-4: 4x oversampled), 1 = full scale, above it an intersample over (falls about 20 dB a second).
     pub peak: f32,
