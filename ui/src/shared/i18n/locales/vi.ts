@@ -152,12 +152,8 @@ const vi: Record<string, string> = {
   'Resize mini player': 'Đổi kích thước trình phát mini',
   'Drag to resize': 'Kéo để đổi kích thước',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify phát trong ứng dụng riêng, ngoài tầm điều khiển',
-  'off for YouTube (Settings › Advanced)': 'tắt với YouTube (Cài đặt › Nâng cao)',
-  'song at {lufs} LUFS': 'bài hát ở mức {lufs} LUFS',
   'Adaptive Sound': 'Adaptive Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptive Sound: {why}',
   // Now Playing
   'Position': 'Vị trí',
   'Playing from {source} · right-click to switch source': 'Đang phát từ {source} · nhấp chuột phải để đổi nguồn',
@@ -843,7 +839,7 @@ const vi: Record<string, string> = {
   'Normal': 'Bình thường',
   'Loud': 'To',
   'Sound processing': 'Xử lý âm thanh',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Bài to và bài nhỏ sẽ nghe như nhau, được điều chỉnh trong khi phát. Một đường mảnh dưới thanh âm lượng hiện kết quả. Tệp trên máy và YouTube; không áp dụng cho Spotify (ứng dụng riêng của nó phát nhạc).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Mỗi bài phát đúng như vốn có, chỉ âm lượng được đưa về mức bạn chọn: đo trong vài giây đầu rồi giữ nguyên, nên các đoạn nhỏ và lớn vẫn ở đúng chỗ. Thay cho Cân bằng âm lượng khi đang bật. Tệp cục bộ và YouTube; không gồm Spotify (ứng dụng riêng của nó phát).',
   'Adaptive Sound level': 'Mức Adaptive Sound',
   'Volume levelling': 'Cân bằng âm lượng',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Tệp của bạn phát to như các bài nghe trực tuyến: theo thẻ ReplayGain, hoặc đo lần đầu phát. Album giữ các bài nhỏ của một album vẫn nhỏ, khi thẻ có độ khuếch đại album',

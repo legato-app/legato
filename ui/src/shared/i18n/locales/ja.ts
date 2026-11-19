@@ -152,12 +152,8 @@ const ja: Record<string, string> = {
   'Resize mini player': 'ミニプレーヤーのサイズを変更',
   'Drag to resize': 'ドラッグしてサイズを変更',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotifyは専用アプリで再生されるため、操作できません',
-  'off for YouTube (Settings › Advanced)': 'YouTubeではオフ（設定 › 詳細）',
-  'song at {lufs} LUFS': '曲の音量 {lufs} LUFS',
   'Adaptive Sound': 'Adaptive Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptive Sound：{why}',
   // Now Playing
   'Position': '再生位置',
   'Playing from {source} · right-click to switch source': '{source}から再生中 · 右クリックでソースを切り替え',
@@ -843,7 +839,7 @@ const ja: Record<string, string> = {
   'Normal': '標準',
   'Loud': '大きめ',
   'Sound processing': 'サウンド処理',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': '大きい曲と小さい曲が、再生中に調整されて同じくらいの音量になります。音量の下の細い線に結果が表示されます。ローカルファイルとYouTubeが対象で、Spotifyは対象外です（専用アプリで再生されるため）。',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': '曲はそのままの音で再生され、音量だけが選んだレベルに合わせられます。最初の数秒で測り、その後は固定するので、静かな部分と大きな部分の差はそのまま残ります。オンの間は音量の均一化の代わりに働きます。ローカルファイルと YouTube。Spotify は対象外（専用アプリで再生されます）。',
   'Adaptive Sound level': 'Adaptive Soundのレベル',
   'Volume levelling': '音量の均一化',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': '自分のファイルをストリーミングの曲と同じ音量で再生します。ReplayGain タグから、または初回再生時に測定。アルバムは、タグにアルバムゲインがあれば、アルバム内の静かな曲を静かなまま保ちます',

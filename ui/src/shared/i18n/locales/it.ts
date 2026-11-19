@@ -152,12 +152,8 @@ const it: Record<string, string> = {
   'Resize mini player': 'Ridimensiona il mini player',
   'Drag to resize': 'Trascina per ridimensionare',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify suona nella sua app, fuori portata',
-  'off for YouTube (Settings › Advanced)': 'disattivato per YouTube (Impostazioni › Avanzate)',
-  'song at {lufs} LUFS': 'brano a {lufs} LUFS',
   'Adaptive Sound': 'Suono adattivo',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Suono adattivo: {why}',
   // Now Playing
   'Position': 'Posizione',
   'Playing from {source} · right-click to switch source': 'Riproduzione da {source} · clic destro per cambiare fonte',
@@ -843,7 +839,7 @@ const it: Record<string, string> = {
   'Normal': 'Normale',
   'Loud': 'Alto',
   'Sound processing': 'Elaborazione del suono',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'I brani forti e quelli deboli finiscono allo stesso livello, regolati mentre suonano. Una linea sottile sotto il volume mostra il risultato. File locali e YouTube; non Spotify (lo riproduce la sua app).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Ogni brano suona così com’è, solo il volume viene portato al livello scelto: misurato nei primi secondi, poi mantenuto, così le parti piano e forti restano al loro posto. Sostituisce Livellamento del volume quando è attivo. File locali e YouTube; non Spotify (lo riproduce la sua app).',
   'Adaptive Sound level': 'Livello del suono adattivo',
   'Volume levelling': 'Livellamento del volume',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'I tuoi file suonano forte quanto i brani in streaming: dai loro tag ReplayGain, o misurati la prima volta che suonano. Album mantiene piano i brani piano di un album, quando i suoi tag hanno un guadagno album',

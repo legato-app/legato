@@ -553,7 +553,7 @@ function SoundGroup() {
   return (
     <Group title={msg('Sound processing')}>
       <div className="rounded-xl border border-line bg-raised">
-        <Row setting="adaptiveSound" label={msg('Adaptive Sound')} sub={tr('Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).')}>
+        <Row setting="adaptiveSound" label={msg('Adaptive Sound')} sub={tr('Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).')}>
           <Toggle label={tr('Adaptive Sound')} checked={s.adaptiveSound} onChange={(adaptiveSound) => update({ adaptiveSound })} />
         </Row>
         {s.adaptiveSound && (

@@ -152,12 +152,8 @@ const ru: Record<string, string> = {
   'Resize mini player': 'Изменить размер мини-плеера',
   'Drag to resize': 'Потяни, чтобы изменить размер',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify играет в своём приложении, вне досягаемости',
-  'off for YouTube (Settings › Advanced)': 'выключено для YouTube (Настройки › Дополнительно)',
-  'song at {lufs} LUFS': 'песня на {lufs} LUFS',
   'Adaptive Sound': 'Адаптивный звук',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Адаптивный звук: {why}',
   // Now Playing
   'Position': 'Позиция',
   'Playing from {source} · right-click to switch source': 'Источник: {source} · правый клик, чтобы сменить источник',
@@ -843,7 +839,7 @@ const ru: Record<string, string> = {
   'Normal': 'Обычно',
   'Loud': 'Громко',
   'Sound processing': 'Обработка звука',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Громкие и тихие песни выравниваются, подстраиваясь во время игры. Тонкая линия под громкостью показывает результат. Локальные файлы и YouTube; не Spotify (его играет собственное приложение).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Каждая песня звучит как есть, меняется только её громкость — до выбранного уровня: измеряется в первые секунды, затем держится, так что тихие и громкие части остаются на своих местах. Пока включено, заменяет Выравнивание громкости. Локальные файлы и YouTube; не Spotify (его играет собственное приложение).',
   'Adaptive Sound level': 'Уровень адаптивного звука',
   'Volume levelling': 'Выравнивание громкости',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Твои файлы звучат так же громко, как песни из стриминга: по их тегам ReplayGain или по замеру при первом прослушивании. Альбом оставляет тихие песни альбома тихими, если в тегах есть усиление альбома',

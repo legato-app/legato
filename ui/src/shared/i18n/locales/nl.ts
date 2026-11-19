@@ -152,12 +152,8 @@ const nl: Record<string, string> = {
   'Resize mini player': 'Formaat van minispeler wijzigen',
   'Drag to resize': 'Sleep om het formaat te wijzigen',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify speelt in zijn eigen app, buiten bereik',
-  'off for YouTube (Settings › Advanced)': 'uit voor YouTube (Instellingen › Geavanceerd)',
-  'song at {lufs} LUFS': 'nummer op {lufs} LUFS',
   'Adaptive Sound': 'Adaptief geluid',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptief geluid: {why}',
   // Now Playing
   'Position': 'Positie',
   'Playing from {source} · right-click to switch source': 'Afgespeeld via {source} · klik met rechts om van bron te wisselen',
@@ -843,7 +839,7 @@ const nl: Record<string, string> = {
   'Normal': 'Normaal',
   'Loud': 'Luid',
   'Sound processing': 'Geluidsverwerking',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Harde en zachte nummers klinken uiteindelijk even luid, aangepast terwijl ze spelen. Een dunne lijn onder het volume toont het resultaat. Lokale bestanden en YouTube; niet Spotify (dat speelt zijn eigen app af).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Elk nummer speelt zoals het is, alleen het volume wordt op het gekozen niveau gezet: gemeten in de eerste seconden, daarna vastgehouden, zodat zachte en luide delen hun plek houden. Vervangt Volume gelijktrekken zolang het aan staat. Lokale bestanden en YouTube; niet Spotify (dat speelt in zijn eigen app).',
   'Adaptive Sound level': 'Niveau van adaptief geluid',
   'Volume levelling': 'Volume gelijktrekken',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Je eigen bestanden spelen even luid als gestreamde nummers: volgens hun ReplayGain-tags, of gemeten de eerste keer dat ze spelen. Album houdt de zachte nummers van een album zacht, als de tags een albumgain hebben',

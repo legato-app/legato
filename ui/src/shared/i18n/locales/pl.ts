@@ -152,12 +152,8 @@ const pl: Record<string, string> = {
   'Resize mini player': 'Zmień rozmiar miniodtwarzacza',
   'Drag to resize': 'Przeciągnij, aby zmienić rozmiar',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify gra we własnej aplikacji, poza zasięgiem',
-  'off for YouTube (Settings › Advanced)': 'wyłączone dla YouTube (Ustawienia › Zaawansowane)',
-  'song at {lufs} LUFS': 'utwór na poziomie {lufs} LUFS',
   'Adaptive Sound': 'Dźwięk adaptacyjny',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Dźwięk adaptacyjny: {why}',
   // Now Playing
   'Position': 'Pozycja',
   'Playing from {source} · right-click to switch source': 'Odtwarzanie z: {source} · kliknij prawym, aby zmienić źródło',
@@ -843,7 +839,7 @@ const pl: Record<string, string> = {
   'Normal': 'Normalnie',
   'Loud': 'Głośno',
   'Sound processing': 'Przetwarzanie dźwięku',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Głośne i ciche utwory brzmią w końcu tak samo, dostosowywane w trakcie grania. Cienka linia pod głośnością pokazuje wynik. Pliki lokalne i YouTube; nie Spotify (gra go jego własna aplikacja).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Każdy utwór gra tak, jak jest, tylko jego głośność jest ustawiana na wybrany poziom: mierzona w pierwszych sekundach, potem utrzymywana, więc ciche i głośne fragmenty zostają na swoim miejscu. Zastępuje Wyrównywanie głośności, gdy jest włączone. Pliki lokalne i YouTube; nie Spotify (gra we własnej aplikacji).',
   'Adaptive Sound level': 'Poziom dźwięku adaptacyjnego',
   'Volume levelling': 'Wyrównywanie głośności',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Twoje pliki grają tak głośno jak utwory ze streamingu: według tagów ReplayGain albo zmierzone przy pierwszym odtworzeniu. Album zostawia ciche utwory albumu cichymi, gdy jego tagi mają wzmocnienie albumu',

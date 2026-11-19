@@ -152,12 +152,8 @@ const de: Record<string, string> = {
   'Resize mini player': 'Größe des Mini-Players ändern',
   'Drag to resize': 'Ziehen, um die Größe zu ändern',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify spielt in seiner eigenen App, außer Reichweite',
-  'off for YouTube (Settings › Advanced)': 'für YouTube aus (Einstellungen › Erweitert)',
-  'song at {lufs} LUFS': 'Song bei {lufs} LUFS',
   'Adaptive Sound': 'Adaptiver Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptiver Sound: {why}',
   // Now Playing
   'Position': 'Position',
   'Playing from {source} · right-click to switch source': 'Wiedergabe von {source} · Rechtsklick, um die Quelle zu wechseln',
@@ -843,7 +839,7 @@ const de: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Laut',
   'Sound processing': 'Klangverarbeitung',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Laute und leise Songs klingen am Ende gleich, angepasst während sie laufen. Eine dünne Linie unter der Lautstärke zeigt das Ergebnis. Lokale Dateien und YouTube; nicht Spotify (das spielt seine eigene App).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Jeder Song spielt, wie er ist, nur seine Lautstärke wird auf die gewählte Stufe gebracht: in den ersten Sekunden gemessen, dann gehalten, sodass leise und laute Stellen ihren Platz behalten. Ersetzt Lautstärkeangleichung, solange es an ist. Lokale Dateien und YouTube; nicht Spotify (das spielt in seiner eigenen App).',
   'Adaptive Sound level': 'Pegel des adaptiven Sounds',
   'Volume levelling': 'Lautstärkeangleichung',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Deine eigenen Dateien spielen so laut wie gestreamte Titel: nach ihren ReplayGain-Tags oder beim ersten Abspielen gemessen. Album lässt die leisen Titel eines Albums leise, wenn seine Tags einen Album-Gain haben',

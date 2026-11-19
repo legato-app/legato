@@ -152,12 +152,8 @@ const ko: Record<string, string> = {
   'Resize mini player': '미니 플레이어 크기 조정',
   'Drag to resize': '드래그하여 크기 조정',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify는 자체 앱에서 재생되어 제어할 수 없습니다',
-  'off for YouTube (Settings › Advanced)': 'YouTube에서는 꺼짐 (설정 › 고급)',
-  'song at {lufs} LUFS': '곡 음량 {lufs} LUFS',
   'Adaptive Sound': 'Adaptive Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptive Sound: {why}',
   // Now Playing
   'Position': '재생 위치',
   'Playing from {source} · right-click to switch source': '{source}에서 재생 중 · 우클릭하여 소스 전환',
@@ -843,7 +839,7 @@ const ko: Record<string, string> = {
   'Normal': '보통',
   'Loud': '크게',
   'Sound processing': '사운드 처리',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': '큰 곡과 작은 곡이 재생 중에 조정되어 비슷한 음량이 됩니다. 볼륨 아래 가는 선에 결과가 표시됩니다. 로컬 파일과 YouTube에 적용되며, Spotify는 제외됩니다 (자체 앱에서 재생).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': '곡은 원래 그대로 재생되고 볼륨만 선택한 레벨에 맞춰집니다. 처음 몇 초 동안 측정한 뒤 유지하므로 조용한 부분과 큰 부분의 차이가 그대로 남습니다. 켜져 있는 동안 볼륨 평준화 대신 작동합니다. 로컬 파일과 YouTube. Spotify는 제외(자체 앱에서 재생).',
   'Adaptive Sound level': 'Adaptive Sound 레벨',
   'Volume levelling': '볼륨 평준화',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': '내 파일을 스트리밍 곡과 같은 크기로 재생합니다. ReplayGain 태그를 쓰거나, 처음 재생할 때 측정합니다. 앨범은 태그에 앨범 게인이 있으면 앨범의 조용한 곡을 조용하게 유지합니다',

@@ -152,12 +152,8 @@ const tr: Record<string, string> = {
   'Resize mini player': 'Mini oynatıcıyı yeniden boyutlandır',
   'Drag to resize': 'Boyutlandırmak için sürükle',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify kendi uygulamasında çalıyor, erişim dışında',
-  'off for YouTube (Settings › Advanced)': 'YouTube için kapalı (Ayarlar › Gelişmiş)',
-  'song at {lufs} LUFS': 'şarkı {lufs} LUFS seviyesinde',
   'Adaptive Sound': 'Uyarlanabilir Ses',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Uyarlanabilir Ses: {why}',
   // Now Playing
   'Position': 'Konum',
   'Playing from {source} · right-click to switch source': 'Çalınan kaynak: {source} · kaynağı değiştirmek için sağ tıkla',
@@ -843,7 +839,7 @@ const tr: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Yüksek',
   'Sound processing': 'Ses işleme',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Yüksek ve kısık şarkılar çalarken ayarlanarak aynı seviyeye gelir. Ses düzeyinin altındaki ince çizgi sonucu gösterir. Yerel dosyalar ve YouTube; Spotify değil (onu kendi uygulaması çalar).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Her şarkı olduğu gibi çalar, yalnızca sesi seçtiğiniz düzeye getirilir: ilk saniyelerinde ölçülür, sonra sabit tutulur; böylece sessiz ve yüksek bölümleri yerinde kalır. Açıkken Ses seviyesi eşitleme yerine geçer. Yerel dosyalar ve YouTube; Spotify değil (kendi uygulaması çalar).',
   'Adaptive Sound level': 'Uyarlanabilir Ses seviyesi',
   'Volume levelling': 'Ses seviyesi eşitleme',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Kendi dosyaların akışla çalınan şarkılar kadar yüksek çalar: ReplayGain etiketlerinden ya da ilk çalındıklarında ölçülerek. Albüm, etiketlerinde albüm kazancı varsa bir albümün sessiz şarkılarını sessiz tutar',

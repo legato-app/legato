@@ -152,12 +152,8 @@ const id: Record<string, string> = {
   'Resize mini player': 'Ubah ukuran pemutar mini',
   'Drag to resize': 'Seret untuk mengubah ukuran',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify diputar di aplikasinya sendiri, di luar jangkauan',
-  'off for YouTube (Settings › Advanced)': 'nonaktif untuk YouTube (Pengaturan › Lanjutan)',
-  'song at {lufs} LUFS': 'lagu pada {lufs} LUFS',
   'Adaptive Sound': 'Suara Adaptif',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Suara Adaptif: {why}',
   // Now Playing
   'Position': 'Posisi',
   'Playing from {source} · right-click to switch source': 'Diputar dari {source} · klik kanan untuk mengganti sumber',
@@ -843,7 +839,7 @@ const id: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Keras',
   'Sound processing': 'Pemrosesan suara',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Lagu yang keras dan pelan jadi setara, disesuaikan saat diputar. Garis tipis di bawah volume menunjukkan hasilnya. File lokal dan YouTube; bukan Spotify (diputar oleh aplikasinya sendiri).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Setiap lagu diputar apa adanya, hanya volumenya yang disetel ke tingkat pilihan Anda: diukur di detik-detik pertama, lalu ditahan, sehingga bagian pelan dan kerasnya tetap di tempatnya. Menggantikan Penyetaraan volume selama aktif. File lokal dan YouTube; bukan Spotify (diputar oleh aplikasinya sendiri).',
   'Adaptive Sound level': 'Level Suara Adaptif',
   'Volume levelling': 'Penyetaraan volume',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'File milikmu diputar sekeras lagu streaming: dari tag ReplayGain-nya, atau diukur saat pertama kali diputar. Album menjaga lagu pelan di sebuah album tetap pelan, jika tag-nya punya gain album',

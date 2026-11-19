@@ -152,12 +152,8 @@ const zh: Record<string, string> = {
   'Resize mini player': '调整迷你播放器大小',
   'Drag to resize': '拖动以调整大小',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify 在其自己的应用中播放，无法控制',
-  'off for YouTube (Settings › Advanced)': '对 YouTube 关闭（设置 › 高级）',
-  'song at {lufs} LUFS': '歌曲响度 {lufs} LUFS',
   'Adaptive Sound': 'Adaptive Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptive Sound：{why}',
   // Now Playing
   'Position': '位置',
   'Playing from {source} · right-click to switch source': '正在从 {source} 播放 · 右键单击可切换来源',
@@ -843,7 +839,7 @@ const zh: Record<string, string> = {
   'Normal': '标准',
   'Loud': '响亮',
   'Sound processing': '声音处理',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': '响亮和安静的歌曲会在播放时自动调整到相近的音量。音量下方的细线显示调整结果。适用于本地文件和 YouTube；不适用于 Spotify（由它自己的应用播放）。',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': '每首歌按原样播放，只把音量调到你选的水平：在开头几秒测量，然后保持不变，因此安静和响亮的段落各保其位。开启时代替音量均衡。适用于本地文件和 YouTube；不包括 Spotify（由其自己的应用播放）。',
   'Adaptive Sound level': 'Adaptive Sound 级别',
   'Volume levelling': '音量均衡',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': '你自己的文件以流媒体歌曲的音量播放：依据其 ReplayGain 标签，或在首次播放时测量。专辑模式在标签含专辑增益时，让专辑里安静的歌保持安静',

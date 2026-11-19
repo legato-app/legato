@@ -152,12 +152,8 @@ const sv: Record<string, string> = {
   'Resize mini player': 'Ändra storlek på minispelaren',
   'Drag to resize': 'Dra för att ändra storlek',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify spelas i sin egen app, utom räckhåll',
-  'off for YouTube (Settings › Advanced)': 'av för YouTube (Inställningar › Avancerat)',
-  'song at {lufs} LUFS': 'låt på {lufs} LUFS',
   'Adaptive Sound': 'Adaptivt ljud',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptivt ljud: {why}',
   // Now Playing
   'Position': 'Position',
   'Playing from {source} · right-click to switch source': 'Spelas från {source} · högerklicka för att byta källa',
@@ -843,7 +839,7 @@ const sv: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Högt',
   'Sound processing': 'Ljudbehandling',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Starka och svaga låtar hamnar på samma nivå, justerat medan de spelas. En tunn linje under volymen visar resultatet. Lokala filer och YouTube; inte Spotify (dess egen app spelar det).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Varje låt spelas som den är, bara volymen sätts till nivån du väljer: mätt under de första sekunderna och sedan hållen, så att låtens tysta och starka delar behåller sin plats. Ersätter Volymutjämning medan den är på. Lokala filer och YouTube; inte Spotify (dess egen app spelar det).',
   'Adaptive Sound level': 'Nivå för adaptivt ljud',
   'Volume levelling': 'Volymutjämning',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Dina egna filer spelas lika högt som streamade låtar: efter deras ReplayGain-taggar, eller uppmätta första gången de spelas. Album låter ett albums lugna låtar vara lugna, när taggarna har albumförstärkning',

@@ -152,12 +152,8 @@ const es: Record<string, string> = {
   'Resize mini player': 'Cambiar tamaño del minirreproductor',
   'Drag to resize': 'Arrastra para cambiar el tamaño',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify suena en su propia app, fuera de alcance',
-  'off for YouTube (Settings › Advanced)': 'desactivado para YouTube (Ajustes › Avanzado)',
-  'song at {lufs} LUFS': 'canción a {lufs} LUFS',
   'Adaptive Sound': 'Sonido adaptativo',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Sonido adaptativo: {why}',
   // Now Playing
   'Position': 'Posición',
   'Playing from {source} · right-click to switch source': 'Reproduciendo desde {source} · clic derecho para cambiar de fuente',
@@ -843,7 +839,7 @@ const es: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Fuerte',
   'Sound processing': 'Procesado del sonido',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Las canciones fuertes y las suaves acaban al mismo nivel, ajustadas mientras suenan. Una línea fina bajo el volumen muestra el resultado. Archivos locales y YouTube; no Spotify (lo reproduce su propia app).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Cada canción suena tal cual, solo su volumen se ajusta al nivel que elijas: se mide en sus primeros segundos y luego se mantiene, así sus partes suaves y fuertes conservan su lugar. Sustituye a Nivelación de volumen mientras está activado. Archivos locales y YouTube; no Spotify (lo reproduce su propia app).',
   'Adaptive Sound level': 'Nivel del sonido adaptativo',
   'Volume levelling': 'Nivelación de volumen',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Tus propios archivos suenan tan fuerte como las canciones en streaming: según sus etiquetas ReplayGain, o medidos la primera vez que suenan. Álbum mantiene suaves las canciones suaves de un álbum, cuando sus etiquetas tienen ganancia de álbum',

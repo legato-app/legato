@@ -152,12 +152,8 @@ const pt: Record<string, string> = {
   'Resize mini player': 'Redimensionar miniplayer',
   'Drag to resize': 'Arraste para redimensionar',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'O Spotify toca no próprio app, fora de alcance',
-  'off for YouTube (Settings › Advanced)': 'desativado para o YouTube (Configurações › Avançado)',
-  'song at {lufs} LUFS': 'música a {lufs} LUFS',
   'Adaptive Sound': 'Som adaptável',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Som adaptável: {why}',
   // Now Playing
   'Position': 'Posição',
   'Playing from {source} · right-click to switch source': 'Tocando de {source} · clique com o botão direito para trocar a fonte',
@@ -843,7 +839,7 @@ const pt: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Alto',
   'Sound processing': 'Processamento de som',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Músicas altas e baixas acabam no mesmo nível, ajustadas enquanto tocam. Uma linha fina sob o volume mostra o resultado. Arquivos locais e YouTube; não o Spotify (o próprio app dele toca).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Cada música toca como é, só o volume é ajustado ao nível escolhido: medido nos primeiros segundos e depois mantido, para que as partes suaves e fortes fiquem no lugar. Substitui Nivelamento de volume enquanto ligado. Arquivos locais e YouTube; não o Spotify (o próprio app dele toca).',
   'Adaptive Sound level': 'Nível do som adaptável',
   'Volume levelling': 'Nivelamento de volume',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Seus próprios arquivos tocam tão alto quanto as músicas em streaming: pelas tags ReplayGain, ou medidos na primeira vez que tocam. Álbum mantém baixas as músicas baixas de um álbum, quando as tags têm ganho de álbum',

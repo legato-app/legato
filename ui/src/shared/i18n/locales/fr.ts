@@ -152,12 +152,8 @@ const fr: Record<string, string> = {
   'Resize mini player': 'Redimensionner le mini-lecteur',
   'Drag to resize': 'Glisser pour redimensionner',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify joue dans sa propre application, hors d’atteinte',
-  'off for YouTube (Settings › Advanced)': 'désactivé pour YouTube (Paramètres › Avancé)',
-  'song at {lufs} LUFS': 'titre à {lufs} LUFS',
   'Adaptive Sound': 'Son adaptatif',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Son adaptatif : {why}',
   // Now Playing
   'Position': 'Position',
   'Playing from {source} · right-click to switch source': 'Lecture depuis {source} · clic droit pour changer de source',
@@ -851,7 +847,7 @@ const fr: Record<string, string> = {
   'Normal': 'Normal',
   'Loud': 'Fort',
   'Sound processing': 'Traitement du son',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'Les titres forts et doux finissent au même niveau, ajustés pendant la lecture. Une fine ligne sous le volume montre le résultat. Fichiers locaux et YouTube ; pas Spotify (sa propre application le joue).',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'Chaque titre est joué tel quel, seul son volume est réglé au niveau choisi : mesuré dans ses premières secondes, puis maintenu, pour que ses passages doux et forts gardent leur place. Remplace le nivellement du volume tant qu’il est activé. Fichiers locaux et YouTube ; pas Spotify (sa propre app le joue).',
   'Adaptive Sound level': 'Niveau du son adaptatif',
   'Volume levelling': 'Nivellement du volume',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'Vos propres fichiers jouent aussi fort que les titres en streaming : d’après leurs tags ReplayGain, ou mesurés la première fois qu’ils jouent. Album garde calmes les titres calmes d’un album, quand ses tags ont un gain d’album',

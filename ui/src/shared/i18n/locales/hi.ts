@@ -152,12 +152,8 @@ const hi: Record<string, string> = {
   'Resize mini player': 'मिनी प्लेयर का आकार बदलें',
   'Drag to resize': 'आकार बदलने के लिए खींचें',
   // Adaptive Sound bar
-  'Spotify plays in its own app, out of reach': 'Spotify अपने ऐप में चलता है, पहुंच से बाहर',
-  'off for YouTube (Settings › Advanced)': 'YouTube के लिए बंद (सेटिंग › एडवांस्ड)',
-  'song at {lufs} LUFS': 'गाना {lufs} LUFS पर',
   'Adaptive Sound': 'Adaptive Sound',
   // Adaptive Sound bar
-  'Adaptive Sound: {why}': 'Adaptive Sound: {why}',
   // Now Playing
   'Position': 'पोज़िशन',
   'Playing from {source} · right-click to switch source': '{source} से चल रहा है · सोर्स बदलने के लिए राइट-क्लिक करें',
@@ -843,7 +839,7 @@ const hi: Record<string, string> = {
   'Normal': 'सामान्य',
   'Loud': 'तेज़',
   'Sound processing': 'साउंड प्रोसेसिंग',
-  'Loud and quiet songs end up alike, adjusted as they play. A thin line under the volume shows the result. Local files and YouTube; not Spotify (its own app plays it).': 'तेज़ और धीमे गाने एक जैसे हो जाते हैं, चलते समय एडजस्ट होकर। आवाज़ के नीचे एक पतली लाइन नतीजा दिखाती है। लोकल फ़ाइलें और YouTube; Spotify नहीं (उसे उसका अपना ऐप चलाता है)।',
+  'Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).': 'हर गाना जैसा है वैसा ही बजता है, केवल उसकी आवाज़ आपके चुने स्तर पर लाई जाती है: पहले कुछ सेकंड में मापी जाती है, फिर स्थिर रखी जाती है, ताकि उसके धीमे और तेज़ हिस्से अपनी जगह बने रहें। चालू रहने पर वॉल्यूम लेवलिंग की जगह लेता है। लोकल फ़ाइलें और YouTube; Spotify नहीं (उसे उसका अपना ऐप चलाता है)।',
   'Adaptive Sound level': 'Adaptive Sound लेवल',
   'Volume levelling': 'वॉल्यूम लेवलिंग',
   'Your own files play as loud as streamed songs: from their ReplayGain tags, or measured the first time they play. Album keeps an album’s quiet songs quiet, when its tags have an album gain': 'आपकी अपनी फ़ाइलें स्ट्रीम किए गए गानों जितनी तेज़ बजती हैं: उनके ReplayGain टैग से, या पहली बार बजने पर मापकर। एल्बम मोड किसी एल्बम के धीमे गानों को धीमा ही रखता है, जब उसके टैग में एल्बम गेन हो',
