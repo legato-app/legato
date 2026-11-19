@@ -401,7 +401,7 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
   cover, early endings, no Adaptive Sound or edits): `listen`, analysers alone (Chromium pulls them unconnected), the
   element never muted, its sound untouched. Switching modes attaches again. Messages: embed
   `postMessage` to the app's origin only; watch page `legato-live:` strings checked in Rust (`ytwatch.rs`).
-- **Spotify**: plays in Spotify's own app, out of reach. Shown as such under the volume.
+- **Spotify**: plays in Spotify’s own app, out of reach (Settings says so).
 - **Volume mixer** (2026-10-23): YouTube's sound plays in WebView2's own processes, so Windows listed it as "Microsoft
   Edge WebView2". `src-tauri/src/mixer.rs` gives our WebView2 audio sessions (only processes this app started) Music
   App's name, icon and grouping every 3 s. Label only: the sound is never taken out of the player (no extraction).
