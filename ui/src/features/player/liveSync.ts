@@ -2,7 +2,9 @@ import { useEffect, useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
 import { startEditor, useEditor } from '../editor/editor'
+import { useScreen } from '../../shared/screen'
 import { useDeviceEq } from './deviceEq'
+import { extrasFor } from './screenExtras'
 import { neutral, withDeviceEq } from './effects'
 import { refreshOutputs, useOutputs } from './outputs'
 import { overlapDue } from './fade'
@@ -21,13 +23,16 @@ const playing = () => {
 
 /** Live processing follows the settings (Settings › Advanced › Sound) and the Live Editor. Mounted once, by the player bar. */
 export function useLiveSync() {
-  const { adaptiveSound, adaptiveLevel, coverPulse, earlyEnds, skipSilence, liveYoutube, fine, wave, levelling } = useSettings(
+  const { adaptiveSound, adaptiveLevel, coverPulse: pulseAsked, earlyEnds, skipSilence, liveYoutube, fine, wave, levelling } = useSettings(
     useShallow(({ settings: s }) => ({ levelling: s.levelling, adaptiveSound: s.adaptiveSound, adaptiveLevel: s.adaptiveLevel, coverPulse: s.coverPulse, earlyEnds: s.earlyEnds, skipSilence: s.skipSilence, liveYoutube: s.liveYoutube, fine: s.visualizerBands === 'twelfth', wave: wantsWave(s.visualizerStyle) })),
   )
   // The 60 Hz frames (Visualizer v2): YouTube's side makes them only while a view listens.
-  const viz = useVizListeners((s) => s.n > 0)
+  const vizAsked = useVizListeners((s) => s.n > 0)
   // The loudness meter reads the levels, not the frames.
-  const meter = useLoudListeners((s) => s.n > 0)
+  const meterAsked = useLoudListeners((s) => s.n > 0)
+  // The phone's screen off: what only feeds the screen (the visualizer, the moving cover, the loudness meter) is not analysed; processing is.
+  const watching = useScreen((s) => s.on)
+  const { coverPulse, viz, meter } = extrasFor(watching, { coverPulse: pulseAsked, viz: vizAsked, meter: meterAsked })
   const own = useEditor((s) => s.effects)
   // Equalizer per output device: the picked output's preset joins the song's own edit.
   const device = useOutputs((s) => s.current)
