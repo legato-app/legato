@@ -148,8 +148,9 @@ class MainActivity : TauriActivity() {
     screen()
   }
 
-  // The page never sees visibilitychange (KeepVisible): it hears the screen here (`window.legatoScreen`, syncmode.ts).
-  private fun screen() = web?.evaluateJavascript("window.legatoScreen && window.legatoScreen()", null)
+  // The page never sees visibilitychange (KeepVisible): it hears the screen here (`window.legatoScreen(on)`, shared/screen.ts: Sync Mode
+  // and our extras that rest while the screen is off).
+  private fun screen() = web?.evaluateJavascript("window.legatoScreen && window.legatoScreen($onScreen)", null)
 
   // wry pauses no WebView here (wryWebView): the music goes on behind other apps. A wry whose field wasn't found pauses
   // it, media with it: undone at once.
