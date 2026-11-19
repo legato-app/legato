@@ -78,7 +78,9 @@ function MixTile({ mix, size }: { mix: Mix; size: number }) {
 function MixCover({ mix, tracks, size }: { mix: Mix; tracks: LibraryTrack[]; size: number }) {
   const style = useSettings((s) => s.settings.mixCovers)
   const byId = useMemo(() => new Map(tracks.map((t) => [t.id, t])), [tracks])
-  const songs = useMemo(() => (style === 'template' ? [] : coverTracks(mix.trackIds, byId, 'playlist', style === 'grid' ? 4 : 1)), [style, mix.trackIds, byId])
+  // "Made from songs you love": the song it was made from (its first) on its cover, not a grid (2026-11-19, the owner).
+  const count = style === 'grid' && mix.kind !== 'loved' ? 4 : 1
+  const songs = useMemo(() => (style === 'template' ? [] : coverTracks(mix.trackIds, byId, 'playlist', count)), [style, count, mix.trackIds, byId])
   if (!songs.length) return <MixTile mix={mix} size={size} />
   const { label } = mixMark(mix)
   return (
