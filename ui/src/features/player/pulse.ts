@@ -1,5 +1,6 @@
 import { useEffect, type RefObject } from 'react'
 import { punch, useLive } from './live'
+import { onScreen, screenOn } from '../../shared/screen'
 import { usePlayer } from './store'
 
 /** Biggest growth, on the hardest hit. */
@@ -29,11 +30,19 @@ export function usePulse(ref: RefObject<HTMLElement | null>, on: boolean) {
       // Unchanged to the eye: no style write, no restyle.
       const scale = Math.round((1 + SCALE * e) * 2000) / 2000
       if (scale !== shown) el.style.transform = `scale(${(shown = scale)})`
-      id = requestAnimationFrame(frame)
+      // The phone's screen off: it rests, and starts again when the screen is back.
+      id = screenOn() ? requestAnimationFrame(frame) : 0
     }
-    id = requestAnimationFrame(frame)
+    id = screenOn() ? requestAnimationFrame(frame) : 0
+    const offScreen = onScreen((now) => {
+      if (now && !id) {
+        last = performance.now()
+        id = requestAnimationFrame(frame)
+      }
+    })
     el.style.willChange = 'transform'
     return () => {
+      offScreen()
       cancelAnimationFrame(id)
       el.style.transform = ''
       el.style.willChange = ''

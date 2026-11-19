@@ -3,6 +3,7 @@ import { useSettings } from '../../app/settings'
 import { allowsMotion, useSystemReduced } from '../../shared/motion'
 import { startFlow, type Flow } from './flow'
 import { usePlayer } from './store'
+import { screenOn } from '../../shared/screen'
 
 /** Drift of the immersive backdrop at t seconds: there and back in 48 s, eased (scale 1.2 → 1.35, a little shift and turn). */
 export function driftTransform(t: number): string {
@@ -59,7 +60,8 @@ export function Backdrop({ url, dim, motion: moves, flowing }: { url?: string; d
     const el = box.current
     if (!motion || flow || !el) return
     const start = performance.now()
-    const id = setInterval(() => el.style.setProperty('--drift', driftTransform((performance.now() - start) / 1000)), 66)
+    // Screen off (the phone): no write, nothing drifts unseen.
+    const id = setInterval(() => screenOn() && el.style.setProperty('--drift', driftTransform((performance.now() - start) / 1000)), 66)
     return () => clearInterval(id)
   }, [motion, flow, !!url])
   if (!url) return null

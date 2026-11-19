@@ -9,6 +9,7 @@ import { bookmarkTime, useBookmarks } from './bookmarks'
 import { songKey } from './effects'
 import { useSponsor } from './sponsor'
 import { usePlayer } from './store'
+import { onScreen, screenOn } from '../../shared/screen'
 import { tr } from '../../shared/i18n/i18n'
 
 const clock = (ms: number | null) => formatDuration(ms) || '0:00'
@@ -41,6 +42,8 @@ let frame = 0
 // About 60-80 ticks a second at most: a 144 / 240 Hz screen would otherwise run (and repaint) every bar 2-4 times as
 // often for no visible gain (review 2026-10-22: 222 calls a second).
 const loop = (t: number) => {
+  // The phone's screen off: no frame is asked (the clocks are drawn from the last report's time when it comes back, screen.ts).
+  if (!screenOn()) return void (frame = 0)
   frame = requestAnimationFrame(loop)
   if (t - frameAt < 12) return
   frameAt = t
@@ -55,12 +58,16 @@ const loop = (t: number) => {
 }
 function onFrame(tick: () => void) {
   ticks.add(tick)
-  if (ticks.size === 1) frame = requestAnimationFrame(loop)
+  if (ticks.size === 1 && screenOn()) frame = requestAnimationFrame(loop)
   return () => {
     ticks.delete(tick)
     if (!ticks.size) cancelAnimationFrame(frame)
   }
 }
+// Back on screen: the loop starts again if something is listening.
+onScreen((on) => {
+  if (on && ticks.size && !frame) frame = requestAnimationFrame(loop)
+})
 const still = () => () => {}
 
 /** Position at this instant (a click), outside React. */

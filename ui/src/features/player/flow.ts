@@ -1,6 +1,8 @@
 // The flowing backdrop (Settings › Appearance › Flowing background): the blurred cover warped slowly by our own
 // shader. Quarter size, 30 frames a second at most, drawn only while it moves (docs/notes/ideas/liner.md 12).
 
+import { onScreen, screenOn } from '../../shared/screen'
+
 /** Canvas pixels for a box of w × h CSS px: a quarter each way (the picture is blurred, the browser stretches it). */
 export const flowSize = (w: number, h: number): [number, number] => [Math.max(1, Math.ceil(w / 4)), Math.max(1, Math.ceil(h / 4))]
 
@@ -89,16 +91,18 @@ export function startFlow(canvas: HTMLCanvasElement): Flow | null {
   const fading = (now: number) => now - fadeFrom < FADE_MS
   const tick = (now: number) => {
     frame = 0
-    if (now - last >= FRAME_MS && !document.hidden) {
+    if (now - last >= FRAME_MS && !document.hidden && screenOn()) {
       if (on) t += Math.min(0.1, (now - last) / 1000)
       last = now
       draw(now)
     }
-    if (on || fading(now)) frame = requestAnimationFrame(tick)
+    // The phone's screen off: no frame is asked; the screen coming back wakes it.
+    if ((on || fading(now)) && screenOn()) frame = requestAnimationFrame(tick)
   }
   const wake = () => {
-    if (!frame) frame = requestAnimationFrame(tick)
+    if (!frame && screenOn()) frame = requestAnimationFrame(tick)
   }
+  const offScreen = onScreen((now) => now && wake())
   return {
     show(img) {
       front = 1 - front
@@ -114,6 +118,7 @@ export function startFlow(canvas: HTMLCanvasElement): Flow | null {
       if (on) wake()
     },
     stop() {
+      offScreen()
       cancelAnimationFrame(frame)
       gl.getExtension('WEBGL_lose_context')?.loseContext()
     },
