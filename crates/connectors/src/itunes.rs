@@ -2,12 +2,13 @@
 
 use crate::linklist::{LinkList, MAX_TRACKS, REQUEST_TIMEOUT, capped_text};
 use anyhow::{Context, Result};
+use music_core::library::Library;
 use music_core::musicness::Musicness;
 use music_core::model::{Source, Track};
 use regex::Regex;
 use serde::Deserialize;
 use std::collections::BTreeMap;
-use std::sync::LazyLock;
+use std::sync::{LazyLock, Mutex};
 use url::Url;
 
 pub const API: &str = "https://itunes.apple.com/search";
@@ -94,6 +95,30 @@ pub async fn lookup(api: &str, ids: &[u64], country: &str) -> Result<Vec<Track>>
         out.extend(songs(Url::parse_with_params(api, &[("id", list.as_str()), ("country", country)])?).await?);
     }
     Ok(out)
+}
+
+/// Done once per library: the settings row.
+const APPLE_REPAIR: &str = "appleRepair1";
+
+/// Older versions could link a YouTube song to another song's Apple id (and take its album and cover). Every such pair
+/// is looked up in one batch and the wrong ones undone. Once; a failed lookup is tried again next time. Returns the
+/// songs repaired.
+pub async fn repair_apple_links(lib: &Mutex<Library>, api: &str, country: &str) -> Result<usize> {
+    let ids = {
+        let lib = lib.lock().unwrap();
+        if lib.setting(APPLE_REPAIR)?.is_some() {
+            return Ok(0);
+        }
+        lib.apple_ids_on_youtube_songs()?
+    };
+    let found = lookup(api, &ids, country).await?;
+    let lib = lib.lock().unwrap();
+    let mut repaired = 0;
+    for apple in &found {
+        repaired += usize::from(lib.drop_wrong_apple_link(apple)?);
+    }
+    lib.set_setting(APPLE_REPAIR, &serde_json::json!(true))?;
+    Ok(repaired)
 }
 
 /// An album from the catalog: release year and every song in order (disc, then track number).
@@ -358,6 +383,37 @@ mod tests {
         assert_eq!((t.title.as_str(), t.artist.as_str(), t.duration_ms), ("Get Lucky", "Daft Punk", Some(369_629)));
         assert_eq!(t.ids[&Source::Apple], "617154366");
         assert_eq!(t.art.as_deref(), Some("https://is1-ssl.mzstatic.com/image/thumb/a/600x600bb.jpg"));
+    }
+
+    #[tokio::test]
+    async fn repairs_a_wrong_apple_link_once_and_leaves_a_true_one() {
+        let mut s = Server::new_async().await;
+        let looked_up = s
+            .mock("GET", "/lookup")
+            .match_query(Matcher::UrlEncoded("id".into(), "1,2".into()))
+            .with_body(r#"{"results":[{"trackId":1,"trackName":"Beyond","artistName":"Daft Punk","collectionName":"Random Access Memories","artworkUrl100":"https://is1-ssl.mzstatic.com/a/100x100bb.jpg"},{"trackId":2,"trackName":"Aerodynamic","artistName":"Daft Punk","collectionName":"Discovery","artworkUrl100":"https://is1-ssl.mzstatic.com/b/100x100bb.jpg"}]}"#)
+            .expect(1)
+            .create_async()
+            .await;
+        let lib = Mutex::new(Library::in_memory().unwrap());
+        let linked = |title: &str, artist: &str, album: &str, video: &str, apple: &str, art: &str| Track {
+            title: title.into(),
+            artist: artist.into(),
+            album: Some(album.into()),
+            ids: BTreeMap::from([(Source::Youtube, video.into()), (Source::Apple, apple.into())]),
+            art: Some(art.into()),
+            ..Default::default()
+        };
+        let wrong = lib.lock().unwrap().upsert_track(&linked("Ultra Slowed", "Winter", "Random Access Memories", "v1", "1", "https://is1-ssl.mzstatic.com/a/600x600bb.jpg")).unwrap();
+        let right = lib.lock().unwrap().upsert_track(&linked("Aerodynamic (Official Video)", "Daft Punk", "Discovery", "v2", "2", "https://is1-ssl.mzstatic.com/b/600x600bb.jpg")).unwrap();
+        let url = format!("{}/lookup", s.url());
+        assert_eq!(repair_apple_links(&lib, &url, "US").await.unwrap(), 1);
+        assert_eq!(repair_apple_links(&lib, &url, "US").await.unwrap(), 0);
+        looked_up.assert_async().await;
+        let tracks = lib.lock().unwrap().tracks().unwrap();
+        let row = |id: i64| &tracks.iter().find(|t| t.id == id).unwrap().track;
+        assert_eq!((row(wrong).ids.contains_key(&Source::Apple), row(wrong).album.as_deref(), row(wrong).art.as_deref()), (false, None, Some("https://i.ytimg.com/vi/v1/hqdefault.jpg")));
+        assert_eq!((row(right).ids.contains_key(&Source::Apple), row(right).album.as_deref()), (true, Some("Discovery")));
     }
 
     #[tokio::test]

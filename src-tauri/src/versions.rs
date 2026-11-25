@@ -107,23 +107,28 @@ pub async fn pick_version(state: State<'_, AppState>, track_id: i64, track: Trac
     lib.set_version(track_id, &track).map_err(err)
 }
 
-/// Apple tracks with no real cover: one batched lookup. Returns tracks given a cover.
+/// Apple tracks with no real cover: one batched lookup. Returns tracks changed (a cover given, a wrong link undone).
 #[tauri::command]
 pub async fn backfill_art(state: State<'_, AppState>, country: String) -> CmdResult<usize> {
     use music_connectors::itunes;
+    // First, once: wrong Apple links older versions made are undone (a failure here doesn't stop the covers).
+    let repaired = itunes::repair_apple_links(&state.lib, hosts::get().itunes_lookup, &store(&country)).await.unwrap_or_else(|e| {
+        crate::diag::warn("apple", "the check of old Apple links failed", &format!("{e:#}"));
+        0
+    });
     let ids: Vec<u64> = {
         let tracks = state.lib().tracks().map_err(err)?;
         tracks.into_iter().filter(|t| t.track.art.as_deref().is_none_or(music_core::model::video_frame)).filter_map(|t| t.track.ids.get(&Source::Apple)?.parse().ok()).collect()
     };
     if ids.is_empty() {
-        return Ok(0);
+        return Ok(repaired);
     }
     let found: Vec<Track> = itunes::lookup(hosts::get().itunes_lookup, &ids, &store(&country)).await.map_err(err)?.into_iter().filter(|t| t.art.is_some()).collect();
     let lib = state.lib();
     for t in &found {
         lib.upsert_track(t).map_err(err)?;
     }
-    Ok(found.len())
+    Ok(repaired + found.len())
 }
 
 #[derive(Serialize, ts_rs::TS)]

@@ -91,6 +91,40 @@ impl Library {
         Ok(!same_track(&row, &Track { ids: BTreeMap::new(), ..t.clone() }))
     }
 
+    /// Apple ids on rows that also play from YouTube.
+    pub fn apple_ids_on_youtube_songs(&self) -> Result<Vec<u64>> {
+        let mut stmt = self.db.prepare(
+            "SELECT a.source_id FROM track_ids a WHERE a.source = 'apple' AND EXISTS (SELECT 1 FROM track_ids y WHERE y.track_id = a.track_id AND y.source = 'youtube') ORDER BY a.track_id",
+        )?;
+        let ids: Vec<String> = stmt.query_map([], |row| row.get(0))?.collect::<rusqlite::Result<_>>()?;
+        Ok(ids.iter().filter_map(|id| id.parse().ok()).collect())
+    }
+
+    /// `apple`: what Apple's catalog says one of those ids is. Another song than its row, by title and artist (lengths
+    /// differ between a video and an album): the id leaves the row, with the album and cover it brought. True: it did.
+    pub fn drop_wrong_apple_link(&self, apple: &Track) -> Result<bool> {
+        let Some(apple_id) = apple.ids.get(&Source::Apple) else { return Ok(false) };
+        self.tx(|| {
+            let row: Option<(i64, String, String, String)> = self
+                .db
+                .query_row(
+                    "SELECT t.id, t.title, t.artist, y.source_id FROM track_ids a JOIN tracks t ON t.id = a.track_id JOIN track_ids y ON y.track_id = t.id AND y.source = 'youtube' WHERE a.source = 'apple' AND a.source_id = ?1 LIMIT 1",
+                    [apple_id],
+                    |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+                )
+                .optional()?;
+            let Some((id, title, artist, video)) = row else { return Ok(false) };
+            let names = |title: &str, artist: &str| Track { title: title.into(), artist: artist.into(), ..Default::default() };
+            if same_track(&names(&title, &artist), &names(&apple.title, &apple.artist)) {
+                return Ok(false);
+            }
+            self.db.execute("DELETE FROM track_ids WHERE source = 'apple' AND source_id = ?1", [apple_id])?;
+            self.db.execute("UPDATE tracks SET album = NULL WHERE id = ?1 AND album = ?2", params![id, apple.album])?;
+            self.db.execute("UPDATE tracks SET art = ?3 WHERE id = ?1 AND art = ?2", params![id, apple.art, crate::model::youtube_art(&video)])?;
+            Ok(true)
+        })
+    }
+
     pub fn upsert_track(&self, t: &Track) -> Result<i64> {
         self.tx(|| {
             let mut found = self.lookup(t)?;
