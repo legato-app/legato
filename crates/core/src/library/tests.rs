@@ -262,6 +262,28 @@ fn a_song_added_here_keeps_the_newest_end_once_the_service_holds_it_too() -> Res
     Ok(())
 }
 
+#[test]
+fn a_refused_song_stays_through_syncs_and_is_sent_ten_times_at_most() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let list = lib.save_playlist(Source::Youtube, "p1", "Road trip", &[song(1)])?;
+    let refused = lib.upsert_track(&song(9))?;
+    lib.append_to_imported(list, &[refused])?;
+    lib.add_pending_push(list, &[refused])?;
+    for _ in 0..10 {
+        assert_eq!(lib.pending_pushes()?, [(list, refused)]);
+        lib.count_push_try(list, refused)?;
+        lib.save_playlist(Source::Youtube, "p1", "Road trip", &[song(1)])?;
+    }
+    // Given up on: no longer sent, still here.
+    assert!(lib.pending_pushes()?.is_empty());
+    assert_eq!(lib.playlist_orders()?[&list].len(), 2);
+    assert_eq!(lib.playlist_orders()?[&list][0], refused);
+    // The service holds it after all: nothing waits, and a later sync without it takes it out as its own.
+    lib.save_playlist(Source::Youtube, "p1", "Road trip", &[song(9), song(1)])?;
+    assert!(!lib.clear_pending_push(list, refused)?);
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }

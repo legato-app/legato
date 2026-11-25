@@ -1,6 +1,7 @@
 //! Library edits: a song's flags, rating and preferences, history cleared, removals and merges, exports to YouTube.
 
 use super::*;
+use music_connectors::ytmusic::YouTubeMusic;
 
 /// "It's music" (true) / "Not music" (false) from the user, None = back to the app's guess.
 #[tauri::command]
@@ -122,6 +123,10 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
     if playlist.source != Source::Youtube {
         return Err("Imported Spotify playlists are read-only here: change them in Spotify.".into());
     }
+    // Never taken by YouTube (refused, still waiting): only here to take out.
+    if state.lib().clear_pending_push(id, track_id).map_err(err)? {
+        return state.lib().remove_from_imported(id, track_id).map_err(err);
+    }
     // Signed out, sending off: said at once, nothing changed.
     let accounts = state.ytm_senders()?;
     let like = liked_key(&playlist.source_id);
@@ -160,7 +165,8 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
         };
         if let Err(reason) = sent {
             let _ = st.lib().append_to_imported(id, &[track_id]);
-            push::failed(&app, push::Failed { kind: if like.is_some() { push::Kind::Unlike } else { push::Kind::Remove }, playlist: playlist.name, songs: 1, reason });
+            let kind = if like.is_some() { push::Kind::Unlike } else { push::Kind::Remove };
+            push::failed(&app, push::Failed::new(kind, playlist.name, 1, reason));
         }
     });
     Ok(())
@@ -180,8 +186,8 @@ pub async fn merge_duplicates(state: State<'_, AppState>, keep: i64, others: Vec
 }
 
 /// Add to an imported YouTube Music playlist: here at once, then on YouTube in the background (push.rs: owner account
-/// accepts, others refuse). Liked Music = like the songs with that account. Refused: taken back out here; a like of
-/// the main account stays in your own Liked Music instead (liked at the next sync).
+/// accepts, others refuse). Liked Music = like the songs with that account. Refused: kept here and sent again at later
+/// syncs; a like of the main account goes to your own Liked Music instead (liked at the next sync).
 #[tauri::command]
 pub async fn add_to_youtube(state: State<'_, AppState>, id: i64, track_ids: Vec<i64>) -> CmdResult<AddReport> {
     let (playlist, videos, there) = {
@@ -218,57 +224,102 @@ pub async fn add_to_youtube(state: State<'_, AppState>, id: i64, track_ids: Vec<
     push::later(async move {
         let st = app.state::<AppState>();
         let ids: Vec<String> = videos.iter().map(|(_, v)| v.clone()).collect();
-        // Taken by YouTube (added, or there already), and why the others weren't.
-        let (taken, reason): (HashSet<String>, Option<String>) = match &like {
-            Some(key) => {
-                let liked = with_ytm(&st, |accounts| {
-                    let ids = &ids;
-                    async move { accounts.into_iter().find(|y| y.account_key() == *key).context("That Google account isn't synced any more")?.like(ids).await }
-                })
-                .await;
-                match liked {
-                    Ok(()) => (ids.iter().cloned().collect(), None),
-                    Err(e) => (HashSet::new(), Some(err(e))),
-                }
-            }
-            None => {
-                // Playlist id carries no account: try each, the owner takes it.
-                let remote = playlist.source_id.split('~').next().unwrap_or(&playlist.source_id).to_string();
-                let mut last = None;
-                let mut done = None;
-                for yt in accounts {
-                    match yt.add_videos(&remote, &ids).await {
-                        Ok(r) => {
-                            done = Some(r);
-                            break;
-                        }
-                        Err(e) => last = Some(err(e)),
-                    }
-                }
-                match done {
-                    Some(r) => (r.added.into_iter().chain(r.already).collect(), r.refused),
-                    None => (HashSet::new(), Some(refusal(last, "Only playlists you own on YouTube Music can take new songs."))),
-                }
-            }
-        };
+        let (taken, reason) = send_to_youtube(&st, &playlist.source_id, accounts, &ids).await;
         let lost: Vec<i64> = videos.iter().filter(|(_, v)| !taken.contains(v)).map(|(t, _)| *t).collect();
         if lost.is_empty() {
             return;
         }
-        let kept = {
+        let reason = reason.unwrap_or_else(|| "YouTube Music refused".into());
+        let kind = {
             let lib = st.lib();
-            for t in &lost {
-                let _ = lib.remove_from_imported(id, *t);
-            }
             // The main account's like: into your own Liked Music, liked there at the next sync (push_own_likes).
-            like.as_deref() == Some("0") && lib.keep_in_own_likes(&lost).is_ok()
+            if like.as_deref() == Some("0") {
+                for t in &lost {
+                    let _ = lib.remove_from_imported(id, *t);
+                }
+                if lib.keep_in_own_likes(&lost).is_ok() { push::Kind::Like } else { push::Kind::LikeLost }
+            } else {
+                push::keep_for_later(&lib, id, &lost, &reason);
+                push::Kind::Add
+            }
         };
-        let kind = match (&like, kept) {
-            (Some(_), true) => push::Kind::Like,
-            (Some(_), false) => push::Kind::LikeLost,
-            (None, _) => push::Kind::Add,
-        };
-        push::failed(&app, push::Failed { kind, playlist: playlist.name, songs: lost.len(), reason: reason.unwrap_or_else(|| "YouTube Music refused".into()) });
+        push::failed(&app, push::Failed::new(kind, playlist.name, lost.len(), reason));
     });
     Ok(report)
+}
+
+/// Songs into a YouTube Music playlist (Liked Music: liked with its account): the videos taken (added, or there
+/// already), and why the others weren't.
+async fn send_to_youtube(st: &AppState, source_id: &str, accounts: Vec<YouTubeMusic>, ids: &[String]) -> (HashSet<String>, Option<String>) {
+    match liked_key(source_id) {
+        Some(key) => {
+            let key = key.as_str();
+            let liked = with_ytm(st, |accounts| {
+                async move { accounts.into_iter().find(|y| y.account_key() == key).context("That Google account isn't synced any more")?.like(ids).await }
+            })
+            .await;
+            match liked {
+                Ok(()) => (ids.iter().cloned().collect(), None),
+                Err(e) => (HashSet::new(), Some(err(e))),
+            }
+        }
+        None => {
+            // Playlist id carries no account: try each, the owner takes it.
+            let remote = source_id.split('~').next().unwrap_or(source_id).to_string();
+            let mut last = None;
+            let mut done = None;
+            for yt in accounts {
+                match yt.add_videos(&remote, ids).await {
+                    Ok(r) => {
+                        done = Some(r);
+                        break;
+                    }
+                    Err(e) => last = Some(err(e)),
+                }
+            }
+            match done {
+                Some(r) => (r.added.into_iter().chain(r.already).collect(), r.refused),
+                None => (HashSet::new(), Some(refusal(last, "Only playlists you own on YouTube Music can take new songs."))),
+            }
+        }
+    }
+}
+
+/// Songs YouTube Music didn't take earlier (`pending_push`), sent again: before each sync reads the playlists.
+pub async fn resend_to_youtube(state: &AppState) -> anyhow::Result<()> {
+    let waiting = push::waiting(&state.lib(), Source::Youtube)?;
+    for (playlist, track_ids) in waiting {
+        let Ok(accounts) = state.ytm_senders() else { return Ok(()) };
+        // A like whose account isn't signed in here, or takes no changes: left waiting, not a refusal.
+        if let Some(key) = liked_key(&playlist.source_id)
+            && !(accounts.iter().any(|y| y.account_key() == key) && state.direction(&format!("youtube:{key}")).pushes())
+        {
+            continue;
+        }
+        let videos = {
+            let lib = state.lib();
+            let mut videos = Vec::new();
+            for track_id in track_ids {
+                if let Some(video) = lib.source_ids(track_id, Source::Youtube)?.into_iter().next() {
+                    videos.push((track_id, video));
+                }
+            }
+            videos
+        };
+        if videos.is_empty() {
+            continue;
+        }
+        let ids: Vec<String> = videos.iter().map(|(_, video)| video.clone()).collect();
+        let (taken, reason) = send_to_youtube(state, &playlist.source_id, accounts, &ids).await;
+        let reason = reason.unwrap_or_else(|| "YouTube Music refused".into());
+        let lib = state.lib();
+        for (track_id, video) in videos {
+            if taken.contains(&video) {
+                lib.clear_pending_push(playlist.id, track_id)?;
+            } else {
+                push::keep_for_later(&lib, playlist.id, &[track_id], &reason);
+            }
+        }
+    }
+    Ok(())
 }

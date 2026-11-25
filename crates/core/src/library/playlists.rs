@@ -4,6 +4,9 @@ use super::*;
 
 const READ_ONLY: &str = "Imported playlist: edit it in its service, or duplicate it";
 
+/// Refusals after which a song is no longer sent (it stays in the playlist here).
+const PUSH_TRIES: i64 = 10;
+
 impl Library {
     pub fn playlists(&self) -> Result<Vec<LibraryPlaylist>> {
         self.playlist_rows(None)
@@ -385,6 +388,43 @@ impl Library {
             self.gone("added", &k)?;
         }
         Ok(())
+    }
+
+    /// Songs the service refused to take into this playlist: they stay in it here, to be sent again.
+    pub fn add_pending_push(&self, id: i64, track_ids: &[i64]) -> Result<()> {
+        self.tx(|| {
+            for track_id in track_ids {
+                self.db.execute("INSERT OR IGNORE INTO pending_push (playlist_id, track_id) VALUES (?1, ?2)", params![id, track_id])?;
+            }
+            Ok(())
+        })
+    }
+
+    /// Those still to be sent, as (playlist, song): refused fewer than `PUSH_TRIES` times.
+    pub fn pending_pushes(&self) -> Result<Vec<(i64, i64)>> {
+        let mut stmt = self.db.prepare_cached("SELECT playlist_id, track_id FROM pending_push WHERE tries < ?1 ORDER BY playlist_id, rowid")?;
+        Ok(stmt.query_map([PUSH_TRIES], |row| Ok((row.get(0)?, row.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
+    }
+
+    pub fn count_push_try(&self, id: i64, track_id: i64) -> Result<()> {
+        self.db.execute("UPDATE pending_push SET tries = tries + 1 WHERE playlist_id = ?1 AND track_id = ?2", params![id, track_id])?;
+        Ok(())
+    }
+
+    /// Taken by the service, or removed here by the user. True: it was waiting.
+    pub fn clear_pending_push(&self, id: i64, track_id: i64) -> Result<bool> {
+        Ok(self.db.execute("DELETE FROM pending_push WHERE playlist_id = ?1 AND track_id = ?2", params![id, track_id])? == 1)
+    }
+
+    /// A sync brought `synced`: the waiting songs it holds are sent, the others (given up on too) are returned, to stay.
+    pub(super) fn still_pending(&self, id: i64, synced: &[i64]) -> Result<Vec<i64>> {
+        let mut stmt = self.db.prepare_cached("SELECT track_id FROM pending_push WHERE playlist_id = ?1 ORDER BY rowid")?;
+        let mut waiting: Vec<i64> = stmt.query_map([id], |row| row.get(0))?.collect::<rusqlite::Result<_>>()?;
+        for track_id in waiting.iter().filter(|track_id| synced.contains(track_id)) {
+            self.clear_pending_push(id, *track_id)?;
+        }
+        waiting.retain(|track_id| !synced.contains(track_id));
+        Ok(waiting)
     }
 
     /// The songs added here to a playlist, oldest first.

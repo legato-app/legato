@@ -4,4 +4,8 @@ import type { PushKind } from "./PushKind";
 /**
  * What the interface says when a change didn't reach the service.
  */
-export type PushFailed = { kind: PushKind, playlist: string, songs: number, reason: string, };
+export type PushFailed = { kind: PushKind, playlist: string, songs: number, reason: string, 
+/**
+ * Refused because the session ended: signing in again is what helps.
+ */
+signedOut: boolean, };

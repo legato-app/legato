@@ -41,6 +41,10 @@ pub async fn disconnect(state: State<'_, AppState>, source: Source) -> CmdResult
 
 #[tauri::command]
 pub async fn sync_all(state: State<'_, AppState>) -> CmdResult<SyncReport> {
+    // Songs YouTube Music refused earlier, before its playlists are read again.
+    if let Err(e) = library_edits::resend_to_youtube(&state).await {
+        diag::warn("push", "Songs waiting for YouTube Music weren't sent", &format!("{e:#}"));
+    }
     let mut report = sync_once(&state).await;
     // Stale Google session: refreshed, then the whole sync once more.
     if report.errors.iter().any(|e| e.contains(music_connectors::ytmusic::SIGNED_OUT)) && ytm::refresh(&state.app).await {

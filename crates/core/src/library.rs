@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS settings (
 ";
 
 /// Schema version this code writes (user_version after migrations).
-pub const SCHEMA_VERSION: i64 = 23;
+pub const SCHEMA_VERSION: i64 = 24;
 
 /// The library was made by a newer version of the app.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -539,6 +539,12 @@ impl Library {
             // v23: songs added here to an imported playlist, kept through its next imports (the owner, 2026-11-18).
             lib.db.execute_batch(
                 "BEGIN; CREATE TABLE IF NOT EXISTS playlist_added (playlist_id INTEGER NOT NULL REFERENCES playlists(id) ON DELETE CASCADE, track_id INTEGER NOT NULL REFERENCES tracks(id) ON DELETE CASCADE, at INTEGER NOT NULL, PRIMARY KEY (playlist_id, track_id)); CREATE INDEX IF NOT EXISTS playlist_added_track ON playlist_added (track_id); PRAGMA user_version = 23; COMMIT;",
+            )?;
+        }
+        if lib.db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))? < 24 {
+            // v24: songs a service refused to take into a playlist, sent again at later syncs (this PC's own: not synced).
+            lib.db.execute_batch(
+                "BEGIN; CREATE TABLE IF NOT EXISTS pending_push (playlist_id INTEGER NOT NULL REFERENCES playlists(id) ON DELETE CASCADE, track_id INTEGER NOT NULL REFERENCES tracks(id) ON DELETE CASCADE, tries INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (playlist_id, track_id)); CREATE INDEX IF NOT EXISTS pending_push_track ON pending_push (track_id); PRAGMA user_version = 24; COMMIT;",
             )?;
         }
         lib.db.execute_batch(CHANGE_LOG)?;

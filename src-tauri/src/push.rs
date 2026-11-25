@@ -1,7 +1,10 @@
 //! Changes sent to a service (likes, adds and removals on YouTube Music) don't hold the interface up: the library
 //! changes at once, the request follows here, one after the other in the order made (a like then an unlike reach
-//! YouTube in that order). A refusal undoes the change here and comes back as a `push-failed` event (a notice).
+//! YouTube in that order). A refusal comes back as a `push-failed` event (a notice): a removal or a rename is
+//! undone here; songs added stay and are sent again at later syncs (`keep_for_later`).
 
+use music_core::library::{Library, LibraryPlaylist};
+use music_core::model::Source;
 use serde::Serialize;
 use std::future::Future;
 use std::pin::Pin;
@@ -56,6 +59,46 @@ pub struct Failed {
     pub playlist: String,
     pub songs: usize,
     pub reason: String,
+    /// Refused because the session ended: signing in again is what helps.
+    pub signed_out: bool,
+}
+
+impl Failed {
+    pub fn new(kind: Kind, playlist: String, songs: usize, reason: String) -> Self {
+        let signed_out = signed_out(&reason);
+        Self { kind, playlist, songs, reason, signed_out }
+    }
+}
+
+/// YouTube Music's or a music server's words for a session it no longer takes.
+fn signed_out(reason: &str) -> bool {
+    reason.starts_with(music_connectors::ytmusic::SIGNED_OUT) || reason.contains("401 Unauthorized") || music_connectors::servers::refused(&anyhow::Error::msg(reason.to_string()))
+}
+
+/// The playlists of `source` with songs waiting to be sent, and those songs.
+pub fn waiting(lib: &Library, source: Source) -> anyhow::Result<Vec<(LibraryPlaylist, Vec<i64>)>> {
+    let pending = lib.pending_pushes()?;
+    if pending.is_empty() {
+        return Ok(Vec::new());
+    }
+    let with_songs = |playlist: LibraryPlaylist| {
+        let songs: Vec<i64> = pending.iter().filter(|(id, _)| *id == playlist.id).map(|(_, track_id)| *track_id).collect();
+        (!songs.is_empty()).then_some((playlist, songs))
+    };
+    Ok(lib.playlists()?.into_iter().filter(|playlist| playlist.source == source && !playlist.custom).filter_map(with_songs).collect())
+}
+
+/// Songs a service didn't take into a playlist: they wait for a later sync. A try made signed out doesn't count.
+pub fn keep_for_later(lib: &Library, playlist_id: i64, track_ids: &[i64], reason: &str) {
+    let kept = lib.add_pending_push(playlist_id, track_ids).and_then(|()| {
+        if signed_out(reason) {
+            return Ok(());
+        }
+        track_ids.iter().try_for_each(|track_id| lib.count_push_try(playlist_id, *track_id))
+    });
+    if let Err(e) = kept {
+        crate::diag::warn("push", "A refused song couldn't be kept for later", &format!("{e:#}"));
+    }
 }
 
 pub fn failed(app: &tauri::AppHandle, f: Failed) {

@@ -308,6 +308,38 @@ async fn sync_one(state: &AppState, a: &Account) -> anyhow::Result<ServerSync> {
     }
 }
 
+/// Songs the server didn't take into its playlists earlier (`pending_push`), sent again.
+async fn resend(state: &AppState, a: &Account, conn: &Conn) -> anyhow::Result<()> {
+    if a.kind != Kind::Subsonic || !state.direction(&direction_key(&a.key())).pushes() {
+        return Ok(());
+    }
+    let waiting = push::waiting(&state.lib(), Source::Server)?;
+    for (playlist, track_ids) in waiting {
+        let Some((key, remote)) = server::split_item(&playlist.source_id) else { continue };
+        if key != a.key() {
+            continue;
+        }
+        let (track_ids, items): (Vec<i64>, Vec<String>) = {
+            let lib = state.lib();
+            track_ids.into_iter().filter_map(|track_id| Some((track_id, on_server(&lib, track_id, key)?))).unzip()
+        };
+        if items.is_empty() {
+            continue;
+        }
+        let sent = conn.playlist_add(remote, &items).await;
+        let lib = state.lib();
+        match sent {
+            Ok(()) => {
+                for track_id in track_ids {
+                    lib.clear_pending_push(playlist.id, track_id)?;
+                }
+            }
+            Err(e) => push::keep_for_later(&lib, playlist.id, &track_ids, &e.to_string()),
+        }
+    }
+    Ok(())
+}
+
 /// A Plex server at another of its addresses: the account saved with it. None: none answers (or signed out meanwhile).
 async fn moved(state: &AppState, a: &Account) -> Option<Account> {
     let all: Vec<String> = a.connections.iter().chain(&a.relays).filter(|c| **c != a.address).cloned().collect();
@@ -332,6 +364,10 @@ async fn moved_to(state: &AppState, a: &Account, all: &[String]) -> Option<Accou
 async fn read(state: &AppState, a: &Account) -> anyhow::Result<ServerSync> {
     let key = a.key();
     let sub = Conn::from_account(a);
+    // Before its playlists are read. A failure here isn't the read's.
+    if let Err(e) = resend(state, a, &sub).await {
+        crate::diag::warn("push", "Songs waiting for a music server weren't sent", &format!("{e:#}"));
+    }
     let got = sub.library().await?;
     let (songs, albums_failed, liked) = (got.songs, got.failed, got.liked);
     let mut skipped = albums_failed;
@@ -464,8 +500,8 @@ fn on_server(lib: &music_core::library::Library, track_id: i64, key: &str) -> Op
     lib.source_ids(track_id, Source::Server).ok()?.iter().find_map(|s| server::split_item(s).filter(|(k, _)| *k == key).map(|(_, i)| i.to_string()))
 }
 
-/// Add to a playlist of your Subsonic server: here at once, then on the server in the background (`push.rs`), taken
-/// back out here if it refuses. That server's songs only; one already in the playlist isn't added twice.
+/// Add to a playlist of your Subsonic server: here at once, then on the server in the background (`push.rs`), kept
+/// and sent again at later syncs if it refuses. That server's songs only; one already in the playlist isn't added twice.
 #[tauri::command]
 pub async fn server_playlist_add(state: State<'_, AppState>, id: i64, track_ids: Vec<i64>) -> CmdResult<AddReport> {
     let (p, a, remote) = sent_playlist(&state, id)?;
@@ -491,11 +527,9 @@ pub async fn server_playlist_add(state: State<'_, AppState>, id: i64, track_ids:
             {
                 let st = app.state::<AppState>();
                 let lib = st.lib();
-                for t in &added {
-                    let _ = lib.remove_from_imported(id, *t);
-                }
+                push::keep_for_later(&lib, id, &added, &e.to_string());
             }
-            push::failed(&app, push::Failed { kind: push::Kind::ServerAdd, playlist: p.name, songs: added.len(), reason: err(e) });
+            push::failed(&app, push::Failed::new(push::Kind::ServerAdd, p.name, added.len(), err(e)));
         }
     });
     Ok(report)
@@ -535,6 +569,10 @@ pub async fn server_playlist_create(state: State<'_, AppState>, id: i64, key: St
 /// background, put back here if it refuses.
 #[tauri::command]
 pub async fn server_playlist_remove(state: State<'_, AppState>, id: i64, track_id: i64) -> CmdResult<()> {
+    // Never taken by the server (refused, still waiting): only here to take out.
+    if state.lib().clear_pending_push(id, track_id).map_err(err)? {
+        return state.lib().remove_from_imported(id, track_id).map_err(err);
+    }
     let (p, a, remote) = sent_playlist(&state, id)?;
     let item = on_server(&state.lib(), track_id, &a.key());
     state.lib().remove_from_imported(id, track_id).map_err(err)?;
@@ -544,7 +582,7 @@ pub async fn server_playlist_remove(state: State<'_, AppState>, id: i64, track_i
         let Some(item) = item else { return };
         if let Err(e) = Conn::from_account(&a).playlist_remove(&remote, &item).await {
             let _ = app.state::<AppState>().lib().append_to_imported(id, &[track_id]);
-            push::failed(&app, push::Failed { kind: push::Kind::ServerRemove, playlist: p.name, songs: 1, reason: err(e) });
+            push::failed(&app, push::Failed::new(push::Kind::ServerRemove, p.name, 1, err(e)));
         }
     });
     Ok(())
@@ -560,7 +598,7 @@ pub async fn server_playlist_rename(state: State<'_, AppState>, id: i64, name: S
     push::later(async move {
         if let Err(e) = Conn::from_account(&a).playlist_rename(&remote, name.trim()).await {
             let _ = app.state::<AppState>().lib().rename_imported(id, &old);
-            push::failed(&app, push::Failed { kind: push::Kind::ServerRename, playlist: old, songs: 0, reason: err(e) });
+            push::failed(&app, push::Failed::new(push::Kind::ServerRename, old, 0, err(e)));
         }
     });
     Ok(())

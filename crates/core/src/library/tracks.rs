@@ -126,6 +126,7 @@ impl Library {
         self.db.execute("UPDATE track_ids SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
         self.db.execute("UPDATE playlist_tracks SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
         self.db.execute("UPDATE OR IGNORE playlist_added SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
+        self.db.execute("UPDATE OR IGNORE pending_push SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
         self.db.execute("UPDATE plays SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
         self.db.execute("UPDATE OR IGNORE track_prefs SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
         self.db.execute("UPDATE OR IGNORE track_ratings SET track_id = ?1 WHERE track_id = ?2", [keep, dupe])?;
@@ -205,7 +206,10 @@ impl Library {
                 ids.reverse();
             }
             // Songs added here (`add_here`) stay at the newest end as they were put in, even once the service holds them too.
-            let mine = self.added_here(id)?;
+            let mut mine = self.added_here(id)?;
+            // Refused by the service (`pending_push`): not in its list, still in this one.
+            let waiting = self.still_pending(id, &ids)?;
+            mine.extend(waiting.into_iter().filter(|t| !mine.contains(t)).collect::<Vec<_>>());
             ids.retain(|t| !mine.contains(t));
             if newest {
                 ids.splice(0..0, mine.into_iter().rev());
