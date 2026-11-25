@@ -7,6 +7,15 @@ const READ_ONLY: &str = "Imported playlist: edit it in its service, or duplicate
 /// Refusals after which a song is no longer sent (it stays in the playlist here).
 const PUSH_TRIES: i64 = 10;
 
+/// What `remove_from_imported` took out: each place the song held, and its "added here" mark as (when, sent).
+#[derive(Debug)]
+pub struct Removed {
+    playlist_id: i64,
+    track_id: i64,
+    positions: Vec<usize>,
+    mark: Option<(i64, i64)>,
+}
+
 impl Library {
     pub fn playlists(&self) -> Result<Vec<LibraryPlaylist>> {
         self.playlist_rows(None)
@@ -213,12 +222,37 @@ impl Library {
         })
     }
 
-    /// A song out of an imported playlist here, with its marks: nothing brings it back but the service's own list.
-    pub fn remove_from_imported(&self, id: i64, track_id: i64) -> Result<()> {
+    /// A song out of an imported playlist here, with its marks: nothing brings it back but the service's own list, or
+    /// `put_back_imported` with what this returns.
+    pub fn remove_from_imported(&self, id: i64, track_id: i64) -> Result<Removed> {
         self.tx(|| {
-            self.db.execute("DELETE FROM playlist_added WHERE playlist_id = ?1 AND track_id = ?2", params![id, track_id])?;
+            let positions = self.playlist_track_ids(id)?.iter().enumerate().filter(|(_, t)| **t == track_id).map(|(position, _)| position).collect();
+            let mark = self
+                .db
+                .query_row("DELETE FROM playlist_added WHERE playlist_id = ?1 AND track_id = ?2 RETURNING at, sent", params![id, track_id], |row| Ok((row.get(0)?, row.get(1)?)))
+                .optional()?;
             self.clear_pending_push(id, track_id)?;
-            self.rewrite(id, |ids| ids.retain(|t| *t != track_id))
+            self.rewrite(id, |ids| ids.retain(|t| *t != track_id))?;
+            Ok(Removed { playlist_id: id, track_id, positions, mark })
+        })
+    }
+
+    /// The service refused the removal: the song where it was, marked as it was.
+    pub fn put_back_imported(&self, removed: &Removed) -> Result<()> {
+        let Removed { playlist_id, track_id, positions, mark } = removed;
+        self.tx(|| {
+            if let Some((at, sent)) = mark {
+                self.db.execute("INSERT OR IGNORE INTO playlist_added (playlist_id, track_id, at, sent) VALUES (?1, ?2, ?3, ?4)", params![playlist_id, track_id, at, sent])?;
+            }
+            self.rewrite(*playlist_id, |ids| {
+                // A sync may have brought it back meanwhile: the service's places hold.
+                if !ids.contains(track_id) {
+                    // Ascending: each lands where it was.
+                    for position in positions {
+                        ids.insert((*position).min(ids.len()), *track_id);
+                    }
+                }
+            })
         })
     }
 

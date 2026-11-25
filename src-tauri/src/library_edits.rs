@@ -125,7 +125,7 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
     }
     // Never taken by YouTube (refused, still waiting): only here to take out.
     if state.lib().clear_pending_push(id, track_id).map_err(err)? {
-        return state.lib().remove_from_imported(id, track_id).map_err(err);
+        return state.lib().remove_from_imported(id, track_id).map(drop).map_err(err);
     }
     // Signed out, sending off: said at once, nothing changed.
     let accounts = state.ytm_senders()?;
@@ -135,7 +135,7 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
     {
         return Err(NOT_SENT.into());
     }
-    state.lib().remove_from_imported(id, track_id).map_err(err)?;
+    let removed = state.lib().remove_from_imported(id, track_id).map_err(err)?;
     let app = state.app.clone();
     push::later(async move {
         let st = app.state::<AppState>();
@@ -164,7 +164,7 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
             }
         };
         if let Err(reason) = sent {
-            let _ = st.lib().append_to_imported(id, &[track_id]);
+            let _ = st.lib().put_back_imported(&removed);
             let kind = if like.is_some() { push::Kind::Unlike } else { push::Kind::Remove };
             push::failed(&app, push::Failed::new(kind, playlist.name, 1, reason));
         }

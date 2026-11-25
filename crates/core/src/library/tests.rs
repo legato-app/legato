@@ -334,6 +334,25 @@ fn a_refused_like_leaves_the_list_only_once_it_is_in_your_own_likes() -> Result<
     Ok(())
 }
 
+#[test]
+fn a_refused_removal_puts_the_song_back_where_it_was_with_its_mark() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let list = lib.save_playlist(Source::Youtube, "p1", "Road trip", &[song(1), song(2)])?;
+    let mine = lib.upsert_track(&song(9))?;
+    lib.add_sent_songs(list, &[mine])?;
+    // One of the service's own, mid-list, and one added here and sent.
+    let theirs = lib.playlist_orders()?[&list][1];
+    let marks = || lib.db.query_row("SELECT group_concat(track_id || ':' || at || ':' || sent) FROM playlist_added", [], |row| row.get::<_, Option<String>>(0));
+    let (before, marked) = (lib.playlist_orders()?[&list].clone(), marks()?);
+    for track_id in [theirs, mine] {
+        let removed = lib.remove_from_imported(list, track_id)?;
+        lib.put_back_imported(&removed)?;
+        assert_eq!(lib.playlist_orders()?[&list], before);
+        assert_eq!(marks()?, marked);
+    }
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }

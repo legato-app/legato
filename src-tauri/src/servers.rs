@@ -571,17 +571,17 @@ pub async fn server_playlist_create(state: State<'_, AppState>, id: i64, key: St
 pub async fn server_playlist_remove(state: State<'_, AppState>, id: i64, track_id: i64) -> CmdResult<()> {
     // Never taken by the server (refused, still waiting): only here to take out.
     if state.lib().clear_pending_push(id, track_id).map_err(err)? {
-        return state.lib().remove_from_imported(id, track_id).map_err(err);
+        return state.lib().remove_from_imported(id, track_id).map(drop).map_err(err);
     }
     let (p, a, remote) = sent_playlist(&state, id)?;
     let item = on_server(&state.lib(), track_id, &a.key());
-    state.lib().remove_from_imported(id, track_id).map_err(err)?;
+    let removed = state.lib().remove_from_imported(id, track_id).map_err(err)?;
     let app = state.app.clone();
     push::later(async move {
         // Not that server's song (matched from elsewhere): nothing to take out there.
         let Some(item) = item else { return };
         if let Err(e) = Conn::from_account(&a).playlist_remove(&remote, &item).await {
-            let _ = app.state::<AppState>().lib().append_to_imported(id, &[track_id]);
+            let _ = app.state::<AppState>().lib().put_back_imported(&removed);
             push::failed(&app, push::Failed::new(push::Kind::ServerRemove, p.name, 1, err(e)));
         }
     });
