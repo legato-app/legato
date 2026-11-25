@@ -731,7 +731,7 @@ known. The remote control of the user's Spotify app (Spotify Connect) was remove
 
 ## Spotify without keys: prototype (2026-10-16)
 
-- (a) Sign-in: Settings › Accounts › "Spotify web player" opens open.spotify.com in an app window; the user signs in on
+- (a) Sign-in: Connect Spotify's "Read Spotify's page instead" opens open.spotify.com in an app window; the user signs in on
   Spotify's page. Signed in = `sp_dc` cookie in the shared WebView2 profile (`src-tauri/src/spotify_web.rs`). No IPC for
   that window, and no ad blocking there (the shield only hooks the main window).
 - (c) Playback in Spotify's official web player: WebView2 (Edge 155) reports both Widevine (`com.widevine.alpha`) and

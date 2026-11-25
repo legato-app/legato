@@ -1,5 +1,5 @@
-//! Spotify without keys: Spotify's own web player (open.spotify.com) in an app window.
-//! The user signs in on Spotify's page; audio plays in Spotify's official player (Widevine DRM, available in WebView2).
+//! Spotify without keys: Spotify's own page (open.spotify.com) in an app window, opened to import lists.
+//! The user signs in on Spotify's page.
 //! The window gets no capability (remote page, no IPC) and no ad blocking: the shield only hooks the main window.
 //! Connect Spotify (user's choice 2026-10-31, against Spotify's User Guidelines: the app says so first): the page's own
 //! rows are read by `music_shield::SPOTIFY_SCRIPT`, private playlists and Liked Songs included. No token, no request of
@@ -30,7 +30,7 @@ const QUIET: Duration = Duration::from_secs(40);
 /// Where the page's messages go while a job runs.
 static INBOX: Mutex<Option<UnboundedSender<Message>>> = Mutex::new(None);
 
-/// Signed in to the web player (sp_dc = Spotify web session cookie). Profile shared with the main window.
+/// Signed in on Spotify's page (sp_dc = Spotify web session cookie). Profile shared with the main window.
 /// WebView2: call from async commands or threads only (sync = deadlock).
 pub fn signed_in(app: &AppHandle) -> bool {
     // Phones: no Spotify, Apple or Google sign-in (one webview, signed out). Android's WebView also throws on a page
@@ -43,7 +43,7 @@ pub fn signed_in(app: &AppHandle) -> bool {
     main.cookies_for_url(url).is_ok_and(|c| c.iter().any(|c| c.name() == "sp_dc" && !c.value().is_empty()))
 }
 
-/// Opens (or focuses) the official web player, straight on Spotify's sign-in page when signed out.
+/// Opens (or focuses) Spotify's page, straight on its sign-in page when signed out.
 /// WebView2: call from async commands or threads only (`signed_in`).
 pub fn open(app: &AppHandle) -> tauri::Result<()> {
     if let Some(w) = app.get_webview_window(LABEL) {

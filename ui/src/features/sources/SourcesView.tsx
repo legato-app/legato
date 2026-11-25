@@ -123,8 +123,8 @@ function ServiceRow({ service }: { service: 'spotify' }) {
   )
 }
 
-/** Prototype: Spotify's official web player in a window, signed in on Spotify's page (no keys). Opening it imports nothing: the import is Connect Spotify's, offered here too, and follows the direction here. */
-function SpotifyWeb() {
+/** Spotify without a key: Connect Spotify's import (signed in on Spotify's page), which follows the direction here. */
+function SpotifyWithoutKey() {
   const [on, setOn] = useState<boolean>()
   const [dirs, setDir] = useDirections()
   const keyed = useStore((s) => s.status.spotify.connected)
@@ -135,21 +135,14 @@ function SpotifyWeb() {
     return () => window.removeEventListener('focus', check)
   }, [])
   return (
-    <div data-setting="Spotify web player" className="flex flex-col gap-3 border-b border-line-soft px-4 py-3.5">
+    <div data-setting="Connect Spotify" className="flex flex-col gap-3 border-b border-line-soft px-4 py-3.5">
       <AccountLine
         on={!!on}
         icon={<SourceIcon source="spotify" size={16} />}
-        title={
-          <>
-            {tr('Spotify web player')} <span className="kicker">{tr('Preview')}</span>
-          </>
-        }
-        pitch={tr('Spotify’s own player in a window, signed in on Spotify’s page. Open only plays it: to bring your lists in, use Import my lists.')}
+        title={tr('Connect Spotify')}
+        pitch={tr('Your Spotify playlists and Liked Songs, without a key. Their songs play through YouTube.')}
         state={on ? tr('Signed in') : tr('Not signed in')}
       >
-        <Button variant="ghost" onClick={() => api.spotifyWebOpen().catch((e) => useStore.setState({ error: String(e) }))}>
-          {tr('Open')}
-        </Button>
         <SpotifyImport label={tr('Import my lists')} />
       </AccountLine>
       {/* With a key the row above shows it. */}
@@ -807,8 +800,8 @@ export function SourcesView() {
       <p className="text-[0.8125rem] text-ink-2">{phoneApp ? tr('Which account is connected to which service. Nothing goes through a server of ours: everything stays on your phone.') : tr('Which account is connected to which service. Nothing goes through a server of ours: everything stays on your computer.')}</p>
       <div className="rounded-xl border border-line bg-raised">
         <GoogleAccounts />
-        {/* A player and an import in windows: none on the phone (FromPc). */}
-        {!phoneApp && <SpotifyWeb />}
+        {/* An import in a window: none on the phone (FromPc). */}
+        {!phoneApp && <SpotifyWithoutKey />}
         <ServiceRow service="spotify" />
         <AppleWeb />
         <LastfmRow />

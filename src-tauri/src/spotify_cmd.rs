@@ -63,7 +63,7 @@ pub async fn import_spotify_link(app: tauri::AppHandle, state: State<'_, AppStat
     Ok(SpotifyImport { playlist_id, name: list.name, tracks: tracks.len(), playable, truncated })
 }
 
-/// Spotify's official web player in an app window (prototype, no keys).
+/// Spotify's page in an app window (no keys), for Connect Spotify to read.
 #[tauri::command]
 pub async fn spotify_web_open(app: tauri::AppHandle) -> CmdResult<()> {
     spotify_web::open(&app).map_err(err)

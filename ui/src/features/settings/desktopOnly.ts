@@ -21,8 +21,8 @@ export const DESKTOP_ONLY: ReadonlySet<string> = new Set([
   'Pause when headphones disconnect',
   // Android stops a background app's timers: a phone's alarm needs its AlarmManager.
   'Alarm',
-  // Accounts: Spotify's player window (FromPc says where it is).
-  'Spotify web player',
+  // Accounts: Spotify's import window (FromPc says where it is).
+  'Connect Spotify',
 ])
 
 /** Whole sections with no phone use. */

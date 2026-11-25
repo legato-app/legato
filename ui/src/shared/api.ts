@@ -183,9 +183,9 @@ export const api = {
   importSongList: (name: string, text: string | null, path: string | null) => invoke<ListImport>('import_song_list', { name, text, path }),
   /** M3U / M3U8, XSPF or CSV by the extension of `path` (a file the user picked). */
   exportPlaylistFile: (playlistId: number, path: string) => invoke<void>('export_playlist_file', { playlistId, path }),
-  /** Spotify's own web player in an app window (prototype). */
+  /** Spotify's page in an app window, to sign in before its lists are read. */
   spotifyWebOpen: () => invoke<void>('spotify_web_open'),
-  /** Signed in to the Spotify web player. */
+  /** Signed in on Spotify's page. */
   spotifyWebStatus: () => invoke<boolean>('spotify_web_status'),
   /** Closes Spotify's window; the session stays. */
   spotifyWebClose: () => invoke<void>('spotify_web_close'),

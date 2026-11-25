@@ -161,7 +161,7 @@ export const SETTINGS: SettingDef[] = [
   { id: 'Spotify', in: 'sources', keywords: msg('client id key premium connect') },
   { id: 'OneDrive', in: 'sync', keywords: msg('sync other pc computer cloud password encrypted backup') },
   { id: msg('Your devices'), in: 'sync', keywords: msg('phone mobile android iphone pair qr code wifi network trusted automatic other pc computer laptop') },
-  { id: msg('Spotify web player'), in: 'sources', keywords: msg('sign in') },
+  { id: msg('Connect Spotify'), in: 'sources', keywords: msg('sign in') },
   { id: msg('Apple Music'), in: 'sources', keywords: msg('apple itunes import playlists favorite songs sign in') },
   { id: msg('Local files'), in: 'sources', keywords: msg('music folder mp3 flac scan') },
   { id: msg('Your music server'), in: 'sources', keywords: msg('navidrome subsonic airsonic gonic ampache nas self-hosted stream own server') },
