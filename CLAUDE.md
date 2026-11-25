@@ -32,14 +32,15 @@ account. Old share links are not read any more (the owner's word).
 - Serverless: no backend of ours. Secrets in the OS keychain (`keyring`), local SQLite library. Sync between the user's
   PCs: a shared folder (OneDrive or any), one file per PC, or the local network with a 6-digit code; secrets travel only
   sealed, otherwise sign in again (`docs/sync-mode.md`).
-- Legal playback only (Spotify Connect / official SDK, embedded YouTube player, local files, personal servers). Never
+- Legal playback only: the embedded YouTube player, local files, personal servers, Apple Music previews as a last
+  resort. External music plays through YouTube only; Spotify only reads playlists (the owner, 2026-11-25). Never
   download, record or export a platform's audio, never touch DRM. Live processing of what plays is allowed: native chain
   `crates/dsp`, YouTube in its player (`crates/shield` `live.js`, the formulas kept alike).
 - Never copy code from Liner (non-commercial licence). Everything is written from scratch.
 - YouTube without keys: Google sign-in in an app window (Google's own page), the session in WebView2's cookies, YouTube
   Music's and YouTube's own web APIs (InnerTube: unofficial, may break). Signed out: YouTube Music's public catalog.
   Clear non-music hidden until asked (`music_core::musicness`).
-- Spotify: the user's own client ID (dev mode: Premium owner, 5 users). Without it, Connect Spotify: Exportify's page in
+- Spotify: the user's own client ID (dev mode: Premium owner, 5 users), playlist scopes only. Without it, Connect Spotify: Exportify's page in
   a window (`crates/shield/src/exportify.js`; its key never taken out of its page), then, on the user's demand and with a
   warning (against Spotify's guidelines), the rows Spotify's own page shows; never its token, never the TOTP in its
   player. Apple Music the same way (against Apple's terms, said first): the playlists music.apple.com shows
