@@ -55,7 +55,7 @@ def material(name, color, metal=0.0, rough=0.3, coat=0.0, image=None, emit=1.0):
         t.interpolation = "Cubic"
         m.node_tree.links.new(t.outputs["Color"], p.inputs["Emission Color"])
         p.inputs["Emission Strength"].default_value = emit
-        p.inputs["Specular IOR Level"].default_value = 0.15
+        p.inputs["Specular IOR Level"].default_value = 0  # no glare over the shots
     return m
 
 
@@ -66,14 +66,14 @@ def srgb(h):
 
 BLUE = srgb("7CB8FF")
 M = {
-    "frame": material("Frame", (0.09, 0.09, 0.1) if DARK else (0.72, 0.73, 0.75), metal=1, rough=0.26),
-    "glass": material("Black glass", (0.004, 0.004, 0.005), rough=0.05, coat=1),
-    "keys": material("Keys", (0.012, 0.012, 0.013), rough=0.45),
+    "frame": material("Frame", (0.09, 0.09, 0.1) if DARK else (0.72, 0.73, 0.75), metal=1, rough=0.34),
+    "glass": material("Black glass", (0.004, 0.004, 0.005), rough=0.12, coat=0.25),
+    "keys": material("Keys", (0.014, 0.014, 0.015), rough=0.38),
     "pad": material("Trackpad", (0.06, 0.06, 0.065) if DARK else (0.55, 0.56, 0.58), metal=1, rough=0.35),
     "gold": material("Gold", (1.0, 0.68, 0.26), metal=1, rough=0.16),
     "chrome": material("Chrome", (0.92, 0.92, 0.95), metal=1, rough=0.07),
-    "blue": material("Legato blue", BLUE, rough=0.18, coat=1),
-    "vinyl": material("Vinyl", (0.006, 0.006, 0.007), rough=0.3, coat=0.3),
+    "blue": material("Legato blue", BLUE, rough=0.25, coat=0.4),
+    "vinyl": material("Vinyl", (0.003, 0.003, 0.0035), rough=0.14, coat=1),
     "black": material("Matte black", (0.01, 0.01, 0.01), rough=0.6),
     "cushion": material("Cushion", (0.03, 0.03, 0.035), rough=0.55),
 }
@@ -85,10 +85,9 @@ for key, shot in (("phone", "library-phone"), ("monitor", "library"), ("laptop",
 _v = M["vinyl"].node_tree
 _w = _v.nodes.new("ShaderNodeTexWave")
 _w.wave_type = "RINGS"
-_w.inputs["Scale"].default_value = 90
+_w.inputs["Scale"].default_value = 140
 _b = _v.nodes.new("ShaderNodeBump")
-_b.inputs["Strength"].default_value = 0.03
-_v.nodes["Principled BSDF"].inputs["Specular IOR Level"].default_value = 0.2
+_b.inputs["Strength"].default_value = 0.05
 _v.links.new(_w.outputs["Fac"], _b.inputs["Height"])
 _v.links.new(_b.outputs["Normal"], _v.nodes["Principled BSDF"].inputs["Normal"])
 
@@ -109,7 +108,7 @@ def link(name, bm, mat, parent=None, loc=(0, 0, 0), rot=(0, 0, 0), smooth=True):
     return ob
 
 
-def bevel(ob, width, segments=4):
+def bevel(ob, width, segments=5):
     b = ob.modifiers.new("Bevel", "BEVEL")
     b.width, b.segments, b.limit_method, b.harden_normals = width, segments, "ANGLE", True
     b.angle_limit = R(50)
@@ -200,7 +199,7 @@ def group(name, loc, rot, scale=1.0):
 # --- Devices ---------------------------------------------------------------------------------------------------
 
 def phone(g):
-    slab("Phone body", 0.44, 0.92, 0.045, 0.07, M["frame"], g, edge=0.012)
+    slab("Phone body", 0.44, 0.92, 0.038, 0.07, M["frame"], g, edge=0.014)
     slab("Phone glass", 0.43, 0.91, 0.004, 0.065, M["glass"], g, loc=(0, -0.002, 0), edge=0.0015)
     screen("Phone screen", 0.405, 0.405 * 1299 / 600, 0.05, M["phone"], g, (0, -0.0025, 0))
     # Side buttons.
@@ -212,8 +211,8 @@ def monitor(g):
     slab("Monitor body", w, h, 0.05, 0.03, M["frame"], g, edge=0.01)
     slab("Monitor glass", w - 0.01, h - 0.01, 0.004, 0.026, M["glass"], g, loc=(0, -0.002, 0), edge=0.0015)
     screen("Monitor screen", 1.5, 1.5 * 505 / 800, 0.004, M["monitor"], g, (0, -0.0025, 0.0))
-    slab("Monitor neck", 0.16, 0.62, 0.035, 0.01, M["frame"], g, loc=(0, 0.06, -0.62), edge=0.008)
-    slab("Monitor foot", 0.56, 0.34, 0.025, 0.06, M["frame"], g, loc=(0, 0.06, -0.93), rot=(R(90), 0, 0), edge=0.008)
+    slab("Monitor neck", 0.13, 0.62, 0.03, 0.012, M["frame"], g, loc=(0, 0.06, -0.62), edge=0.008)
+    slab("Monitor foot", 0.5, 0.3, 0.018, 0.06, M["frame"], g, loc=(0, 0.06, -0.93), rot=(R(90), 0, 0), edge=0.008)
 
 
 def laptop(g):
@@ -221,11 +220,11 @@ def laptop(g):
     # Base lies flat: a slab turned face down, top at z=0.035.
     slab("Laptop base", w, d, 0.035, 0.04, M["frame"], g, rot=(R(90), 0, 0), edge=0.01)
     pitch = 0.065 * 1.18
-    keys = box("Laptop keys", (0.065, 0.065, 0.01), M["keys"], g, (-6 * pitch, 0.12 - 2 * pitch, 0.037))
+    keys = box("Laptop keys", (0.062, 0.062, 0.012), M["keys"], g, (-6 * pitch, 0.12 - 2 * pitch, 0.036), edge=0.006)
     for axis, count in ((0, 13), (1, 5)):
         a = keys.modifiers.new("Rows", "ARRAY")
         a.count = count
-        a.relative_offset_displace = [1.18 if i == axis else 0 for i in range(3)]
+        a.relative_offset_displace = [1.24 if i == axis else 0 for i in range(3)]
     keys.modifiers.move(0, len(keys.modifiers) - 1)  # bevel last
     slab("Laptop trackpad", 0.42, 0.25, 0.002, 0.02, M["pad"], g, loc=(0, -0.2, 0.0365), rot=(R(90), 0, 0), edge=0.001)
     # Lid at the back, open at 90 degrees.
@@ -258,15 +257,47 @@ def vinyl(g):
 
 
 def headphones(g):
-    arc = [(0.3 * math.cos(R(a)), 0, 0.3 * math.sin(R(a))) for a in range(0, 181, 6)]
-    tube("Headband", arc, 0.026, M["chrome"], g)
+    # Thin metal band over a padded inner band, flat aluminium cups with a blue cap, thick cushions.
+    tube("Headband", [(0.3 * math.cos(R(a)), 0, 0.3 * math.sin(R(a))) for a in range(4, 177, 4)], 0.012, M["chrome"], g)
+    tube("Head pad", [(0.278 * math.cos(R(a)), 0, 0.278 * math.sin(R(a))) for a in range(40, 141, 4)], 0.022, M["cushion"], g)
     for side in (-1, 1):
         x = side * 0.31
-        disc("Cup", 0.11, 0.085, M["blue"], g, (x, 0, -0.06), (0, R(90), 0), edge=0.03)
+        tube("Yoke", [(x * 0.985, 0, 0.03), (x, 0, -0.02)], 0.01, M["chrome"], g)
+        disc("Cup", 0.105, 0.055, M["frame"], g, (x, 0, -0.1), (0, R(90), 0), edge=0.02)
+        disc("Cup cap", 0.07, 0.008, M["blue"], g, (x + side * 0.03, 0, -0.1), (0, R(90), 0), edge=0.003)
         bm = bmesh.new()
-        bmesh.ops.create_cone(bm, cap_ends=True, segments=64, radius1=0.1, radius2=0.1, depth=0.04)
-        bevel(link("Cushion", bm, M["cushion"], g, (x - side * 0.058, 0, -0.06), (0, R(90), 0)), 0.018, 5)
-        tube("Yoke", [(x, 0, 0.0), (x * 0.98, 0, 0.06)], 0.014, M["chrome"], g)
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=64, radius1=0.1, radius2=0.1, depth=0.045)
+        bevel(link("Cushion", bm, M["cushion"], g, (x - side * 0.045, 0, -0.1), (0, R(90), 0)), 0.02, 6)
+
+
+def shadow(name, loc, size, strength):
+    """A soft baked-style shadow: a floor quad whose alpha fades out from its centre."""
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    try:
+        m.surface_render_method = "BLENDED"
+    except AttributeError:
+        m.blend_method = "BLEND"
+    nt = m.node_tree
+    p = nt.nodes["Principled BSDF"]
+    p.inputs["Base Color"].default_value = (0, 0, 0, 1)
+    p.inputs["Specular IOR Level"].default_value = 0
+    co = nt.nodes.new("ShaderNodeTexCoord")
+    gr = nt.nodes.new("ShaderNodeTexGradient")
+    gr.gradient_type = "SPHERICAL"
+    pw = nt.nodes.new("ShaderNodeMath")
+    pw.operation, pw.inputs[1].default_value = "POWER", 2.2
+    mul = nt.nodes.new("ShaderNodeMath")
+    mul.operation, mul.inputs[1].default_value = "MULTIPLY", strength
+    nt.links.new(co.outputs["Object"], gr.inputs["Vector"])
+    nt.links.new(gr.outputs["Fac"], pw.inputs[0])
+    nt.links.new(pw.outputs[0], mul.inputs[0])
+    nt.links.new(mul.outputs[0], p.inputs["Alpha"])
+    bm = bmesh.new()
+    bm.faces.new([bm.verts.new(v) for v in ((-1, -1, 0), (1, -1, 0), (1, 1, 0), (-1, 1, 0))])
+    ob = link(name, bm, m, loc=loc, smooth=False)
+    ob.scale = (size[0] / 2, size[1] / 2, 1)
+    ob.visible_shadow = False
 
 
 def sync(g):
@@ -275,12 +306,15 @@ def sync(g):
     ball("Sync dot", 0.04, M["gold"], g, (0, 0, 0.0))
 
 
-phone(group("Phone", (-1.85, -0.2, 0.0), (12, -20, 26), 1.2))
+# The phone looks up and toward the middle (the owner's ask).
+phone(group("Phone", (-1.85, -0.2, 0.0), (-16, -16, 30), 1.2))
 monitor(group("Monitor", (0.0, 0.35, 0.22), (0, 0, -6)))
 laptop(group("Laptop", (1.85, -0.1, -0.5), (22, 6, -32), 1.05))
 note(group("Eighth note", (-0.95, -0.9, 0.62), (8, 18, 14), 0.7))
-vinyl(group("Vinyl", (1.05, 0.9, 0.85), (74, 16, -16), 0.9))
+vinyl(group("Vinyl", (1.05, 0.9, 0.85), (82, 12, -14), 0.9))
 headphones(group("Headphones", (-0.95, -0.8, -0.72), (-12, 22, -18), 0.75))
+for name, loc, size in (("Phone shadow", (-1.85, -0.1, -1.1), (1.0, 0.55)), ("Monitor shadow", (0, 0.4, -1.1), (1.5, 0.7)), ("Laptop shadow", (1.85, 0.0, -1.1), (1.5, 0.9))):
+    shadow(name, loc, size, 0.7 if DARK else 0.35)
 sync(group("Sync", (2.15, -0.6, 0.78), (8, -12, -16), 0.85))
 
 
