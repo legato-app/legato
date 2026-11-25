@@ -73,9 +73,17 @@ pub fn match_key(title: &str, artist: &str) -> String {
     format!("{}|{}", normalize(title), primary_artist(artist))
 }
 
-/// "56K plays", "1.2M views" or a bare number: what a byline counts, never who made the song.
+/// "56K plays", "1.2M views", "56K": what a byline counts, never who made the song. A bare number stays a name ("311"
+/// is a band). YouTube is asked in English (`hl`), so only its English words.
 pub fn is_count(text: &str) -> bool {
-    text.contains(" views") || text.contains(" plays") || text.parse::<u32>().is_ok()
+    let unworded = [" plays", " views", " play", " view"].iter().find_map(|word| text.strip_suffix(word));
+    if unworded == Some("No") {
+        return true;
+    }
+    let number = unworded.unwrap_or(text);
+    let unscaled = number.strip_suffix(['K', 'M', 'B']);
+    let digits = unscaled.unwrap_or(number);
+    (unworded.is_some() || unscaled.is_some()) && digits.starts_with(|c: char| c.is_ascii_digit()) && digits.chars().all(|c| c.is_ascii_digit() || c == '.' || c == ',')
 }
 
 fn artists_overlap(a: &str, b: &str) -> bool {
@@ -203,6 +211,17 @@ mod tests {
         assert!(same_song_upload(&blocked, &copy));
         assert!(!same_song_upload(&blocked, &longer));
         assert!(!same_song_upload(&blocked, &t("GREEDY", "Capt. Slowed")));
+    }
+
+    #[test]
+    fn a_count_has_a_counts_shape() {
+        for count in ["56K plays", "1.2M views", "1,234 views", "1 play", "No views", "56K", "3B"] {
+            assert!(is_count(count), "{count}");
+        }
+        // Artists named by a number, or ending like a count.
+        for name in ["311", "702", "112", "1975", "MK", "Ocean Views", "Replay plays", "Maroon 5", ""] {
+            assert!(!is_count(name), "{name:?}");
+        }
     }
 
     #[test]

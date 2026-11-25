@@ -108,14 +108,14 @@ impl ListRef {
 const LABELS: [&str; 11] = ["Song", "Video", "Single", "Album", "EP", "Playlist", "Episode", " • ", " & ", ", ", " and "];
 
 /// Artist in a subtitle or byline ("Song • Artist • Album", "Artist • 2M views"): linked artists, else the first plain
-/// run that isn't a label, a count or a length.
+/// run that isn't a label, a count, a length or a bare number (an album's year).
 fn artist_of(runs: Option<&Value>) -> String {
     let runs: Vec<&Value> = runs.and_then(|s| s.get("runs")?.as_array()).map(|r| r.iter().collect()).unwrap_or_default();
     let linked: Vec<&str> = runs.iter().filter(|r| matches!(page_type(r), "MUSIC_PAGE_TYPE_ARTIST" | "MUSIC_PAGE_TYPE_USER_CHANNEL")).filter_map(|r| r.get("text")?.as_str()).collect();
     if !linked.is_empty() {
         return linked.join(", ");
     }
-    runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !LABELS.contains(t) && !is_count(t) && parse_duration(t).is_none()).unwrap_or("").to_string()
+    runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !LABELS.contains(t) && !is_count(t) && parse_duration(t).is_none() && t.parse::<u32>().is_err()).unwrap_or("").to_string()
 }
 
 fn album_of(runs: Option<&Value>) -> Option<String> {
