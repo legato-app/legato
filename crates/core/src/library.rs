@@ -568,9 +568,9 @@ impl Library {
         Ok(())
     }
 
-    /// Older versions stored a play count as the artist: the first source naming a real one replaces it.
+    /// Older versions stored a play count as the artist: the next read without a count replaces it, even with none.
     fn repair_artist(&self, id: i64, artist: &str) -> Result<()> {
-        if artist.is_empty() || is_count(artist) {
+        if is_count(artist) {
             return Ok(());
         }
         let (title, stored): (String, String) = self.db.prepare_cached("SELECT title, artist FROM tracks WHERE id = ?1")?.query_row([id], |row| Ok((row.get(0)?, row.get(1)?)))?;

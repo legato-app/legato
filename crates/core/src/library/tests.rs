@@ -1420,6 +1420,11 @@ fn a_count_stored_as_artist_is_repaired_by_the_next_upsert() -> Result<()> {
     assert_eq!(stored(id)?.0, "56K plays");
     assert_eq!(lib.upsert_track(&youtube())?, id);
     assert_eq!(stored(id)?, ("Daft Punk".into(), match_key(&youtube().title, "Daft Punk")));
+    // No artist at all still beats a count.
+    let nameless = Track { artist: "".into(), ids: BTreeMap::from([(Source::Youtube, "countOnly".into())]), title: "Freestyle".into(), ..Default::default() };
+    let other = lib.upsert_track(&Track { artist: "56K plays".into(), ..nameless.clone() })?;
+    lib.upsert_track(&nameless)?;
+    assert_eq!(stored(other)?, ("".into(), match_key("Freestyle", "")));
     // A real artist stays, whatever comes next.
     lib.upsert_track(&Track { artist: "Someone Else".into(), ..youtube() })?;
     assert_eq!(stored(id)?.0, "Daft Punk");
