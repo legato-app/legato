@@ -370,8 +370,8 @@ copies, downloads for offline), their accounts, limits and paid plan.
         2026-11-25, slice 1: the meeting through Nostr (`connectors/src/roomsignal.rs`): ephemeral signed events, offer and
         answer sealed, a refusal or 30 s without an answer ends it; tested on a mock relay (WebSocket), never a real one.
         2026-11-25, slice 2 (first half): the room's wire runs over any stream (`rooms::Stream`, `Host::take`, `join_over`):
-        same handshake, code and tries; tested over an in-memory pipe. Left of slice 2: the str0m data channel as that
-        stream, with Cloudflare's STUN for each side's public address.
+        same handshake, code and tries; tested over an in-memory pipe. Each side's public address from Cloudflare's STUN
+        (`stun.rs`, tested on a local UDP socket). Left of slice 2: the str0m data channel as that stream.
 - [ ] 18. `L` A Linux build (AppImage, deb): WebKitGTK, the MPRIS media panel, the tray, PipeWire for the detector.
       Built by GitHub's Actions (the owner's word, 2026-11-07); local tries in WSL or a VM once the owner sets one up
       (a system change, theirs). 19 the same, on a macOS runner.
