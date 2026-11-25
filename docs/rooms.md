@@ -2,8 +2,7 @@
 
 One device leads a room; friends on the same network follow what plays there. Each listener plays the song from their
 own source (their library, YouTube, their Spotify): no sound ever travels, only the song's description, where it is
-and whether it plays. The local network only: no server, no relay, nothing through the internet. The internet half
-is the owner's call, not built (`docs/notes/plan-v2.md` › Waiting on the user).
+and whether it plays. The local network today: no server, no relay. The internet half is being built (below).
 
 | Part | Where |
 | --- | --- |
@@ -71,6 +70,22 @@ Reactions are a fixed set of six (heart, fire, laugh, clap, party, wow); no free
   queue and play-now say "You follow the room: the host picks the songs", with Leave. A song that ends waits for the
   host instead of playing the listener's own Up next.
 
+## Over the internet (being built, plan-v2 line 17)
+
+Not in the interface yet. The listener and the host meet once through public Nostr relays (relay.damus.io, nos.lol), then
+talk directly over a WebRTC data channel (`str0m`, in Rust: never the WebView's), each side's public address learned from
+Cloudflare's STUN; no TURN, so two strict NATs can't meet. Inside the channel the room's own wire runs unchanged (the
+version, SPAKE2 on the code, sealed frames, tries counted).
+
+- The meeting (`connectors/src/roomsignal.rs`): the listener sends its offer as an ephemeral event (kind 25473: relays
+  forward it, keep nothing) tagged with SHA-256("legato-room-tag-v1" ‖ id) cut to 16 bytes, its content sealed with
+  ChaCha20-Poly1305 under SHA-256("legato-room-offer-v1" ‖ id ‖ 0 ‖ code), "offer" bound in; the host, listening for that
+  tag, answers with an event naming the offer's, sealed the same way ("answer"). A key is made for each meeting to sign
+  them (BIP-340). An event that doesn't open is skipped; a relay's refusal (`OK` false, `CLOSED`) or 30 s with no answer
+  ends the meeting, never retried sooner or elsewhere.
+- What the relays see: the tag (a hash of the room's id, not the id), both public addresses, the times. Never the id,
+  the code, the offer, songs, names or reactions.
+
 ## Privacy
 
 What leaves the host, to the devices in the room only, sealed: the song (title, artist, album, length, ISRC, YouTube
@@ -87,4 +102,6 @@ path, an account, a token or sound. The website's privacy row "Listening rooms" 
   frame before the code never read.
 - `roomFollow.test.ts`: load, seek, play / pause, the quiet time, an own pause and Catch up, a missing song, a song
   ended here first, no seek back at the end, a host's seek while paused.
+- `music_connectors::roomsignal`, on a mock relay (WebSocket on 127.0.0.1): an offer and its answer meet sealed, a wrong
+  code never heard and the listener giving up in time, a refusal, the tag and a valid signature.
 - The interface in the site demo (an invented room to start or join). Two real devices: plan-v2 › Check live.

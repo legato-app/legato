@@ -360,6 +360,15 @@ copies, downloads for offline), their accounts, limits and paid plan.
         and swapped once through public Nostr relays (relay.damus.io, nos.lol), Cloudflare's STUN for each side's public
         address; no TURN, so two strict NATs can't meet. The relays see the room's random id, both public IPs and the
         times, never songs, names or reactions: a privacy row says so.
+        Decided alone (2026-11-25): WebRTC runs in Rust, not in the WebView. The WebView's RTCPeerConnection would be network
+        from the front end (CLAUDE.md), its sockets past `Noted` and Settings › Privacy. `str0m` 0.26 (MIT/Apache, sans-IO: our
+        own UDP socket, so every host is noted; pure-Rust crypto, `rust-crypto`; only its certificate maker builds aws-lc, a C
+        library) builds on Windows (tried 2026-11-25); webrtc-rs was larger and mid-rewrite (0.17 frozen, 0.20 not stable).
+        Desktop only at first (aws-lc on the Android NDK untried). The room's own wire (SPAKE2 on the code, sealed frames,
+        tries counted) runs unchanged inside the data channel, so only the transport is new. Offers are sealed with a key from
+        the room's id and code; the relays see a hash of the id, never the id.
+        2026-11-25, slice 1: the meeting through Nostr (`connectors/src/roomsignal.rs`): ephemeral signed events, offer and
+        answer sealed, a refusal or 30 s without an answer ends it; tested on a mock relay (WebSocket), never a real one.
 - [ ] 18. `L` A Linux build (AppImage, deb): WebKitGTK, the MPRIS media panel, the tray, PipeWire for the detector.
       Built by GitHub's Actions (the owner's word, 2026-11-07); local tries in WSL or a VM once the owner sets one up
       (a system change, theirs). 19 the same, on a macOS runner.

@@ -24,6 +24,7 @@ pub mod plex;
 pub mod podcast;
 pub mod radio_browser;
 pub mod rooms;
+pub mod roomsignal;
 pub mod servers;
 pub mod soundcloud;
 pub mod spotify;
