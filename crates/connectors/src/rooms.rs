@@ -17,8 +17,7 @@ use std::fmt;
 use std::net::{IpAddr, SocketAddr};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{Semaphore, mpsc, watch};
 use tokio::task::JoinHandle;
@@ -35,7 +34,7 @@ const STEP: Duration = Duration::from_secs(10);
 /// Handshakes answered at once (members don't count).
 const AT_ONCE: usize = 4;
 /// A listener silent this long (it pings every tick) is gone; a host too (it ticks).
-const SILENT: Duration = Duration::from_millis(3 * rm::TICK_MS as u64);
+pub const SILENT: Duration = Duration::from_millis(3 * rm::TICK_MS as u64);
 /// One reaction per listener this often at most (ms): no flood.
 const REACT_GAP: i64 = 400;
 /// The host's word after the opening.
@@ -96,9 +95,13 @@ fn nonce(from_host: bool, n: u64) -> Nonce {
     Nonce::from(b)
 }
 
+/// Any byte stream a room runs over: TCP on the local network, a data channel over the internet.
+pub trait Stream: AsyncRead + AsyncWrite + Unpin + Send + 'static {}
+impl<T: AsyncRead + AsyncWrite + Unpin + Send + 'static> Stream for T {}
+
 /// The sending half of a sealed connection.
 struct Seal {
-    w: OwnedWriteHalf,
+    w: Box<dyn AsyncWrite + Unpin + Send>,
     cipher: ChaCha20Poly1305,
     host: bool,
     n: u64,
@@ -114,7 +117,7 @@ impl Seal {
 
 /// The reading half.
 struct Opener {
-    r: OwnedReadHalf,
+    r: Box<dyn AsyncRead + Unpin + Send>,
     cipher: ChaCha20Poly1305,
     host: bool,
     n: u64,
@@ -129,16 +132,16 @@ impl Opener {
     }
 }
 
-async fn spake(s: &mut TcpStream, code: &str) -> Result<Vec<u8>> {
+async fn spake<S: AsyncRead + AsyncWrite + Unpin>(s: &mut S, code: &str) -> Result<Vec<u8>> {
     let (spake, msg) = Spake2::<Ed25519Group>::start_symmetric(&Password::new(code.as_bytes()), &Identity::new(ROOM_ID));
     write_frame(s, &msg).await?;
     spake.finish(&read_frame_max(s, SPAKE_MAX).await?).map_err(|e| anyhow!("Handshake failed: {e:?}"))
 }
 
-fn halves(s: TcpStream, key: &[u8], host: bool) -> Result<(Opener, Seal)> {
+fn halves(s: impl Stream, key: &[u8], host: bool) -> Result<(Opener, Seal)> {
     let c = cipher(key)?;
-    let (r, w) = s.into_split();
-    Ok((Opener { r, cipher: c.clone(), host, n: 0 }, Seal { w, cipher: c, host, n: 0 }))
+    let (r, w) = tokio::io::split(s);
+    Ok((Opener { r: Box::new(r), cipher: c.clone(), host, n: 0 }, Seal { w: Box::new(w), cipher: c, host, n: 0 }))
 }
 
 /// What the host's shell hears.
@@ -210,6 +213,8 @@ pub struct Host {
     tasks: Vec<JoinHandle<()>>,
     /// Dropped with the host: every connection's task stops (handshakes too), whatever its listener still sends.
     _open: watch::Sender<()>,
+    closed: watch::Receiver<()>,
+    gate: Arc<Semaphore>,
 }
 
 impl Host {
@@ -217,9 +222,10 @@ impl Host {
     pub fn start(listener: TcpListener, room: String, host: String, code: String, events: mpsc::UnboundedSender<HostEvent>) -> Host {
         let r = Arc::new(Mutex::new(Room { room, host, code, tries: 0, changed: 0, shut_until: 0, members: Vec::new(), now: Now { at: now_ms(), ..Now::default() }, next: Vec::new(), ids: 0, events }));
         let (open, closed) = watch::channel(());
-        let shared = r.clone();
+        let gate = Arc::new(Semaphore::new(AT_ONCE));
+        let (shared, accepting, gone) = (r.clone(), gate.clone(), closed.clone());
         let accept = tokio::spawn(async move {
-            let gate = Arc::new(Semaphore::new(AT_ONCE));
+            let (gate, closed) = (accepting, gone);
             loop {
                 let Ok((s, from)) = listener.accept().await else {
                     tokio::time::sleep(Duration::from_millis(200)).await;
@@ -252,7 +258,20 @@ impl Host {
                 room.broadcast(&ToListener::Tick { position_ms: n.position_at(t), playing: n.playing, at: t, seq: n.seq }, None);
             }
         });
-        Host { room: r, tasks: vec![accept, tick], _open: open }
+        Host { room: r, tasks: vec![accept, tick], _open: open, closed, gate }
+    }
+
+    /// A listener come another way (a data channel over the internet): the same handshake, code and tries as on the
+    /// local network. Refused unseen when 4 handshakes already run.
+    pub fn take(&self, s: impl Stream) {
+        let Ok(permit) = self.gate.clone().try_acquire_owned() else { return };
+        let (shared, mut gone) = (self.room.clone(), self.closed.clone());
+        tokio::spawn(async move {
+            tokio::select! {
+                () = serve(shared, s, permit) => {}
+                _ = gone.changed() => {}
+            }
+        });
     }
 
     pub fn code(&self) -> String {
@@ -308,7 +327,7 @@ impl Drop for Host {
     }
 }
 
-async fn serve(room: Arc<Mutex<Room>>, mut s: TcpStream, permit: tokio::sync::OwnedSemaphorePermit) {
+async fn serve(room: Arc<Mutex<Room>>, mut s: impl Stream, permit: tokio::sync::OwnedSemaphorePermit) {
     let Ok(Ok(raw)) = timeout(STEP, read_frame_max(&mut s, OPENING_MAX)).await else { return };
     let Ok(open) = serde_json::from_slice::<Opening>(&raw) else { return };
     if open.v != rm::VERSION {
@@ -437,7 +456,12 @@ impl Drop for Link {
 
 /// `silent`: the host heard of (ticks every 5 s) at least this often, else gone (asleep, off the network).
 async fn join_at(addr: SocketAddr, code: &str, name: &str, silent: Duration) -> Result<Joined> {
-    let mut s = timeout(STEP, TcpStream::connect(addr)).await.map_err(|_| anyhow!("Unreachable"))??;
+    let s = timeout(STEP, TcpStream::connect(addr)).await.map_err(|_| anyhow!("Unreachable"))??;
+    join_over(s, code, name, silent).await
+}
+
+/// Joins the room at the other end of `s` (TCP, or a data channel over the internet).
+pub async fn join_over(mut s: impl Stream, code: &str, name: &str, silent: Duration) -> Result<Joined> {
     write_frame(&mut s, &serde_json::to_vec(&Opening { v: rm::VERSION })?).await?;
     match timeout(STEP, s.read_u8()).await.map_err(|_| anyhow!("No answer"))?? {
         GO => {}
@@ -640,6 +664,23 @@ mod tests {
             let _ = join(&[addr], "111111", "Guess").await;
         }
         assert!(host.room.lock().unwrap().shut_until - now_ms() > rm::shut_ms(1) - 5_000);
+    }
+
+    #[tokio::test]
+    async fn a_room_runs_the_same_over_any_stream_code_and_tries_included() {
+        let (host, _, _) = host().await;
+        let over = |code: &'static str| {
+            let (mine, theirs) = tokio::io::duplex(64 * 1024);
+            host.take(theirs);
+            async move { join_over(mine, code, "Far", SILENT).await }
+        };
+        assert!(over("111111").await.err().unwrap().is::<WrongCode>());
+        assert_eq!(host.room.lock().unwrap().tries, 1, "a guess counted, as on the local network");
+        let j = over(CODE).await.unwrap();
+        assert_eq!(j.welcome.people, vec!["Far".to_string()]);
+        host.set_now(Now { song: Some(song("Over")), ..Now::default() });
+        let ToListener::Now { now } = next(&mut { j.messages }).await else { panic!() };
+        assert_eq!(now.song.unwrap().title, "Over");
     }
 
     #[tokio::test]
