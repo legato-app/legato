@@ -4,12 +4,12 @@ PackageVersion: 1.1.681
 PackageLocale: en-US
 Publisher: Clovis500c
 PublisherUrl: https://github.com/Clovis500c
-PublisherSupportUrl: https://github.com/Clovis500c/legato/issues
-PrivacyUrl: https://clovis500c.github.io/legato/#privacy
+PublisherSupportUrl: https://github.com/legato-app/legato/issues
+PrivacyUrl: https://legato-app.github.io/legato/#privacy
 PackageName: Legato
-PackageUrl: https://clovis500c.github.io/legato/
+PackageUrl: https://legato-app.github.io/legato/
 License: Source-available, free to use
-LicenseUrl: https://github.com/Clovis500c/legato/blob/master/LICENSE
+LicenseUrl: https://github.com/legato-app/legato/blob/master/LICENSE
 Copyright: Copyright (c) 2026 Clovis500c. All rights reserved.
 ShortDescription: One player for YouTube Music, Spotify, Apple Music and your files.
 Description: |-
@@ -24,6 +24,6 @@ Tags:
   - music-player
   - spotify
   - youtube-music
-ReleaseNotesUrl: https://github.com/Clovis500c/legato/releases/tag/v1.1.681
+ReleaseNotesUrl: https://github.com/legato-app/legato/releases/tag/v1.1.681
 ManifestType: defaultLocale
 ManifestVersion: 1.28.0

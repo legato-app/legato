@@ -1,2 +1,2 @@
 /** A pasted text that is a shared playlist: the website's link, the app's own, a QR code's text. Rust reads it (`music_core::share::parse`). */
-export const isShareCode = (text: string) => /^(https:\/\/(legato-app|clovis500c)\.github\.io\/legato\/l\/#|legato:\/\/playlist\/|LG1:)/i.test(text)
+export const isShareCode = (text: string) => /^(https:\/\/legato-app\.github\.io\/legato\/l\/#|legato:\/\/playlist\/|LG1:)/i.test(text)

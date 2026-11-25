@@ -5,7 +5,7 @@ Last.fm, Music Detector, the Live Editor, the Windows media panel.
 
 ## "Why Legato" on the website
 
-- **Sees**: a section on https://clovis500c.github.io/legato/ (and a short line in the README): four cards, Legal (plays
+- **Sees**: a section on https://legato-app.github.io/legato/ (and a short line in the README): four cards, Legal (plays
   through the official players, nothing downloaded), Light (measured RAM and start time), Your PCs in sync (no
   account, no server), Your scrobbles (Last.fm). No competitor named.
 - **How**: `site/components/content.tsx` (copy), a new component beside the features grid, in every site language.

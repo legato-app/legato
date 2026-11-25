@@ -111,8 +111,6 @@ pub const QR: &str = "LG1:";
 /// The website's page that shows a shared playlist in any browser. The code rides in the fragment, which a browser
 /// keeps to itself: GitHub's server never sees the playlist.
 pub const WEB_LINK: &str = "https://legato-app.github.io/legato/l/#";
-/// The page's address before the repo moved to the organization (2026-11-25): links already sent still read.
-const OLD_WEB_LINK: &str = "https://clovis500c.github.io/legato/l/#";
 
 impl Item {
     pub fn from_track(t: &Track) -> Self {
@@ -395,7 +393,7 @@ pub fn read_qr(path: &Path) -> Result<String> {
 /// Link or QR text. Whitespace inside links tolerated (chat apps wrap lines).
 pub fn parse(text: &str) -> Result<Shared> {
     let text = text.trim();
-    if let Some(rest) = [LINK, WEB_LINK, OLD_WEB_LINK].iter().find_map(|p| text.strip_prefix(p)) {
+    if let Some(rest) = text.strip_prefix(LINK).or_else(|| text.strip_prefix(WEB_LINK)) {
         let clean: String = rest.chars().filter(|c| !c.is_whitespace()).collect();
         return decode(&URL_SAFE_NO_PAD.decode(clean).context("Share link is damaged")?);
     }
@@ -535,8 +533,6 @@ mod tests {
     fn a_web_link_reads_like_the_app_link() {
         let link = to_web_link(&sample());
         assert!(link.starts_with("https://legato-app.github.io/legato/l/#"));
-        // A link sent before the move to the organization (2026-11-25) still reads.
-        assert_eq!(parse(&link.replace(WEB_LINK, OLD_WEB_LINK)).unwrap(), sample());
         assert_eq!(parse(&link).unwrap(), sample());
         // The website's test reads this very link (site/components/sharelink.test.ts).
         println!("WEB {link}");

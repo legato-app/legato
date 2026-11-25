@@ -27,7 +27,7 @@ versions are in git (`git log -p -- docs/notes/handoff.md`). Updated 2026-11-19 
   lists what to delete.
 - **Android**: desktop-only code sits behind `#[cfg(desktop)]` or `#[cfg(windows)]`. The Android target and the Kotlin
   toolchain are not usable on this PC: CI's android job is the check.
-- **Website** https://clovis500c.github.io/legato/, deployed from master: 18 languages, not yet Arabic or Hebrew.
+- **Website** https://legato-app.github.io/legato/, deployed from master: 18 languages, not yet Arabic or Hebrew.
 - **winget**: microsoft/winget-pkgs#474341 (Stable 1.1.681) waits for a moderator; each new Stable needs a new manifest
   (`packaging/README.md`).
 - **Discord pings** (`CONTRIBUTING.md` › Releasing, `.github/workflows/release.yml`): MonitoRSS reads the releases feed. A
@@ -94,7 +94,7 @@ Nothing left that can be built without the owner. In order, when he is back:
 
 Releasing, only on the owner's word (`CONTRIBUTING.md` › Releasing). A Beta: `/release-check`, then
 `git push origin platforms:master`. Stable: `git fetch --tags`, `node scripts/promote.mjs --dry-run <version>`, then
-`gh workflow run promote.yml --repo Clovis500c/legato --ref master -f version=<version>`; check
+`gh workflow run promote.yml --repo legato-app/legato --ref master -f version=<version>`; check
 `releases/latest/download/latest.json` after.
 
 ## Reprendre l'orchestration
