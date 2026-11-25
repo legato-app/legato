@@ -371,7 +371,14 @@ copies, downloads for offline), their accounts, limits and paid plan.
         answer sealed, a refusal or 30 s without an answer ends it; tested on a mock relay (WebSocket), never a real one.
         2026-11-25, slice 2 (first half): the room's wire runs over any stream (`rooms::Stream`, `Host::take`, `join_over`):
         same handshake, code and tries; tested over an in-memory pipe. Each side's public address from Cloudflare's STUN
-        (`stun.rs`, tested on a local UDP socket). Left of slice 2: the str0m data channel as that stream.
+        (`stun.rs`, tested on a local UDP socket). Slice 2 done: the str0m data channel as that stream (`roomlink.rs`
+        `dial`/`accept`, candidates sent with the offer, no trickle; 20 s to open or "Couldn’t reach the room"); a real
+        room runs over it on 127.0.0.1 (welcome, code, a song). Never tried across two networks or through a NAT.
+        Left: slice 3, the UI ("Over the internet" in the room dialog: the invite link with id and code, the host listening
+        on the relays, each side's LAN address and STUN, "two strict networks can't meet" said, 17 locales) and the shell
+        commands in `src-tauri/src/rooms.rs` (desktop only); slice 4 with it, as nothing reaches the relays or STUN until
+        then: the privacy row "Listening rooms" (`content.tsx`) and Settings › Privacy's hosts gain the relays and STUN
+        with what they see (`connect` and `public_address` already note their hosts).
 - [ ] 18. `L` A Linux build (AppImage, deb): WebKitGTK, the MPRIS media panel, the tray, PipeWire for the detector.
       Built by GitHub's Actions (the owner's word, 2026-11-07); local tries in WSL or a VM once the owner sets one up
       (a system change, theirs). 19 the same, on a macOS runner.

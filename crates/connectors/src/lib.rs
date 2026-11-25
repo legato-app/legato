@@ -24,6 +24,8 @@ pub mod plex;
 pub mod podcast;
 pub mod radio_browser;
 pub mod rooms;
+#[cfg(not(target_os = "android"))]
+pub mod roomlink;
 pub mod roomsignal;
 pub mod stun;
 pub mod servers;

@@ -85,6 +85,9 @@ version, SPAKE2 on the code, sealed frames, tries counted).
   ends the meeting, never retried sooner or elsewhere.
 - Each side's public address (`connectors/src/stun.rs`): one STUN binding request to stun.cloudflare.com:3478 from the
   data channel's own UDP socket, 3 tries a second apart. Cloudflare sees that address and the time.
+- The link (`connectors/src/roomlink.rs`, desktop only): the listener's `dial` makes an offer with one data channel
+  ("room") and its candidates (the socket's own address and the public one), the host's `accept` answers; each side
+  drives its `str0m` on its own UDP socket and hands the room a byte stream once the channel opened (20 s at most).
 - What the relays see: the tag (a hash of the room's id, not the id), both public addresses, the times. Never the id,
   the code, the offer, songs, names or reactions.
 
@@ -106,5 +109,7 @@ path, an account, a token or sound. The website's privacy row "Listening rooms" 
   ended here first, no seek back at the end, a host's seek while paused.
 - `music_connectors::roomsignal`, on a mock relay (WebSocket on 127.0.0.1): an offer and its answer meet sealed, a wrong
   code never heard and the listener giving up in time, a refusal, the tag and a valid signature.
+- `music_connectors::roomlink`: a real room (welcome, code, a song) over a data channel between two sockets on
+  127.0.0.1, nobody answering ending in time.
 - `music_connectors::stun`: an answer read (its own only), a lost request retried, on a UDP socket on 127.0.0.1.
 - The interface in the site demo (an invented room to start or join). Two real devices: plan-v2 › Check live.
