@@ -239,7 +239,10 @@ fn row_track_with(row: &Value, fallback: Option<&str>) -> Option<Track> {
     let duration_ms = runs.iter().filter_map(|r| r.get("text")?.as_str()).chain(fixed.iter().map(String::as_str)).find_map(parse_duration);
     // No linked artist (plain videos): first plain run that isn't a type label, separator or count.
     let artist = if artists.is_empty() {
-        runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !matches!(*t, "Song" | "Video" | "Episode" | " • " | " & " | ", ") && !is_count(t) && parse_duration(t).is_none()).or(fallback.filter(|f| !f.is_empty()))?.to_string()
+        let plain = || runs.iter().filter_map(|r| r.get("text")?.as_str());
+        // Only a count to go by: kept with no artist, as a dropped row would leave a synced playlist.
+        let nameless = || plain().any(is_count).then_some("");
+        plain().find(|t| !matches!(*t, "Song" | "Video" | "Episode" | " • " | " & " | ", ") && !is_count(t) && parse_duration(t).is_none()).or(fallback.filter(|f| !f.is_empty())).or_else(nameless)?.to_string()
     } else {
         artists.join(", ")
     };
@@ -638,7 +641,8 @@ mod tests {
         let plays = |more: Vec<Value>| [vec![run("Video", None), run(" • ", None), run("56K plays", None), run(" • ", None), run("2:31", None)], more].concat();
         let page = json!([row("v1", "Freestyle", plays(vec![run(" • ", None), run("A Channel", None)]), None), row("v2", "Freestyle", plays(vec![]), None)]);
         let tracks = rows(&page);
-        assert_eq!(tracks.iter().map(|t| t.artist.as_str()).collect::<Vec<_>>(), ["A Channel"]);
+        // The count-only row stays, nameless: a dropped row would leave the playlist's mirror.
+        assert_eq!(tracks.iter().map(|t| t.artist.as_str()).collect::<Vec<_>>(), ["A Channel", ""]);
         assert_eq!(row_track_with(&page[1]["musicResponsiveListItemRenderer"], Some("The Artist")).unwrap().artist, "The Artist");
     }
 
