@@ -45,7 +45,7 @@ account. Old share links are not read any more (the owner's word).
   player. Apple Music the same way (against Apple's terms, said first): the playlists music.apple.com shows
   (`crates/shield/src/apple.js`), never its developer or user token.
 - Every HTTP client the app builds takes `music_connectors::Noted` as its resolver, every window the shield hook or
-  `shield::watch` (hosts talked to: Settings › Privacy). The website's privacy rows (`PRIVACY`, `SERVICES` in
+  `shield::watch` (hosts talked to: Settings › Privacy). The website's privacy rows (`PRIVACY` in
   `content.tsx`) stay true when the app reaches or sends something new.
 - English for code, comments, docs and commits. Every interface text goes through `shared/i18n` (`tr`, `trn` for
   counts, `msg` in tables): English source and fallback, 17 locales in `shared/i18n/locales` keyed by the English text;
