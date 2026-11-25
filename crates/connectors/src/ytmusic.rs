@@ -402,6 +402,7 @@ impl YouTubeMusic {
 
     /// Playlist page + continuations: the playlist shelf of the first page (no suggestions), then each continuation.
     /// False: cut short (a continuation came without songs, pages left unread, or a first page of an unknown shape).
+    /// A playlist emptied on YouTube reads as that last one on purpose: the safe side, its songs stay here.
     async fn browse_pages(&self, browse_id: &str) -> Result<(Vec<Value>, bool)> {
         let page = self.call("browse", json!({ "browseId": browse_id })).await?;
         let known_shape = !all(&page, "musicPlaylistShelfRenderer").is_empty() || !rows(&page).is_empty();
