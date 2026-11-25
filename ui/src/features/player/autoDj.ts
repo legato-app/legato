@@ -25,9 +25,9 @@ export const whyText = (w: DjWhy) =>
 
 /** The pool's songs still in the library and playable now, picked by the rules after `queue`; their reasons kept. */
 function pick(pool: readonly number[], queue: readonly LibraryTrack[]): LibraryTrack[] {
-  const { tracks, stats, status, raw } = useStore.getState()
+  const { tracks, stats, raw } = useStore.getState()
   const keep = new Set(pool)
-  const songs = tracks.filter((t) => keep.has(t.id) && vias(t, status.spotify.connected).length > 0)
+  const songs = tracks.filter((t) => keep.has(t.id) && vias(t).length > 0)
   // Liked Music, the account's and yours: their artists come up more.
   const liked = new Set([youtubeLiked(raw.playlists), ownLiked(raw.playlists)].flatMap((p) => (p ? (raw.orders[p.id] ?? []) : [])))
   const by = likedArtists(tracks, liked)

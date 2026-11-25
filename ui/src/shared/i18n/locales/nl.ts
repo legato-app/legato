@@ -164,7 +164,6 @@ const nl: Record<string, string> = {
   'Auto · video': 'Auto · video',
   'Video': 'Video',
   'Cover': 'Cover',
-  'Playing in your Spotify app': 'Speelt in je Spotify-app',
   '30-second preview': 'Voorbeeld van 30 seconden',
   'Listen on Apple Music': 'Luisteren op Apple Music',
   'Add {title} to a playlist': '{title} aan een playlist toevoegen',
@@ -1080,7 +1079,6 @@ const nl: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'Dubbelklik om te herstellen',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify speelt in zijn eigen app: de Live Editor kan het geluid ervan niet veranderen. Je instellingen voor dit nummer blijven bewaard voor andere bronnen.',
   'YouTube’s sound processing is off.': 'De geluidsverwerking van YouTube staat uit.',
   'Edited': 'Bewerkt',
   'Original sound': 'Origineel geluid',

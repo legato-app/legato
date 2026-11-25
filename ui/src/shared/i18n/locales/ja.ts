@@ -164,7 +164,6 @@ const ja: Record<string, string> = {
   'Auto · video': '自動 · 動画',
   'Video': '動画',
   'Cover': 'カバー',
-  'Playing in your Spotify app': 'Spotifyアプリで再生中',
   '30-second preview': '30秒プレビュー',
   'Listen on Apple Music': 'Apple Musicで聴く',
   'Add {title} to a playlist': '{title}をプレイリストに追加',
@@ -1080,7 +1079,6 @@ const ja: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'ダブルクリックでリセット',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'SpotifyはSpotifyアプリで再生されるため、Live Editorでは音を変えられません。この曲の設定は別に保存されています。',
   'YouTube’s sound processing is off.': 'YouTubeのサウンド処理がオフになっています。',
   'Edited': '編集済み',
   'Original sound': '元の音',

@@ -164,7 +164,6 @@ const id: Record<string, string> = {
   'Auto · video': 'Otomatis · video',
   'Video': 'Video',
   'Cover': 'Sampul',
-  'Playing in your Spotify app': 'Diputar di aplikasi Spotify-mu',
   '30-second preview': 'Pratinjau 30 detik',
   'Listen on Apple Music': 'Dengarkan di Apple Music',
   'Add {title} to a playlist': 'Tambahkan {title} ke playlist',
@@ -1080,7 +1079,6 @@ const id: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'Klik dua kali untuk mengatur ulang',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify diputar di aplikasinya sendiri: Live Editor tidak bisa mengubah suaranya. Pengaturanmu untuk lagu ini disimpan untuk sumber lain.',
   'YouTube’s sound processing is off.': 'Pemrosesan suara YouTube nonaktif.',
   'Edited': 'Diedit',
   'Original sound': 'Suara asli',

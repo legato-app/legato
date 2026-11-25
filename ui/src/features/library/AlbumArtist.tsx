@@ -91,10 +91,9 @@ function AlbumRow({ list, i, number }: { list: LibraryTrack[]; i: number; number
   const t = list[i]
   const play = usePlayer((s) => s.playTracks)
   const on = usePlayer((s) => s.now?.trackId === t.id)
-  const sp = useStore((s) => s.status.spotify.connected)
   const plays = useStore((s) => s.stats[t.id]?.[0])
   const liked = useLikedIds().has(t.id)
-  const playable = canPlay(t, sp)
+  const playable = canPlay(t)
   const phone = usePhone()
   return (
     <li onContextMenu={onMenu(() => trackMenu(t, { list, index: i }))} onClick={() => phone && playable && play(list, i)} onDoubleClick={() => playable && play(list, i)} className={`group grid h-10 items-center gap-4 rounded-md px-2 hover:bg-raised ${PHONE_GRID}`} style={ALBUM_GRID}>
@@ -134,8 +133,7 @@ function SongRow({ list, i, cover, extra, sub, number }: { list: LibraryTrack[];
   const t = list[i]
   const play = usePlayer((s) => s.playTracks)
   const on = usePlayer((s) => s.now?.trackId === t.id)
-  const sp = useStore((s) => s.status.spotify.connected)
-  const playable = canPlay(t, sp)
+  const playable = canPlay(t)
   const phone = usePhone()
   return (
     <li onContextMenu={onMenu(() => trackMenu(t, { list, index: i }))} onClick={() => phone && playable && play(list, i)} onDoubleClick={() => playable && play(list, i)} className="group flex h-13 items-center gap-4 rounded-md px-3 hover:bg-raised phone:gap-3 phone:px-0">

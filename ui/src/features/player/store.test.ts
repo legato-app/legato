@@ -11,6 +11,20 @@ const song = (id: number): LibraryTrack => ({ id, added: 0, addedAt: null, title
 const settle = () => new Promise((r) => setTimeout(r))
 const STOPPED = 'No song in the queue can play here: stopped'
 
+describe('a song with only an Apple preview', () => {
+  it('is looked up on YouTube first, and plays its preview when it is not there', async () => {
+    const findNow = vi.spyOn(api, 'findNow').mockResolvedValue(false)
+    vi.spyOn(api, 'playPreview').mockResolvedValue('https://music.apple.com/x')
+    useStore.setState({ notify: vi.fn(() => 0), notFound: [] })
+    usePlayer.getState().playTracks([{ ...song(7), ids: { apple: '7' } }], 0)
+    await settle()
+    await settle()
+    expect(findNow).toHaveBeenCalledWith(7)
+    expect(usePlayer.getState().now?.via).toBe('preview')
+    vi.restoreAllMocks()
+  })
+})
+
 describe('queue of refused videos on repeat all', () => {
   const notify = vi.fn()
   beforeEach(() => {

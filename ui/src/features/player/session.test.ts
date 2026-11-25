@@ -23,6 +23,8 @@ describe('session', () => {
     const served = JSON.parse(JSON.stringify(snapshot({ ...player, now: { trackId: 3, via: 'server' } })))
     expect(restore(served, lib)?.queue?.via).toBe('server')
     expect(restore({ ...served, via: 'elsewhere' }, lib)?.queue?.via).toBeUndefined()
+    // Saved by a version that played through Spotify Connect: the queue still loads, played the usual way.
+    expect(restore({ ...served, via: 'spotify' }, lib)?.queue).toMatchObject({ index: expect.any(Number), via: undefined })
   })
 
   it('keeps where the queue was started (Now Playing\'s "From …") through a relaunch, junk dropped', () => {

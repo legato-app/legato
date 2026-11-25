@@ -34,7 +34,7 @@ export function startListenbrainz() {
     if (!s.now || !s.playing || id === undefined || id === last) return
     last = id
     from.delete(id)
-    from.set(id, { via: s.now.via, youtubeId: s.now.youtubeId, spotifyId: s.now.spotifyId })
+    from.set(id, { via: s.now.via, youtubeId: s.now.youtubeId })
     if (from.size > 8) from.delete(from.keys().next().value!)
     const t = trackOf(id)
     if (on() && t) void api.listenbrainzNowPlaying(toListen(t, Math.floor(Date.now() / 1000), from.get(id))).catch(() => {})

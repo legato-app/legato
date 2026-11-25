@@ -164,7 +164,6 @@ const uk: Record<string, string> = {
   'Auto · video': 'Авто · відео',
   'Video': 'Відео',
   'Cover': 'Обкладинка',
-  'Playing in your Spotify app': 'Грає у твоєму застосунку Spotify',
   '30-second preview': '30-секундний фрагмент',
   'Listen on Apple Music': 'Слухати в Apple Music',
   'Add {title} to a playlist': 'Додати {title} до плейлиста',
@@ -1080,7 +1079,6 @@ const uk: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'Подвійне клацання для скидання',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify грає у власному застосунку: Live Editor не може змінити його звук. Твої налаштування для цієї пісні зберігаються для інших джерел.',
   'YouTube’s sound processing is off.': 'Обробку звуку YouTube вимкнено.',
   'Edited': 'Змінено',
   'Original sound': 'Оригінальний звук',

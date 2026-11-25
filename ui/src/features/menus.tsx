@@ -61,7 +61,6 @@ import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, use
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
 const fail = (e: unknown) => app().notify(String(e), { kind: 'error' })
-const sp = () => app().status.spotify.connected
 
 function copy(text: string, done: string) {
   navigator.clipboard.writeText(text).then(() => app().notify(done), fail)
@@ -287,7 +286,7 @@ export function playlistsMenu(): MenuEntry[] {
 }
 
 function playVia(t: LibraryTrack, list: LibraryTrack[], index: number): MenuEntry {
-  const ways = vias(t, sp())
+  const ways = vias(t)
   return ways.length > 1 && { label: tr('Play via'), icon: <SpeakerHigh size={16} />, items: ways.map((v) => ({ label: tr(viaLabel[v]), onSelect: () => player().playTracks(list, index, v) })) }
 }
 
@@ -440,7 +439,7 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
   // Added since: library actions (playlists) from now on.
   t = ownOf(t)
   if (isRemote(t)) return remoteMenu(t, list, index)
-  const playable = canPlay(t, sp())
+  const playable = canPlay(t)
   const go = app().go
   return shaped('track', [
     { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !playable, onSelect: () => player().playTracks(list, index) },
@@ -448,8 +447,8 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
     { id: 'addToQueue', label: tr('Add to queue'), icon: <ListPlus size={16} />, disabled: !playable, onSelect: () => player().enqueue([t], false) },
     ctx.queueIndex !== undefined && { id: 'removeFromQueue', label: tr('Remove from queue'), icon: <MinusCircle size={16} />, onSelect: () => player().dequeue(ctx.queueIndex!) },
     tag('playVia', playVia(t, list, index)),
-    vias(t, sp()).length > 0 && { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, onSelect: () => void startRadio(t) },
-    vias(t, sp()).length > 0 && { id: 'startMix', label: tr('Start a mix from this song'), icon: <Sparkle size={16} />, onSelect: () => void startMix(t) },
+    vias(t).length > 0 && { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, onSelect: () => void startRadio(t) },
+    vias(t).length > 0 && { id: 'startMix', label: tr('Start a mix from this song'), icon: <Sparkle size={16} />, onSelect: () => void startMix(t) },
     '-',
     tag('addTo', addTo(() => [t], t)),
     ctx.playlistId !== undefined && { id: 'removeFromPlaylist', label: tr('Remove from this playlist'), icon: <MinusCircle size={16} />, onSelect: () => void removeFromPlaylist(ctx.playlistId!, ctx.position!) },
@@ -457,7 +456,7 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
     '-',
     t.album && { id: 'goToAlbum', label: tr('Go to album'), icon: <Disc size={16} />, onSelect: () => go({ name: 'album', album: t.album!, artist: primaryArtist(t.artist) }) },
     { id: 'goToArtist', label: tr('Go to artist'), icon: <MicrophoneStage size={16} />, onSelect: () => go({ name: 'artist', artist: primaryArtist(t.artist) }) },
-    !isFull(t, sp()) &&
+    !isFull(t) &&
       app().status.youtube.connected && {
         id: 'findFull',
         label: tr('Find full version'),
@@ -564,7 +563,7 @@ function editAll(tracks: LibraryTrack[]): MenuEntry {
 }
 
 export function tracksMenu(tracks: LibraryTrack[], extra: MenuEntry[] = []): MenuEntry[] {
-  const playable = tracks.some((t) => canPlay(t, sp()))
+  const playable = tracks.some((t) => canPlay(t))
   return shaped('tracks', [
     { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !playable, onSelect: () => player().playTracks(tracks, 0) },
     { id: 'shuffle', label: tr('Shuffle play'), icon: <Shuffle size={16} />, disabled: !playable, onSelect: () => shufflePlay(tracks) },

@@ -164,7 +164,6 @@ const hi: Record<string, string> = {
   'Auto · video': 'ऑटो · वीडियो',
   'Video': 'वीडियो',
   'Cover': 'कवर',
-  'Playing in your Spotify app': 'आपके Spotify ऐप में चल रहा है',
   '30-second preview': '30 सेकंड का प्रीव्यू',
   'Listen on Apple Music': 'Apple Music पर सुनें',
   'Add {title} to a playlist': '{title} को प्लेलिस्ट में जोड़ें',
@@ -1080,7 +1079,6 @@ const hi: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'रीसेट करने के लिए डबल-क्लिक करें',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify अपने ऐप में चलता है: Live Editor उसकी आवाज़ नहीं बदल सकता। इस गाने के लिए आपकी सेटिंग कहीं और रखी हैं।',
   'YouTube’s sound processing is off.': 'YouTube की साउंड प्रोसेसिंग बंद है।',
   'Edited': 'बदला गया',
   'Original sound': 'मूल आवाज़',

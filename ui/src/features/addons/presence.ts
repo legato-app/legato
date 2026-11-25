@@ -15,11 +15,9 @@ export function presenceFor(now: NowPlaying | undefined, track: LibraryTrack | u
     ? null
     : now.youtubeId
       ? ['Listen on YouTube', `https://www.youtube.com/watch?v=${now.youtubeId}`]
-      : now.spotifyId
-        ? ['Listen on Spotify', `https://open.spotify.com/track/${now.spotifyId}`]
-        : now.page?.startsWith('https://')
-          ? ['Listen on Apple Music', now.page]
-          : null
+      : now.page?.startsWith('https://')
+        ? ['Listen on Apple Music', now.page]
+        : null
   // Discord fetches the cover itself: https only (local covers stay on this PC).
   const art = track?.art?.startsWith('https://') ? track.art : now.youtubeId ? `https://i.ytimg.com/vi/${now.youtubeId}/hqdefault.jpg` : null
   return {

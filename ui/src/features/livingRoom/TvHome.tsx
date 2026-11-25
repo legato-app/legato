@@ -18,8 +18,7 @@ export function TvHome() {
   const order = usePlayer((s) => s.order)
   const index = usePlayer((s) => s.index)
   const playAt = usePlayer((s) => s.playAt)
-  const sp = useStore((s) => s.status.spotify.connected)
-  const coming = tvQueue(order, index, 6, (i) => !!list[i] && canPlay(list[i], sp))
+  const coming = tvQueue(order, index, 6, (i) => !!list[i] && canPlay(list[i]))
   const tiles: [string, ReactNode, View][] = [
     [tr('Search'), <MagnifyingGlass key="s" size={40} />, { name: 'search' }],
     [tr('Songs'), <MusicNotes key="o" size={40} />, { name: 'songs' }],

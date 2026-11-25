@@ -16,8 +16,7 @@ let unkey: (() => void) | undefined
 
 /** Can the screen open now: something plays (or is queued) that the app can hear. */
 export const canVizFull = () => {
-  const via = usePlayer.getState().now?.via
-  return !!via && via !== 'spotify'
+  return !!usePlayer.getState().now?.via
 }
 
 export function openVizFull() {

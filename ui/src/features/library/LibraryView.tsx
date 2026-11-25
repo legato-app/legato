@@ -107,8 +107,7 @@ function ColumnsButton({ extra }: { extra?: () => MenuEntry[] }) {
 /** Round play button: starts first playable track of the list. Absent if none. */
 export function PlayAll({ tracks }: { tracks: LibraryTrack[] }) {
   const play = usePlayer((s) => s.playTracks)
-  const sp = useStore((s) => s.status.spotify.connected)
-  const first = tracks.findIndex((t) => canPlay(t, sp))
+  const first = tracks.findIndex((t) => canPlay(t))
   if (first < 0) return null
   return (
     <RoundButton label={tr('Play all')} kind="primary" size="lg" onClick={() => play(tracks, first)}>
@@ -237,13 +236,12 @@ function FindVersions({ tracks }: { tracks: LibraryTrack[] }) {
 
 /** What plays in full, what only previews, what can't play: a pill in the toolbar, the detail on click. */
 function Playability({ tracks }: { tracks: LibraryTrack[] }) {
-  const sp = useStore((s) => s.status.spotify.connected)
   const [open, setOpen] = useState(false)
   // Android's Back closes it first (app/androidBack.ts).
   useEffect(() => (open ? holdLayer(() => setOpen(false)) : undefined), [open])
-  const full = tracks.filter((t) => isFull(t, sp)).length
-  const missing = tracks.filter((t) => !isFull(t, sp))
-  const preview = missing.filter((t) => vias(t, sp).length > 0).length
+  const full = tracks.filter((t) => isFull(t)).length
+  const missing = tracks.filter((t) => !isFull(t))
+  const preview = missing.filter((t) => vias(t).length > 0).length
   if (!tracks.length) return null
   const parts = [trn(full, '{n} song playable in full', '{n} songs playable in full'), preview > 0 && trn(preview, '{n} as 30 s preview', '{n} as 30 s preview'), missing.length > preview && trn(missing.length - preview, '{n} with no playable source', '{n} with no playable source')].filter((x): x is string => !!x)
   return (

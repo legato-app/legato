@@ -164,7 +164,6 @@ const vi: Record<string, string> = {
   'Auto · video': 'Tự động · video',
   'Video': 'Video',
   'Cover': 'Ảnh bìa',
-  'Playing in your Spotify app': 'Đang phát trong ứng dụng Spotify của bạn',
   '30-second preview': 'Bản nghe thử 30 giây',
   'Listen on Apple Music': 'Nghe trên Apple Music',
   'Add {title} to a playlist': 'Thêm {title} vào danh sách phát',
@@ -1080,7 +1079,6 @@ const vi: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'Nhấp đúp để đặt lại',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify phát trong ứng dụng riêng: Live Editor không thể thay đổi âm thanh của nó. Cài đặt của bạn cho bài này vẫn được giữ ở nơi khác.',
   'YouTube’s sound processing is off.': 'Xử lý âm thanh YouTube đang tắt.',
   'Edited': 'Đã chỉnh',
   'Original sound': 'Âm thanh gốc',

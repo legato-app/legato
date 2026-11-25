@@ -137,7 +137,6 @@ function Reach() {
       {action}
     </p>
   )
-  if (via === 'spotify') return note(tr('Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.'))
   if (via === 'youtube' && !liveYoutube)
     return note(
       tr('YouTube’s sound processing is off.'),

@@ -11,8 +11,7 @@ const Strip = lazy(() => import('./Visualizer').then((m) => ({ default: m.MiniSt
  */
 export function MiniViz({ className = '' }: { className?: string }) {
   const on = useSettings((s) => s.settings.visualizer && s.settings.visualizerMini && s.settings.motion)
-  const spotify = usePlayer((s) => s.now?.via === 'spotify')
-  if (!on || spotify) return null
+  if (!on) return null
   return (
     <div aria-hidden className={`pointer-events-none h-6 ${className}`}>
       <Suspense>

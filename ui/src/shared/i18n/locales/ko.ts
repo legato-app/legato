@@ -164,7 +164,6 @@ const ko: Record<string, string> = {
   'Auto · video': '자동 · 동영상',
   'Video': '동영상',
   'Cover': '커버',
-  'Playing in your Spotify app': 'Spotify 앱에서 재생 중',
   '30-second preview': '30초 미리 듣기',
   'Listen on Apple Music': 'Apple Music에서 듣기',
   'Add {title} to a playlist': '{title}을(를) 플레이리스트에 추가',
@@ -1080,7 +1079,6 @@ const ko: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': '두 번 클릭하여 초기화',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify는 자체 앱에서 재생되어 Live Editor가 소리를 바꿀 수 없습니다. 이 곡의 설정은 따로 보관됩니다.',
   'YouTube’s sound processing is off.': 'YouTube 사운드 처리가 꺼져 있습니다.',
   'Edited': '편집됨',
   'Original sound': '원래 소리',

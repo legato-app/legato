@@ -73,7 +73,6 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
   const play = usePlayer((s) => s.playTracks)
   const editPlaylist = useStore((s) => s.editPlaylist)
   const playingId = usePlayer((s) => s.now?.trackId)
-  const sp = useStore((s) => s.status.spotify.connected)
   const stats = useStore((s) => s.stats)
   const rate = useStore((s) => s.rate)
   const liked = useLikedIds()
@@ -140,7 +139,7 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
       return choose(all(tracks))
     }
     if (e.key === 'Escape' && sel.ids.size) return choose({ ...NONE, cursor: sel.cursor })
-    if (e.key === 'Enter' && sel.cursor !== null && canPlay(tracks[sel.cursor], sp)) return play(tracks, sel.cursor)
+    if (e.key === 'Enter' && sel.cursor !== null && canPlay(tracks[sel.cursor])) return play(tracks, sel.cursor)
     if (e.key === 'Delete' && editId !== undefined && sel.ids.size) removeChosen()
   }
   // Mockup order: the hover actions and the heart sit right before the time (last column).
@@ -250,7 +249,7 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
             {virtual.getVirtualItems().map((v) => {
               const t = tracks[v.index]
               const on = t.id === playingId
-              const playable = canPlay(t, sp)
+              const playable = canPlay(t)
               const isPicked = sel.ids.has(t.id)
               return (
                 <div
@@ -301,7 +300,7 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
                     <span className="min-w-0">
                       <span className="flex items-center gap-2 text-sm font-medium">
                         <span className="truncate">{t.title}</span>
-                        {playable && !isFull(t, sp) && (
+                        {playable && !isFull(t) && (
                           <span title={tr('30-second preview')} className="shrink-0 rounded-[3px] border border-line px-1 text-[0.625rem] font-normal text-ink-3">
                             {tr('Sample')}
                           </span>

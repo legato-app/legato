@@ -1,21 +1,21 @@
 import type { Track } from '../../shared/api'
 import { msg } from '../../shared/i18n/i18n'
 
-/** How a track plays here. server = your music server, by the native engine like a local file. spotify = Spotify Connect
- * (user's own app, Premium). preview = Apple 30 s clip. */
-export type Via = 'local' | 'server' | 'youtube' | 'spotify' | 'preview'
+/** How a track plays here: external music through YouTube only. server = your music server, by the native engine like
+ * a local file. preview = Apple 30 s clip, the last resort. */
+export type Via = 'local' | 'server' | 'youtube' | 'preview'
 
-export const viaLabel: Record<Via, string> = { local: msg('Local file'), server: msg('Your music server'), youtube: 'YouTube', spotify: 'Spotify Connect', preview: msg('Apple Music preview') }
+export const viaLabel: Record<Via, string> = { local: msg('Local file'), server: msg('Your music server'), youtube: 'YouTube', preview: msg('Apple Music preview') }
 
-/** Ways this track can play, best first: local file, your server, YouTube (in app), Spotify (when connected), then preview. */
-export const vias = (t: Pick<Track, 'ids'>, spotify = false): Via[] => [t.ids.local && 'local', t.ids.server && 'server', t.ids.youtube && 'youtube', spotify && t.ids.spotify && 'spotify', t.ids.apple && 'preview'].filter((v): v is Via => !!v)
-
-/** No way to play yet, but YouTube may have it (Against Liner 13): a library song with an artist, not found before. The
- * player looks it up as it comes up to play. */
-export const toFind = (t: Pick<Track, 'ids' | 'artist'> & { id: number }, notFound: ReadonlySet<number>, spotify = false) => t.id > 0 && !vias(t, spotify).length && !!t.artist.trim() && !notFound.has(t.id)
+/** Ways this track can play, best first: local file, your server, YouTube (in app), then preview. */
+export const vias = (t: Pick<Track, 'ids'>): Via[] => [t.ids.local && 'local', t.ids.server && 'server', t.ids.youtube && 'youtube', t.ids.apple && 'preview'].filter((v): v is Via => !!v)
 
 /** Plays in full (not just a preview). */
-export const isFull = (t: Pick<Track, 'ids'>, spotify = false) => !!(t.ids.local || t.ids.server || t.ids.youtube || (spotify && t.ids.spotify))
+export const isFull = (t: Pick<Track, 'ids'>) => !!(t.ids.local || t.ids.server || t.ids.youtube)
+
+/** No way to play it in full yet, but YouTube may have it (Against Liner 13): a library song with an artist, not found
+ * before. The player looks it up as it comes up to play. */
+export const toFind = (t: Pick<Track, 'ids' | 'artist'> & { id: number }, notFound: ReadonlySet<number>) => t.id > 0 && !isFull(t) && !!t.artist.trim() && !notFound.has(t.id)
 
 /** Engine paths of server songs (`music_player::http::PREFIX`): no URL, no auth, Rust builds the requests. */
 export const SERVER_PATH = 'server:'

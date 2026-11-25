@@ -15,7 +15,6 @@ describe('ListenBrainz', () => {
 
   it('says where the listen played from', () => {
     expect(toListen(song, 1_800_000_000, { via: 'youtube', youtubeId: 'otherVideo1' })).toEqual({ artist: 'Kavinsky', track: 'Nightcall', album: 'OutRun', durationMs: 258_000, listenedAt: 1_800_000_000, isrc: 'FR6V81200001', youtubeId: 'otherVideo1', spotifyId: null })
-    expect(toListen(song, 1, { via: 'spotify' })).toMatchObject({ youtubeId: null, spotifyId: '0U0ldCRmgCqhVvD6ksG63j' })
     // A file of yours, an Apple preview: no link.
     expect(toListen({ ...song, ids: { local: 'C:/Music/a.mp3', youtube: 'MV_3Dpw-BRY' } }, 1)).toMatchObject({ youtubeId: null, spotifyId: null })
     expect(toListen(song, 1, { via: 'preview' })).toMatchObject({ youtubeId: null, spotifyId: null })

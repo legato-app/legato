@@ -36,11 +36,10 @@ function useRows(): QueueRow[] {
   const index = usePlayer((s) => s.index)
   const upcoming = usePlayer((s) => s.upcoming)
   const path = usePlayer((s) => s.now?.path)
-  const sp = useStore((s) => s.status.spotify.connected)
   return useMemo(() => {
-    if (trackId !== undefined) return queueRows(order, index, (i) => !!list[i] && canPlay(list[i], sp))
+    if (trackId !== undefined) return queueRows(order, index, (i) => !!list[i] && canPlay(list[i]))
     return [...(path ? [path] : []), ...upcoming].map((p, k) => ({ key: p, i: -1, played: false, current: k === 0 && !!path, path: p }))
-  }, [trackId, list, order, index, sp, upcoming, path])
+  }, [trackId, list, order, index, upcoming, path])
 }
 
 /** The whole queue in play order as a new playlist (recommendations join the library on the way). */

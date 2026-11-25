@@ -82,7 +82,7 @@ export function restore(raw: unknown, tracks: LibraryTrack[]): { volume: number;
   const order = list.length === ids.length && Array.isArray(r.order) && r.order.every(isInt) ? (r.order as number[]) : []
   // What the user queued plays next only in that order: without it, they're part of the list again.
   const added = order.length && Array.isArray(r.added) ? r.added.filter((i): i is number => isInt(i) && i < list.length) : []
-  const via = (['local', 'server', 'youtube', 'spotify', 'preview'] as const).find((v) => v === r.via)
+  const via = (['local', 'server', 'youtube', 'preview'] as const).find((v) => v === r.via)
   // The words as saved: a playlist renamed since keeps its old name, as it does while it plays.
   const from = typeof r.from === 'string' && r.from ? r.from : undefined
   const fromKind = from ? FROM_KINDS.find((k) => k === r.fromKind) : undefined

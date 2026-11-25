@@ -43,7 +43,7 @@ export const clock = (ms: number | null) => formatDuration(ms) || '0:00'
 export const fileFormat = (path?: string) => path?.split('.').pop()?.toUpperCase()
 
 // Source of what plays: icon and name after the artist, details in its tooltip. Previews come from Apple Music.
-const viaSource: Record<string, Source> = { local: 'local', server: 'server', youtube: 'youtube', spotify: 'spotify', preview: 'apple' }
+const viaSource: Record<string, Source> = { local: 'local', server: 'server', youtube: 'youtube', preview: 'apple' }
 function viaTitle(via: string, path?: string) {
   if (via === 'local') return tr('Playing a local file') + (path ? ` · ${fileFormat(path)}` : '')
   if (via === 'preview') return tr('Playing a 30-second Apple Music preview')
@@ -331,7 +331,6 @@ export function PlayerBar() {
   const tail = usePlayer((s) => s.tail)
   const frameKey = usePlayer((s) => s.frameKey)
   const onLocal = usePlayer((s) => s.onLocal)
-  const onSpotify = usePlayer((s) => s.onSpotify)
   const setFull = usePlayer((s) => s.setFull)
   const readout = useSettings((s) => s.settings.readout)
   const sleepButton = useSettings((s) => s.settings.sleepButton)
@@ -339,9 +338,8 @@ export function PlayerBar() {
   const track = useNowTrack()
   const offer = usePickup((s) => s.offer)
   useLiveSync()
-  // Engine plays local files, server songs and previews: poll it. Spotify Connect: poll its API, slower (rate limits).
+  // Engine plays local files, server songs and previews: poll it.
   const local = now && (now.via === 'local' || now.via === 'server' || now.via === 'preview')
-  const remote = now?.via === 'spotify'
 
   // Files or folders dropped from Explorer = added (takeDrop). An image alone = read a shared playlist QR code.
   useEffect(() => {
@@ -391,19 +389,6 @@ export function PlayerBar() {
     const id = setInterval(() => api.playerStatus().then(onLocal), 250)
     return () => clearInterval(id)
   }, [local, onLocal])
-
-  useEffect(() => {
-    if (!remote) return
-    const id = setInterval(
-      () =>
-        api
-          .spotifyPlayback()
-          .then(onSpotify)
-          .catch((e) => useStore.setState({ error: String(e) })),
-      1500,
-    )
-    return () => clearInterval(id)
-  }, [remote, onSpotify])
 
   return (
     // On the window's background, under the panels (docs/design.md).

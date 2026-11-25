@@ -164,7 +164,6 @@ const tr: Record<string, string> = {
   'Auto · video': 'Otomatik · video',
   'Video': 'Video',
   'Cover': 'Kapak',
-  'Playing in your Spotify app': 'Spotify uygulamanda çalıyor',
   '30-second preview': '30 saniyelik önizleme',
   'Listen on Apple Music': 'Apple Music’te dinle',
   'Add {title} to a playlist': '{title} şarkısını bir çalma listesine ekle',
@@ -1080,7 +1079,6 @@ const tr: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': 'Sıfırlamak için çift tıkla',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify kendi uygulamasında çalıyor: Live Editor sesini değiştiremez. Bu şarkı için ayarların diğer kaynaklar için saklanır.',
   'YouTube’s sound processing is off.': 'YouTube’un ses işlemesi kapalı.',
   'Edited': 'Düzenlendi',
   'Original sound': 'Orijinal ses',

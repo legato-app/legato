@@ -5,7 +5,7 @@ import type { NowPlaying } from '../player/store'
 export const counts = (durationMs: number | null, listenedMs: number) => listenedMs >= Math.min(durationMs ? durationMs / 2 : Infinity, 240_000)
 
 /** Where a song played from, noted as it started: its YouTube video or Spotify track (a file of yours: neither). */
-export type PlayedFrom = Pick<NowPlaying, 'via' | 'youtubeId' | 'spotifyId'>
+export type PlayedFrom = Pick<NowPlaying, 'via' | 'youtubeId'>
 
 /** A listen to send. Not noted (it started before the app did): the source the player tries first. */
 export function toListen(t: Pick<LibraryTrack, 'artist' | 'title' | 'album' | 'durationMs' | 'isrc' | 'ids'>, listenedAt: number, from?: PlayedFrom, durationMs: number | null = t.durationMs): Listen {
@@ -18,6 +18,7 @@ export function toListen(t: Pick<LibraryTrack, 'artist' | 'title' | 'album' | 'd
     listenedAt,
     isrc: t.isrc,
     youtubeId: via === 'youtube' ? (from?.youtubeId ?? t.ids.youtube ?? null) : null,
-    spotifyId: via === 'spotify' ? (from?.spotifyId ?? t.ids.spotify ?? null) : null,
+    // Nothing plays through Spotify.
+    spotifyId: null,
   }
 }

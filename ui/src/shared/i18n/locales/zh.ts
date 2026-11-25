@@ -164,7 +164,6 @@ const zh: Record<string, string> = {
   'Auto · video': '自动 · 视频',
   'Video': '视频',
   'Cover': '封面',
-  'Playing in your Spotify app': '正在你的 Spotify 应用中播放',
   '30-second preview': '30 秒试听',
   'Listen on Apple Music': '在 Apple Music 上收听',
   'Add {title} to a playlist': '将 {title} 添加到歌单',
@@ -1080,7 +1079,6 @@ const zh: Record<string, string> = {
   // Live Editor (features/editor)
   'Live Editor': 'Live Editor',
   'Double-click to reset': '双击可重置',
-  'Spotify plays in its own app: the Live Editor can’t change its sound. Your settings are kept for this song elsewhere.': 'Spotify 在其自己的应用中播放：Live Editor 无法改变它的声音。这首歌的设置已另外保存。',
   'YouTube’s sound processing is off.': 'YouTube 的声音处理已关闭。',
   'Edited': '已编辑',
   'Original sound': '原声',

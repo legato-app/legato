@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { useStore } from '../../app/store'
-import { api, type Chapter, type Levelling, type LibraryTrack, type PlayerCommand, type PlayerStatus, type SpotifyCommand, type SpotifyPlayback, type Track } from '../../shared/api'
+import { api, type Chapter, type Levelling, type LibraryTrack, type PlayerCommand, type PlayerStatus, type Track } from '../../shared/api'
 import { markBroken } from '../library/broken'
 import type { Box } from '../../shared/artbox'
 import { fold, region } from '../../shared/format'
@@ -41,7 +41,6 @@ export interface NowPlaying {
   path?: string
   /** Apple Music page of a preview (Apple terms: previews link to the store). */
   page?: string
-  spotifyId?: string
 }
 
 interface PlayerState {
@@ -156,8 +155,6 @@ interface PlayerState {
   toggleMute: () => void
   onYoutube: (u: YtUpdate) => void
   onLocal: (s: PlayerStatus) => void
-  /** Spotify Connect poll result. */
-  onSpotify: (p: SpotifyPlayback | null) => void
 }
 
 // Songs from recommendations play without joining the library: negative ids, one per video for the session.
@@ -228,13 +225,13 @@ let nfOf: number[] | undefined
 let nfSet: ReadonlySet<number> = new Set()
 let findOff = 0
 const REFUSED_MS = 5 * 60_000
-const findable = (t: LibraryTrack, spotify: boolean) => {
+const findable = (t: LibraryTrack) => {
   const { notFound } = useStore.getState()
   if (notFound !== nfOf) [nfOf, nfSet] = [notFound, new Set(notFound)]
-  return Date.now() >= findOff && toFind(t, nfSet, spotify)
+  return Date.now() >= findOff && toFind(t, nfSet)
 }
 /** Plays here, or will once its YouTube version is looked up (Against Liner 13). */
-export const canPlay = (t: LibraryTrack, spotify = spotifyOn()) => vias(t, spotify).length > 0 || findable(t, spotify)
+export const canPlay = (t: LibraryTrack) => vias(t).length > 0 || findable(t)
 // The queue passes over it: nothing to play it with, or longer than Skip long songs (known lengths only).
 export const passOver = (t: LibraryTrack, longMin: number) => !canPlay(t) || tooLong(t.durationMs, longMin)
 // The library's row now: the queue's copy may predate a version found.
@@ -274,15 +271,11 @@ const send = (cmd: PlayerCommand) => api.player(cmd).catch((e) => useStore.setSt
 const yt = (func: string, ...args: unknown[]) => (watching() ? sendWatch(func, args) : ytPost(frame, 'command', func, args))
 export const fileTitle = (path: string) => path.split(/[\\/]/).pop()!.replace(/\.[^.]+$/, '')
 const previewPath = (t: LibraryTrack) => `apple:${t.ids.apple}`
-const spotifyOn = () => useStore.getState().status.spotify.connected
-const spotify = (cmd: SpotifyCommand) => api.spotifyPlayer(cmd).catch((e) => useStore.setState({ error: String(e) }))
 // Library local run in engine: drop files queued after current (dropped files keep theirs).
 const endRun = () => {
   const now = usePlayer.getState().now
   if (isNative(now?.via) && now?.trackId) void send({ type: 'truncate' })
 }
-// Knob drags fire many changes: one Spotify call per pause.
-let volumeTimer: ReturnType<typeof setTimeout> | undefined
 /**
  * Play order for `list` from `current`: smart shuffle's unless off. Shaped once the taste store has loaded (docs/recommendation.md ›
  * Shuffle: songs rested longest and the ones you like tend to come sooner, those you skip later, none is ever out, artists apart);
@@ -459,8 +452,8 @@ function cueNext() {
   const i = nextIndex(p.order, p.index, 1, p.repeat, false, (j) => passOver(p.list[j], p.skipLong))
   const next = i === null ? undefined : fresh(p.list[i])
   // No way to play it yet: looked up now, quietly, then cued (one search per song played, Against Liner 13).
-  if (next && !vias(next, spotifyOn()).length) return void findAhead(next, p.playId)
-  const id = next && vias(next, spotifyOn())[0] === 'youtube' ? next.ids.youtube : undefined
+  if (next && findable(next)) return void findAhead(next, p.playId)
+  const id = next && vias(next)[0] === 'youtube' ? next.ids.youtube : undefined
   if (!id || id === p.now.youtubeId) return
   usePlayer.setState({ tail: { key: p.tail?.key ?? p.frameKey + 1, videoId: id, end: 0, done: true, cue: true } })
 }
@@ -482,8 +475,8 @@ async function findAhead(t: LibraryTrack, playId: number) {
   cueNext()
 }
 
-/** A song with no way to play yet comes up (Against Liner 13): its YouTube version looked up now, then it plays; not
- *  found or refused, the queue moves on. A later choice meanwhile wins. */
+/** A song with no way to play it in full comes up (Against Liner 13): its YouTube version looked up now, then it plays;
+ *  not found or refused, its preview if it has one, else the queue moves on. A later choice meanwhile wins. */
 async function lookUp(index: number, t: LibraryTrack, opts: { auto?: boolean; from?: number; hold?: boolean }) {
   const mine = ++seq
   // The queue's place: what comes after it if it isn't found.
@@ -495,6 +488,7 @@ async function lookUp(index: number, t: LibraryTrack, opts: { auto?: boolean; fr
   if (mine !== seq) return
   const p = usePlayer.getState()
   if (found) return void p.playAt(index, 'youtube', opts)
+  if (t.ids.apple) return void p.playAt(index, 'preview', opts)
   if (found === false) notify(tr('“{title}” wasn’t found on YouTube: skipped', { title: t.title }), { kind: 'info' })
   else if (Date.now() < findOff) notify(`YouTube: ${tr('Too many requests for now: wait a few minutes, then try again.')}`, { kind: 'error' })
   p.step(1)
@@ -745,17 +739,16 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     const { list } = get()
     // Fresh row: sources may have changed since the queue was built (Find versions).
     const t = useStore.getState().tracks.find((x) => x.id === list[index]?.id) ?? list[index]
-    const how = via ?? (t && vias(t, spotifyOn())[0])
-    if (t && !how && findable(t, spotifyOn())) return lookUp(index, t, { auto, from, hold })
-    if (!t || !how || !vias(t, spotifyOn()).includes(how)) return
+    // No way in full: YouTube is asked before settling for a preview.
+    if (t && !via && findable(t)) return lookUp(index, t, { auto, from, hold })
+    const how = via ?? (t && vias(t)[0])
+    if (!t || !how || !vias(t).includes(how)) return
     const mine = ++seq
     reachedAuto = auto
     // The last song's pause isn't this one's.
     pausedAt = 0
     // Watch page belongs to one video: anything else plays elsewhere.
     if (how !== 'youtube') closeWatch()
-    // Leaving Spotify: pause the user's Spotify app.
-    if (get().now?.via === 'spotify' && how !== 'spotify') void spotify({ type: 'pause' })
     // A catalog song: no history (not in the library), only this session's verdict (its skip steers the picks).
     startListen(t.id, t.durationMs, isRemote(t))
     const base: NowPlaying = { title: t.title, artist: t.artist, trackId: t.id, via: how }
@@ -826,22 +819,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
       set({ now: { ...base, path: paths[0] } })
       return get().applyVolume(true)
     }
-    if (how === 'spotify') {
-      expect = []
-      send({ type: 'stop' })
-      set({ now: { ...base, spotifyId: t.ids.spotify } })
-      // Held: shown, not started (Spotify plays on the user's own app).
-      if (hold) return
-      try {
-        await api.spotifyPlayer({ type: 'play', trackId: t.ids.spotify! })
-        if (start) void spotify({ type: 'seek', ms: Math.round(start) })
-      } catch (e) {
-        if (mine !== seq) return
-        useStore.setState({ error: String(e) })
-        set({ playing: false })
-      }
-      return
-    }
     // Preview: silence while it downloads (Rust side, memory only).
     expect = [previewPath(t)]
     send({ type: 'stop' })
@@ -880,7 +857,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     set({ hold: false })
     const pause = () => {
       if (now.via === 'youtube') yt(playing ? 'pauseVideo' : 'playVideo')
-      else if (now.via === 'spotify') void spotify({ type: playing ? 'pause' : 'resume' })
       else send({ type: 'toggle' })
     }
     set({ playing: !playing, ...(playing && { tail: stopTail(get().tail) }) })
@@ -892,8 +868,8 @@ export const usePlayer = create<PlayerState>((set, get) => ({
       else watchForStuck(get().playId)
     }
     // Fade on pause: down (from where a running fade, the sleep timer's, has got to), then pause. On play: play silent,
-    // then up. Spotify: no volume control fast enough.
-    if (!fade.pause || now.via === 'spotify') return pause()
+    // then up.
+    if (!fade.pause) return pause()
     const from = gainNow
     if (playing) return ramp((t) => from * (1 - t), fade.pause, pause)
     gainNow = 0
@@ -911,7 +887,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     set({ hold: false, playing: false, tail: stopTail(get().tail) })
     pausedAt = Date.now()
     if (now.via === 'youtube') yt('pauseVideo')
-    else if (now.via === 'spotify') void spotify({ type: 'pause' })
     else if (!enginePaused) send({ type: 'toggle' })
     get().applyVolume(true)
   },
@@ -919,8 +894,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   sleep(ms) {
     const { now, playing } = get()
     if (!now || !playing) return
-    // Paused at the end by what plays then: a fade of minutes outlasts the song it began on.
-    if (now.via === 'spotify') return get().pauseNow()
     ramp((t) => (1 - t) ** 2, ms, () => get().pauseNow())
   },
 
@@ -937,7 +910,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     if (held) return held()
     const via = get().now?.via
     if (via === 'youtube') yt('seekTo', ms / 1000, true)
-    else if (via === 'spotify') void spotify({ type: 'seek', ms: Math.round(ms) })
     else send({ type: 'seek', ms })
     set({ positionMs: ms })
   },
@@ -1011,12 +983,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   applyVolume(force = false) {
     const { now, volume, positionMs, durationMs, fadeIn, fadeFrom } = get()
     const via = now?.via
-    if (via === 'spotify') {
-      // Spotify Connect: rate-limited API, no fades.
-      clearTimeout(volumeTimer)
-      if (force) volumeTimer = setTimeout(() => void spotify({ type: 'volume', percent: Math.round(volume * 100) }), 300)
-      return
-    }
     const value = Math.round(volume * fadeGain(positionMs, durationMs, { ...songFade(get()), in: fadeIn }, true, fadeFrom) * gainNow * 100) / 100
     if (!force && value === sent) return
     sent = value
@@ -1110,7 +1076,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     if (s.error) useStore.setState({ error: s.error })
     if (s.error && serverDown(s.error)) serverDownAt = Date.now()
     const via = get().now?.via
-    if (via === 'youtube' || via === 'spotify') return
+    if (via === 'youtube') return
     enginePaused = s.paused
     if (expect) {
       // Error = engine already tried our items (bad file skipped): status is ours.
@@ -1164,20 +1130,6 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     if (s.durationMs && songMs && songMs < s.durationMs && !s.paused && s.positionMs >= songMs && get().now?.path === s.path) songOver()
   },
 
-  onSpotify(p) {
-    const { now, positionMs, durationMs } = get()
-    if (now?.via !== 'spotify') return
-    const ours = !!p && p.trackId === now.spotifyId
-    // Our track ran out: Spotify moved on (autoplay) or stopped at 0.
-    const ended = (!ours || (!p.playing && p.positionMs === 0)) && !!durationMs && positionMs > durationMs - 4000
-    if (ended) {
-      endListen(true)
-      return get().step(1, true)
-    }
-    if (!p || !ours) return set({ playing: false })
-    progress(p.positionMs, p.durationMs)
-    set({ playing: p.playing, positionMs: p.positionMs, ...(p.durationMs && { durationMs: p.durationMs }) })
-  },
 }))
 
 /**
@@ -1191,7 +1143,7 @@ function overlap() {
   if (p.tail?.done === false || !p.playing || ytFresh || stopAtEnd || now?.via !== 'youtube' || !now.youtubeId || watching() || !overlapDue(p.positionMs, p.durationMs, songFade(p))) return
   const i = nextIndex(order, index, 1, repeat, true, (j) => passOver(list[j], p.skipLong))
   const next = i === null ? undefined : (useStore.getState().tracks.find((x) => x.id === list[i].id) ?? list[i])
-  if (i === null || i === index || !next || vias(next, spotifyOn())[0] !== 'youtube' || next.ids.youtube === now.youtubeId) return
+  if (i === null || i === index || !next || vias(next)[0] !== 'youtube' || next.ids.youtube === now.youtubeId) return
   if (beforeNext?.()) return
   endListen(true)
   // In the tray: a new embed's video never starts in a hidden page (Chromium); a reused one has played there before.
