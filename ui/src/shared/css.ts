@@ -1,15 +1,27 @@
-/**
- * CSS from outside the app (plugins, themes): comments, @import, links (url(), except data: images, and the app's
- * own image scheme when allowed), old script hooks and anything that could close the <style> taken out. Set as text,
- * never parsed as HTML. Pure.
- */
-export function cleanCss(raw: unknown, max = 100_000): string {
-  return (typeof raw === 'string' ? raw.slice(0, max) : '')
+/** Passes after which text still changing is nobody's theme: refused whole. */
+const CLEAN_PASSES = 10
+
+const cleanOnce = (css: string) =>
+  css
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/@import[^;]*;?/gi, '')
     .replace(/url\(\s*(['"]?)(?!data:image\/)[^)]*\)/gi, 'none')
     .replace(/expression\s*\(|-moz-binding|behavior\s*:/gi, '')
     .replace(/<\/?style/gi, '')
+
+/**
+ * CSS from outside the app (plugins, themes): comments, @import, links (url(), except data: images, and the app's
+ * own image scheme when allowed), old script hooks and anything that could close the <style> taken out. Again until
+ * nothing changes: a removal can join the pieces around it into a banned one. Set as text, never parsed as HTML. Pure.
+ */
+export function cleanCss(raw: unknown, max = 100_000): string {
+  let css = typeof raw === 'string' ? raw.slice(0, max) : ''
+  for (let pass = 0; pass < CLEAN_PASSES; pass++) {
+    const cleaned = cleanOnce(css)
+    if (cleaned === css) return css
+    css = cleaned
+  }
+  return ''
 }
 
 /**
