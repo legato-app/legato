@@ -204,8 +204,9 @@ impl Library {
             if newest {
                 ids.reverse();
             }
-            // Songs added here (`add_here`) stay, at the newest end as they were put in.
-            let mine: Vec<i64> = self.added_here(id)?.into_iter().filter(|t| !ids.contains(t)).collect();
+            // Songs added here (`add_here`) stay at the newest end as they were put in, even once the service holds them too.
+            let mine = self.added_here(id)?;
+            ids.retain(|t| !mine.contains(t));
             if newest {
                 ids.splice(0..0, mine.into_iter().rev());
             } else {

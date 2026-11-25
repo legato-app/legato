@@ -245,6 +245,23 @@ fn a_song_added_here_to_an_imported_playlist_stays_through_its_imports_and_alone
     Ok(())
 }
 
+#[test]
+fn a_song_added_here_keeps_the_newest_end_once_the_service_holds_it_too() -> Result<()> {
+    for (source, newest_first) in [(Source::Youtube, true), (Source::Spotify, false)] {
+        let lib = Library::in_memory()?;
+        let list = lib.save_playlist(source, "p1", "Road trip", &[song(1), song(2)])?;
+        assert_eq!(lib.order_of(list)?.0, newest_first);
+        let mine = lib.upsert_track(&song(9))?;
+        lib.edit_playlist(PlaylistEdit::Add { id: list, track_ids: vec![mine] })?;
+        let mut expected = lib.playlist_orders()?[&list].clone();
+        lib.save_playlist(source, "p1", "Road trip", &[song(1), song(9), song(2)])?;
+        assert_eq!(lib.playlist_orders()?[&list], expected);
+        assert_eq!(expected.len(), 3);
+        assert_eq!(if newest_first { expected.remove(0) } else { expected.pop().unwrap() }, mine);
+    }
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }
