@@ -70,6 +70,9 @@ account. Old share links are not read any more (the owner's word).
   `shared/files.ts`, never the dialog plugin's `open` / `save`.
 
 ## Code rules
+- Written for a human contributor (the owner's word, 2026-11-25): names say what a thing is in whole words
+  (`playlistSort`, not `ps`; one letter only in a tiny lambda or a loop index), one job per function, a comment for
+  the why the code can't show. New code follows it; old code gets renamed when a change touches it, not in bulk.
 - `shared/api.ts` is the only place that calls `invoke`; its types come from Rust (ts-rs, `pnpm types` →
   `shared/generated/`, committed), never written by hand.
 - No network from the front end, images included: `shared/art.ts` → the `art` scheme (host allowlist, disk cache).
