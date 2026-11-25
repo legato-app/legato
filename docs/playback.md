@@ -1,6 +1,6 @@
 # Audio playback: prototypes and plan
 
-Status on 2026-10-16. YouTube, local files and Apple Music previews: done and tested on Windows (WebView2). Spotify Connect: built and tested with mocks, not yet tried on a real Premium account.
+Status on 2026-10-16. YouTube, local files and Apple Music previews: done and tested on Windows (WebView2). Spotify: playlists only (its remote control was removed on 2026-11-25).
 
 ## One queue for every source (phase 4)
 
@@ -148,7 +148,7 @@ Songs started in the last 24 h (play stats) come after all the others, spread th
   sets what plays, so the first YouTube song of a session (or after a file) was never watched (2026-10-30).
 - Now Playing Auto mode: frames `1.jpg` / `2.jpg` / `3.jpg` (25 / 50 / 75 %) compared at 32×24 (`still.ts`); nearly the
   same = still image upload = cover. Cover mode keeps the embed playing, transparent (user's choice, see plan).
-- Fades between songs: volume × `fadeGain` (smoothstep), only on transitions that happen on their own; Spotify none.
+- Fades between songs: volume × `fadeGain` (smoothstep), only on transitions that happen on their own.
   YouTube → YouTube overlap: as the fade out begins, the next song starts in a second embed; the old one plays on
   unseen as the tail (`tail` in the store), fading out to its song's end (`tail.end`, where the overlap was timed), then
   stopped there. Watch page, other sources: no overlap.
@@ -266,7 +266,7 @@ We still pin the policy on the iframe: a meta tag or header added later can't br
   keeps them, a song removed takes them along (`player/bookmarks.ts`, `Library::add_bookmark`).
 - **Alarm** (2026-11-05, Settings › Playback › Alarm, or the player's right-click › Alarm…): at its time on its days, a
   playlist from its first song (or all your songs shuffled), the volume up from silence over 0 to 15 minutes (`wake`,
-  the sleep timer's ramp the other way; Spotify Connect at once, it has no fades). Music already playing: nothing is
+  the sleep timer's ramp the other way). Music already playing: nothing is
   replaced. The next ring is kept in Rust (`src-tauri/src/alarm.rs`, a thread looking every 10 s), so it rings from the
   tray: the page is woken first (`background::wake`). A PC asleep at its time doesn't wake for it: over 10 minutes late
   it is skipped (logged) and the next one set. This PC only (Sync Mode leaves it), desktop only (a phone would need
@@ -300,7 +300,7 @@ visualizer and the media panel apply.
 - Sign out: the account leaves the keychain, the server's covers leave the art allowlist, its songs and playlists leave
   the library (decided 2026-11-06: removed, not kept unplayable; a song also on another source stays, without the
   server; Sign in again brings them back). A sync still reading at that moment writes nothing.
-- Playing: the interface's source order is local file, server, YouTube, Spotify, preview (`player/sources.ts`); a run of
+- Playing: the interface's source order is local file, server, YouTube, preview (`player/sources.ts`); a run of
   native songs (local or server) goes to the engine at once. The engine gets `server:<key>:<item>` paths, never a URL:
   `music_player::http::Fetch` (built in `servers.rs`) makes each request with a fresh token, so no token reaches the
   interface or a log.
@@ -376,7 +376,7 @@ visualizer and the media panel apply.
   count) and kept per video (localStorage `song-loudness`, this PC only); its later plays get `level` = -14 minus it,
   boosts only (0..+9 dB, the limiter on): YouTube's own normalisation already turns loud videos down through the
   element's volume, which comes after the measure. Levelling on puts YouTube's sound through processing (needs
-  "Process YouTube's sound"); Adaptive Sound, when on, levels instead (`level` ignored). Spotify: out of reach.
+  "Process YouTube's sound"); Adaptive Sound, when on, levels instead (`level` ignored).
 - Not yet: the server's own search in the app's search (each connector has it: `Conn::search`), playlist edits sent
   back to Jellyfin and Plex (a Subsonic server takes adds and removals since 2026-11-11: `server_playlist_add`,
   `server_playlist_remove`, `updatePlaylist` in the background like YouTube Music's, undone here when refused). Tested with a local HTTP server in the
@@ -401,7 +401,6 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
   cover, early endings, no Adaptive Sound or edits): `listen`, analysers alone (Chromium pulls them unconnected), the
   element never muted, its sound untouched. Switching modes attaches again. Messages: embed
   `postMessage` to the app's origin only; watch page `legato-live:` strings checked in Rust (`ytwatch.rs`).
-- **Spotify**: plays in Spotify’s own app, out of reach (Settings says so).
 - **Volume mixer** (2026-10-23): YouTube's sound plays in WebView2's own processes, so Windows listed it as "Microsoft
   Edge WebView2". `src-tauri/src/mixer.rs` gives our WebView2 audio sessions (only processes this app started) Music
   App's name, icon and grouping every 3 s. Label only: the sound is never taken out of the player (no extraction).
@@ -599,15 +598,14 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
     menu on top keeps its Esc). The window goes full screen through `holdFullscreen` (`app/fullscreen.ts`: gives back only
     what it took, sees F11 / the title bar leaving it, sessionStorage flag for a reload), the same care as karaoke's.
     While it is up Now Playing's F and karaoke's K do nothing; the native watch page (a YouTube video that can't be
-    embedded) is hidden, as for karaoke (`PlayerBar.tsx`). Not offered while Spotify plays. Click on the strip still
+    embedded) is hidden, as for karaoke (`PlayerBar.tsx`). Click on the strip still
     does nothing (it did nothing before).
 - **Radial, VU needles, spectrogram** (Visualizer v2 step 3, 2026-10-31). Same worker, same frames, three more looks
   in `vizPaint.ts`; their numbers are pure and tested (`vizVu.ts`, `vizSpectro.ts`, the geometry in `vizDraw.ts`).
   - **Radial**: bars on a ring, mirrored left and right, low notes at the bottom rising to meet at the top
     (`ringBars`). It is drawn behind a round cover, never the strip: in Now Playing (`Stage`, `NowPlaying.tsx`) the
     cover turns round and shrinks to 66 % of the stage's square, the canvas fills that square behind it, only when the
-    stage is at least 330 CSS px, the art is square (within 6 %, so not a video frame with bars) and the song is not
-    Spotify's; the strip under the cover then stays away (one worker, not two). Elsewhere the strip shows the bars
+    stage is at least 330 CSS px, the art is square (within 6 %, so not a video frame with bars); the strip under the cover then stays away (one worker, not two). Elsewhere the strip shows the bars
     look. The full screen puts the round cover in the middle of the ring. Moving cover (`pulse.ts`, a setting) scales
     the cover element and so works with the ring unchanged; the ring's own step on a kick: Beats, above.
   - **VU needles**: two dials side by side, L and R, each a damped spring in closed form (`stepNeedle`: exact at any
@@ -724,43 +722,12 @@ Edit the playing song live; written from scratch, Audacity's ideas as inspiratio
   dither), written as `.part` then renamed; refuses the original's path and anything but `.wav`; cancel removes the
   partial file. Never for YouTube, Spotify or Apple Music (their audio is never saved). Reverb tails are cut where the
   file ends.
-- **Spotify**: plays in its own app, out of reach; the panel says so (settings stay saved for the song).
 
-## Spotify Connect (built, untested on a real Premium account)
+## Spotify: playlists only, played through YouTube (2026-11-25)
 
-The Web Playback SDK inside the app is ruled out. We drive the official Spotify app (desktop, mobile or speaker) through **Spotify Connect**,
-via the Web API Player endpoints. Audio comes out of the Spotify app; we only send commands.
-
-**Prerequisites**
-- Premium for the user: the `PUT /me/player/play` docs say "This API only works for users who have Spotify Premium".
-- Premium for the Client ID owner: mandatory in dev mode since February 2026. The February 2026 migration guide touches no Player endpoint.
-- New scopes `user-read-playback-state` and `user-modify-playback-state`, so a reconnect on first use.
-
-**Endpoints**
-
-| Need | Call |
-|---|---|
-| Pick the device | `GET /me/player/devices` |
-| Transfer playback | `PUT /me/player` `{ device_ids: [id], play: false }` |
-| Play a track or playlist | `PUT /me/player/play?device_id=…` `{ uris: ["spotify:track:…"] }` or `{ context_uri, offset: { position } }` |
-| Transport | `PUT /me/player/pause`, `POST /me/player/next`, `POST /me/player/previous`, `PUT /me/player/seek?position_ms=`, `PUT /me/player/volume?volume_percent=` |
-| State for the bar | `GET /me/player` (`is_playing`, `progress_ms`, `item`) |
-| Queue | `POST /me/player/queue?uri=` |
-
-**Integration (done)**
-- Done: `Spotify::{devices, playback, command}` (mockito tests), IPC `spotify_player` / `spotify_playback`, a `spotify` `Via` after YouTube,
-  "SP" in Play via (locked until Spotify is connected), polling every 1.5 s, end of track detected when Spotify moves on,
-  volume debounced. Not done: position interpolation between polls, queue (`/me/player/queue`). Original notes:
-- `crates/connectors/src/spotify.rs`: Player methods on `Spotify`, tested with mockito like the rest of the connector.
-- `src-tauri`: a `spotify_player(cmd)` command modeled on `player`.
-- UI: a `spotify` `Via` in the store routes commands to Spotify. Poll `GET /me/player` every 1 to 2 s
-  and interpolate the position in between, to spare the quota.
-- No active device: open `spotify:` with the opener, poll `/devices` for a few seconds, else show "Open Spotify on a device".
-- Errors: `403` (Premium required) gives a clear message and a disabled button; `404` (no device) restarts the steps above;
-  `429` honors `Retry-After`.
-- Fallback without Premium: if the track also has a YouTube id (ISRC or title+artist matching), play it in the YouTube player.
-  That's already the case today for any linked track.
-- Real validation impossible without a Premium account: mockito tests first, then a try on a Premium account.
+Spotify is read, never played by the app: its playlists come in (the user's own client ID, a public link, Connect
+Spotify or Spotify's data export) and each song plays from its YouTube version, looked up when it comes up if none is
+known. The remote control of the user's Spotify app (Spotify Connect) was removed, with its two playback scopes.
 
 ## Spotify without keys: prototype (2026-10-16)
 

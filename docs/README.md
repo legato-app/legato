@@ -8,7 +8,7 @@ the website: https://legato-app.github.io/legato/ (source in `site/`).
 | [development.md](development.md) | Developer setup: tools per system, YouTube Music and Spotify sign-in, keychain, where data lives |
 | [architecture.md](architecture.md) | How the app is built: crates, shell, interface, and the rules that hold them together |
 | [design.md](design.md) | Design direction: palette, type, shapes, motion, and what listeners ask music apps for |
-| [playback.md](playback.md) | How each source plays (YouTube, local files, Apple previews, Spotify) and why |
+| [playback.md](playback.md) | How each source plays (YouTube, local files, music servers, Apple previews) and why |
 | [sync-mode.md](sync-mode.md) | Sync Mode between PCs: files, sealing, the network exchange |
 | [plugins.md](plugins.md) | Writing a plugin |
 | [performance.md](performance.md) | Start time, RAM and CPU: how they are measured, every full run |
