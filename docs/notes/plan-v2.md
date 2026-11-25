@@ -639,6 +639,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       WebView2 cookies, chosen before the window opens, so a switch restarts the app; it touches `identity`, `rename.rs`'s folders and
       Sync Mode's per-PC files, and a wrong first step could mix two people's data. Needs the owner's choices (what is shared, e.g. local
       folders) before the data model.
+      Owner's choices (2026-11-25): shared between profiles: local folders, personal servers (Subsonic, Jellyfin, Plex), look and sound (theme, EQ, playback settings); each profile's own: library, likes, history, Last.fm, YouTube cookies (WebView2 profile), keychain entries. A profile picker at launch when there are several; a switch restarts the app. An optional 4-digit code per profile, said in the UI as a lock against mistakes, not real protection.
 - [ ] `L` Exclusive WASAPI output / bit-perfect for local files (foobar's audiophiles).
 - [ ] `L` Podcasts by RSS (open feeds only: no platform audio taken), resume per episode, speed.
       2026-11-13, the first slice: Settings › Playback › Podcasts (off) adds Podcasts to the app menu: type an open feed's address, keep
