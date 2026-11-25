@@ -23,9 +23,10 @@ format that carried the old name was renamed too (share QR prefix `LG1:`, `_lega
 `.legatosync` files, `legato://` links, no more `musicapp://`) and nothing reads the old ones. The only thing left is ONE
 catch-up for data on disk, `src-tauri/src/rename.rs` (old identifier folders and keychain entries, the `Music App Sync`
 folder), with the old Run entry in `autostart.rs` and the old-install cleanup in `src-tauri/windows/hooks.nsh`: plan-v2
-"Remove the rename catch-up" lists what to delete. The repo is `Clovis500c/legato` (website
-https://clovis500c.github.io/legato/): GitHub redirects the old `music-app` URL and installed versions look for updates
-there, so never create a repo named `music-app`.
+"Remove the rename catch-up" lists what to delete. The repo is `legato-app/legato` (website
+https://legato-app.github.io/legato/), moved from the owner's account on 2026-11-25: GitHub redirects the old URLs and
+installed versions look for updates there, so never create a repo named `legato` (nor `music-app`) on the owner's
+account. Old share links are not read any more (the owner's word).
 
 ## Non-negotiable rules
 - Serverless: no backend of ours. Secrets in the OS keychain (`keyring`), local SQLite library. Sync between the user's
