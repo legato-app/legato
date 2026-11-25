@@ -13,7 +13,7 @@ fast: number,
  */
 momentary: number, 
 /**
- * Over the last 3 s (Adaptive Sound), LUFS.
+ * Over the last 3 s, LUFS.
  */
 short: number, 
 /**
