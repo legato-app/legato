@@ -30,7 +30,7 @@ export function alignTranslation(shown: { text: string }[], from: string[], to: 
   })
 }
 
-/** The rows to show under the lines of `song`: its translation as the user asked it (any language), else none. */
+/** The rows to show under the lines of `song`: its translation as the user asked it (any language), else none. A song with no key ('') never matches: two in a row would share it. */
 export function underFor(done: { song: string; code?: string; from: string[]; to: string[] } | null, song: string, shown: { text: string }[]): (string | null)[] | null {
-  return done && done.song === song ? alignTranslation(shown, done.from, done.to) : null
+  return done && song && done.song === song ? alignTranslation(shown, done.from, done.to) : null
 }

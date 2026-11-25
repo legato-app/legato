@@ -48,4 +48,7 @@ describe('underFor', () => {
     expect(underFor(done, 's2', shown)).toBeNull()
     expect(underFor(null, 's1', shown)).toBeNull()
   })
+  it('none for a song with no key (a catalog or server song): two of them in a row are not the same song', () => {
+    expect(underFor({ ...done, song: '' }, '', shown)).toBeNull()
+  })
 })
