@@ -1,7 +1,7 @@
 //! YouTube Music's home: its recommendation shelves (Quick picks, Listen again, Mixed for you…), and the songs behind
 //! a playlist, album or radio there, to play without importing anything. An artist's page: same shelves.
 
-use super::{ARTISTS, YouTubeMusic, all, big_thumb, explicit_badge, page_type, parse_duration, row_track, row_track_with, text};
+use super::{ARTISTS, YouTubeMusic, all, big_thumb, explicit_badge, is_count, page_type, parse_duration, row_track, row_track_with, text};
 use anyhow::Result;
 use music_core::matching::normalize;
 use music_core::searchpace::{Quiet, refused};
@@ -115,7 +115,7 @@ fn artist_of(runs: Option<&Value>) -> String {
     if !linked.is_empty() {
         return linked.join(", ");
     }
-    runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !LABELS.contains(t) && !t.contains(" views") && !t.contains(" plays") && parse_duration(t).is_none() && t.parse::<u32>().is_err()).unwrap_or("").to_string()
+    runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !LABELS.contains(t) && !is_count(t) && parse_duration(t).is_none()).unwrap_or("").to_string()
 }
 
 fn album_of(runs: Option<&Value>) -> Option<String> {

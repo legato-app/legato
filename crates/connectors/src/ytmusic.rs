@@ -237,9 +237,9 @@ fn row_track_with(row: &Value, fallback: Option<&str>) -> Option<Track> {
     let album = runs.iter().find(|r| page_type(r) == "MUSIC_PAGE_TYPE_ALBUM").and_then(|r| r.get("text")?.as_str().map(String::from));
     let fixed = row.get("fixedColumns").map(|f| all(f, "text").into_iter().filter_map(text).collect::<Vec<_>>()).unwrap_or_default();
     let duration_ms = runs.iter().filter_map(|r| r.get("text")?.as_str()).chain(fixed.iter().map(String::as_str)).find_map(parse_duration);
-    // No linked artist (plain videos): first plain run that isn't a type label or separator.
+    // No linked artist (plain videos): first plain run that isn't a type label, separator or count.
     let artist = if artists.is_empty() {
-        runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !matches!(*t, "Song" | "Video" | "Episode" | " • " | " & " | ", ") && parse_duration(t).is_none()).or(fallback.filter(|f| !f.is_empty()))?.to_string()
+        runs.iter().filter_map(|r| r.get("text")?.as_str()).find(|t| !matches!(*t, "Song" | "Video" | "Episode" | " • " | " & " | ", ") && !is_count(t) && parse_duration(t).is_none()).or(fallback.filter(|f| !f.is_empty()))?.to_string()
     } else {
         artists.join(", ")
     };
@@ -248,6 +248,11 @@ fn row_track_with(row: &Value, fallback: Option<&str>) -> Option<Track> {
     let video_type = all(row, "musicVideoType").into_iter().find_map(|v| VideoType::from_innertube(v.as_str()?));
     let musicness = Some(classify(&Clues { title: &title, channel: &artist, duration_ms, artist_badge: false, video_type, live: false }));
     Some(Track { title, artist, album, duration_ms, isrc: None, ids: BTreeMap::from([(Source::Youtube, video_id)]), art, musicness, explicit: explicit_badge(row) })
+}
+
+/// "56K plays", "1.2M views" or a bare number: what a byline counts, never who made the song.
+fn is_count(text: &str) -> bool {
+    text.contains(" views") || text.contains(" plays") || text.parse::<u32>().is_ok()
 }
 
 /// googleusercontent thumbs are sized in the URL ("=w60-h60-l90-rj"): ask for 544 px.
@@ -631,6 +636,15 @@ mod tests {
         assert_eq!(cookie_value(COOKIE, "SAPISID"), Some("abc/def"));
         assert!(YouTubeMusic::new("YSC=x").is_err());
         assert!(client_version().starts_with("1.20") && client_version().len() == 16, "{}", client_version());
+    }
+
+    #[test]
+    fn a_play_count_is_never_the_artist() {
+        let plays = |more: Vec<Value>| [vec![run("Video", None), run(" • ", None), run("56K plays", None), run(" • ", None), run("2:31", None)], more].concat();
+        let page = json!([row("v1", "Freestyle", plays(vec![run(" • ", None), run("A Channel", None)]), None), row("v2", "Freestyle", plays(vec![]), None)]);
+        let tracks = rows(&page);
+        assert_eq!(tracks.iter().map(|t| t.artist.as_str()).collect::<Vec<_>>(), ["A Channel"]);
+        assert_eq!(row_track_with(&page[1]["musicResponsiveListItemRenderer"], Some("The Artist")).unwrap().artist, "The Artist");
     }
 
     #[test]
