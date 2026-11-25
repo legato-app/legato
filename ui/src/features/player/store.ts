@@ -756,8 +756,8 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     if (how !== 'youtube') closeWatch()
     // Leaving Spotify: pause the user's Spotify app.
     if (get().now?.via === 'spotify' && how !== 'spotify') void spotify({ type: 'pause' })
-    // Recommendations: no history (not in the library).
-    startListen(isRemote(t) ? undefined : t.id, t.durationMs)
+    // A catalog song: no history (not in the library), only this session's verdict (its skip steers the picks).
+    startListen(t.id, t.durationMs, isRemote(t))
     const base: NowPlaying = { title: t.title, artist: t.artist, trackId: t.id, via: how }
     // A part of a split video starts where it does; times stay the video's, so its length is the video's (known once
     // the same video plays on, else from YouTube's first report: a part's own length would end it at once).

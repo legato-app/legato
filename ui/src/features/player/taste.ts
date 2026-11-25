@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { api, type LibraryTrack, type TasteSignal } from '../../shared/api'
-import { onListenEnd, REPLAY_GAP, session, SKIP_MS } from './listens'
-import { usePickWhy } from './pickWhyStore'
+import { onListenEnd, REPLAY_GAP, session } from './listens'
 import type { Taste } from './score'
 
 /**
@@ -26,22 +25,11 @@ export async function loadTaste(ask: () => Promise<TasteSignal[]> = api.tasteSig
   }
 }
 
-/**
- * This session's explore picks ("new" in Up next) heard to the end or skipped early, memory only: the explore slots learn from them
- * (`score.ts` `K.bandit`). shortcut: a catalog song has no listen (store.ts), so only library songs count; fine while most explore
- * picks are the library's.
- */
-const explored = { hits: 0, misses: 0 }
-
-/** Loads now and after every `RELOAD_EVERY`-th listen; counts the explore picks' outcomes. Returns the way out. */
+/** Loads now and after every `RELOAD_EVERY`-th listen. Returns the way out. */
 export function startTaste(ask: () => Promise<TasteSignal[]> = api.tasteSignals): () => void {
   void loadTaste(ask)
   let n = 0
-  return onListenEnd((play) => {
-    if (usePickWhy.getState()[play.trackId]?.kind === 'new') {
-      if (play.completed) explored.hits++
-      else if (play.listenedMs < SKIP_MS) explored.misses++
-    }
+  return onListenEnd(() => {
     if (++n % RELOAD_EVERY === 0) void loadTaste(ask)
   })
 }
@@ -77,6 +65,7 @@ export function tasteFor(stats: Record<number, [plays: number, last: number, sta
     hours: (t: LibraryTrack) => signals.get(t.id)?.hours ?? 0,
     // The stats see a start at once, the signals at their next load.
     lastPlayed: (t: LibraryTrack) => Math.max(signals.get(t.id)?.lastPlayed ?? 0, stats[t.id]?.[1] ?? 0),
-    explored: { ...explored },
+    // This session's explore picks heard or skipped (listens.ts): the explore slots learn from them (`score.ts` `K.bandit`).
+    explored: { ...session.explored },
   }
 }

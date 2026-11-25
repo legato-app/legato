@@ -228,7 +228,11 @@ rules still hold for every lookup. No script ever runs real requests in bulk; te
    the floor of one from 5 slots kept (Anderson 2020); as set until one is heard or skipped (`score.ts` `K.bandit`,
    `exploreRate`; `taste.ts` counts them, memory only). Tests in `feel.test.ts` (skipped: fewer "new", heard: more, one stays)
    and `taste.test.ts`. The prior, cap and ceiling are first guesses, never heard by ear; a catalog song has no listen, so only
-   library songs' outcomes count; nothing is kept across restarts (no new data written).
+   radio songs' outcomes count too (below); nothing is kept across restarts (no new data written).
+7. *A catalog song's verdict* Done 2026-11-25 (found by the gap analysis): a radio's song (most picks at Up next's end) gave no
+   listen, so skipping it steered nothing. Now it gives this session its verdict by its session id (`listens.ts` `remote`,
+   `store.ts`): its early skip steers the next picks of its artist and Shuffle, its replay and explore outcome count; still no
+   stored play, no scrobble. Test in `listens.test.ts`. Not tried in the app.
 **Not chosen** (the owner, 2026-11-18), with what each would add:
 - Last.fm `track.getSimilar` / `artist.getSimilar`: similar songs "based on listening data", for users with their own key.
   It would send the titles being played beyond the scrobbles, and the privacy row would change.

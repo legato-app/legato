@@ -1,5 +1,8 @@
-import { expect, it } from 'vitest'
-import { toPlay } from './listens'
+import { expect, it, vi } from 'vitest'
+import { api } from '../../shared/api'
+import { endListen, onListenEnd, progress, session, startListen, toPlay } from './listens'
+
+vi.mock('@tauri-apps/api/core', () => ({ convertFileSrc: (p: string) => p, invoke: vi.fn(async () => undefined) }))
 
 const listen = (heardMs: number, lastMs: number, durationMs: number | null = 200_000) => ({ trackId: 1, startedAt: 100, heardMs, lastMs, durationMs })
 
@@ -10,4 +13,19 @@ it('records completes, skips, ignores stray clicks', () => {
   // Seeked near the end and listened out: complete.
   expect(toPlay(listen(20_000, 185_000), false)).toMatchObject({ completed: true })
   expect(toPlay(listen(20_000, 185_000, null), false)).toMatchObject({ completed: false })
+})
+
+it('a catalog song (a radio pick) gives this session its verdict, never a stored play nor a listen to others', () => {
+  const record = vi.spyOn(api, 'recordPlay')
+  const heard = vi.fn()
+  const off = onListenEnd(heard)
+  startListen(-7, 200_000, true)
+  progress(3000)
+  endListen(false)
+  startListen(-8, 200_000, true)
+  endListen(true)
+  expect([session.skips.get(-7), session.last.get(-7), session.last.get(-8)]).toEqual([1, -1, 1])
+  expect(record).not.toHaveBeenCalled()
+  expect(heard).not.toHaveBeenCalled()
+  off()
 })
