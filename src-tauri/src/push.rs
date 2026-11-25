@@ -88,10 +88,18 @@ pub fn waiting(lib: &Library, source: Source) -> anyhow::Result<Vec<(LibraryPlay
     Ok(lib.playlists()?.into_iter().filter(|playlist| playlist.source == source && !playlist.custom).filter_map(with_songs).collect())
 }
 
-/// Songs a service didn't take into a playlist: they wait for a later sync. A try made signed out doesn't count.
+/// The service itself saying no: its own words, or a 4xx. A network failure, a 5xx or "too many requests" (429, Google's
+/// "Sorry" page) says nothing about the song.
+fn counts_as_try(reason: &str) -> bool {
+    const REFUSALS: [&str; 5] = ["YouTube Music: ", "YouTube Music refused", "Your music server said:", "Your music server doesn't let this user", "Your music server doesn't have this item"];
+    let answered_no = REFUSALS.iter().any(|words| reason.starts_with(words)) || reason.contains("→ 4");
+    answered_no && !signed_out(reason) && !music_core::searchpace::refused(reason)
+}
+
+/// Songs a service didn't take into a playlist: they wait for a later sync. Only a real refusal counts as a try.
 pub fn keep_for_later(lib: &Library, playlist_id: i64, track_ids: &[i64], reason: &str) {
     let kept = lib.add_pending_push(playlist_id, track_ids).and_then(|()| {
-        if signed_out(reason) {
+        if !counts_as_try(reason) {
             return Ok(());
         }
         track_ids.iter().try_for_each(|track_id| lib.count_push_try(playlist_id, *track_id))
@@ -110,9 +118,44 @@ pub fn failed(app: &tauri::AppHandle, f: Failed) {
 
 #[cfg(test)]
 mod tests {
-    use super::later;
+    use super::{counts_as_try, keep_for_later, later};
+    use music_core::library::Library;
+    use music_core::model::{Source, Track};
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
+
+    #[test]
+    fn only_a_real_refusal_counts_as_a_try() {
+        let network = "error sending request for url (https://music.youtube.com/youtubei/v1/browse/edit_playlist). Only playlists you own on YouTube Music can take new songs.";
+        for not_counted in [
+            network,
+            "operation timed out",
+            "YouTube Music signed you out (browse → 401 Unauthorized): sign in again",
+            "YouTube Music browse/edit_playlist → 503 Service Unavailable",
+            "YouTube Music browse/edit_playlist → 429 Too Many Requests",
+            "YouTube Music browse/edit_playlist → 403 Forbidden Sorry...",
+            "Your music server doesn't answer",
+            "Your music server failed (HTTP 502): not JSON",
+        ] {
+            assert!(!counts_as_try(not_counted), "{not_counted}");
+        }
+        for counted in [
+            "YouTube Music: This playlist is full",
+            "YouTube Music refused to add the tracks (STATUS_FAILED)",
+            "YouTube Music browse/edit_playlist → 403 Forbidden {}. Only playlists you own on YouTube Music can take new songs.",
+            "Your music server doesn't let this user do that (no)",
+            "Your music server said: nope (code 0)",
+        ] {
+            assert!(counts_as_try(counted), "{counted}");
+        }
+        let lib = Library::in_memory().unwrap();
+        let list = lib.save_playlist(Source::Youtube, "p1", "Road trip", &[]).unwrap();
+        let song = lib.upsert_track(&Track { title: "Song".into(), artist: "Artist".into(), ..Default::default() }).unwrap();
+        for _ in 0..20 {
+            keep_for_later(&lib, list, &[song], network);
+        }
+        assert_eq!(lib.pending_pushes().unwrap(), [(list, song)]);
+    }
 
     #[test]
     fn jobs_run_in_the_order_made() {
