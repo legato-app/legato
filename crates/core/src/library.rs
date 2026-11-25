@@ -548,7 +548,8 @@ impl Library {
             )?;
         }
         if lib.db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))? < 25 {
-            // v25: songs added here and sent to the playlist's service (`sent`: 0 not sent, 1 sent, 2 seen in its list).
+            // v25: songs added here and sent to the playlist's service (`sent`: 0 not sent, 1 sent, 2 seen in its list,
+            // 3 missing from the last one).
             lib.db.execute_batch("BEGIN; ALTER TABLE playlist_added ADD COLUMN sent INTEGER NOT NULL DEFAULT 0; PRAGMA user_version = 25; COMMIT;")?;
         }
         lib.db.execute_batch(CHANGE_LOG)?;

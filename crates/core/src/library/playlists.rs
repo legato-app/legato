@@ -236,12 +236,13 @@ impl Library {
         })
     }
 
-    /// A sync brought `synced`: sent songs it holds are marked seen; seen ones it no longer holds were removed in the
-    /// service, so their mark goes.
+    /// A sync brought `synced`: sent songs it holds are marked seen (2). A seen one missing is marked so (3), as the
+    /// list may have come cut short; missing a second sync in a row, it was removed in the service: its mark goes.
     pub(super) fn settle_sent(&self, id: i64, synced: &[i64]) -> Result<()> {
         let synced = ids_json(synced.iter().copied());
-        self.db.execute("DELETE FROM playlist_added WHERE playlist_id = ?1 AND sent = 2 AND track_id NOT IN (SELECT value FROM json_each(?2))", params![id, synced])?;
-        self.db.execute("UPDATE playlist_added SET sent = 2 WHERE playlist_id = ?1 AND sent = 1 AND track_id IN (SELECT value FROM json_each(?2))", params![id, synced])?;
+        self.db.execute("DELETE FROM playlist_added WHERE playlist_id = ?1 AND sent = 3 AND track_id NOT IN (SELECT value FROM json_each(?2))", params![id, synced])?;
+        self.db.execute("UPDATE playlist_added SET sent = 3 WHERE playlist_id = ?1 AND sent = 2 AND track_id NOT IN (SELECT value FROM json_each(?2))", params![id, synced])?;
+        self.db.execute("UPDATE playlist_added SET sent = 2 WHERE playlist_id = ?1 AND sent IN (1, 3) AND track_id IN (SELECT value FROM json_each(?2))", params![id, synced])?;
         Ok(())
     }
 

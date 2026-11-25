@@ -307,6 +307,12 @@ fn a_song_sent_to_the_service_keeps_the_newest_end_until_removed_here_or_there()
     lib.remove_from_imported(list, mine)?;
     lib.add_sent_songs(list, &[mine])?;
     sync(&[1, 9, 2])?;
+    // One list without it may be one cut short: it stays, still the newest. Held again, the count starts over.
+    sync(&[1, 2])?;
+    assert_eq!(order()?[0], mine);
+    sync(&[1, 9, 2])?;
+    sync(&[1, 2])?;
+    assert_eq!(order()?[0], mine);
     sync(&[1, 2])?;
     assert!(!order()?.contains(&mine));
     Ok(())
