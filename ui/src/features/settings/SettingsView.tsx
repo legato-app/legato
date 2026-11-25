@@ -553,7 +553,7 @@ function SoundGroup() {
   return (
     <Group title={msg('Sound processing')}>
       <div className="rounded-xl border border-line bg-raised">
-        <Row setting="adaptiveSound" label={msg('Adaptive Sound')} sub={tr('Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube; not Spotify (its own app plays it).')}>
+        <Row setting="adaptiveSound" label={msg('Adaptive Sound')} sub={tr('Each song plays as it is, only its volume set to the level you pick: measured in its first seconds, then held, so its quiet and loud parts keep their place. Takes over from Volume levelling while on. Local files and YouTube.')}>
           <Toggle label={tr('Adaptive Sound')} checked={s.adaptiveSound} onChange={(adaptiveSound) => update({ adaptiveSound })} />
         </Row>
         {s.adaptiveSound && (
@@ -1047,7 +1047,7 @@ function PlaybackSection() {
           <Row setting="eqPerDevice" label={msg('Equalizer per output device')} sub={tr('Adds Equalizer for this output to the player\'s menu: one preset per output device, applied while it is in use (remembered on this PC)')}>
             <Toggle label={tr(labelOf('Equalizer per output device'))} checked={s.eqPerDevice} onChange={(eqPerDevice) => update({ eqPerDevice })} />
           </Row>
-          <Row setting="volumePerSource" label={msg('Volume per source')} sub={tr('Each source remembers the volume you last set on it: files, YouTube and Spotify need no turn of the knob when the queue switches source')}>
+          <Row setting="volumePerSource" label={msg('Volume per source')} sub={tr('Each source remembers the volume you last set on it: files and YouTube need no turn of the knob when the queue switches source')}>
             <Toggle label={tr('Volume per source')} checked={s.volumePerSource} onChange={(volumePerSource) => update({ volumePerSource })} />
           </Row>
           <Row setting="volumePerDevice" label={msg('Volume per output device')} sub={tr('Each output device picked in the player menu remembers the volume you last set on it and gets it back when you switch to it')}>

@@ -270,7 +270,7 @@ export function FadeEditor() {
         <div data-setting="Fade on pause and play" className="flex items-center gap-4 px-4 py-3">
           <div className="flex-1">
             <p className="text-[0.8125rem] font-medium">{tr(labelOf('Fade on pause and play'))}</p>
-            <p className="text-xs text-ink-2">{tr('Volume glides down before a pause and back up after (not with Spotify)')}</p>
+            <p className="text-xs text-ink-2">{tr('Volume glides down before a pause and back up after')}</p>
           </div>
           <Segmented
             label={tr(labelOf('Fade on pause and play'))}

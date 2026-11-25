@@ -74,7 +74,7 @@ function Hosting({ s }: { s: RoomStatus }) {
       </div>
       <People s={s} />
       <Reactions />
-      <p className="text-xs text-ink-2">{tr('Friends hear what plays here, each from their own source: YouTube, Spotify or their own files. No sound is sent, only the song and where it is, sealed with the code.')}</p>
+      <p className="text-xs text-ink-2">{tr('Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.')}</p>
       <div className="flex justify-end">
         <Button variant="ghost" onClick={() => void endRoom().then(closeRoom)}>
           {tr('End room')}

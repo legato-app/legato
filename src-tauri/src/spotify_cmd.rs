@@ -1,21 +1,6 @@
-//! Spotify: the player and its playback state, a pasted link imported, the web page's window; YouTube Music's sign-in window.
+//! Spotify: a pasted link imported, the web page's window; YouTube Music's sign-in window.
 
 use super::*;
-
-pub fn spotify_on(state: &AppState) -> CmdResult<Spotify> {
-    state.spotify().filter(|s| s.is_connected()).ok_or_else(|| "Connect Spotify first (Settings › Sources)".into())
-}
-
-/// Spotify Connect remote: the user's own Spotify app plays.
-#[tauri::command]
-pub async fn spotify_player(state: State<'_, AppState>, cmd: music_connectors::spotify::PlayerCommand) -> CmdResult<()> {
-    spotify_on(&state)?.command(cmd).await.map_err(err)
-}
-
-#[tauri::command]
-pub async fn spotify_playback(state: State<'_, AppState>) -> CmdResult<Option<music_connectors::spotify::Playback>> {
-    spotify_on(&state)?.playback().await.map_err(err)
-}
 
 /// Google sign-in window for YouTube Music (no keys). add = sign in one more Google account.
 #[tauri::command]
