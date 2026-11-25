@@ -31,11 +31,15 @@ export const onListenEnd = (f: Listener) => {
 /** Under this, not finished: an early skip (Rust's `mixes::SKIP_MS`). */
 export const SKIP_MS = 30_000
 
+/** Heard again this soon (s) after the last listen heard: a replay (Rust's `history::REPLAY_GAP`). */
+export const REPLAY_GAP = 86_400
+
 /**
- * This session's verdicts, in memory only (docs/recommendation.md › In the session): early skips counted by song, and the last
- * verdict by song (-1 skipped early, 1 heard to the end). Shuffle and what plays next react to them at once.
+ * This session's verdicts, in memory only (docs/recommendation.md › In the session): early skips counted by song, the last
+ * verdict by song (-1 skipped early, 1 heard to the end), the start of the last listen heard (finished or 30 s, unix s) and the
+ * songs replayed. Shuffle and what plays next react to them at once.
  */
-export const session = { skips: new Map<number, number>(), last: new Map<number, -1 | 1>() }
+export const session = { skips: new Map<number, number>(), last: new Map<number, -1 | 1>(), heard: new Map<number, number>(), replays: new Set<number>() }
 
 export function endListen(ended: boolean) {
   const play = cur && toPlay(cur, ended)
@@ -46,6 +50,11 @@ export function endListen(ended: boolean) {
   else if (play.listenedMs < SKIP_MS) {
     session.skips.set(play.trackId, (session.skips.get(play.trackId) ?? 0) + 1)
     session.last.set(play.trackId, -1)
+  }
+  if (play.completed || play.listenedMs >= SKIP_MS) {
+    const before = session.heard.get(play.trackId)
+    if (before !== undefined && play.startedAt - before <= REPLAY_GAP) session.replays.add(play.trackId)
+    session.heard.set(play.trackId, play.startedAt)
   }
   api.recordPlay(play).catch(() => {})
   for (const f of listeners) f(play, durationMs)

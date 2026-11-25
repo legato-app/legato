@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { api, type LibraryTrack, type TasteSignal } from '../../shared/api'
-import { onListenEnd, session } from './listens'
+import { onListenEnd, REPLAY_GAP, session } from './listens'
 import type { Taste } from './score'
 
 /**
@@ -34,6 +34,16 @@ export function startTaste(ask: () => Promise<TasteSignal[]> = api.tasteSignals)
   })
 }
 
+/**
+ * Replayed this session, before the next reload counts it: heard twice here within a day, or heard here within a day after the
+ * last play the signals knew (a later reload sees this listen itself: its own start, not before it).
+ * shortcut: the signals' last play may be a skip, which Rust would not count; fine until it shows in picks.
+ */
+function replayedNow(id: number, lastPlayed: number): boolean {
+  const at = session.heard.get(id)
+  return session.replays.has(id) || (at !== undefined && lastPlayed > 0 && lastPlayed < at && at - lastPlayed <= REPLAY_GAP)
+}
+
 /** What the model reads about a song: the store's stats (`stats[id]` = listens, last start, rating) and the signals. */
 export function tasteFor(stats: Record<number, [plays: number, last: number, stars?: number] | undefined>, signals: Map<number, TasteSignal>): Taste {
   return {
@@ -46,7 +56,7 @@ export function tasteFor(stats: Record<number, [plays: number, last: number, sta
     never: (t: LibraryTrack) => signals.get(t.id)?.never ?? false,
     less: (t: LibraryTrack) => signals.get(t.id)?.less ?? false,
     // A song heard again within a day is a strong like, beside Liked Music (Rust counts the replays from the stored plays).
-    liked: (t: LibraryTrack) => (signals.get(t.id)?.liked ?? false) || (signals.get(t.id)?.replays ?? 0) > 0,
+    liked: (t: LibraryTrack) => (signals.get(t.id)?.liked ?? false) || (signals.get(t.id)?.replays ?? 0) > 0 || replayedNow(t.id, signals.get(t.id)?.lastPlayed ?? 0),
     // The long profile mixes the two memories as the design says: 70 % the last weeks (30-day half-life), 30 % the months (180).
     decayed: (t: LibraryTrack) => {
       const s = signals.get(t.id)

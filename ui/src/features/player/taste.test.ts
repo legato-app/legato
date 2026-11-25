@@ -38,3 +38,43 @@ describe('the taste store', () => {
     expect(ask).toHaveBeenCalledTimes(2)
   })
 })
+
+describe('this session’s replays (before the next reload)', () => {
+  beforeEach(() => vi.resetModules())
+  const track = (id: number) => ({ id }) as never
+
+  it('a song heard again within a day counts as a like at once; once, or two days apart, does not', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-25T10:00:00Z') })
+    const { tasteFor } = await import('./taste')
+    const { startListen, endListen } = await import('./listens')
+    const hear = (id: number) => {
+      startListen(id, 200_000)
+      endListen(true)
+    }
+    hear(1)
+    hear(2)
+    hear(3)
+    vi.advanceTimersByTime(3 * 3600_000)
+    hear(1)
+    vi.advanceTimersByTime(2 * 86_400_000)
+    hear(3)
+    const liked = tasteFor({}, new Map()).liked ?? (() => false)
+    expect([liked(track(1)), liked(track(2)), liked(track(3))]).toEqual([true, false, false])
+    vi.useRealTimers()
+  })
+
+  it('a song last heard a few hours before the signals were read, heard again now, counts too', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-25T10:00:00Z') })
+    const now = Math.floor(Date.now() / 1000)
+    const { tasteFor } = await import('./taste')
+    const { startListen, endListen } = await import('./listens')
+    startListen(1, 200_000)
+    endListen(true)
+    startListen(2, 200_000)
+    endListen(true)
+    const signals = new Map([signal(1, { lastPlayed: now - 3 * 3600 }), signal(2, { lastPlayed: now - 3 * 86_400 })].map((x) => [x.id, x]))
+    const liked = tasteFor({}, signals).liked ?? (() => false)
+    expect([liked(track(1)), liked(track(2))]).toEqual([true, false])
+    vi.useRealTimers()
+  })
+})
