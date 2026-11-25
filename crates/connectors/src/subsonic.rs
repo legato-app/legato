@@ -10,7 +10,7 @@ use anyhow::{Context, Result, anyhow, bail, ensure};
 use md5::{Digest, Md5};
 use music_core::local::ReplayGain;
 use music_core::lyrics::{self, Record};
-use music_core::model::{PlaylistRef, Source, Track};
+use music_core::model::{PlaylistRead, PlaylistRef, Source, Track};
 use music_core::server;
 use serde_json::Value;
 use std::collections::BTreeMap;
@@ -294,8 +294,17 @@ impl Subsonic {
     }
 
     pub async fn playlist(&self, id: &str) -> Result<Vec<Track>> {
+        Ok(self.playlist_read(id).await?.tracks)
+    }
+
+    /// The same, not complete when the server sends fewer entries than the `songCount` it announces.
+    pub async fn playlist_read(&self, id: &str) -> Result<PlaylistRead> {
         let r = self.call("getPlaylist", &[("id", id)], LIST_TIMEOUT).await?;
-        Ok(self.tracks(list(r.get("playlist").and_then(|p| p.get("entry")))))
+        let playlist = r.get("playlist");
+        let entries = list(playlist.and_then(|p| p.get("entry")));
+        let announced = playlist.and_then(|p| p.get("songCount")).and_then(Value::as_u64).unwrap_or(0);
+        let complete = entries.len() as u64 >= announced;
+        Ok(PlaylistRead { tracks: self.tracks(entries), complete })
     }
 
     /// Songs added at a playlist's end (`updatePlaylist`), a hundred per request (they travel in the URL).

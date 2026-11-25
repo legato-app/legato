@@ -9,7 +9,7 @@ use music_connectors::servers::{self as conns, Conn};
 use music_connectors::subsonic::Subsonic;
 use music_connectors::pin;
 use music_core::library::LibraryPlaylist;
-use music_core::model::{Source, Track};
+use music_core::model::{PlaylistRead, Source};
 use music_core::server::{self, Account, Exposure, Kind};
 use music_player::http::{Fetch as PlayerFetch, PREFIX, Remote, Reply};
 use music_player::{Command, Gain};
@@ -371,14 +371,14 @@ async fn read(state: &AppState, a: &Account) -> anyhow::Result<ServerSync> {
     let got = sub.library().await?;
     let (songs, albums_failed, liked) = (got.songs, got.failed, got.liked);
     let mut skipped = albums_failed;
-    let mut lists: Vec<(String, String, Vec<Track>)> = Vec::new();
+    let mut lists: Vec<(String, String, PlaylistRead)> = Vec::new();
     // Every playlist the server lists stays, one that failed to come too (kept as it was, not dropped).
     let mut keep: Vec<String> = Vec::new();
     for p in sub.playlists().await? {
         let id = server::item_id(&key, &p.id);
         keep.push(id.clone());
-        match sub.playlist(&p.id).await {
-            Ok(tracks) => lists.push((id, p.name, tracks)),
+        match sub.playlist_read(&p.id).await {
+            Ok(read) => lists.push((id, p.name, read)),
             Err(e) if conns::refused(&e) => return Err(e),
             Err(_) => skipped += 1,
         }
@@ -392,8 +392,8 @@ async fn read(state: &AppState, a: &Account) -> anyhow::Result<ServerSync> {
         anyhow::ensure!(account(&key2).is_some(), "Your music server isn't signed in");
         // Some albums didn't come: their songs aren't gone, nothing dropped this time.
         let n = lib.replace_server(&key2, &songs, albums_failed == 0)?;
-        for (id, name, tracks) in &lists {
-            lib.save_playlist(Source::Server, id, name, tracks)?;
+        for (id, name, read) in &lists {
+            lib.save_playlist_read(Source::Server, id, name, &read.tracks, read.complete)?;
         }
         lib.drop_server_playlists(&key2, &keep)?;
         if !liked.is_empty() {

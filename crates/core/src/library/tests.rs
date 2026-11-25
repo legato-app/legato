@@ -353,6 +353,26 @@ fn a_refused_removal_puts_the_song_back_where_it_was_with_its_mark() -> Result<(
     Ok(())
 }
 
+#[test]
+fn a_read_cut_short_removes_nothing_and_a_whole_one_does() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let sync = |songs: &[u32], complete: bool| lib.save_playlist_read(Source::Youtube, "p1", "Road trip", &songs.iter().map(|n| song(*n)).collect::<Vec<_>>(), complete);
+    let list = sync(&[1, 2, 3, 4], true)?;
+    let order = || -> Result<Vec<i64>> { Ok(lib.playlist_orders()?.remove(&list).unwrap_or_default()) };
+    let all = order()?;
+    let sent = lib.upsert_track(&song(9))?;
+    lib.add_sent_songs(list, &[sent])?;
+    sync(&[9, 1, 2, 3, 4], true)?;
+    // Cut short, twice: what's read is reordered and added, the rest stays after it, the sent song keeps its place.
+    sync(&[2, 1], false)?;
+    sync(&[2, 1], false)?;
+    assert_eq!(order()?, [sent, all[1], all[0], all[2], all[3]]);
+    // Whole: the song really gone leaves.
+    sync(&[9, 1, 2, 3], true)?;
+    assert_eq!(order()?, [sent, all[0], all[1], all[2]]);
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }

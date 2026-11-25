@@ -74,7 +74,7 @@ pub async fn import_spotify_link(app: tauri::AppHandle, state: State<'_, AppStat
     let playable = tracks.iter().filter(|t| t.ids.contains_key(&Source::Youtube)).count();
     // Same id as a keyed Spotify sync, so both update one playlist. Albums get their own prefix.
     let source_id = if list.kind == "album" { format!("album:{}", list.id) } else { list.id.clone() };
-    let playlist_id = state.lib().save_playlist(Source::Spotify, &source_id, &list.name, &tracks).map_err(err)?;
+    let playlist_id = state.lib().save_playlist_read(Source::Spotify, &source_id, &list.name, &tracks, !truncated).map_err(err)?;
     Ok(SpotifyImport { playlist_id, name: list.name, tracks: tracks.len(), playable, truncated })
 }
 

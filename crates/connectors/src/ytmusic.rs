@@ -6,7 +6,7 @@ use anyhow::{Context, Result, bail};
 use async_trait::async_trait;
 use music_core::lyrics::Line;
 use music_core::matching::{best_match, is_count};
-use music_core::model::{Connector, PlaylistRef, Source, Track};
+use music_core::model::{Connector, PlaylistRead, PlaylistRef, Source, Track};
 use music_core::musicness::{Clues, VideoType, classify};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -401,8 +401,10 @@ impl YouTubeMusic {
     }
 
     /// Playlist page + continuations: the playlist shelf of the first page (no suggestions), then each continuation.
-    async fn browse_pages(&self, browse_id: &str) -> Result<Vec<Value>> {
+    /// False: cut short (a continuation came without songs, pages left unread, or a first page of an unknown shape).
+    async fn browse_pages(&self, browse_id: &str) -> Result<(Vec<Value>, bool)> {
         let page = self.call("browse", json!({ "browseId": browse_id })).await?;
+        let known_shape = !all(&page, "musicPlaylistShelfRenderer").is_empty() || !rows(&page).is_empty();
         let shelf = playlist_shelf(&page).clone();
         let mut token = continuation(&shelf);
         let mut out = vec![shelf];
@@ -410,23 +412,23 @@ impl YouTubeMusic {
             let Some(t) = token else { break };
             let next = self.call("browse", json!({ "continuation": t })).await?;
             if rows(&next).is_empty() {
-                break;
+                return Ok((out, false));
             }
             token = continuation(&next);
             out.push(next);
         }
-        Ok(out)
+        Ok((out, known_shape && token.is_none()))
     }
 
     /// Playlist page + continuations, playlist rows only.
     async fn browse_rows(&self, browse_id: &str) -> Result<Vec<Track>> {
-        Ok(self.browse_pages(browse_id).await?.iter().flat_map(rows).collect())
+        Ok(self.browse_pages(browse_id).await?.0.iter().flat_map(rows).collect())
     }
 
     /// Every occurrence of these videos out of a playlist the account owns. Removing needs each row's own item id
     /// ("setVideoId"), read fresh here (the library doesn't keep them). Returns how many rows went.
     pub async fn remove_videos(&self, playlist_id: &str, video_ids: &[String]) -> Result<usize> {
-        let items: Vec<(String, String)> = self.browse_pages(&format!("VL{playlist_id}")).await?.iter().flat_map(item_ids).filter(|(v, _)| video_ids.contains(v)).collect();
+        let items: Vec<(String, String)> = self.browse_pages(&format!("VL{playlist_id}")).await?.0.iter().flat_map(item_ids).filter(|(v, _)| video_ids.contains(v)).collect();
         if items.is_empty() {
             return Ok(0);
         }
@@ -576,7 +578,12 @@ impl Connector for YouTubeMusic {
     }
 
     async fn playlist_tracks(&self, playlist_id: &str) -> Result<Vec<Track>> {
-        self.browse_rows(&format!("VL{}", playlist_id.split('~').next().unwrap_or(playlist_id))).await
+        Ok(self.read_playlist(playlist_id).await?.tracks)
+    }
+
+    async fn read_playlist(&self, playlist_id: &str) -> Result<PlaylistRead> {
+        let (pages, complete) = self.browse_pages(&format!("VL{}", playlist_id.split('~').next().unwrap_or(playlist_id))).await?;
+        Ok(PlaylistRead { tracks: pages.iter().flat_map(rows).collect(), complete })
     }
 
     async fn search(&self, query: &str) -> Result<Vec<Track>> {
@@ -782,6 +789,22 @@ mod tests {
         let yt = YouTubeMusic::with_api(&s.url(), COOKIE).unwrap().as_account(&acct);
         assert_eq!(yt.playlist_videos("PL1").await.unwrap(), ["v1", "v2"]);
         first.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn a_continuation_without_songs_makes_the_read_incomplete() {
+        for (last, complete) in [(json!({ "items": [row("v2", "B", vec![run("Y", None)], None)] }), true), (json!({}), false)] {
+            let mut s = Server::new_async().await;
+            s.mock("POST", "/browse")
+                .match_query(Matcher::Any)
+                .match_body(Matcher::PartialJson(json!({ "browseId": "VLPL1" })))
+                .with_body(json!({ "contents": [{ "musicPlaylistShelfRenderer": { "contents": [row("v1", "A", vec![run("X", None)], None)], "continuations": [{ "nextContinuationData": { "continuation": "T2" } }] } }] }).to_string())
+                .create_async()
+                .await;
+            s.mock("POST", "/browse").match_query(Matcher::Any).match_body(Matcher::PartialJson(json!({ "continuation": "T2" }))).with_body(last.to_string()).create_async().await;
+            let read = YouTubeMusic::with_api(&s.url(), COOKIE).unwrap().read_playlist("PL1").await.unwrap();
+            assert_eq!(read.complete, complete);
+        }
     }
 
     #[tokio::test]

@@ -643,7 +643,7 @@ mod tests {
         let play = s.mock("GET", "/:/scrobble").match_query(Matcher::AllOf(vec![Matcher::UrlEncoded("key".into(), "101".into()), Matcher::UrlEncoded("identifier".into(), LIBRARY.into())])).expect(1).create_async().await;
         let c = crate::servers::Conn::from_account(&account(&s.url()));
         assert_eq!(c.playlists().await.unwrap()[0].name, "Road");
-        assert_eq!(c.playlist("55").await.unwrap().len(), 1, "an episode isn't a song");
+        assert_eq!(c.playlist_read("55").await.unwrap().tracks.len(), 1, "an episode isn't a song");
         assert_eq!(c.search("night call", 10).await.unwrap().len(), 1);
         c.like("101", true).await.unwrap();
         c.like("101", false).await.unwrap();

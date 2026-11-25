@@ -79,6 +79,14 @@ pub struct PlaylistRef {
     pub name: String,
 }
 
+/// A playlist as read from its service. Not `complete`: cut short (a page lost, fewer songs than it announces), so
+/// the songs missing from it are not known to be gone.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PlaylistRead {
+    pub tracks: Vec<Track>,
+    pub complete: bool,
+}
+
 /// Music service. Each user connects own account.
 #[async_trait]
 pub trait Connector: Send + Sync {
@@ -88,6 +96,10 @@ pub trait Connector: Send + Sync {
     fn disconnect(&self) -> Result<()>;
     async fn list_playlists(&self) -> Result<Vec<PlaylistRef>>;
     async fn playlist_tracks(&self, playlist_id: &str) -> Result<Vec<Track>>;
+    /// The same, saying whether the list came whole. A service that can't tell: taken as whole.
+    async fn read_playlist(&self, playlist_id: &str) -> Result<PlaylistRead> {
+        Ok(PlaylistRead { tracks: self.playlist_tracks(playlist_id).await?, complete: true })
+    }
     async fn search(&self, query: &str) -> Result<Vec<Track>>;
     /// Find `track` on this service, or None.
     async fn resolve(&self, track: &Track) -> Result<Option<Track>>;

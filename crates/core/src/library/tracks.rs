@@ -176,6 +176,12 @@ impl Library {
     /// Replace imported playlist content. A re-sync also learns which end new songs land on ("date added" order),
     /// unless the user set it by hand.
     pub fn save_playlist(&self, source: Source, source_id: &str, name: &str, tracks: &[Track]) -> Result<i64> {
+        self.save_playlist_read(source, source_id, name, tracks, true)
+    }
+
+    /// The same from a read that may have come cut short (`complete` false): songs it didn't return stay, after the
+    /// ones read. A sync never removes songs by mistake.
+    pub fn save_playlist_read(&self, source: Source, source_id: &str, name: &str, tracks: &[Track], complete: bool) -> Result<i64> {
         self.tx(|| {
             let before: Option<String> = self.db.query_row("SELECT name FROM playlists WHERE source = ?1 AND source_id = ?2", params![source.as_str(), source_id], |r| r.get(0)).optional()?;
             let id: i64 = self.db.query_row(
@@ -206,11 +212,17 @@ impl Library {
                 ids.reverse();
             }
             // Songs added here (`add_here`) stay at the newest end as they were put in, even once the service holds them too.
-            self.settle_sent(id, &ids)?;
+            if complete {
+                self.settle_sent(id, &ids)?;
+            }
             let mut mine = self.added_here(id)?;
             // Refused by the service (`pending_push`): not in its list, still in this one.
             let waiting = self.still_pending(id, &ids)?;
             mine.extend(waiting.into_iter().filter(|t| !mine.contains(t)).collect::<Vec<_>>());
+            if !complete {
+                let unread: Vec<i64> = old_order.iter().copied().filter(|t| !ids.contains(t)).collect();
+                ids.extend(unread);
+            }
             ids.retain(|t| !mine.contains(t));
             if newest {
                 ids.splice(0..0, mine.into_iter().rev());

@@ -7,7 +7,7 @@ use crate::jellyfin::Jellyfin;
 use crate::plex::Plex;
 use crate::subsonic::Subsonic;
 use anyhow::{Result, anyhow};
-use music_core::model::{PlaylistRef, Track};
+use music_core::model::{PlaylistRead, PlaylistRef, Track};
 use music_core::server::{self, Account, Kind};
 use std::time::Duration;
 use url::Url;
@@ -211,11 +211,13 @@ impl Conn {
         }
     }
 
-    pub async fn playlist(&self, id: &str) -> Result<Vec<Track>> {
+    /// Jellyfin and Plex: taken as complete.
+    pub async fn playlist_read(&self, id: &str) -> Result<PlaylistRead> {
+        let whole = |tracks| PlaylistRead { tracks, complete: true };
         match self {
-            Self::Subsonic(s) => s.playlist(id).await,
-            Self::Jellyfin(j) => j.playlist(id).await,
-            Self::Plex(p) => p.playlist(id).await,
+            Self::Subsonic(s) => s.playlist_read(id).await,
+            Self::Jellyfin(j) => j.playlist(id).await.map(whole),
+            Self::Plex(p) => p.playlist(id).await.map(whole),
         }
     }
 

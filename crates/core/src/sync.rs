@@ -79,8 +79,8 @@ pub async fn sync(lib: &Mutex<Library>, connectors: &[&dyn Connector], target: O
             }
         };
         for p in playlists {
-            let saved = match c.playlist_tracks(&p.id).await {
-                Ok(tracks) => lib.lock().unwrap().save_playlist(source, &p.id, &p.name, &tracks),
+            let saved = match c.read_playlist(&p.id).await {
+                Ok(read) => lib.lock().unwrap().save_playlist_read(source, &p.id, &p.name, &read.tracks, read.complete),
                 Err(e) => Err(e),
             };
             match saved {
