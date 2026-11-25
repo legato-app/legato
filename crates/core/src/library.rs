@@ -568,13 +568,13 @@ impl Library {
         Ok(())
     }
 
-    /// Older versions stored a play count as the artist: the next read without a count replaces it, even with none.
+    /// Older versions stored a play count as the artist: the next read without a count replaces it, even with none; none is filled later.
     fn repair_artist(&self, id: i64, artist: &str) -> Result<()> {
         if is_count(artist) {
             return Ok(());
         }
         let (title, stored): (String, String) = self.db.prepare_cached("SELECT title, artist FROM tracks WHERE id = ?1")?.query_row([id], |row| Ok((row.get(0)?, row.get(1)?)))?;
-        if is_count(&stored) {
+        if stored != artist && (stored.is_empty() || is_count(&stored)) {
             self.db.execute("UPDATE tracks SET artist = ?1, match_key = ?2 WHERE id = ?3", params![artist, match_key(&title, artist), id])?;
         }
         Ok(())

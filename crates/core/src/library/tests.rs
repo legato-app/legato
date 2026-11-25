@@ -1425,6 +1425,9 @@ fn a_count_stored_as_artist_is_repaired_by_the_next_upsert() -> Result<()> {
     let other = lib.upsert_track(&Track { artist: "56K plays".into(), ..nameless.clone() })?;
     lib.upsert_track(&nameless)?;
     assert_eq!(stored(other)?, ("".into(), match_key("Freestyle", "")));
+    // A later read naming one fills it.
+    lib.upsert_track(&Track { artist: "A Channel".into(), ..nameless })?;
+    assert_eq!(stored(other)?, ("A Channel".into(), match_key("Freestyle", "A Channel")));
     // A real artist stays, whatever comes next.
     lib.upsert_track(&Track { artist: "Someone Else".into(), ..youtube() })?;
     assert_eq!(stored(id)?.0, "Daft Punk");
