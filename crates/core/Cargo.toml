@@ -16,7 +16,7 @@ lofty = "=0.25.5"
 unicode-normalization = "0.1.25"
 flate2 = "1.1.10"
 base64 = "0.23.1"
-qrcode = { version = "0.14.1", default-features = false }
+qrcode = { version = "0.15.0", default-features = false }
 rqrr = { version = "0.11.0", default-features = false }
 # WebP and GIF: read for cover thumbnails (YouTube's vi_webp frames, Apple and Google art), never written.
 image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "webp", "gif"] }
