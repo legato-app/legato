@@ -53,6 +53,7 @@ import { useSettings } from './settings'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
+import { pushNotice } from './pushNotice'
 import { toggleFullscreen } from './fullscreen'
 import { Toasts } from './Toasts'
 import { PhoneTabs } from './PhoneTabs'
@@ -299,22 +300,17 @@ export function App() {
     const off = api.onLocalChanged(() => void useStore.getState().refreshChanged())
     return () => void off.then((f) => f())
   }, [])
-  // A like, add or removal YouTube Music refused after the fact (push.rs): undone in the library, said here.
+  // A like, add or removal a service refused after the fact (push.rs): said here.
   useEffect(() => {
-    const off = api.onPushFailed((f) => {
-      // The reason in plain words, before the sentence around it (its own full stop goes: the sentence has one).
-      const say = { name: f.playlist, reason: explain(f.reason).text.replace(/\.$/, '') }
-      const text = {
-        add: tr('Not added to {name} on YouTube Music: {reason}. Taken back out here.', say),
-        like: tr('Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.', say),
-        likeLost: tr('Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.', say),
-        remove: tr('Not removed from {name} on YouTube Music: {reason}. Put back here.', say),
-        unlike: tr('Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.', say),
-        serverAdd: tr('Not added to {name} on your music server: {reason}. Taken back out here.', say),
-        serverRemove: tr('Not removed from {name} on your music server: {reason}. Put back here.', say),
-        serverRename: tr('Not renamed on your music server: {reason}. Called {name} here again.', say),
-      }[f.kind]
-      useStore.getState().notify(text, { kind: 'error' })
+    const off = api.onPushFailed((failed) => {
+      const { notify, go } = useStore.getState()
+      const notice = pushNotice(failed)
+      if (notice.signIn === null) notify(notice.text, { kind: 'error' })
+      else {
+        // Same words each time: the toast already up is replaced, never stacked.
+        const signIn = notice.signIn === 'youtube' ? () => void api.ytmSignIn().catch((e: unknown) => useStore.setState({ error: String(e) })) : () => go({ name: 'settings', section: 'sources' })
+        notify(notice.text, { kind: 'info', action: { label: tr('Sign in again'), run: signIn } })
+      }
       void useStore.getState().refreshChanged()
     })
     return () => void off.then((f) => f())

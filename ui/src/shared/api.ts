@@ -239,7 +239,7 @@ export const api = {
   rescanLocal: () => invoke<number>('rescan_local'),
   /** A watched local folder changed and was scanned again (src-tauri folders.rs): local file count. */
   onLocalChanged: (cb: (count: number) => void) => listen<number>('local-changed', (e) => cb(e.payload)),
-  /** A change YouTube Music refused after the fact (push.rs): already undone in the library. */
+  /** A change a service refused after the fact (push.rs): kept to be sent again, or already undone in the library. */
   onPushFailed: (cb: (f: PushFailed) => void) => listen<PushFailed>('push-failed', (e) => cb(e.payload)),
   /** A second launch from a taskbar Jump List entry: `jumpPending` has it. */
   onJump: (cb: () => void) => listen('jump', () => cb()),
