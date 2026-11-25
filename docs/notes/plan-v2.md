@@ -422,6 +422,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
 - **Low**: niche or fun, for later.
 
 **High**
+- [ ] `L` A Lite build next to the full one (owner's ask 2026-11-25, his words as recorded: "deux versions… une version light
+      faite automatiquement à la compilation… l'essentiel de l'app, focus sur l'optimisation"; maybe more variants later).
+      Built from the same code by a build flag (cargo feature + a Vite define), never a fork. Its own app: name "Legato Lite",
+      its own identifier, data, keychain entries and update feed (the full app's `latest.json` URL unchanged). Cut: advanced
+      sound (Live Editor, effects, Music Detector, visualizer, loudness meter; the simple EQ and levelling stay), connected
+      extras (Discord, OBS overlay, Stream Deck, phone remote, listening rooms, plugins), modes and games (blind test,
+      karaoke, living-room TV, podcasts, audiobooks). Animations stay. Windows and Android. Built and attached on every
+      Beta and Stable, same release. For Opus: the design first (identity::installed(), rename.rs, updater, Sync Mode
+      between a full and a Lite PC), then slices; measured against the full one with `pnpm bench`.
 - [ ] `L+` Mobile version, well optimised, the Rust code reused (the owner's ask 2026-11-02): Tauri 2's Android target
       with the same crates and `ui/`, Android first, iPhone after. Spec, seven phases, what stays desktop-only and the
       owner's calls (Android SDK / NDK on this PC, a phone, GitHub or Play Store, YouTube sign-in in a WebView):
