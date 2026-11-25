@@ -227,8 +227,8 @@ rules still hold for every lookup. No script ever runs real requests in bulk; te
    Beta(5 + heard, 5 + skipped early) of this session's explore picks ("new"), each count capped at 20, at most half the slots,
    the floor of one from 5 slots kept (Anderson 2020); as set until one is heard or skipped (`score.ts` `K.bandit`,
    `exploreRate`; `taste.ts` counts them, memory only). Tests in `feel.test.ts` (skipped: fewer "new", heard: more, one stays)
-   and `taste.test.ts`. The prior, cap and ceiling are first guesses, never heard by ear; a catalog song has no listen, so only
-   radio songs' outcomes count too (below); nothing is kept across restarts (no new data written).
+   and `taste.test.ts`. The prior, cap and ceiling are first guesses, never heard by ear; radio
+   songs' outcomes count too (slice 7); nothing is kept across restarts (no new data written).
 7. *A catalog song's verdict* Done 2026-11-25 (found by the gap analysis): a radio's song (most picks at Up next's end) gave no
    listen, so skipping it steered nothing. Now it gives this session its verdict by its session id (`listens.ts` `remote`,
    `store.ts`): its early skip steers the next picks of its artist and Shuffle, its replay and explore outcome count; still no
