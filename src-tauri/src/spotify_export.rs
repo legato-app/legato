@@ -213,7 +213,7 @@ pub async fn spotify_export_import(app: AppHandle, state: State<'_, AppState>, p
         // Trust boundary: the interface's name, bounded.
         let name = name.trim();
         let name = if name.is_empty() || name.chars().count() > 200 { list.name.as_str() } else { name };
-        let id = crate::spotify_web::save(&state, &list.id, name, &list.tracks).map_err(err)?;
+        let id = crate::spotify_web::save(&state, &list.id, name, &list.tracks, true).map_err(err)?;
         report.playlist_id.get_or_insert(id);
         report.lists += 1;
         report.songs += list.tracks.len();
