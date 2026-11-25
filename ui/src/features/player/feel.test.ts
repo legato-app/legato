@@ -315,6 +315,23 @@ describe('every pick carries one reason', () => {
     }
     expect(news).toBeGreaterThan(0)
   })
+
+  it('explore slots learn (slice 6): picks skipped early give fewer of them, picks heard give more, and one stays', () => {
+    const news = (explored: { hits: number; misses: number }) => {
+      let n = 0
+      for (let s = 1; s <= 8; s++) {
+        const why = new Map<number, PickWhy>()
+        pickSimilar(candidates, bands.slice(0, 3), 2, { ...mine, explored }, 'balanced', 15, seeded(s), library, undefined, why)
+        n += [...why.values()].filter((w) => w.kind === 'new').length
+      }
+      return n
+    }
+    const skipped = news({ hits: 0, misses: 20 })
+    const heard = news({ hits: 20, misses: 0 })
+    expect(skipped).toBeLessThan(news({ hits: 0, misses: 0 }))
+    expect(heard).toBeGreaterThan(news({ hits: 0, misses: 0 }))
+    expect(skipped).toBeGreaterThanOrEqual(8)
+  })
 })
 
 // Session signals (docs/recommendation.md, slice 3): taken from the stored plays by Rust, read here.

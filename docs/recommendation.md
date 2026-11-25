@@ -223,8 +223,12 @@ rules still hold for every lookup. No script ever runs real requests in bulk; te
    parser fixture plus a `feel` case.
 5. *Discovery from Home* Done 2026-11-19 (night run): a "New for you" button above YouTube Music's shelves on Home (`HomeView.tsx` `NewForYou`) starts 20 songs from the shelves that the library does not hold (`discovery.ts`), ranked by `rankPicks` against the last 3 songs played, with the explore dose and the reasons; tests in `discovery.test.ts` and `feel.test.ts` (the off-style songs stay out of the first 10 even when the shelves lead with them). No new request. Original: (signed in): the shelves' songs, ranked by our score with the explore dose, in a "New for you"
    mix. Measure: a Home fixture where an off-style song stays out of the first 10.
-6. Later, if 1 to 5 fall short: exploration as a bandit over the explore slots (Thompson sampling; the floor kept,
-   Anderson 2020).
+6. *Exploration as a bandit* Done 2026-11-25: the explore slots' dose is the variety's times 2θ, θ a Thompson draw from
+   Beta(5 + heard, 5 + skipped early) of this session's explore picks ("new"), each count capped at 20, at most half the slots,
+   the floor of one from 5 slots kept (Anderson 2020); as set until one is heard or skipped (`score.ts` `K.bandit`,
+   `exploreRate`; `taste.ts` counts them, memory only). Tests in `feel.test.ts` (skipped: fewer "new", heard: more, one stays)
+   and `taste.test.ts`. The prior, cap and ceiling are first guesses, never heard by ear; a catalog song has no listen, so only
+   library songs' outcomes count; nothing is kept across restarts (no new data written).
 **Not chosen** (the owner, 2026-11-18), with what each would add:
 - Last.fm `track.getSimilar` / `artist.getSimilar`: similar songs "based on listening data", for users with their own key.
   It would send the titles being played beyond the scrobbles, and the privacy row would change.

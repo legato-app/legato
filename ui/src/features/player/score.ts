@@ -50,6 +50,11 @@ export const K = {
   window: 10,
   /** An explore pick: middle affinity (z between these), few plays. */
   explore: { low: -0.5, high: 1.2, plays: 2 },
+  /**
+   * The explore slots learn (Thompson sampling, docs/recommendation.md slice 6): the dose times 2θ, θ drawn from Beta(prior + heard,
+   * prior + skipped early) of this session's explore picks, each count capped; never more than `most` of the slots, the floor kept.
+   */
+  bandit: { prior: 5, cap: 20, most: 0.5 },
 } as const
 
 /** What the app knows of a song's taste: all but the first four are optional (absent = none). */
@@ -68,6 +73,8 @@ export interface Taste {
   decayed?: (t: LibraryTrack) => number
   /** Unix s of the last listen, 0 = never. */
   lastPlayed?: (t: LibraryTrack) => number
+  /** This session's explore picks heard to the end (hits) and skipped early (misses): the explore slots learn from them. */
+  explored?: { hits: number; misses: number }
   /** Bit h = played at local hour h in the last 90 days. */
   hours?: (t: LibraryTrack) => number
   /** This session: -1 skipped early, 1 heard to the end, 0 neither. */
@@ -255,10 +262,22 @@ export function scoreAll(candidates: Candidate[], session: Map<string, number>, 
   return candidates.map((c, i) => ({ c, f: feats[i], artist: artists[i], z: z[i], za: za[i], parts: parts[i] }))
 }
 
-/** How many of `max` slots go to explore picks: the dose of the variety, never none from 5 slots up. */
-export function exploreSlots(variety: Variety, max: number): number {
-  const n = Math.round(K.dose[variety] * max)
+/** How many of `max` slots go to explore picks: the dose of the variety (times 2 x `rate`, 0.5 = as set), never none from 5 slots up. */
+export function exploreSlots(variety: Variety, max: number, rate = 0.5): number {
+  const n = Math.min(Math.round(K.dose[variety] * 2 * rate * max), Math.round(K.bandit.most * max))
   return max >= 5 ? Math.max(1, n) : n
+}
+
+/** A draw from Beta(a, b), whole a and b >= 1: the a-th smallest of a + b - 1 uniforms. */
+export function betaDraw(a: number, b: number, rand: () => number): number {
+  return Array.from({ length: a + b - 1 }, rand).sort((x, y) => x - y)[a - 1]
+}
+
+/** The explore rate for this pick: as set until an explore pick was heard or skipped, then a Thompson draw. */
+function exploreRate(e: Taste['explored'], rand: () => number): number {
+  if (!e || e.hits + e.misses === 0) return 0.5
+  const { prior, cap } = K.bandit
+  return betaDraw(prior + Math.min(cap, e.hits), prior + Math.min(cap, e.misses), rand)
 }
 
 /** Songs kept for the picks: this many by score and as many explore candidates. */
@@ -323,7 +342,7 @@ export function rankPicks({ candidates, queue, index, taste, variety, max, rand,
   const byZ = [...pool].sort((a, b) => b.z - a.z)
   const mids = byZ.slice(KEEP).filter((x) => isMid(x, taste)).slice(0, KEEP)
   pool = [...byZ.slice(0, KEEP), ...mids]
-  const slots = exploreSlots(variety, max)
+  const slots = exploreSlots(variety, max, exploreRate(taste.explored, rand))
   // The explore slots are spread through the picks, never the first.
   const explore = new Set(Array.from({ length: slots }, (_, j) => Math.round(((j + 1) * max) / (slots + 1))))
   const recent = queue.slice(Math.max(0, index - 1), index + 1)

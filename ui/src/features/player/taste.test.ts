@@ -78,3 +78,24 @@ describe('this session’s replays (before the next reload)', () => {
     vi.useRealTimers()
   })
 })
+
+describe('explore picks heard or skipped (slice 6)', () => {
+  beforeEach(() => vi.resetModules())
+
+  it('an explore pick heard to the end is a hit, one skipped early a miss; other picks count nothing', async () => {
+    const { startTaste, tasteFor } = await import('./taste')
+    const { startListen, endListen, progress } = await import('./listens')
+    const { usePickWhy } = await import('./pickWhyStore')
+    usePickWhy.setState({ 1: { kind: 'new' }, 2: { kind: 'new' }, 3: { kind: 'style' } })
+    const stop = startTaste(async () => [])
+    startListen(1, 200_000)
+    endListen(true)
+    startListen(2, 200_000)
+    progress(3000)
+    endListen(false)
+    startListen(3, 200_000)
+    endListen(true)
+    expect(tasteFor({}, new Map()).explored).toEqual({ hits: 1, misses: 1 })
+    stop()
+  })
+})
