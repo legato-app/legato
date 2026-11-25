@@ -128,13 +128,14 @@ pub fn doubtful(track: &Track, hit: &Track) -> bool {
     !ids && !isrc && track.duration_ms.zip(hit.duration_ms).is_none_or(|(x, y)| x.abs_diff(y) > 3_000)
 }
 
-/// Best candidate: exact ISRC first, then fuzzy.
+/// Best candidate: exact ISRC first, then fuzzy. By names alone, a candidate of unknown length is a doubt, not a match,
+/// when the song's own length is known.
 pub fn best_match<'a>(track: &Track, candidates: &'a [Track]) -> Option<&'a Track> {
     track
         .isrc
         .as_ref()
         .and_then(|isrc| candidates.iter().find(|c| c.isrc.as_ref().is_some_and(|x| x.eq_ignore_ascii_case(isrc))))
-        .or_else(|| candidates.iter().find(|c| same_track(track, c)))
+        .or_else(|| candidates.iter().find(|c| (c.duration_ms.is_some() || track.duration_ms.is_none()) && same_track(track, c)))
 }
 
 /// Merge two views of same track. `a` wins on filled fields.
@@ -190,6 +191,16 @@ mod tests {
 
     fn t(title: &str, artist: &str) -> Track {
         Track { title: title.into(), artist: artist.into(), ..Default::default() }
+    }
+
+    #[test]
+    fn a_hit_of_unknown_length_is_no_match_for_a_song_whose_length_is_known() {
+        let song = Track { duration_ms: Some(290_000), ..t("Beyond", "Daft Punk") };
+        let hit = |ms: Option<u32>| Track { duration_ms: ms, ids: [(Source::Youtube, "v".into())].into(), ..t("Beyond", "Daft Punk") };
+        assert_eq!(best_match(&song, &[hit(None)]), None);
+        assert!(best_match(&song, &[hit(None), hit(Some(291_000))]).is_some_and(|found| found.duration_ms.is_some()));
+        // Asked by name alone (a song list): nothing to compare, matched as before.
+        assert!(best_match(&t("Beyond", "Daft Punk"), &[hit(Some(291_000))]).is_some());
     }
 
     #[test]
