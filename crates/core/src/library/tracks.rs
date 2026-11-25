@@ -77,6 +77,20 @@ impl Library {
         Ok(found)
     }
 
+    /// `t` would bring ids new to row `id` while naming another song (title, artist, length; ISRC when both have one).
+    fn links_another_song(&self, id: i64, t: &Track) -> Result<bool> {
+        let mut owner = self.db.prepare_cached("SELECT track_id FROM track_ids WHERE source = ?1 AND source_id = ?2")?;
+        let mut brings_new_id = false;
+        for (source, source_id) in &t.ids {
+            brings_new_id |= owner.query_row(params![source.as_str(), source_id], |row| row.get::<_, i64>(0)).optional()? != Some(id);
+        }
+        if !brings_new_id {
+            return Ok(false);
+        }
+        let row = self.db.prepare_cached(&format!("SELECT {TRACK_COLS} FROM tracks t WHERE t.id = ?1"))?.query_row([id], to_track)?.track;
+        Ok(!same_track(&row, &Track { ids: BTreeMap::new(), ..t.clone() }))
+    }
+
     pub fn upsert_track(&self, t: &Track) -> Result<i64> {
         self.tx(|| {
             let mut found = self.lookup(t)?;
@@ -90,6 +104,9 @@ impl Library {
                     .execute(params![t.title, t.artist, t.album, t.duration_ms, isrc, match_key(&t.title, &t.artist), t.art, t.musicness.map(Musicness::as_str), t.explicit])?;
                     self.db.last_insert_rowid()
                 }
+                // Only an id in common, and another song by its names: a wrong link somewhere. The row stays as it is and
+                // takes no id from elsewhere.
+                Some(keep) if self.links_another_song(keep, t)? => return Ok(keep),
                 Some(keep) => {
                     // Track may sit in several rows (seen on YouTube, then Spotify). Merge into lowest id.
                     for dupe in found {

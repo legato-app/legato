@@ -373,6 +373,29 @@ fn a_read_cut_short_removes_nothing_and_a_whole_one_does() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn a_shared_id_alone_does_not_merge_another_song() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let upload = |video: &str, title: &str, artist: &str| Track { title: title.into(), artist: artist.into(), ids: BTreeMap::from([(Source::Youtube, video.into())]), art: Some(format!("https://i.ytimg.com/vi/{video}/hqdefault.jpg")), ..Default::default() };
+    let catalog = |video: &str, apple: &str| Track {
+        title: "Beyond".into(),
+        artist: "Daft Punk".into(),
+        album: Some("Random Access Memories".into()),
+        ids: BTreeMap::from([(Source::Youtube, video.into()), (Source::Apple, apple.into())]),
+        art: Some("https://is1-ssl.mzstatic.com/image/thumb/a/600x600bb.jpg".into()),
+        ..Default::default()
+    };
+    let row = |id: i64| Ok::<_, anyhow::Error>(lib.tracks()?.into_iter().find(|t| t.id == id).unwrap().track);
+    let other = lib.upsert_track(&upload("v1", "ENTITY.096 - Ultra Slowed [Beyond Birthday]", "Winter"))?;
+    let before = row(other)?;
+    assert_eq!(lib.upsert_track(&catalog("v1", "1"))?, other);
+    assert_eq!(row(other)?, before);
+    let same = lib.upsert_track(&upload("v2", "Beyond", "Daft Punk"))?;
+    assert_eq!(lib.upsert_track(&catalog("v2", "2"))?, same);
+    assert_eq!(row(same)?.ids.get(&Source::Apple).map(String::as_str), Some("2"));
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }
