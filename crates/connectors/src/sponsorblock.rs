@@ -12,7 +12,7 @@ use sha2::{Digest, Sha256};
 use url::Url;
 
 pub const API: &str = "https://sponsor.ajay.app/api";
-const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/Clovis500c/legato)");
+const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/legato-app/legato)");
 const CATEGORY: &str = "music_offtopic";
 /// Hex characters of the hash sent.
 const PREFIX: usize = 4;

@@ -8,8 +8,8 @@ use std::io::Write;
 use std::path::Path;
 
 /// The rolling `beta` release's file (`release.yml` moves it at every release), as the PC's Beta reads it.
-pub const BETA: &str = "https://github.com/Clovis500c/legato/releases/download/beta/latest.json";
-const RELEASES: &str = "https://github.com/Clovis500c/legato/releases/download";
+pub const BETA: &str = "https://github.com/legato-app/legato/releases/download/beta/latest.json";
+const RELEASES: &str = "https://github.com/legato-app/legato/releases/download";
 
 /// A newer version whose release has its APK.
 #[derive(Debug, Clone, PartialEq)]

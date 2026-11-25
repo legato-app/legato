@@ -14,7 +14,7 @@ describe('presenceFor', () => {
     expect(presenceFor(now, track, true, 30_000.4, 197_000, opts)).toEqual({ title: 'jinx', artist: 'lexycat', album: 'Pink', art: track.art, artistArt: null, buttons: [['Listen on YouTube', 'https://www.youtube.com/watch?v=abc']], playing: true, positionMs: 30_000, durationMs: 197_000, status: 'song' })
     const sp = presenceFor({ ...now, via: 'spotify', youtubeId: undefined, spotifyId: 'xyz' }, undefined, true, 0, null, opts)
     expect(sp?.buttons).toEqual([['Listen on Spotify', 'https://open.spotify.com/track/xyz']])
-    expect(presenceFor(now, track, true, 0, null, { ...opts, github: true })?.buttons[1]).toEqual(['Get App On GitHub', 'https://github.com/Clovis500c/legato'])
+    expect(presenceFor(now, track, true, 0, null, { ...opts, github: true })?.buttons[1]).toEqual(['Get App On GitHub', 'https://github.com/legato-app/legato'])
     expect(sp?.art).toBeNull()
   })
 

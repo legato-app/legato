@@ -250,7 +250,7 @@ mod tests {
             artist_art: None,
             buttons: vec![
                 ("Listen on YouTube".into(), "https://www.youtube.com/watch?v=abc".into()),
-                ("Get App On GitHub".into(), "https://github.com/Clovis500c/legato".into()),
+                ("Get App On GitHub".into(), "https://github.com/legato-app/legato".into()),
                 ("Third one".into(), "https://example.com".into()),
             ],
             playing: true,

@@ -21,7 +21,7 @@ const KEY: &str = "update";
 /// Beta's file: the rolling `beta` release, whose latest.json `release.yml` replaces at every release. Stable's is
 /// `tauri.conf.json`'s endpoint (`releases/latest/download/latest.json`, which skips prereleases): every installed
 /// version reads it, so it stays.
-const BETA_ENDPOINT: &str = "https://github.com/Clovis500c/legato/releases/download/beta/latest.json";
+const BETA_ENDPOINT: &str = "https://github.com/legato-app/legato/releases/download/beta/latest.json";
 
 /// Which releases this PC follows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -362,14 +362,14 @@ mod tests {
     fn stable_keeps_the_endpoint_installed_versions_read() {
         // CLAUDE.md: installed versions read this URL, and GitHub's `latest` skips prereleases: it stays Stable's.
         let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
-        assert_eq!(conf["plugins"]["updater"]["endpoints"], serde_json::json!(["https://github.com/Clovis500c/legato/releases/latest/download/latest.json"]));
+        assert_eq!(conf["plugins"]["updater"]["endpoints"], serde_json::json!(["https://github.com/legato-app/legato/releases/latest/download/latest.json"]));
         assert_eq!(Channel::Stable.endpoint(), None, "Stable reads the configured endpoint");
     }
 
     #[test]
     fn beta_reads_the_rolling_beta_release_that_the_workflow_feeds() {
         let url = Channel::Beta.endpoint().unwrap();
-        assert_eq!(url, "https://github.com/Clovis500c/legato/releases/download/beta/latest.json");
+        assert_eq!(url, "https://github.com/legato-app/legato/releases/download/beta/latest.json");
         assert!(url.parse::<tauri::Url>().is_ok());
         // A push must reach Beta only: releases are prereleases (GitHub's latest skips them) and feed that release.
         let release = include_str!("../../.github/workflows/release.yml");

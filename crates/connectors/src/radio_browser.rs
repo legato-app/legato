@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 pub const API: &str = "https://all.api.radio-browser.info/json";
-const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/Clovis500c/legato)");
+const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/legato-app/legato)");
 const TIMEOUT: Duration = Duration::from_secs(15);
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, ts_rs::TS)]

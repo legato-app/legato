@@ -20,7 +20,7 @@ export function metadataOf(code: string): Metadata {
   const path = code === 'en' ? SITE : `${SITE}${code}/`
   const languages = Object.fromEntries([...LANGS.filter((l) => COPIES[l.code]).map((l) => [COPIES[l.code].lang, l.code === 'en' ? SITE : `${SITE}${l.code}/`]), ['x-default', SITE]])
   return {
-    metadataBase: new URL('https://clovis500c.github.io'),
+    metadataBase: new URL('https://legato-app.github.io'),
     title: c.title,
     description: c.hero.lead,
     alternates: { canonical: path, languages },

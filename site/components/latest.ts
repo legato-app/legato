@@ -10,7 +10,7 @@ type Release = { tag_name: string; assets: { name: string; browser_download_url:
 // One request per visit, shared by every download button.
 let pending: Promise<Latest> | null = null
 const latest = () =>
-  (pending ??= fetch('https://api.github.com/repos/Clovis500c/legato/releases/latest')
+  (pending ??= fetch('https://api.github.com/repos/legato-app/legato/releases/latest')
     .then((r) => (r.ok ? (r.json() as Promise<Release>) : Promise.reject(new Error(String(r.status)))))
     .then((r) => ({ href: r.assets.find((a) => a.name.endsWith('-setup.exe'))?.browser_download_url ?? RELEASES, version: r.tag_name.replace(/^v/, '') }))
     .catch(() => ({ href: RELEASES, version: null })))
@@ -19,7 +19,7 @@ type Android = { href: string; version: string | null }
 let pendingApk: Promise<Android> | null = null
 // The APK is attached to every Beta (a prerelease), so Stable's "latest" may have none: the newest release that has one.
 const apk = () =>
-  (pendingApk ??= fetch('https://api.github.com/repos/Clovis500c/legato/releases?per_page=10')
+  (pendingApk ??= fetch('https://api.github.com/repos/legato-app/legato/releases?per_page=10')
     .then((r) => (r.ok ? (r.json() as Promise<Release[]>) : Promise.reject(new Error(String(r.status)))))
     .then((all) => {
       for (const r of all) {

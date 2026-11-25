@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 // The page's text is English here; copy/<code>.ts holds the app's 17 other languages in the same shape: a line changed
 // here changes there too. PRIVACY stays English in every language, the one reference for what leaves the PC.
 
-export const GITHUB = 'https://github.com/Clovis500c/legato'
+export const GITHUB = 'https://github.com/legato-app/legato'
 /** The public Discord invitation: a link out, the visitor clicks and nothing is sent from this site. */
 export const DISCORD = 'https://discord.gg/WsqAuCSxQU'
 export const PLUGINS_GUIDE = `${GITHUB}/blob/master/docs/plugins.md`

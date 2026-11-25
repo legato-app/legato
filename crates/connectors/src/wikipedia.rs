@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use url::Url;
 
-const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/Clovis500c/legato)");
+const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/legato-app/legato)");
 const TIMEOUT: Duration = Duration::from_secs(10);
 /// Longest bio kept, in characters (the summary is a paragraph or two).
 const MAX_CHARS: usize = 1_200;

@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: >-
-        Have a look at [what's next](https://clovis500c.github.io/legato/#next) first: it may already be planned.
+        Have a look at [what's next](https://legato-app.github.io/legato/#next) first: it may already be planned.
         Legato only plays music the legal way, so ideas that download, record or export a service's audio, or get
         around DRM, can't be taken.
   - type: textarea

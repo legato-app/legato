@@ -11,9 +11,9 @@ which would install over the app on this PC.
 - First submission: a pull request to `microsoft/winget-pkgs` adding the folder as
   `manifests/c/Clovis500c/Legato/<version>/`, or `wingetcreate submit packaging/winget/Clovis500c.Legato/<version>`.
 - Later Stable releases, once the first is merged: `wingetcreate update Clovis500c.Legato --version <v> --urls
-  https://github.com/Clovis500c/legato/releases/download/v<v>/Legato_<v>_x64-setup.exe --submit`.
+  https://github.com/legato-app/legato/releases/download/v<v>/Legato_<v>_x64-setup.exe --submit`.
 - The installer's SHA-256 is the release asset's digest:
-  `gh api repos/Clovis500c/legato/releases/latest --jq '.assets[] | .name + " " + .digest'`.
+  `gh api repos/legato-app/legato/releases/latest --jq '.assets[] | .name + " " + .digest'`.
 - `AppsAndFeaturesEntries` match what the NSIS installer writes (HKCU uninstall key `Legato`, publisher `legato`): winget
   then sees the app's own updates between two songs as the same package.
 

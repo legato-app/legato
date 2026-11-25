@@ -7,7 +7,7 @@ use anyhow::{Result, anyhow, bail};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/Clovis500c/legato)");
+const AGENT: &str = concat!("Legato v", env!("CARGO_PKG_VERSION"), " (https://github.com/legato-app/legato)");
 const TIMEOUT: Duration = Duration::from_secs(20);
 /// A feed bigger than this is refused (big shows have a few thousand episodes: about 3 MB).
 const MAX_BYTES: usize = 8 << 20;

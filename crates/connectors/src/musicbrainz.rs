@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 pub const API: &str = "https://musicbrainz.org/ws/2";
-pub(crate) const AGENT: &str = concat!("Legato/", env!("CARGO_PKG_VERSION"), " ( https://github.com/Clovis500c/legato )");
+pub(crate) const AGENT: &str = concat!("Legato/", env!("CARGO_PKG_VERSION"), " ( https://github.com/legato-app/legato )");
 /// Under this score the search matched something else than the artist's name.
 const MIN_SCORE: u32 = 90;
 /// Releases offered to pick from in Edit song info.
@@ -525,7 +525,7 @@ mod tests {
         let m = server
             .mock("GET", "/release-group/")
             .match_query(mockito::Matcher::AllOf(vec![mockito::Matcher::UrlEncoded("fmt".into(), "json".into()), mockito::Matcher::UrlEncoded("query".into(), query("Velvet Cartographers", "2026-09-12"))]))
-            .match_header("user-agent", mockito::Matcher::Regex(r"^Legato/\S+ \( https://github\.com/Clovis500c/legato \)$".into()))
+            .match_header("user-agent", mockito::Matcher::Regex(r"^Legato/\S+ \( https://github\.com/legato-app/legato \)$".into()))
             .with_body(BODY)
             .expect(1)
             .create_async()
