@@ -396,6 +396,23 @@ fn a_shared_id_alone_does_not_merge_another_song() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn a_page_that_comes_short_or_gives_no_count_removes_nothing() -> Result<()> {
+    use crate::model::PlaylistRead;
+    let read = |songs: &[u32], announced: usize| PlaylistRead::from_page(songs.iter().map(|n| song(*n)).collect(), announced);
+    assert!(read(&[1, 2], 2).complete);
+    let lib = Library::in_memory()?;
+    let save = |read: PlaylistRead| lib.save_playlist_read(Source::Apple, "p.1", "Road trip", &read.tracks, read.complete);
+    let list = save(read(&[1, 2, 3], 3))?;
+    for short in [read(&[1], 3), read(&[1], 0)] {
+        save(short)?;
+        assert_eq!(lib.playlist_orders()?[&list].len(), 3);
+    }
+    save(read(&[1], 1))?;
+    assert_eq!(lib.playlist_orders()?[&list].len(), 1);
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }

@@ -11,7 +11,7 @@ use crate::{AppState, CmdResult, err, links};
 use anyhow::Context;
 use music_connectors::apple_page::{self, Message};
 use music_connectors::linklist::MAX_TRACKS;
-use music_core::model::{Source, Track};
+use music_core::model::{PlaylistRead, Source, Track};
 use std::sync::Mutex;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, State, Url, WebviewUrl, WebviewWindowBuilder};
@@ -90,18 +90,20 @@ async fn next(rx: &mut UnboundedReceiver<Message>) -> anyhow::Result<Message> {
 }
 
 /// The songs of one playlist, as the page draws them. `read`: songs so far, songs the list says it has.
-async fn songs(app: &AppHandle, id: &str, mut read: impl FnMut(usize, usize)) -> anyhow::Result<Vec<Track>> {
+async fn songs(app: &AppHandle, id: &str, mut read: impl FnMut(usize, usize)) -> anyhow::Result<PlaylistRead> {
     let path = apple_page::list_path(id).context("Invalid list")?;
     let mut rx = start(app, &path, "read").await?;
     let mut all = Vec::new();
+    let mut announced = 0;
     loop {
         match next(&mut rx).await? {
             Message::Songs { songs, total } => {
+                announced = total;
                 all.extend(songs);
                 all.truncate(MAX_TRACKS);
                 read(all.len(), total.max(all.len()));
             }
-            Message::Done => return Ok(all),
+            Message::Done => return Ok(PlaylistRead::from_page(all, announced)),
             _ => {}
         }
     }
@@ -160,7 +162,7 @@ pub async fn apple_import(app: AppHandle, state: State<'_, AppState>, picks: Vec
         };
         tell(false, 0, 0, before, 0, None);
         let read = match songs(&app, &pick.id, |done, total| tell(false, done, total, before, 0, None)).await {
-            Ok(read) if !read.is_empty() => read,
+            Ok(read) if !read.tracks.is_empty() => read,
             Ok(_) => {
                 report.failed.push(pick.name.clone());
                 continue;
@@ -171,9 +173,9 @@ pub async fn apple_import(app: AppHandle, state: State<'_, AppState>, picks: Vec
                 continue;
             }
         };
-        let total = read.len();
-        let save = |known: &[Track]| state.lib().save_playlist(Source::Apple, &pick.id, pick.name.trim(), known);
-        let Some((id, links::Found { tracks, unsearched })) = links::save_then_find(&app, &read, save, |step| tell(true, step.done, total, before + step.found, step.wait_secs, step.song)).await? else { break };
+        let total = read.tracks.len();
+        let save = |known: &[Track]| state.lib().save_playlist_read(Source::Apple, &pick.id, pick.name.trim(), known, read.complete);
+        let Some((id, links::Found { tracks, unsearched })) = links::save_then_find(&app, &read.tracks, save, |step| tell(true, step.done, total, before + step.found, step.wait_secs, step.song)).await? else { break };
         report.unsearched += unsearched;
         report.playlist_id.get_or_insert(id);
         report.lists += 1;

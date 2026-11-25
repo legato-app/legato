@@ -87,6 +87,14 @@ pub struct PlaylistRead {
     pub complete: bool,
 }
 
+impl PlaylistRead {
+    /// A list read off a service's page, which says how many songs it holds (`announced`, 0: it doesn't say). Complete
+    /// only when that many were read: unknown or short removes nothing.
+    pub fn from_page(tracks: Vec<Track>, announced: usize) -> Self {
+        Self { complete: announced > 0 && tracks.len() >= announced, tracks }
+    }
+}
+
 /// Music service. Each user connects own account.
 #[async_trait]
 pub trait Connector: Send + Sync {
