@@ -318,6 +318,15 @@ impl Library {
         Ok(())
     }
 
+    /// A like the service refused, from its list `id` into your own Liked Music (liked there at the next sync).
+    pub fn move_to_own_likes(&self, id: i64, track_ids: &[i64]) -> Result<()> {
+        self.keep_in_own_likes(track_ids)?;
+        for track_id in track_ids {
+            self.remove_from_imported(id, *track_id)?;
+        }
+        Ok(())
+    }
+
     /// Your own "Liked Music": what a like waits in, or all of them with no YouTube Music. Made when first needed.
     pub fn keep_in_own_likes(&self, ids: &[i64]) -> Result<i64> {
         let own = match self.playlists()?.into_iter().find(|p| p.custom && p.name == "Liked Music") {

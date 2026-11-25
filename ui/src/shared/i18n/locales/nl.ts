@@ -1643,7 +1643,6 @@ const nl: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Uitgelogd bij je muziekserver. Je wijzigingen wachten hier tot je weer inlogt.',
   'Sign in again': 'Opnieuw inloggen',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'Liken op YouTube Music lukte niet: {reason}. Bewaard in je Liked Music, geliket bij de volgende synchronisatie.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'Liken op YouTube Music lukte niet: {reason}. Weer uit {name} gehaald.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'Niet verwijderd uit {name} op YouTube Music: {reason}. Hier teruggezet.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'Like op YouTube Music niet teruggedraaid: {reason}. Nog steeds in {name}.',
   'Visualizer style': 'Stijl van de visualisatie',

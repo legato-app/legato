@@ -39,8 +39,6 @@ pub enum Kind {
     Add,
     /// Kept in your own Liked Music instead (liked at the next sync).
     Like,
-    /// Another account's like: taken back out here.
-    LikeLost,
     Remove,
     Unlike,
     /// A music server's playlist (`servers.rs`).

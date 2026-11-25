@@ -1643,7 +1643,6 @@ const uk: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Виконано вихід із музичного сервера. Ваші зміни чекають тут, доки ви не ввійдете знову.',
   'Sign in again': 'Увійти знову',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'Не вдалося вподобати на YouTube Music: {reason}. Збережено у вашій Liked Music, вподобаємо під час наступної синхронізації.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'Не вдалося вподобати на YouTube Music: {reason}. Прибрано з {name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'Не прибрано з {name} на YouTube Music: {reason}. Повернуто сюди.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'Не вдалося скасувати вподобання на YouTube Music: {reason}. Досі в {name}.',
   'Visualizer style': 'Стиль візуалізації',

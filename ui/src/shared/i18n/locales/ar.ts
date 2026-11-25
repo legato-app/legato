@@ -1589,7 +1589,6 @@ const ar: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'تم تسجيل خروجك من خادم الموسيقى. تنتظر تغييراتك هنا حتى تسجّل الدخول من جديد.',
   'Sign in again': 'تسجيل الدخول من جديد',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'تعذّر الإعجاب به على YouTube Music: {reason}. يبقى في موسيقاك المفضّلة، ويُعجَب به عند المزامنة التالية.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'تعذّر الإعجاب به على YouTube Music: {reason}. أُزيل من {name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'لم تتم الإزالة من {name} على YouTube Music: {reason}. أُعيدت هنا.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'تعذّر سحب الإعجاب على YouTube Music: {reason}. لا يزال في {name}.',
   'Visualizer style': 'نمط المصوّر المرئي',

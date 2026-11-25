@@ -1589,7 +1589,6 @@ const he: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'נותקתם משרת המוזיקה. השינויים שלכם ממתינים כאן עד שתתחברו שוב.',
   'Sign in again': 'התחברות מחדש',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'לא ניתן היה לתת לייק ב-YouTube Music: {reason}. נשאר ב-Liked Music שלכם, ויקבל לייק בסנכרון הבא.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'לא ניתן היה לתת לייק ב-YouTube Music: {reason}. הוסר מ-{name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'לא הוסר מ-{name} ב-YouTube Music: {reason}. הוחזר גם כאן.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'לא ניתן היה לבטל את הלייק ב-YouTube Music: {reason}. עדיין ב-{name}.',
   'Visualizer style': 'סגנון הוויזואליזציה',

@@ -1643,7 +1643,6 @@ const vi: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Đã đăng xuất khỏi máy chủ nhạc của bạn. Các thay đổi của bạn chờ ở đây đến khi bạn đăng nhập lại.',
   'Sign in again': 'Đăng nhập lại',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'Không thích được trên YouTube Music: {reason}. Đã giữ trong Liked Music của bạn, sẽ thích ở lần đồng bộ tới.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'Không thích được trên YouTube Music: {reason}. Đã gỡ khỏi {name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'Không gỡ được khỏi {name} trên YouTube Music: {reason}. Đã đặt lại ở đây.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'Không bỏ thích được trên YouTube Music: {reason}. Vẫn còn trong {name}.',
   'Visualizer style': 'Kiểu hình ảnh âm thanh',

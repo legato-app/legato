@@ -1643,7 +1643,6 @@ const zh: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': '已退出音乐服务器登录。你的更改会保留在此，直到你重新登录。',
   'Sign in again': '重新登录',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': '无法在 YouTube Music 上点赞：{reason}。已保留在你的 Liked Music，下次同步时点赞。',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': '无法在 YouTube Music 上点赞：{reason}。已从 {name} 撤回。',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': '未能从 YouTube Music 的 {name} 移除：{reason}。已放回此处。',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': '无法在 YouTube Music 上取消点赞：{reason}。仍在 {name} 中。',
   'Visualizer style': '可视化样式',

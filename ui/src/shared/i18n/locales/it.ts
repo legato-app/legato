@@ -1643,7 +1643,6 @@ const it: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Disconnesso dal tuo server musicale. Le tue modifiche aspettano qui finché non accedi di nuovo.',
   'Sign in again': 'Accedi di nuovo',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'Impossibile mettere “mi piace” su YouTube Music: {reason}. Tenuto nella tua Liked Music, messo alla prossima sincronizzazione.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'Impossibile mettere “mi piace” su YouTube Music: {reason}. Tolto da {name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'Non tolto da {name} su YouTube Music: {reason}. Rimesso qui.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'Impossibile togliere il “mi piace” su YouTube Music: {reason}. Ancora in {name}.',
   'Visualizer style': 'Stile del visualizzatore',

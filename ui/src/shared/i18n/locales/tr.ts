@@ -1643,7 +1643,6 @@ const tr: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Müzik sunucunuzdaki oturum kapandı. Değişiklikleriniz yeniden giriş yapana kadar burada bekler.',
   'Sign in again': 'Yeniden giriş yap',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'YouTube Music\'te beğenilemedi: {reason}. Liked Music listende tutuldu, bir sonraki eşitlemede beğenilecek.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'YouTube Music\'te beğenilemedi: {reason}. {name} listesinden geri çıkarıldı.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'YouTube Music\'te {name} listesinden çıkarılmadı: {reason}. Buraya geri kondu.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'YouTube Music\'te beğeni geri alınamadı: {reason}. Hâlâ {name} listesinde.',
   'Visualizer style': 'Görselleştirici stili',

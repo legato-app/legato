@@ -1643,7 +1643,6 @@ const ko: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': '음악 서버에서 로그아웃되었습니다. 다시 로그인할 때까지 변경 사항은 여기에서 대기합니다.',
   'Sign in again': '다시 로그인',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'YouTube Music에서 좋아요를 누르지 못함: {reason}. 내 Liked Music에 두고 다음 동기화 때 좋아요를 누릅니다.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'YouTube Music에서 좋아요를 누르지 못함: {reason}. {name}에서 다시 뺐습니다.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'YouTube Music의 {name}에서 빼지 못함: {reason}. 여기에 다시 넣었습니다.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'YouTube Music에서 좋아요를 취소하지 못함: {reason}. {name}에 그대로 있습니다.',
   'Visualizer style': '비주얼라이저 스타일',

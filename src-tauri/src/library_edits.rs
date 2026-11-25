@@ -233,11 +233,8 @@ pub async fn add_to_youtube(state: State<'_, AppState>, id: i64, track_ids: Vec<
         let kind = {
             let lib = st.lib();
             // The main account's like: into your own Liked Music, liked there at the next sync (push_own_likes).
-            if like.as_deref() == Some("0") {
-                for t in &lost {
-                    let _ = lib.remove_from_imported(id, *t);
-                }
-                if lib.keep_in_own_likes(&lost).is_ok() { push::Kind::Like } else { push::Kind::LikeLost }
+            if like.as_deref() == Some("0") && lib.move_to_own_likes(id, &lost).is_ok() {
+                push::Kind::Like
             } else {
                 push::keep_for_later(&lib, id, &lost, &reason);
                 push::Kind::Add

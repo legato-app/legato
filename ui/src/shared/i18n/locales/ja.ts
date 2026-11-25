@@ -1643,7 +1643,6 @@ const ja: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': '音楽サーバーからログアウトされました。もう一度ログインするまで、変更はここで待機します。',
   'Sign in again': 'もう一度ログイン',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'YouTube Music で高評価できませんでした：{reason}。あなたの Liked Music に残し、次回の同期で高評価します。',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'YouTube Music で高評価できませんでした：{reason}。{name} から外しました。',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'YouTube Music の {name} から外せませんでした：{reason}。こちらに戻しました。',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'YouTube Music で高評価を取り消せませんでした：{reason}。{name} に残っています。',
   'Visualizer style': 'ビジュアライザーのスタイル',

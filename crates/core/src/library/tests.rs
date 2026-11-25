@@ -318,6 +318,22 @@ fn a_song_sent_to_the_service_keeps_the_newest_end_until_removed_here_or_there()
     Ok(())
 }
 
+#[test]
+fn a_refused_like_leaves_the_list_only_once_it_is_in_your_own_likes() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let liked = lib.save_playlist(Source::Youtube, "LM", "Liked Music", &[])?;
+    let mine = lib.upsert_track(&song(9))?;
+    lib.add_sent_songs(liked, &[mine])?;
+    // A song that can't go into your own likes (no such row): nothing leaves.
+    assert!(lib.move_to_own_likes(liked, &[mine, 999]).is_err());
+    assert_eq!(lib.playlist_orders()?[&liked], [mine]);
+    lib.move_to_own_likes(liked, &[mine])?;
+    assert!(!lib.playlist_orders()?.contains_key(&liked));
+    let own = lib.playlists()?.into_iter().find(|p| p.custom && p.name == "Liked Music").unwrap().id;
+    assert_eq!(lib.playlist_orders()?[&own], [mine]);
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }

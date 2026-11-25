@@ -17,7 +17,6 @@ export function pushNotice(failed: PushFailed): PushNotice {
   const text = {
     add: tr('Not added to {name} on YouTube Music yet: {reason}. Kept here, sent again at the next sync.', say),
     like: tr('Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.', say),
-    likeLost: tr('Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.', say),
     remove: tr('Not removed from {name} on YouTube Music: {reason}. Put back here.', say),
     unlike: tr('Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.', say),
     serverAdd: tr('Not added to {name} on your music server yet: {reason}. Kept here, sent again at the next sync.', say),

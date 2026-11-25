@@ -1643,7 +1643,6 @@ const es: Record<string, string> = {
   'Signed out of your music server. Your changes wait here until you sign in again.': 'Se cerró la sesión de tu servidor de música. Tus cambios esperan aquí hasta que vuelvas a iniciar sesión.',
   'Sign in again': 'Volver a iniciar sesión',
   'Couldn’t like it on YouTube Music: {reason}. Kept in your Liked Music, liked at the next sync.': 'No se pudo dar “me gusta” en YouTube Music: {reason}. Guardado en tu Liked Music, se marcará en la próxima sincronización.',
-  'Couldn’t like it on YouTube Music: {reason}. Taken back out of {name}.': 'No se pudo dar “me gusta” en YouTube Music: {reason}. Quitado de {name}.',
   'Not removed from {name} on YouTube Music: {reason}. Put back here.': 'No se quitó de {name} en YouTube Music: {reason}. Vuelto a poner aquí.',
   'Couldn’t take the like back on YouTube Music: {reason}. Still in {name}.': 'No se pudo quitar el “me gusta” en YouTube Music: {reason}. Sigue en {name}.',
   'Visualizer style': 'Estilo del visualizador',
