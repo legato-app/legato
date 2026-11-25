@@ -218,7 +218,7 @@ pub async fn add_to_youtube(state: State<'_, AppState>, id: i64, track_ids: Vec<
         return Err(NOT_SENT.into());
     }
     let added: Vec<i64> = videos.iter().map(|(t, _)| *t).collect();
-    state.lib().append_to_imported(id, &added).map_err(err)?;
+    state.lib().add_sent_songs(id, &added).map_err(err)?;
     report.added = added.len();
     let app = state.app.clone();
     push::later(async move {

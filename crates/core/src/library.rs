@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS settings (
 ";
 
 /// Schema version this code writes (user_version after migrations).
-pub const SCHEMA_VERSION: i64 = 24;
+pub const SCHEMA_VERSION: i64 = 25;
 
 /// The library was made by a newer version of the app.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -546,6 +546,10 @@ impl Library {
             lib.db.execute_batch(
                 "BEGIN; CREATE TABLE IF NOT EXISTS pending_push (playlist_id INTEGER NOT NULL REFERENCES playlists(id) ON DELETE CASCADE, track_id INTEGER NOT NULL REFERENCES tracks(id) ON DELETE CASCADE, tries INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (playlist_id, track_id)); CREATE INDEX IF NOT EXISTS pending_push_track ON pending_push (track_id); PRAGMA user_version = 24; COMMIT;",
             )?;
+        }
+        if lib.db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))? < 25 {
+            // v25: songs added here and sent to the playlist's service (`sent`: 0 not sent, 1 sent, 2 seen in its list).
+            lib.db.execute_batch("BEGIN; ALTER TABLE playlist_added ADD COLUMN sent INTEGER NOT NULL DEFAULT 0; PRAGMA user_version = 25; COMMIT;")?;
         }
         lib.db.execute_batch(CHANGE_LOG)?;
         // Statements on logged tables compile their triggers too: kept, not rebuilt per call.

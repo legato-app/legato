@@ -17,7 +17,7 @@ impl Library {
         let filter = if only.is_some() { "WHERE p.id IN (SELECT value FROM json_each(?1))" } else { "" };
         let mut stmt = self.db.prepare_cached(&format!(
             "SELECT p.id, p.source, p.source_id, p.name, COUNT(pt.track_id), p.custom, p.newest_first, p.order_manual,
-               (SELECT group_concat(track_id) FROM (SELECT track_id FROM playlist_added WHERE playlist_id = p.id ORDER BY at, track_id))
+               (SELECT group_concat(track_id) FROM (SELECT track_id FROM playlist_added WHERE playlist_id = p.id AND sent = 0 ORDER BY at, track_id))
              FROM playlists p LEFT JOIN playlist_tracks pt ON pt.playlist_id = p.id {filter}
              GROUP BY p.id ORDER BY p.name COLLATE NOCASE, p.id"
         ))?;
@@ -213,8 +213,36 @@ impl Library {
         })
     }
 
+    /// A song out of an imported playlist here, with its marks: nothing brings it back but the service's own list.
     pub fn remove_from_imported(&self, id: i64, track_id: i64) -> Result<()> {
-        self.tx(|| self.rewrite(id, |ids| ids.retain(|t| *t != track_id)))
+        self.tx(|| {
+            self.db.execute("DELETE FROM playlist_added WHERE playlist_id = ?1 AND track_id = ?2", params![id, track_id])?;
+            self.clear_pending_push(id, track_id)?;
+            self.rewrite(id, |ids| ids.retain(|t| *t != track_id))
+        })
+    }
+
+    /// Songs added here and sent to the playlist's service: in it here at once, kept at the newest end.
+    pub fn add_sent_songs(&self, id: i64, track_ids: &[i64]) -> Result<()> {
+        self.tx(|| {
+            let at = now_ms();
+            for track_id in track_ids {
+                self.db.execute(
+                    "INSERT INTO playlist_added (playlist_id, track_id, at, sent) VALUES (?1, ?2, ?3, 1) ON CONFLICT (playlist_id, track_id) DO UPDATE SET sent = 1",
+                    params![id, track_id, at],
+                )?;
+            }
+            self.append_to_imported(id, track_ids)
+        })
+    }
+
+    /// A sync brought `synced`: sent songs it holds are marked seen; seen ones it no longer holds were removed in the
+    /// service, so their mark goes.
+    pub(super) fn settle_sent(&self, id: i64, synced: &[i64]) -> Result<()> {
+        let synced = ids_json(synced.iter().copied());
+        self.db.execute("DELETE FROM playlist_added WHERE playlist_id = ?1 AND sent = 2 AND track_id NOT IN (SELECT value FROM json_each(?2))", params![id, synced])?;
+        self.db.execute("UPDATE playlist_added SET sent = 2 WHERE playlist_id = ?1 AND sent = 1 AND track_id IN (SELECT value FROM json_each(?2))", params![id, synced])?;
+        Ok(())
     }
 
     /// Out of the library: out of every playlist here (custom ones, and imported mirrors: the services keep their own
@@ -429,12 +457,13 @@ impl Library {
 
     /// The songs added here to a playlist, oldest first.
     pub(crate) fn added_here(&self, id: i64) -> Result<Vec<i64>> {
-        Ok(self.added_rows(id)?.into_iter().map(|(t, _)| t).collect())
+        let mut stmt = self.db.prepare_cached("SELECT track_id FROM playlist_added WHERE playlist_id = ?1 ORDER BY at, track_id")?;
+        Ok(stmt.query_map([id], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?)
     }
 
-    /// The same with when each was added (ms), for Sync Mode.
+    /// Those the service doesn't get from here, with when each was added (ms), for Sync Mode.
     pub(crate) fn added_rows(&self, id: i64) -> Result<Vec<(i64, i64)>> {
-        let mut stmt = self.db.prepare_cached("SELECT track_id, at FROM playlist_added WHERE playlist_id = ?1 ORDER BY at, track_id")?;
+        let mut stmt = self.db.prepare_cached("SELECT track_id, at FROM playlist_added WHERE playlist_id = ?1 AND sent = 0 ORDER BY at, track_id")?;
         Ok(stmt.query_map([id], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
     }
 

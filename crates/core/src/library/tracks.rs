@@ -206,6 +206,7 @@ impl Library {
                 ids.reverse();
             }
             // Songs added here (`add_here`) stay at the newest end as they were put in, even once the service holds them too.
+            self.settle_sent(id, &ids)?;
             let mut mine = self.added_here(id)?;
             // Refused by the service (`pending_push`): not in its list, still in this one.
             let waiting = self.still_pending(id, &ids)?;

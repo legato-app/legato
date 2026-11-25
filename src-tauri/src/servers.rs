@@ -520,7 +520,7 @@ pub async fn server_playlist_add(state: State<'_, AppState>, id: i64, track_ids:
         return Ok(report);
     }
     let (added, items): (Vec<i64>, Vec<String>) = new.into_iter().unzip();
-    state.lib().append_to_imported(id, &added).map_err(err)?;
+    state.lib().add_sent_songs(id, &added).map_err(err)?;
     let app = state.app.clone();
     push::later(async move {
         if let Err(e) = Conn::from_account(&a).playlist_add(&remote, &items).await {

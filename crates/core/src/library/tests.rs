@@ -284,6 +284,34 @@ fn a_refused_song_stays_through_syncs_and_is_sent_ten_times_at_most() -> Result<
     Ok(())
 }
 
+#[test]
+fn a_song_sent_to_the_service_keeps_the_newest_end_until_removed_here_or_there() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let list = lib.save_playlist(Source::Youtube, "p1", "Road trip", &[song(1), song(2)])?;
+    let sync = |songs: &[u32]| lib.save_playlist(Source::Youtube, "p1", "Road trip", &songs.iter().map(|n| song(*n)).collect::<Vec<_>>());
+    let order = || -> Result<Vec<i64>> { Ok(lib.playlist_orders()?.remove(&list).unwrap_or_default()) };
+    let mine = lib.upsert_track(&song(9))?;
+    lib.add_sent_songs(list, &[mine])?;
+    // Not in the service's list yet: stays. Then held mid-list: still the newest here.
+    sync(&[1, 2])?;
+    assert_eq!(order()?[0], mine);
+    sync(&[1, 9, 2])?;
+    assert_eq!(order()?[0], mine);
+    // The service's to remove: no "added here" mark for the interface.
+    assert_eq!(lib.playlists()?.into_iter().find(|p| p.id == list).unwrap().added, None);
+    // Removed here: where the service has it from now on.
+    lib.remove_from_imported(list, mine)?;
+    sync(&[1, 9, 2])?;
+    assert_eq!(order()?[1], mine);
+    // Removed on the service after it held it: gone here too.
+    lib.remove_from_imported(list, mine)?;
+    lib.add_sent_songs(list, &[mine])?;
+    sync(&[1, 9, 2])?;
+    sync(&[1, 2])?;
+    assert!(!order()?.contains(&mine));
+    Ok(())
+}
+
 fn song(n: u32) -> Track {
     Track { title: format!("Song {n}"), artist: format!("Artist {n}"), ids: BTreeMap::from([(Source::Youtube, format!("vid{n}"))]), ..Default::default() }
 }
