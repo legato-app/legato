@@ -5,7 +5,7 @@
 use anyhow::{Context, Result, bail};
 use async_trait::async_trait;
 use music_core::lyrics::Line;
-use music_core::matching::best_match;
+use music_core::matching::{best_match, is_count};
 use music_core::model::{Connector, PlaylistRef, Source, Track};
 use music_core::musicness::{Clues, VideoType, classify};
 use regex::Regex;
@@ -248,11 +248,6 @@ fn row_track_with(row: &Value, fallback: Option<&str>) -> Option<Track> {
     let video_type = all(row, "musicVideoType").into_iter().find_map(|v| VideoType::from_innertube(v.as_str()?));
     let musicness = Some(classify(&Clues { title: &title, channel: &artist, duration_ms, artist_badge: false, video_type, live: false }));
     Some(Track { title, artist, album, duration_ms, isrc: None, ids: BTreeMap::from([(Source::Youtube, video_id)]), art, musicness, explicit: explicit_badge(row) })
-}
-
-/// "56K plays", "1.2M views" or a bare number: what a byline counts, never who made the song.
-fn is_count(text: &str) -> bool {
-    text.contains(" views") || text.contains(" plays") || text.parse::<u32>().is_ok()
 }
 
 /// googleusercontent thumbs are sized in the URL ("=w60-h60-l90-rj"): ask for 544 px.

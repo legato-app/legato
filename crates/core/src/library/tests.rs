@@ -1392,3 +1392,19 @@ fn an_imported_playlist_renamed_here_says_its_old_name_and_custom_ones_go_their_
     assert!(lib.rename_imported(mine, "x").is_err(), "a custom playlist is renamed by edit_playlist");
     Ok(())
 }
+
+#[test]
+fn a_count_stored_as_artist_is_repaired_by_the_next_upsert() -> Result<()> {
+    let lib = Library::in_memory()?;
+    let stored = |id: i64| lib.db.query_row("SELECT artist, match_key FROM tracks WHERE id = ?1", [id], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)));
+    let broken = Track { artist: "56K plays".into(), ..youtube() };
+    let id = lib.upsert_track(&broken)?;
+    lib.upsert_track(&Track { artist: "1.2M views".into(), ..youtube() })?;
+    assert_eq!(stored(id)?.0, "56K plays");
+    assert_eq!(lib.upsert_track(&youtube())?, id);
+    assert_eq!(stored(id)?, ("Daft Punk".into(), match_key(&youtube().title, "Daft Punk")));
+    // A real artist stays, whatever comes next.
+    lib.upsert_track(&Track { artist: "Someone Else".into(), ..youtube() })?;
+    assert_eq!(stored(id)?.0, "Daft Punk");
+    Ok(())
+}

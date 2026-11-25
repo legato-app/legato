@@ -96,6 +96,7 @@ impl Library {
                         self.absorb(keep, dupe)?;
                     }
                     self.fill(keep, t.album.clone(), t.duration_ms, isrc, t.art.clone(), t.musicness)?;
+                    self.repair_artist(keep, &t.artist)?;
                     if t.explicit {
                         self.mark_explicit(keep)?;
                     }

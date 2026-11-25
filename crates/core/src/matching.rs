@@ -73,6 +73,11 @@ pub fn match_key(title: &str, artist: &str) -> String {
     format!("{}|{}", normalize(title), primary_artist(artist))
 }
 
+/// "56K plays", "1.2M views" or a bare number: what a byline counts, never who made the song.
+pub fn is_count(text: &str) -> bool {
+    text.contains(" views") || text.contains(" plays") || text.parse::<u32>().is_ok()
+}
+
 fn artists_overlap(a: &str, b: &str) -> bool {
     let (pa, pb) = (primary_artist(a), primary_artist(b));
     if pa.is_empty() || pb.is_empty() {

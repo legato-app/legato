@@ -1,6 +1,6 @@
 use crate::local::LocalSong;
 use crate::lyrics::{self, LyricHit, Lyrics};
-use crate::matching::{match_key, same_track};
+use crate::matching::{is_count, match_key, same_track};
 use crate::model::{Source, Track};
 use crate::musicness::Musicness;
 use anyhow::{Context, Result};
@@ -564,6 +564,18 @@ impl Library {
         // device's own rows (the sync config after every sync) don't: no reason for a devices sync.
         if key == crate::syncmode::TIMES {
             self.versions.setting_written();
+        }
+        Ok(())
+    }
+
+    /// Older versions stored a play count as the artist: the first source naming a real one replaces it.
+    fn repair_artist(&self, id: i64, artist: &str) -> Result<()> {
+        if artist.is_empty() || is_count(artist) {
+            return Ok(());
+        }
+        let (title, stored): (String, String) = self.db.prepare_cached("SELECT title, artist FROM tracks WHERE id = ?1")?.query_row([id], |row| Ok((row.get(0)?, row.get(1)?)))?;
+        if is_count(&stored) {
+            self.db.execute("UPDATE tracks SET artist = ?1, match_key = ?2 WHERE id = ?3", params![artist, match_key(&title, artist), id])?;
         }
         Ok(())
     }
