@@ -6,17 +6,22 @@ floating around them. Nothing is modelled by hand, so the renders can be made ag
 
 ## What it makes
 
-- **The website hero** (`site/components/DeviceScene.tsx`): a two-second camera move from the three devices to the
-  visitor's own, then it stays there.
-  - The device is picked by `site/components/device.ts`:
-    - Android → the phone;
-    - a battery that is running down or not full (Chromium) → the laptop;
+- **The website hero** (`site/components/DeviceScene.tsx`, Figma « Landing concept »): the page opens on the wide view
+  of the three devices under the headline. Scrolling plays a camera move into the visitor's screen, square on; there
+  the live demo takes the screen's place and the story goes on (`site/components/Story.tsx`).
+  - A phone-sized window (under 1000 px) gets the phone's move, framed upright. Wider ones get their device from
+    `site/components/device.ts`:
+    - a battery that is running down or not full (Chromium) → the laptop (an Android tablet too);
     - anything else → the monitor.
-  - Each move is a WebM (VP9) with an MP4 (H.264) fallback, plus its last frame as a WebP poster. Reduced motion shows
-    the poster only.
-  - On a phone the scroll plays the move (the scene rises, then fades into the phone with the live demo), so the phone's
-    files have a keyframe on every frame (`-g 1`, about 1 MB each); the others play once at load.
+  - 96 frames each, 1600×900 (the phone's 900×1600), a keyframe on every frame (`-g 1`) so the scroll's seeks land at
+    once. Each is an MP4 (H.264), about half the size of its WebM (VP9) twin, the fallback.
+  - The poster is the first frame, the wide view: the page's first look, and all that reduced motion shows. The film
+    loads after the page (or at the first scroll).
+  - `site/components/screens.json`: where each screen lands in the last frame, written by the render. The live window
+    is laid on it.
   - Files: `site/public/landing/{phone,monitor,laptop}-{dark,light}.{webm,mp4,webp}`.
+  - The screens show `site/public/shots`, which predate the interface's latest words (« Your library », now
+    « Library »). Re-capture the shots, then render again; nothing captures them yet.
   - The videos are laid on the page colour (`#131313` / `#FFFFFF`), not transparent, because Safari plays no WebM with
     alpha.
 - **The README picture**: `site/public/landing/float-{dark,light}.svg`, picked through `<picture>`.
@@ -31,7 +36,8 @@ node scripts/landing/render.mjs [--samples 32] [--only hero|readme]
 ```
 
 - Needs Blender 5 (`BLENDER` env var, else Steam's path) and `ffmpeg` on PATH.
-- About 10 minutes on an RTX 3060 Ti with Eevee. Renders run one at a time; nothing else should load the GPU then.
+- About 5 minutes on an RTX 3060 Ti with Eevee for the six moves (`--only hero`). Renders run one at a time; nothing
+  else should load the GPU then.
 - A release job could call the same command after the screenshots change, then commit `site/public/landing`.
 
 For one still or the `.blend`:

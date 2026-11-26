@@ -377,7 +377,7 @@ SHOTS = {
 SCREENS = {"phone": "Phone screen", "monitor": "Monitor screen", "laptop": "Laptop screen"}
 # The site's hero (DeviceScene): the page's text sits over the top of the frame, so the move starts further back with the
 # view shifted up (the devices low, as in Figma's "Landing concept"). (camera, what it looks at, lens shift up).
-START = {"landscape": ((0, -8.6, 1.1), (0.05, 0, 0.0), 0.12), "portrait": ((0, -7.8, 1.0), (0.05, 0, 0.0), 0.1)}
+START = {"landscape": ((0, -9.2, 1.1), (0.05, 0, 0.0), 0.12), "portrait": ((0, -9.8, 1.0), (0.05, 0, 0.0), 0.14)}
 # How tall the screen stands in the last frame: as the live demo's window (site Story.tsx, `full`: 82 % of the height).
 FILL = 0.82
 scene.camera = camob

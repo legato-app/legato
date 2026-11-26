@@ -86,8 +86,9 @@ export function DeviceMove({ device, dark, move, opacity }: { device: Device; da
   useMotionValueEvent(opacity, 'change', (o) => film.current && (film.current.style.opacity = String(o)))
   return (
     <video key={name} ref={film} aria-hidden muted playsInline preload={wanted ? 'auto' : 'none'} poster={`${name}.webp`} onLoadedData={seek} className="pointer-events-none absolute inset-0 size-full object-cover">
-      {wanted && <source src={`${name}.webm`} type="video/webm" />}
+      {/* All-intra H.264 comes out about half VP9's size (render.mjs): the MP4 first, the WebM for a browser without it. */}
       {wanted && <source src={`${name}.mp4`} type="video/mp4" />}
+      {wanted && <source src={`${name}.webm`} type="video/webm" />}
     </video>
   )
 }
