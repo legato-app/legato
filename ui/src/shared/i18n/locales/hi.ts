@@ -2241,7 +2241,7 @@ const hi: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'दोस्त यहाँ जो चल रहा है वह सुनते हैं, हर कोई अपने स्रोत से: YouTube या अपनी फ़ाइलें। कोई आवाज़ नहीं भेजी जाती, सिर्फ़ गाना और वह कहाँ है, कोड से सील किया हुआ।',
   'Over the internet': 'इंटरनेट पर',
   'Invite over the internet': 'इंटरनेट पर बुलाएँ',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'दूर के दोस्त आमंत्रण लिंक से जुड़ते हैं। दो सार्वजनिक रिले और Cloudflare आपका इंटरनेट पता और समय देखते हैं, गाने, नाम या प्रतिक्रियाएँ कभी नहीं। दो सख्त नेटवर्क आपस में नहीं मिल सकते।',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'दूर के दोस्त आमंत्रण लिंक से जुड़ते हैं। दो सार्वजनिक रिले और Cloudflare आपका इंटरनेट पता और समय देखते हैं, गाने, नाम या प्रतिक्रियाएँ कभी नहीं। दो सख्त नेटवर्क आपस में नहीं मिल सकते। इसे सिर्फ़ उन्हीं को भेजें जिन्हें आप बुला रहे हैं।',
   'Invite link': 'आमंत्रण लिंक',
   'Paste an invite link': 'आमंत्रण लिंक चिपकाएँ',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'जुड़ने पर आपका इंटरनेट पता दो सार्वजनिक रिले, Cloudflare और होस्ट को दिखता है। दो सख्त नेटवर्क आपस में नहीं मिल सकते।',

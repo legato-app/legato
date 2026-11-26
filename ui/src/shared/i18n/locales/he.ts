@@ -2181,7 +2181,7 @@ const he: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'חברים שומעים מה שמתנגן כאן, כל אחד מהמקור שלו: YouTube או הקבצים שלו. לא נשלח צליל, רק השיר ואיפה הוא נמצא, חתום בקוד.',
   'Over the internet': 'דרך האינטרנט',
   'Invite over the internet': 'הזמנה דרך האינטרנט',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'חברים רחוקים מצטרפים עם קישור ההזמנה. שני ממסרים ציבוריים ו-Cloudflare רואים את כתובת האינטרנט שלכם ומתי, ולעולם לא שירים, שמות או תגובות. שתי רשתות מחמירות לא יכולות להיפגש.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'חברים רחוקים מצטרפים עם קישור ההזמנה. שני ממסרים ציבוריים ו-Cloudflare רואים את כתובת האינטרנט שלכם ומתי, ולעולם לא שירים, שמות או תגובות. שתי רשתות מחמירות לא יכולות להיפגש. שלחו אותו רק לאנשים שאתם מזמינים.',
   'Invite link': 'קישור הזמנה',
   'Paste an invite link': 'הדביקו קישור הזמנה',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'ההצטרפות חושפת את כתובת האינטרנט שלכם לשני ממסרים ציבוריים, ל-Cloudflare ולמארח. שתי רשתות מחמירות לא יכולות להיפגש.',

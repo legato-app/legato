@@ -2241,7 +2241,7 @@ const nl: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Vrienden horen wat hier speelt, elk via hun eigen bron: YouTube of hun eigen bestanden. Er wordt geen geluid verstuurd, alleen het nummer en waar het is, verzegeld met de code.',
   'Over the internet': 'Via internet',
   'Invite over the internet': 'Uitnodigen via internet',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Vrienden ver weg doen mee met de uitnodigingslink. Twee openbare relays en Cloudflare zien je internetadres en wanneer, nooit nummers, namen of reacties. Twee strenge netwerken kunnen elkaar niet bereiken.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Vrienden ver weg doen mee met de uitnodigingslink. Twee openbare relays en Cloudflare zien je internetadres en wanneer, nooit nummers, namen of reacties. Twee strenge netwerken kunnen elkaar niet bereiken. Stuur hem alleen naar de mensen die je uitnodigt.',
   'Invite link': 'Uitnodigingslink',
   'Paste an invite link': 'Plak een uitnodigingslink',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'Meedoen laat je internetadres zien aan twee openbare relays, Cloudflare en de host. Twee strenge netwerken kunnen elkaar niet bereiken.',

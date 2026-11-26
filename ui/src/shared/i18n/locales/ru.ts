@@ -2241,7 +2241,7 @@ const ru: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Друзья слышат то, что играет здесь, каждый из своего источника: YouTube или свои файлы. Звук не передаётся, только песня и её место, запечатанные кодом.',
   'Over the internet': 'Через интернет',
   'Invite over the internet': 'Пригласить через интернет',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Друзья издалека входят по ссылке-приглашению. Два публичных ретранслятора и Cloudflare видят ваш интернет-адрес и время, но не песни, имена или реакции. Две строгие сети не могут соединиться.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Друзья издалека входят по ссылке-приглашению. Два публичных ретранслятора и Cloudflare видят ваш интернет-адрес и время, но не песни, имена или реакции. Две строгие сети не могут соединиться. Отправляйте её только тем, кого приглашаете.',
   'Invite link': 'Ссылка-приглашение',
   'Paste an invite link': 'Вставьте ссылку-приглашение',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'При входе ваш интернет-адрес видят два публичных ретранслятора, Cloudflare и ведущий. Две строгие сети не могут соединиться.',

@@ -2241,7 +2241,7 @@ const uk: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Друзі чують те, що грає тут, кожен зі свого джерела: YouTube або власні файли. Звук не надсилається, лише пісня та її місце, запечатані кодом.',
   'Over the internet': 'Через інтернет',
   'Invite over the internet': 'Запросити через інтернет',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Друзі здалеку приєднуються за посиланням-запрошенням. Два публічні ретранслятори та Cloudflare бачать вашу інтернет-адресу й час, але не пісні, імена чи реакції. Дві суворі мережі не можуть з’єднатися.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Друзі здалеку приєднуються за посиланням-запрошенням. Два публічні ретранслятори та Cloudflare бачать вашу інтернет-адресу й час, але не пісні, імена чи реакції. Дві суворі мережі не можуть з’єднатися. Надсилайте його лише тим, кого запрошуєте.',
   'Invite link': 'Посилання-запрошення',
   'Paste an invite link': 'Вставте посилання-запрошення',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'Під час приєднання вашу інтернет-адресу бачать два публічні ретранслятори, Cloudflare та ведучий. Дві суворі мережі не можуть з’єднатися.',

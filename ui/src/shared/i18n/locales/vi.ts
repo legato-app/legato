@@ -2241,7 +2241,7 @@ const vi: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Bạn bè nghe những gì đang phát ở đây, mỗi người từ nguồn riêng: YouTube hoặc tệp của họ. Không gửi âm thanh, chỉ gửi bài hát và vị trí đang phát, được niêm phong bằng mã.',
   'Over the internet': 'Qua internet',
   'Invite over the internet': 'Mời qua internet',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Bạn ở xa tham gia bằng liên kết mời. Hai máy chuyển tiếp công khai và Cloudflare thấy địa chỉ internet của bạn và thời điểm, không bao giờ thấy bài hát, tên hay cảm xúc. Hai mạng nghiêm ngặt không thể kết nối với nhau.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Bạn ở xa tham gia bằng liên kết mời. Hai máy chuyển tiếp công khai và Cloudflare thấy địa chỉ internet của bạn và thời điểm, không bao giờ thấy bài hát, tên hay cảm xúc. Hai mạng nghiêm ngặt không thể kết nối với nhau. Chỉ gửi cho những người bạn mời.',
   'Invite link': 'Liên kết mời',
   'Paste an invite link': 'Dán liên kết mời',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'Khi tham gia, địa chỉ internet của bạn hiện với hai máy chuyển tiếp công khai, Cloudflare và chủ phòng. Hai mạng nghiêm ngặt không thể kết nối với nhau.',

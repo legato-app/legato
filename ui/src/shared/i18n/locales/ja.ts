@@ -2241,7 +2241,7 @@ const ja: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': '友だちはここで流れている曲を、それぞれ自分のソース（YouTube、自分のファイル）で聴きます。音声は送られません。送るのは曲と再生位置だけで、コードで封印されます。',
   'Over the internet': 'インターネット経由',
   'Invite over the internet': 'インターネット経由で招待',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': '離れた友だちは招待リンクで参加します。2 つの公開リレーと Cloudflare には、あなたのインターネットアドレスと時刻が見えます。曲、名前、リアクションは見えません。制限の厳しいネットワーク同士はつながりません。',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': '離れた友だちは招待リンクで参加します。2 つの公開リレーと Cloudflare には、あなたのインターネットアドレスと時刻が見えます。曲、名前、リアクションは見えません。制限の厳しいネットワーク同士はつながりません。招待する人にだけ送ってください。',
   'Invite link': '招待リンク',
   'Paste an invite link': '招待リンクを貼り付け',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': '参加すると、あなたのインターネットアドレスが 2 つの公開リレー、Cloudflare、ホストに見えます。制限の厳しいネットワーク同士はつながりません。',

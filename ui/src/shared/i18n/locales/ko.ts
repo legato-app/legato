@@ -2241,7 +2241,7 @@ const ko: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': '친구들은 여기서 재생 중인 곡을 각자 자기 소스(YouTube, 자기 파일)로 들어요. 소리는 보내지 않고, 곡과 재생 위치만 코드로 봉인해 보내요.',
   'Over the internet': '인터넷으로',
   'Invite over the internet': '인터넷으로 초대',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': '멀리 있는 친구는 초대 링크로 참여합니다. 공개 릴레이 두 곳과 Cloudflare는 내 인터넷 주소와 시각만 보며, 노래, 이름, 반응은 보지 않습니다. 제한이 엄격한 두 네트워크는 연결되지 않습니다.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': '멀리 있는 친구는 초대 링크로 참여합니다. 공개 릴레이 두 곳과 Cloudflare는 내 인터넷 주소와 시각만 보며, 노래, 이름, 반응은 보지 않습니다. 제한이 엄격한 두 네트워크는 연결되지 않습니다. 초대하는 사람에게만 보내세요.',
   'Invite link': '초대 링크',
   'Paste an invite link': '초대 링크 붙여넣기',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': '참여하면 내 인터넷 주소가 공개 릴레이 두 곳, Cloudflare, 호스트에게 보입니다. 제한이 엄격한 두 네트워크는 연결되지 않습니다.',

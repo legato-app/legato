@@ -2241,7 +2241,7 @@ const id: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Teman mendengar yang diputar di sini, masing-masing dari sumbernya sendiri: YouTube atau file mereka. Tidak ada suara yang dikirim, hanya lagu dan posisinya, disegel dengan kode.',
   'Over the internet': 'Lewat internet',
   'Invite over the internet': 'Undang lewat internet',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Teman yang jauh bergabung dengan tautan undangan. Dua relai publik dan Cloudflare melihat alamat internetmu dan waktunya, tidak pernah lagu, nama, atau reaksi. Dua jaringan yang ketat tidak bisa saling terhubung.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Teman yang jauh bergabung dengan tautan undangan. Dua relai publik dan Cloudflare melihat alamat internetmu dan waktunya, tidak pernah lagu, nama, atau reaksi. Dua jaringan yang ketat tidak bisa saling terhubung. Kirim hanya ke orang yang kamu undang.',
   'Invite link': 'Tautan undangan',
   'Paste an invite link': 'Tempel tautan undangan',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'Bergabung menunjukkan alamat internetmu ke dua relai publik, Cloudflare, dan tuan rumah. Dua jaringan yang ketat tidak bisa saling terhubung.',

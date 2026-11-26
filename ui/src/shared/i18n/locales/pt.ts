@@ -2241,7 +2241,7 @@ const pt: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Os amigos ouvem o que toca aqui, cada um pela sua própria fonte: YouTube ou seus arquivos. Nenhum som é enviado, só a música e onde ela está, selado com o código.',
   'Over the internet': 'Pela internet',
   'Invite over the internet': 'Convidar pela internet',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Amigos distantes entram com o link de convite. Dois relays públicos e a Cloudflare veem seu endereço de internet e quando, nunca músicas, nomes ou reações. Duas redes restritas não conseguem se encontrar.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Amigos distantes entram com o link de convite. Dois relays públicos e a Cloudflare veem seu endereço de internet e quando, nunca músicas, nomes ou reações. Duas redes restritas não conseguem se encontrar. Envie só para quem você convidar.',
   'Invite link': 'Link de convite',
   'Paste an invite link': 'Cole um link de convite',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'Ao entrar, seu endereço de internet aparece para dois relays públicos, a Cloudflare e o anfitrião. Duas redes restritas não conseguem se encontrar.',

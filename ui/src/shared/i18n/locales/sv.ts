@@ -2241,7 +2241,7 @@ const sv: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'Vänner hör det som spelas här, var och en från sin egen källa: YouTube eller egna filer. Inget ljud skickas, bara låten och var den är, förseglat med koden.',
   'Over the internet': 'Över internet',
   'Invite over the internet': 'Bjud in över internet',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'Vänner långt bort går med via inbjudningslänken. Två publika reläer och Cloudflare ser din internetadress och när, aldrig låtar, namn eller reaktioner. Två strikta nätverk kan inte nå varandra.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'Vänner långt bort går med via inbjudningslänken. Två publika reläer och Cloudflare ser din internetadress och när, aldrig låtar, namn eller reaktioner. Två strikta nätverk kan inte nå varandra. Skicka den bara till dem du bjuder in.',
   'Invite link': 'Inbjudningslänk',
   'Paste an invite link': 'Klistra in en inbjudningslänk',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'När du går med ser två publika reläer, Cloudflare och värden din internetadress. Två strikta nätverk kan inte nå varandra.',

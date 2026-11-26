@@ -2181,7 +2181,7 @@ const ar: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': 'يسمع الأصدقاء ما يُشغَّل هنا، كلٌّ من مصدره: YouTube أو ملفاتهم الخاصة. لا يُرسل صوت، فقط الأغنية وموضعها، مختومة بالرمز.',
   'Over the internet': 'عبر الإنترنت',
   'Invite over the internet': 'دعوة عبر الإنترنت',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': 'ينضم الأصدقاء البعيدون برابط الدعوة. يرى مُرحِّلان عامّان وCloudflare عنوانك على الإنترنت ووقت الاتصال، ولا يرون أبدًا الأغاني أو الأسماء أو التفاعلات. لا يمكن لشبكتين صارمتين أن تلتقيا.',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': 'ينضم الأصدقاء البعيدون برابط الدعوة. يرى مُرحِّلان عامّان وCloudflare عنوانك على الإنترنت ووقت الاتصال، ولا يرون أبدًا الأغاني أو الأسماء أو التفاعلات. لا يمكن لشبكتين صارمتين أن تلتقيا. لا ترسله إلا لمن تدعوهم.',
   'Invite link': 'رابط الدعوة',
   'Paste an invite link': 'ألصق رابط دعوة',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': 'الانضمام يُظهر عنوانك على الإنترنت لمُرحِّلين عامّين وCloudflare والمضيف. لا يمكن لشبكتين صارمتين أن تلتقيا.',

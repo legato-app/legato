@@ -86,7 +86,7 @@ function Hosting({ s }: { s: RoomStatus }) {
   )
 }
 
-const internetNote = () => tr('Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.')
+const internetNote = () => tr('Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.')
 
 /** The host's way in over the internet: asked for, then the link to send. */
 function Invite({ link }: { link: string | null }) {

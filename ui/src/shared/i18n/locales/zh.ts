@@ -2241,7 +2241,7 @@ const zh: Record<string, string> = {
   'Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.': '朋友们听这里正在播放的内容，各自用自己的来源：YouTube 或自己的文件。不发送任何声音，只发送歌曲和播放位置，并用此码加密。',
   'Over the internet': '通过互联网',
   'Invite over the internet': '通过互联网邀请',
-  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.': '远方的朋友用邀请链接加入。两个公共中继和 Cloudflare 能看到你的互联网地址和时间，永远看不到歌曲、名称或回应。两个限制严格的网络无法互相连接。',
+  'Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet. Send it only to the people you invite.': '远方的朋友用邀请链接加入。两个公共中继和 Cloudflare 能看到你的互联网地址和时间，永远看不到歌曲、名称或回应。两个限制严格的网络无法互相连接。请只发给你邀请的人。',
   'Invite link': '邀请链接',
   'Paste an invite link': '粘贴邀请链接',
   'Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.': '加入时，你的互联网地址会被两个公共中继、Cloudflare 和房主看到。两个限制严格的网络无法互相连接。',
