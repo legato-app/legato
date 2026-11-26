@@ -203,7 +203,7 @@ function Appearance() {
       {/* The phone keeps its own arrangement (its row is desktop only): no empty box. */}
       {!phoneApp && (
         <div className="rounded-xl border border-line bg-raised">
-          <Row setting="themeLayouts" label={msg('Let themes arrange the app')} sub={tr('A theme may move or hide the sidebar, the side panel and the player bar. Off, only its colors and CSS apply')}>
+          <Row setting="themeLayouts" label={msg('Let themes arrange the app')} sub={tr('A theme may move or hide the sidebar, the side panel and the player bar. Off, only its colors and CSS apply. This setting applies to every synced PC')}>
             <Toggle label={tr('Let themes arrange the app')} checked={s.themeLayouts} onChange={(themeLayouts) => update({ themeLayouts })} />
           </Row>
         </div>

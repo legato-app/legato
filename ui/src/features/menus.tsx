@@ -3,7 +3,7 @@ import { UsersThree, Devices, DotsThree, ArrowCounterClockwise, ArrowsClockwise,
 import { ArrowLeft, ArrowRight } from '../shared/ui/directional'
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useSettings } from '../app/settings'
-import { shellLayoutOn } from '../app/shellLayout'
+import { shellLayoutOn, turnLayoutsOff } from '../app/shellLayout'
 import { playlistSongs, useStore, type SettingsSection, type View } from '../app/store'
 import { api, playlistKey, type Edit, type LibraryPlaylist, type PluginInfo, type LibraryTrack, type SearchHit } from '../shared/api'
 import { pickFile, saveFile } from '../shared/files'
@@ -1060,8 +1060,8 @@ export function appMenu(): MenuEntry[] {
     '-',
     player().now && { id: 'nowPlaying', label: tr('Now playing'), icon: <ArrowsOutSimple size={16} />, onSelect: () => player().setFull(true) },
     tag('room', roomItem()),
-    // The way back from a theme's layout: no id, so no menu setting folds or hides it. The theme keeps its layout.
-    shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: () => useSettings.getState().update({ themeLayouts: false }) },
+    // The way back from a theme's layout: no id, so no menu setting hides it.
+    shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: turnLayoutsOff },
     { id: 'settings', label: tr('Settings'), icon: <Gear size={16} />, onSelect: () => go({ name: 'settings', section: 'general' }) },
   ])
 }

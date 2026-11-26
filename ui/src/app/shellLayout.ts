@@ -30,6 +30,13 @@ export function shellLayoutOn() {
   return !phoneApp && !useLayoutFailure.getState().failed && layoutOn(settings.themeLayouts, current().layout)
 }
 
+/** The menu's way back: the setting off (on every synced PC), said, with a way to undo it. The theme keeps its layout. */
+export function turnLayoutsOff() {
+  const turn = (themeLayouts: boolean) => useSettings.getState().update({ themeLayouts })
+  turn(false)
+  useStore.getState().notify(tr('Themes no longer arrange the app'), { kind: 'info', action: { label: tr('Undo'), run: () => turn(true) } })
+}
+
 /** No right panel to open (a narrow window, a theme without it): what it holds is Now Playing's and the floating card's. */
 export function useSidePanelAway() {
   const narrow = useNarrow()
