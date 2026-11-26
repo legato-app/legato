@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react'
 import { useSettings } from '../../app/settings'
-import { usePlayer } from './store'
 
 // The canvas and its worker come with Now Playing's chunk, loaded by the first mini visualizer shown: never at start-up.
 const Strip = lazy(() => import('./Visualizer').then((m) => ({ default: m.MiniStrip })))
