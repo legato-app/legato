@@ -20,6 +20,13 @@ pub fn allowed(url: &str) -> bool {
     service(url) || server_signer(url).is_some() || favicon(url)
 }
 
+/// A cover others may be handed (plugins, and Discord through them): a public service's https address only. Never a
+/// personal server's (its address is the user's own), a radio's favicon or a file. The interface's twin:
+/// `publicCover` in `plugins/shapes.ts`.
+pub fn public_cover(url: &str) -> bool {
+    url.starts_with("https://") && url.len() <= 1000 && service(url)
+}
+
 /// Radio stations' favicons (a station's page chooses its host, so any host): only addresses the Rust side handed out
 /// itself (`allow_favicons`, from the directory's answers and the stations the user keeps), each one https on a public-looking
 /// host (`favicon_ok`). Bounded; the cache's size and type checks apply as to any cover.
@@ -328,6 +335,16 @@ mod tests {
     use super::*;
     use mockito::Server;
     use std::time::SystemTime;
+
+    #[test]
+    fn only_public_services_covers_are_handed_out() {
+        for public in ["https://i.ytimg.com/vi/abc/hqdefault.jpg", "https://is1-ssl.mzstatic.com/image/thumb/a/600x600bb.jpg"] {
+            assert!(public_cover(public), "{public}");
+        }
+        for kept in ["https://music.example.net/rest/getCoverArt.view?id=al-1", "http://i.ytimg.com/vi/abc/hqdefault.jpg", "art://local/1", "C:/Music/cover.jpg"] {
+            assert!(!public_cover(kept), "{kept}");
+        }
+    }
 
     #[test]
     fn allows_service_image_hosts_only() {

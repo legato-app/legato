@@ -8,7 +8,12 @@ describe('what plugins see of the player', () => {
   it('a track: web covers only, the YouTube page, no path', () => {
     const now = { title: 'Song 1', artist: 'Band', via: 'local' as const, trackId: 1, path: 'C:/Music/a.flac' }
     expect(pluginTrack(now, song(1, 'art://local/1'), 1000)).toEqual({ title: 'Song 1', artist: 'Band', trackId: 1, via: 'local', album: 'Record', durationMs: 1000, art: null, youtubeId: null, page: null })
-    expect(pluginTrack({ ...now, via: 'youtube', youtubeId: 'abc' }, song(1, 'https://example.com/a.jpg'), null)).toMatchObject({ art: 'https://example.com/a.jpg', page: 'https://www.youtube.com/watch?v=abc' })
+    expect(pluginTrack({ ...now, via: 'youtube', youtubeId: 'abc' }, song(1, 'https://i.ytimg.com/vi/abc/hqdefault.jpg'), null)).toMatchObject({ art: 'https://i.ytimg.com/vi/abc/hqdefault.jpg', page: 'https://www.youtube.com/watch?v=abc' })
+  })
+  it('a personal server’s cover stays here', () => {
+    const now = { title: 'Song 1', artist: 'Band', via: 'server' as const, trackId: 1 }
+    expect(pluginTrack(now, song(1, 'https://music.example.net/rest/getCoverArt.view?id=al-1'), 1000).art).toBeNull()
+    expect(pluginTrack(now, song(1, 'https://is1-ssl.mzstatic.com/a/600x600bb.jpg'), 1000).art).not.toBeNull()
   })
   it('the queue: in play order, 500 around the current song', () => {
     const list = Array.from({ length: 900 }, (_, i) => song(i + 1))

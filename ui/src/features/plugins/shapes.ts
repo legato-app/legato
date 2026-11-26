@@ -5,12 +5,22 @@ import type { NowPlaying } from '../player/store'
 /** Songs of the queue handed out at most. */
 const QUEUE_MAX = 500
 
+// Rust's `art::public_cover`: public services only, never a personal server's address.
+const COVER_HOSTS = ['i.ytimg.com', 'yt3.ggpht.com', 'i.scdn.co', 'mosaic.scdn.co', 'cdn-images.dzcdn.net', 'e-cdns-images.dzcdn.net', 'i1.sndcdn.com', 'i2.sndcdn.com', 'i3.sndcdn.com', 'i4.sndcdn.com']
+const COVER_DOMAINS = ['.googleusercontent.com', '.mzstatic.com', '.spotifycdn.com']
+
+export function publicCover(art: string | null | undefined): string | null {
+  if (!art?.startsWith('https://') || !URL.canParse(art)) return null
+  const { hostname } = new URL(art)
+  return COVER_HOSTS.includes(hostname) || COVER_DOMAINS.some((domain) => hostname.endsWith(domain)) ? art : null
+}
+
 const libraryId = (id: number | undefined) => (id !== undefined && id > 0 ? id : null)
 
 export function pluginTrack(now: NowPlaying, song: LibraryTrack | undefined, durationMs: number | null) {
   const youtubeId = now.youtubeId ?? null
   const page = youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : now.page?.startsWith('https://') ? now.page : null
-  const art = song?.art?.startsWith('https://') ? song.art : null
+  const art = publicCover(song?.art)
   return { title: now.title, artist: now.artist, trackId: libraryId(now.trackId), via: now.via, album: song?.album ?? null, durationMs, art, youtubeId, page }
 }
 

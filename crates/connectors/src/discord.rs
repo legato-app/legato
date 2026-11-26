@@ -67,7 +67,7 @@ struct PluginButton {
 }
 
 /// A plugin's presence, checked (it is untrusted): the Discord app's id to show it under, and the track. An art link
-/// that isn't a short https one is left out; anything else out of bounds is refused.
+/// that isn't a short public cover is left out; anything else out of bounds is refused.
 pub fn from_plugin(value: serde_json::Value) -> Result<(String, Presence)> {
     let sent: PluginPresence = serde_json::from_value(value).map_err(|e| anyhow::anyhow!("discord.set: {e}"))?;
     anyhow::ensure!((1..=32).contains(&sent.client_id.len()) && sent.client_id.bytes().all(|b| b.is_ascii_digit()), "discord.set: clientId is up to 32 digits");
@@ -84,7 +84,7 @@ pub fn from_plugin(value: serde_json::Value) -> Result<(String, Presence)> {
         title: field(&sent.title),
         artist: field(&sent.artist),
         album: sent.album.as_deref().map(field),
-        art: sent.art.filter(|art| https(&art.as_str())),
+        art: sent.art.filter(|art| https(&art.as_str()) && crate::art::public_cover(art)),
         artist_art: None,
         buttons: sent.buttons.into_iter().map(|button| (button.label, button.url)).collect(),
         playing: sent.playing,

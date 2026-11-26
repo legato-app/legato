@@ -244,7 +244,7 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
 /// A song as plugins see it: no local file path.
 fn track_json(t: &music_core::library::LibraryTrack) -> Value {
     let sources: Vec<&str> = t.track.ids.keys().map(|s| s.as_str()).collect();
-    json!({ "id": t.id, "title": t.track.title, "artist": t.track.artist, "album": t.track.album, "durationMs": t.track.duration_ms, "sources": sources, "art": music_core::model::web_art(t.track.art.as_deref()) })
+    json!({ "id": t.id, "title": t.track.title, "artist": t.track.artist, "album": t.track.album, "durationMs": t.track.duration_ms, "sources": sources, "art": t.track.art.as_deref().filter(|art| music_connectors::art::public_cover(art)) })
 }
 
 fn start(app: &AppHandle, id: &str, granted: &[String]) -> CmdResult<()> {
