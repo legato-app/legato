@@ -276,7 +276,7 @@ export interface DiscordSettings {
 }
 
 /** Bumped when defaults change for everyone (saved settings get the new ones once). */
-const DEFAULTS_VERSION = 11
+const DEFAULTS_VERSION = 12
 
 /** Glow levels (Settings › Appearance › Glow). */
 export const GLOW_LEVELS = ['off', 'soft', 'strong'] as const
@@ -491,8 +491,8 @@ export interface Settings {
   smartLists: SmartList[]
   /** Per playlist (playlistKey). Missing = service logo in the sidebar, first cover on its page. */
   playlistCovers: Record<string, PlaylistCover>
-  /** Mixes page: 4 song covers, the first one, or the plain numbered tile. */
-  mixCovers: 'grid' | 'single' | 'template'
+  /** Mixes page: a look per mix (the default, v12: grids everywhere read alike), 4 song covers, the first one, or the plain numbered tile. */
+  mixCovers: 'varied' | 'grid' | 'single' | 'template'
   /** Download updates in the background and install them when nothing plays. */
   autoUpdate: boolean
   /** Which releases this PC follows: Stable (promoted by hand) or Beta (every green push). Not synced between PCs. */
@@ -690,7 +690,7 @@ export const DEFAULTS: Settings = {
   smartLists: [],
   homeFilter: 'all',
   playlistCovers: {},
-  mixCovers: 'grid',
+  mixCovers: 'varied',
   autoUpdate: true,
   updateChannel: 'stable',
   coverCacheMb: 500,
@@ -965,7 +965,7 @@ export function sanitize(raw: unknown): Settings {
     playlistFolders: sanitizeFolders(r.playlistFolders),
     lyricsSync: sanitizeLyricsSync(r.lyricsSync),
     playlistCovers: sanitizeCovers(r.playlistCovers),
-    mixCovers: pick(r.mixCovers, ['grid', 'single', 'template'] as const, DEFAULTS.mixCovers),
+    mixCovers: pick(r.mixCovers, ['varied', 'grid', 'single', 'template'] as const, DEFAULTS.mixCovers),
     autoUpdate: typeof r.autoUpdate === 'boolean' ? r.autoUpdate : DEFAULTS.autoUpdate,
     updateChannel: pick(r.updateChannel, ['stable', 'beta'] as const, DEFAULTS.updateChannel),
     coverCacheMb: pick(r.coverCacheMb, COVER_CACHE_MB, DEFAULTS.coverCacheMb),
@@ -1034,6 +1034,8 @@ export function sanitize(raw: unknown): Settings {
     // v6: the sections of HOME_OFF off once. v11 (2026-11-14): Your playlists (the banners carousel) on once; the v6 forced it off,
     // so an explicit "off" is not told from the default: everyone saved before gets it on, and turning it off again sticks.
     ...(saved < 11 ? { homeSections: sanitizeHome(r.homeSections).map((x) => (saved < 6 && HOME_OFF.includes(x.id) ? { ...x, on: false } : x.id === 'playlists' ? { ...x, on: true } : x)) } : {}),
+    // v12 (2026-11-26): varied mix covers for who kept the grid, the old default; the other picks stay.
+    ...(saved < 12 && (r.mixCovers ?? 'grid') === 'grid' ? { mixCovers: 'varied' as const } : {}),
   }
 }
 

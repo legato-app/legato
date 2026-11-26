@@ -134,9 +134,17 @@ describe('resolveTheme', () => {
     expect(sanitize({ sleepButton: true, defaultsVersion: 10 }).sleepButton).toBe(true)
   })
 
+  it('mix covers are varied by default; the old default grid moves once (v12), a pick of one’s own stays', () => {
+    expect(sanitize({}).mixCovers).toBe('varied')
+    expect(sanitize({ mixCovers: 'grid', defaultsVersion: 11 }).mixCovers).toBe('varied')
+    expect(sanitize({ mixCovers: 'template', defaultsVersion: 11 }).mixCovers).toBe('template')
+    expect(sanitize({ mixCovers: 'single', defaultsVersion: 2 }).mixCovers).toBe('single')
+    expect(sanitize({ mixCovers: 'grid', defaultsVersion: 12 }).mixCovers).toBe('grid')
+  })
+
   it('settings saved before v2 get the new defaults once, later choices stay', () => {
     const old = sanitize({ volume: 'knob', tuner: true, clickToPlay: 'double', zoom: 110 })
-    expect(old).toMatchObject({ volume: 'bar', tuner: false, clickToPlay: 'single', stage: 'auto', zoom: 110, startView: 'home', defaultsVersion: 11 })
+    expect(old).toMatchObject({ volume: 'bar', tuner: false, clickToPlay: 'single', stage: 'auto', zoom: 110, startView: 'home', defaultsVersion: 12 })
     // Saved at v2: only v3's change applies.
     expect(sanitize({ volume: 'knob', stage: 'video', defaultsVersion: 2 })).toMatchObject({ volume: 'knob', stage: 'auto' })
     // Home opens first once (v4), then the user's pick stays.

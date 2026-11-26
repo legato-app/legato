@@ -331,7 +331,7 @@ export function VolumeScene({ volume }: Pick<Settings, 'volume'>) {
   )
 }
 
-/** Mix cover: four song covers, the first one, or the numbered tile. */
+/** Mix cover: a look per mix (a sample of each), four song covers, the first one, or the numbered tile. */
 export function MixCoverScene({ mixCovers }: Pick<Settings, 'mixCovers'>) {
   return (
     <div role="img" aria-label={tr('Mix cover preview')} className="relative size-16 shrink-0 overflow-hidden rounded-md border border-line bg-recess">
@@ -342,6 +342,22 @@ export function MixCoverScene({ mixCovers }: Pick<Settings, 'mixCovers'>) {
               <SampleArt className="size-full" />
             </span>
           ))}
+        </span>
+      )}
+      {mixCovers === 'varied' && (
+        <span className="grid size-full grid-cols-2 gap-1 p-1">
+          <SampleArt className="size-full rounded-sm" />
+          <span className="grid place-items-center rounded-sm bg-raised font-mono text-xs font-semibold text-ink-2">01</span>
+          <span className="grid grid-cols-2 overflow-hidden rounded-sm">
+            {[0, 90, 180, 270].map((h) => (
+              <span key={h} style={{ filter: `hue-rotate(${h}deg)` }}>
+                <SampleArt className="size-full" />
+              </span>
+            ))}
+          </span>
+          <span style={{ filter: 'sepia(1) hue-rotate(160deg) saturate(2)' }}>
+            <SampleArt className="size-full rounded-sm" />
+          </span>
         </span>
       )}
       {mixCovers === 'single' && <SampleArt className="size-full" />}

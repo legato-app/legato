@@ -5,6 +5,7 @@ import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { api, type LibraryTrack, type Mix } from '../../shared/api'
 import { trackArt } from '../../shared/art'
+import { hueOf } from '../../shared/hue'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton } from '../../shared/ui/controls'
 import { Cover } from '../../shared/ui/Cover'
@@ -19,6 +20,7 @@ import { TrackTable } from '../library/TrackTable'
 import { tracksMenu } from '../menus'
 import { isRemote, remoteTrack, usePlayer } from '../player/store'
 import { msg, tr, trn } from '../../shared/i18n/i18n'
+import { coverStyleFor } from './coverStyle'
 import { useMixes } from './useMixes'
 import { mixReason, mixTitle, monthName, weekdayName } from './words'
 import { ResetHistory } from '../history/ResetHistory'
@@ -74,22 +76,26 @@ function MixTile({ mix, size }: { mix: Mix; size: number }) {
   )
 }
 
-/** Mix covers as set in Advanced: grid of 4 song covers (like playlists), the first cover, or the tile. */
+/** Mix covers as set in Settings: varied from one mix to the next, a grid of 4 song covers, the first one, or the tile. */
 function MixCover({ mix, tracks, size }: { mix: Mix; tracks: LibraryTrack[]; size: number }) {
-  const style = useSettings((s) => s.settings.mixCovers)
+  const picked = useSettings((s) => s.settings.mixCovers)
   const byId = useMemo(() => new Map(tracks.map((t) => [t.id, t])), [tracks])
   // "Made from songs you love": the song it was made from (its first) on its cover, not a grid (2026-11-19, the owner).
-  const count = style === 'grid' && mix.kind !== 'loved' ? 4 : 1
+  const loved = mix.kind === 'loved'
+  const style = picked !== 'varied' ? picked : loved ? 'single' : coverStyleFor(mix.id)
+  const count = style === 'grid' && !loved ? 4 : 1
   const songs = useMemo(() => (style === 'template' ? [] : coverTracks(mix.trackIds, byId, 'playlist', count)), [style, count, mix.trackIds, byId])
   if (!songs.length) return <MixTile mix={mix} size={size} />
   const { label } = mixMark(mix)
   return (
-    <span className="relative shrink-0 overflow-hidden rounded-cover border border-line-soft bg-recess" style={{ width: size, height: size }}>
+    <span className="relative isolate shrink-0 overflow-hidden rounded-cover border border-line-soft bg-recess" style={{ width: size, height: size }}>
       {style === 'grid' && songs.length === 4 ? (
         <CoverGrid arts={songs.map(trackArt)} size={size - 2} framed={false} />
       ) : (
         <Cover title={mixTitle(mix)} art={trackArt(songs[0])} size={size} className="rounded-none! border-0!" />
       )}
+      {/* The cover in one flat colour, taken from its song's name. */}
+      {style === 'tinted' && <span aria-hidden className="absolute inset-0 mix-blend-color" style={{ background: `hsl(${hueOf(songs[0].title)} 70% 50%)` }} />}
       {/* Badge on the art: fixed dark chip, readable over any cover. */}
       <span className="absolute top-2.5 start-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
         <span className="size-1.5 rounded-full bg-white" /> {label}
