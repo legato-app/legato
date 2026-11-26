@@ -1,0 +1,5 @@
+{
+  "title": "Using Legato",
+  "defaultOpen": true,
+  "pages": ["install", "first-steps", "import", "sync", "share", "stream-deck", "shortcuts"]
+}

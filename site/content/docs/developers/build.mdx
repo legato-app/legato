@@ -1,0 +1,14 @@
+---
+title: "Build from source"
+description: "What to install, and the commands."
+---
+
+Windows 10 or 11, Rust stable, Node.js 22 or later and pnpm.
+
+```bash
+pnpm install
+pnpm dev      # the app, with its own data, never the installed app's library
+pnpm check    # types, lint, tests, clippy, cargo test: green before every commit
+pnpm build    # the installer
+pnpm e2e      # smoke test of the built app
+```

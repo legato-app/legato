@@ -1,0 +1,5 @@
+{
+  "title": "For developers",
+  "defaultOpen": true,
+  "pages": ["architecture", "plugins", "themes", "build", "contribute"]
+}
