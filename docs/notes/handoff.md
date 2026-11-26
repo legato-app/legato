@@ -1,5 +1,8 @@
 # Handoff
 
+**Start here:** CLAUDE.md, then this file, then [workflow.md](workflow.md) (how the work runs), then the plan-v2 sections
+you need. Private notes are `docs/notes/report*.md`, on the PC that wrote them only; they are not in git.
+
 Where the work stands, for a session with no history here. Read this first, then only the parts of
 [plan-v2.md](plan-v2.md) you need. Rewrite it, short, when a branch, a release or the next step changes; older
 versions are in git. Updated 2026-11-26.
