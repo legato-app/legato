@@ -681,8 +681,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     `LOOK_KEYS`), so the user's own reordering wins. The frame of each page is layout-only (`pages`), applied live:
     one pure table `PAGE_PARTS` (each part `fixed` or not: a fixed part moves but never hides), a hook
     `usePageParts(page)` in its own file, the page drawing its existing blocks in that order. Reordered in React,
-    never with CSS `order` (keyboard and screen readers follow). A hidden part's actions stay in the page's More and
-    right-click. The shared `PageHeader` takes `pages.header` (art start / end / top / none, its size clamped, kicker
+    never with CSS `order` (keyboard and screen readers follow; one exception, the player bar: shown above the page by
+    its flex order while it stays last in the document, because its YouTube frames must never move, so the keyboard
+    reaches it after the page). A hidden part's actions stay in the page's More and right-click. The shared `PageHeader` takes `pages.header` (art start / end / top / none, its size clamped, kicker
     and sub, actions beside or below). Column order: `pages.lists.columns` over `COLUMNS`, Title and Artist first,
     the heart and Time last; which columns show stays the user's `columns`. Pages in order: album, playlist, artist;
     Songs, Albums, Artists; Home (its frame; its sections through `look`); Now Playing on the PC. Other pages get the
@@ -724,7 +725,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       before this one; asked on the phone too (the theme syncs to a PC); the dialog names Settings (Ctrl+,) only, not
       right-click › Default layout, which slice 5 adds (its words to extend then); six changes listed, then "And more".
   - [ ] `S` 5. Ways back: "Default layout" in the fallback menu; a throwing region or part drops the layout + toast.
-    Tests: the entry only while a layout is on; the boundary drops it. Skills: i18n.
+    Tests: the entry only while a layout is on; the boundary drops it. Skills: i18n. Review of 4: the import warning's
+    text gains « right-click › Default layout » in every locale file.
   - [ ] `M` 6. The bars' parts: player bar, top bar, sidebar (order, hidden, each hidden part still in More). Tests:
     per-surface part sanitize.
   - [ ] `M` 7. The shared page header (`pages.header` in `PageHeader`). Tests: a pure `headerLayout` (clamps, unknown
@@ -739,7 +741,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     resolve for its blocks.
   - [ ] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);
     the website copy ("Make it look like yours", `site/components/content.tsx` and its locales). Tests: a
-    `themefile.rs` round-trip with a `layout` key.
+    `themefile.rs` round-trip with a `layout` key. Review of 1-4: the docs say that a layout from a newer version, or
+    imported while the setting was off, starts to apply later (an update, the setting turned on) without the question.
   - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
     enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
   - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.
