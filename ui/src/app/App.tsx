@@ -96,8 +96,19 @@ function useSearchCentered(box: React.RefObject<HTMLDivElement | null>, on: bool
   return shift
 }
 
+/** The logo and name: Home, from anywhere. In the top bar, or where the theme puts it; never hidden (`data-brand`). */
+function Brand({ className = '', order }: { className?: string; order?: number }) {
+  const go = useStore((s) => s.go)
+  return (
+    <button data-brand onClick={() => go({ name: 'home' })} title={tr('Home')} style={{ order }} className={`flex items-center gap-2.5 rounded-md px-2 py-1 ${className}`}>
+      <Logo />
+      <span data-brand-name className="text-[0.9375rem] font-bold tracking-tight phone:hidden">Legato</span>
+    </button>
+  )
+}
+
 /** `bare`: a theme hides it. The logo, Settings, the window's buttons and the drag area stay: nothing else closes the window. */
-function TopBar({ bare, order }: { bare: boolean; order?: number }) {
+function TopBar({ brand, bare, order }: { brand: boolean; bare: boolean; order?: number }) {
   const full = usePlayer((s) => s.full)
   const searchBox = useRef<HTMLDivElement>(null)
   // The phone's bar has no room to move the search: it stays put.
@@ -131,10 +142,7 @@ function TopBar({ bare, order }: { bare: boolean; order?: number }) {
     // Over Now Playing: a veil from the top keeps logo, Close player and window buttons readable on any cover.
     <header data-tauri-drag-region style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
       {/* The phone: the logo or Back, never both (Home is a tab there). */}
-      <button data-brand onClick={() => go({ name: 'home' })} title={tr('Home')} className={`flex items-center gap-2.5 rounded-md px-2 py-1 ${canBack && !full ? 'phone:hidden' : ''}`}>
-        <Logo />
-        <span data-brand-name className="text-[0.9375rem] font-bold tracking-tight phone:hidden">Legato</span>
-      </button>
+      {brand && <Brand className={canBack && !full ? 'phone:hidden' : ''} />}
       {full ? (
         <button onClick={() => setFull(false)} title={tr('Close Now Playing (Esc)')} className="glass flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink transition hover:bg-raised">
           <CaretDown size={12} weight="bold" /> {tr('Close player')}
@@ -352,9 +360,15 @@ export function App() {
   const shell = layoutRegions(placement, full)
   // Open wide, the library stands in for the page: only with a sidebar to hold it.
   const sidebarShown = shell.regions.left.includes('sidebar') || shell.regions.right.includes('sidebar')
-  const bar = (surface: Surface) => surface === 'topbar' && <TopBar key={surface} bare={shell.topbarBare} order={shell.order?.topbar} />
-  const column = (surface: Surface, side: 'left' | 'right') =>
-    surface === 'sidebar' ? <Sidebar key={surface} side={side} fixedWidth={placement.sizes.sidebar} /> : <SidePanel key={surface} width={placement.sizes.sidePanel} />
+  // Above and under the middle row; the player bar is drawn apart.
+  const bar = (surface: Surface) => {
+    if (surface === 'topbar') return <TopBar key={surface} brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} />
+    return surface === 'brand' && <Brand key={surface} className="mx-4 my-1 shrink-0 self-start" order={shell.order?.brand} />
+  }
+  const column = (surface: Surface, side: 'left' | 'right') => {
+    if (surface === 'sidebar') return <Sidebar key={surface} side={side} fixedWidth={placement.sizes.sidebar} />
+    return surface === 'brand' ? <Brand key={surface} className="shrink-0 self-start" /> : <SidePanel key={surface} width={placement.sizes.sidePanel} />
+  }
 
   return (
     // Setting appTint: every surface takes the playing cover's color (text keeps AA, ambient.ts).

@@ -712,8 +712,10 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       (nothing else closes the window) and shows whole over Now Playing; a layout's size fixes the width (no resize
       handle); with no side panel the mini player floats and its buttons open Now Playing; the row is PC only and part of
       Reset appearance; a newer layout's theme card says it needs a newer Legato.
-  - [ ] `S` 3. The brand as its own surface, never hidden. Tests: a table of hostile layouts keeps it; `css.test.ts`
-    unchanged.
+  - [x] `S` 3. The brand as its own surface, never hidden. Tests: a table of hostile layouts keeps it; `css.test.ts`
+    unchanged. 2026-11-26: done (`Brand` in `App.tsx`); never seen elsewhere than in the top bar.
+    - Decided alone (2026-11-26): the logo leads the top bar when it stands just before it, and always while Now
+      Playing is up (it covers the other places); elsewhere it is its own small block at its place in the region.
   - [ ] `M` 4. The import warning: `layoutSummary`, `withoutLayout` (pure), the dialog in both import paths. Tests:
     summary lines per difference, capped; Colours only drops `layout`; no question without a layout or with the
     setting off. Skills: i18n.

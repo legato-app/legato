@@ -6,7 +6,33 @@ const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), p
 
 describe('layoutRegions', () => {
   it('draws the app’s own arrangement in today’s order, with no reordering', () => {
-    expect(layoutRegions(DEFAULT_LAYOUT)).toEqual({ regions: { top: ['topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, topbarBare: false, playerBarHidden: false })
+    expect(layoutRegions(DEFAULT_LAYOUT)).toEqual({ regions: { top: ['topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, brandInTopbar: true, topbarBare: false, playerBarHidden: false })
+  })
+
+  it('draws the logo once, whatever the file says, Now Playing open or not', () => {
+    const hostile = [
+      { v: 1, hidden: ['brand', 'topbar', 'sidebar', 'sidePanel', 'playerBar'] },
+      { v: 1, regions: { top: ['topbar', 'brand'] }, hidden: ['topbar'] },
+      { v: 1, regions: { left: ['brand'] }, hidden: ['sidebar', 'brand'] },
+      { v: 1, regions: { right: ['brand', 'sidebar'] } },
+      { v: 1, regions: { bottom: ['brand'], top: ['playerBar', 'topbar'] } },
+      { v: 9, hidden: ['brand'] },
+    ]
+    for (const raw of hostile) {
+      for (const playerOpen of [false, true]) {
+        const { regions, brandInTopbar } = draw(raw, playerOpen)
+        const alone = Object.values(regions).flat().filter((surface) => surface === 'brand').length
+        expect(alone + Number(brandInTopbar), JSON.stringify(raw)).toBe(1)
+        // The top bar is always drawn, bare or not: the logo in it shows.
+        expect(regions.top).toContain('topbar')
+      }
+    }
+  })
+
+  it('stands the logo alone away from the top bar, back in it while Now Playing is up', () => {
+    expect(draw({ v: 1, regions: { left: ['brand'] } })).toMatchObject({ brandInTopbar: false, regions: { left: ['sidebar', 'brand'] } })
+    expect(draw({ v: 1, regions: { top: ['topbar', 'brand'] } })).toMatchObject({ brandInTopbar: false, regions: { top: ['topbar', 'brand'] } })
+    expect(draw({ v: 1, regions: { left: ['brand'] } }, true)).toMatchObject({ brandInTopbar: true, regions: { left: ['sidebar'] } })
   })
 
   it('leaves out hidden columns, keeps the player bar mounted and a bare top bar', () => {

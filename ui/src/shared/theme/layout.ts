@@ -114,8 +114,10 @@ export type RootBlock = Surface | 'main'
 
 /** A placement as the shell draws it. */
 export interface ShellRegions {
-  /** Surfaces drawn on each side, in order. The logo is the top bar's to draw. */
+  /** Surfaces drawn on each side, in order; the logo among them only when it stands alone. */
   regions: Record<Region, Surface[]>
+  /** The logo leads the top bar: just before it there, and whenever Now Playing covers the rest. */
+  brandInTopbar: boolean
   /** A hidden top bar keeps what no layout can take: the window's buttons, Settings, the drag area. */
   topbarBare: boolean
   /** Not drawn, still mounted: it holds YouTube's player. */
@@ -127,13 +129,15 @@ export interface ShellRegions {
 
 /** `playerOpen`: Now Playing is up, the top bar carries its Close button. */
 export function layoutRegions({ regions, hidden }: Placement, playerOpen = false): ShellRegions {
-  const drawn = (surface: Surface) => surface !== 'brand' && (!hidden.includes(surface) || surface === 'topbar' || surface === 'playerBar')
+  const brandInTopbar = playerOpen || regions.top[regions.top.indexOf('topbar') - 1] === 'brand'
+  const drawn = (surface: Surface) => (surface === 'brand' ? !brandInTopbar : !hidden.includes(surface) || surface === 'topbar' || surface === 'playerBar')
   const shown = Object.fromEntries(REGIONS.map((region) => [region, regions[region].filter(drawn)])) as ShellRegions['regions']
   const playerBarHidden = hidden.includes('playerBar')
   const column: RootBlock[] = [...shown.top, 'main', ...shown.bottom]
   const inPlace = playerBarHidden || column.at(-1) === 'playerBar'
   return {
     regions: shown,
+    brandInTopbar,
     topbarBare: hidden.includes('topbar') && !playerOpen,
     playerBarHidden,
     ...(!inPlace && { order: Object.fromEntries(column.map((block, index) => [block, index])) }),
