@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arrangeParts, DEFAULT_LAYOUT, headerLayout, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, headerLayout, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -87,6 +87,21 @@ describe('headerLayout', () => {
     expect(layoutSummary(layout)).toEqual(['Page headers arranged another way'])
     expect(resolveLayout(layout).pages.header).toEqual({ art: 'none' })
     expect(resolveLayout(layout, true).pages).toEqual({})
+  })
+})
+
+describe('a page’s parts', () => {
+  it('keeps known parts, never hides a fixed one, new ones at their default place', () => {
+    const got = sanitizeLayout({ v: 1, pages: { album: { order: ['more', 'credits'], hidden: ['tracks', 'more'] }, artist: { hidden: ['mostPlayed', 'topSongs', 'links', 'about'] }, home: { hidden: ['more'] } } })!
+    expect(got.pages).toEqual({ album: { order: ['more'], hidden: ['more'] }, artist: { hidden: ['about'] } })
+    expect(arrangeParts({ order: ['shelves', 'mostPlayed'] }, pagePartIds('artist'))).toEqual(['shelves', 'mostPlayed', 'topSongs', 'discography', 'about', 'links'])
+    for (const page of ['album', 'artist'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
+  })
+
+  it('says which pages change', () => {
+    const summary = (pages: unknown) => layoutSummary(sanitizeLayout({ v: 1, pages }) ?? undefined)
+    expect(summary({ album: { order: ['more', 'tracks'] }, artist: { hidden: ['shelves'] } })).toEqual(['Album pages arranged their own way', 'Artist pages arranged their own way'])
+    expect(summary({ album: { order: ['tracks'] } })).toEqual([])
   })
 })
 

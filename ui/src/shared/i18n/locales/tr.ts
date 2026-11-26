@@ -1298,6 +1298,8 @@ const tr: Record<string, string> = {
   'Colors only': 'Yalnızca renkler',
   'Parts of the bars moved or hidden': 'Çubukların bazı parçaları taşındı veya gizlendi',
   'Page headers arranged another way': 'Sayfa başlıkları farklı düzenlendi',
+  'Album pages arranged their own way': 'Albüm sayfaları kendine göre düzenlendi',
+  'Artist pages arranged their own way': 'Sanatçı sayfaları kendine göre düzenlendi',
   'Default layout': 'Varsayılan düzen',
   'Themes no longer arrange the app': 'Temalar artık uygulamayı düzenlemiyor',
   'This theme’s layout didn’t work: the default layout is back': 'Bu temanın düzeni çalışmadı: varsayılan düzen geri geldi',

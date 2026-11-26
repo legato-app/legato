@@ -61,7 +61,16 @@ export interface HeaderChoice {
   sub?: boolean
   actions?: (typeof HEADER_ACTIONS)[number]
 }
-export interface Pages {
+/** The blocks under a page's header a layout can order, in the app's order; a fixed one (the page's lists, and what
+ *  no menu else reaches) moves but never hides. */
+export const PAGE_PARTS = {
+  album: [{ id: 'tracks', fixed: true }, { id: 'more' }],
+  artist: [{ id: 'mostPlayed', fixed: true }, { id: 'topSongs', fixed: true }, { id: 'discography' }, { id: 'about' }, { id: 'links', fixed: true }, { id: 'shelves' }],
+} as const
+export type PartedPage = keyof typeof PAGE_PARTS
+export const pagePartIds = (page: PartedPage): string[] => PAGE_PARTS[page].map((part) => part.id)
+
+export interface Pages extends Partial<Record<PartedPage, PartsChoice>> {
   header?: HeaderChoice
 }
 
@@ -93,13 +102,19 @@ const record = (value: unknown): Record<string, unknown> | null => (value && typ
 const knownList = <Id extends string>(raw: unknown, known: readonly Id[]): Id[] => [...new Set(Array.isArray(raw) ? raw.filter((id): id is Id => known.includes(id as Id)) : [])]
 const surfaceList = (raw: unknown) => knownList(raw, SURFACES)
 
+/** Known ids to order, hideable ones to hide; undefined when neither. */
+function partsChoice(raw: unknown, known: readonly string[], hideable: readonly string[]): PartsChoice | undefined {
+  const given = record(raw)
+  const order = knownList(given?.order, known)
+  const hidden = knownList(given?.hidden, hideable)
+  return order.length || hidden.length ? { ...(order.length > 0 && { order }), ...(hidden.length > 0 && { hidden }) } : undefined
+}
+
 function sanitizeParts(raw: unknown): Layout['parts'] {
   const given = record(raw)
   const parts = Object.entries(PART_GROUPS).flatMap(([surface, groups]) => {
-    const choice = record(given?.[surface])
-    const order = knownList<string>(choice?.order, groups.flat())
-    const hidden = knownList<string>(choice?.hidden, HIDEABLE[surface as PartedSurface])
-    return order.length || hidden.length ? [[surface, { ...(order.length > 0 && { order }), ...(hidden.length > 0 && { hidden }) }]] : []
+    const choice = partsChoice(given?.[surface], groups.flat(), HIDEABLE[surface as PartedSurface])
+    return choice ? [[surface, choice]] : []
   })
   return parts.length ? Object.fromEntries(parts) : undefined
 }
@@ -143,8 +158,14 @@ export function headerLayout(raw: unknown): HeaderChoice | undefined {
 }
 
 function sanitizePages(raw: unknown): Pages | undefined {
-  const header = headerLayout(record(raw)?.header)
-  return header && { header }
+  const given = record(raw)
+  const header = headerLayout(given?.header)
+  const parted = (Object.keys(PAGE_PARTS) as PartedPage[]).flatMap((page) => {
+    const hideable = PAGE_PARTS[page].filter((part) => !('fixed' in part)).map((part) => part.id)
+    const choice = partsChoice(given?.[page], pagePartIds(page), hideable)
+    return choice ? [[page, choice]] : []
+  })
+  return header || parted.length ? { ...(header && { header }), ...Object.fromEntries(parted) } : undefined
 }
 
 /** Trust boundary (a theme file, stored settings): what is valid is kept; null when nothing is. */
@@ -241,6 +262,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
   const on = (region: Region, surface: Surface) => regions[region].includes(surface)
   const logoMoved = !layoutRegions(placement).brandInTopbar
   const partsChanged = Object.entries(PART_GROUPS).some(([surface, groups]) => groups.some((group) => arrangeParts<string>(placement.parts[surface as PartedSurface], group).join() !== group.join()))
+  const pageChanged = (page: PartedPage) => arrangeParts(placement.pages[page], pagePartIds(page)).join() !== pagePartIds(page).join()
   const lines = [
     hides('topbar') && tr('A smaller top bar'),
     hides('sidebar') ? tr('No sidebar') : on('right', 'sidebar') && tr('The sidebar on the right'),
@@ -254,6 +276,8 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     !!sizes.sidePanel && !hides('sidePanel') && tr('The side panel {n} px wide', { n: sizes.sidePanel }),
     partsChanged && tr('Parts of the bars moved or hidden'),
     !!placement.pages.header && tr('Page headers arranged another way'),
+    pageChanged('album') && tr('Album pages arranged their own way'),
+    pageChanged('artist') && tr('Artist pages arranged their own way'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
 }

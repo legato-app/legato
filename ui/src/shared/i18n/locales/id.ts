@@ -1298,6 +1298,8 @@ const id: Record<string, string> = {
   'Colors only': 'Hanya warna',
   'Parts of the bars moved or hidden': 'Bagian bilah dipindahkan atau disembunyikan',
   'Page headers arranged another way': 'Kepala halaman ditata berbeda',
+  'Album pages arranged their own way': 'Halaman album ditata sendiri',
+  'Artist pages arranged their own way': 'Halaman artis ditata sendiri',
   'Default layout': 'Tata letak bawaan',
   'Themes no longer arrange the app': 'Tema tidak lagi menata aplikasi',
   'This theme’s layout didn’t work: the default layout is back': 'Tata letak tema ini gagal: tata letak bawaan dipakai lagi',

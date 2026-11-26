@@ -1298,6 +1298,8 @@ const uk: Record<string, string> = {
   'Colors only': 'Лише кольори',
   'Parts of the bars moved or hidden': 'Частини панелей переміщено або приховано',
   'Page headers arranged another way': 'Заголовки сторінок розташовано інакше',
+  'Album pages arranged their own way': 'Сторінки альбомів розташовано по-своєму',
+  'Artist pages arranged their own way': 'Сторінки виконавців розташовано по-своєму',
   'Default layout': 'Типове розташування',
   'Themes no longer arrange the app': 'Теми більше не змінюють розташування елементів',
   'This theme’s layout didn’t work: the default layout is back': 'Розташування цієї теми не спрацювало: повернено типове',

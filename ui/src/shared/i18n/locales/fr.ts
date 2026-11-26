@@ -1307,6 +1307,8 @@ const fr: Record<string, string> = {
   'Colors only': 'Couleurs seulement',
   'Parts of the bars moved or hidden': 'Des éléments des barres déplacés ou masqués',
   'Page headers arranged another way': 'Les en-têtes des pages disposés autrement',
+  'Album pages arranged their own way': 'Les pages d’album disposées à leur façon',
+  'Artist pages arranged their own way': 'Les pages d’artiste disposées à leur façon',
   'Default layout': 'Disposition par défaut',
   'Themes no longer arrange the app': 'Les thèmes ne disposent plus l’application',
   'This theme’s layout didn’t work: the default layout is back': 'La disposition de ce thème n’a pas fonctionné : celle par défaut est revenue',

@@ -1298,6 +1298,8 @@ const sv: Record<string, string> = {
   'Colors only': 'Bara färger',
   'Parts of the bars moved or hidden': 'Delar av fälten flyttade eller dolda',
   'Page headers arranged another way': 'Sidhuvudena ordnade annorlunda',
+  'Album pages arranged their own way': 'Albumsidorna ordnade på eget sätt',
+  'Artist pages arranged their own way': 'Artistsidorna ordnade på eget sätt',
   'Default layout': 'Standardlayout',
   'Themes no longer arrange the app': 'Teman ordnar inte längre om appen',
   'This theme’s layout didn’t work: the default layout is back': 'Temats layout fungerade inte: standardlayouten är tillbaka',

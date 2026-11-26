@@ -34,6 +34,7 @@ import { photoOf, useArtistPicture } from './artistPicture'
 import { ArtistLinks } from './ArtistLinks'
 import { HiddenExplicit } from './HiddenVideos'
 import { useExplicit } from './useExplicit'
+import { usePageParts } from '../../shared/ui/usePageParts'
 import { PlayAll, ShuffleRound, totalTime } from './LibraryView'
 import { TrackTable } from './TrackTable'
 
@@ -219,6 +220,55 @@ export function AlbumView({ album, artist }: { album: string; artist: string }) 
   // Where its songs come from (the mockup's line under the title).
   const from = SOURCES.filter((s) => shown.some((t) => t.ids[s]))
   const tint = useCoverTint(firstArt(shown)[0])
+  const parts = usePageParts('album')
+  const blocks: Record<string, ReactNode> = {
+    tracks: (
+      <>
+        <AlbumHead />
+        <HiddenExplicit tracks={hiddenHere} />
+        {page ? (
+          <>
+            <ul className="flex flex-col">
+              {page.rows.map((r, k) => (
+                <Fragment key={k}>
+                  {page.discs > 1 && (k === 0 || page.rows[k - 1].disc !== r.disc) && <li className="kicker px-2 pt-4 pb-1">{tr('Disc {n}', { n: r.disc })}</li>}
+                  {'mine' in r ? <AlbumRow list={ordered} i={ordered.indexOf(r.mine)} number={r.number} /> : <MissingRow track={r.missing} number={r.number} />}
+                </Fragment>
+              ))}
+            </ul>
+            {page.extras.length > 0 && (
+              <div className="pt-6">
+                <h2 className="kicker px-2 pb-1">{tr('Also in your library')}</h2>
+                <ul className="flex flex-col">
+                  {page.extras.map((t) => (
+                    <AlbumRow key={t.id} list={ordered} i={ordered.indexOf(t)} />
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        ) : (
+          <ul className="flex flex-col">
+            {shown.map((t, i) => (
+              <AlbumRow key={t.id} list={shown} i={i} />
+            ))}
+          </ul>
+        )}
+      </>
+    ),
+    more: more.length > 0 && (
+      // Moved above the songs, its room goes under it.
+      <div className={parts[0] === 'more' ? 'pb-6' : 'pt-9'}>
+        <Section title={tr('More by {artist}', { artist: artistName(artist) })} side={<SideLink label={tr('Go to artist')} onClick={toArtist} />}>
+          <CardRow>
+            {more.map((a) => (
+              <AlbumCard key={a.album} a={a} sub={trn(a.tracks.length, '{n} song', '{n} songs')} />
+            ))}
+          </CardRow>
+        </Section>
+      </div>
+    ),
+  }
   return (
     // From the pane's edges (-mx-6 -mt-5): room for the band (PageHeader).
     <div className="-mx-6 -mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pt-5 pb-8 phone:-mx-4 phone:-mt-3 phone:px-4 phone:pt-3">
@@ -259,47 +309,9 @@ export function AlbumView({ album, artist }: { album: string; artist: string }) 
           </>
         }
       />
-      <AlbumHead />
-      <HiddenExplicit tracks={hiddenHere} />
-      {page ? (
-        <>
-          <ul className="flex flex-col">
-            {page.rows.map((r, k) => (
-              <Fragment key={k}>
-                {page.discs > 1 && (k === 0 || page.rows[k - 1].disc !== r.disc) && <li className="kicker px-2 pt-4 pb-1">{tr('Disc {n}', { n: r.disc })}</li>}
-                {'mine' in r ? <AlbumRow list={ordered} i={ordered.indexOf(r.mine)} number={r.number} /> : <MissingRow track={r.missing} number={r.number} />}
-              </Fragment>
-            ))}
-          </ul>
-          {page.extras.length > 0 && (
-            <div className="pt-6">
-              <h2 className="kicker px-2 pb-1">{tr('Also in your library')}</h2>
-              <ul className="flex flex-col">
-                {page.extras.map((t) => (
-                  <AlbumRow key={t.id} list={ordered} i={ordered.indexOf(t)} />
-                ))}
-              </ul>
-            </div>
-          )}
-        </>
-      ) : (
-        <ul className="flex flex-col">
-          {shown.map((t, i) => (
-            <AlbumRow key={t.id} list={shown} i={i} />
-          ))}
-        </ul>
-      )}
-      {more.length > 0 && (
-        <div className="pt-9">
-          <Section title={tr('More by {artist}', { artist: artistName(artist) })} side={<SideLink label={tr('Go to artist')} onClick={toArtist} />}>
-            <CardRow>
-              {more.map((a) => (
-                <AlbumCard key={a.album} a={a} sub={trn(a.tracks.length, '{n} song', '{n} songs')} />
-              ))}
-            </CardRow>
-          </Section>
-        </div>
-      )}
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
     </div>
   )
 }
@@ -358,6 +370,7 @@ export function ArtistView({ artist }: { artist: string }) {
   const picture = useArtistPicture(artist, yt?.art)
   const photo = photoOf(picture, shown.length || !yt?.art ? firstArt(shown) : [remoteArt(yt.art)])
   const tint = useCoverTint(photo[0])
+  const parts = usePageParts('artist')
   // Only an artist of the library has a walk (it follows what you listen to together).
   const walk: MenuEntry[] = shown.length ? ['-', { label: tr('Walk to another artist…'), icon: <MicrophoneStage size={16} />, onSelect: () => void import('./artistWalk').then((m) => m.walkFrom(artist)) }, neverArtistItem(artist)] : [neverArtistItem(artist)]
   const header = (
@@ -382,6 +395,61 @@ export function ArtistView({ artist }: { artist: string }) {
       }
     />
   )
+  const blocks: Record<string, ReactNode> = {
+    mostPlayed: top.length > 0 && (
+      <Section title={tr('Your most played')} side={shown.length > top.length && <SideLink label={tr('All {n} songs', { n: formatCount(shown.length) })} onClick={() => setAll('mine')} />}>
+        <ul className="-mt-1 flex flex-col">
+          {top.map((t, i) => (
+            <SongRow key={t.id} list={top} i={i} cover extra={<span className="hidden w-56 truncate text-xs text-ink-2 md:block">{t.album}</span>} sub={stats[t.id]?.[0] ? trn(stats[t.id][0], '{n} play', '{n} plays') : undefined} />
+          ))}
+        </ul>
+      </Section>
+    ),
+    topSongs: ytSongs.length > 0 && (
+      <Section
+        title={
+          <>
+            <SourceIcon source="youtube" size={18} /> {tr('Top songs')}
+          </>
+        }
+        side={yt?.allSongs && <SideLink label={tr('Show all')} onClick={() => openEvery(yt.allSongs!)} />}
+      >
+        <ul className="-mt-1 flex flex-col">
+          {ytSongs.map((t, i) => (
+            <SongRow key={t.id} list={ytSongs} i={i} cover extra={<span className="hidden w-56 truncate text-xs text-ink-2 md:block">{t.album}</span>} sub={artistName(t.artist)} />
+          ))}
+        </ul>
+      </Section>
+    ),
+    discography: releases.length > 0 && (
+      <Section
+        title={
+          <>
+            {tr('Discography')}
+            {disco.albums.length > 0 && disco.singles.length > 0 && (
+              <span role="tablist" className="flex gap-2 text-xs font-normal tracking-normal">
+                <LedChip on={releases === disco.albums} label={tr('Albums')} onClick={() => setKind('albums')} />
+                <LedChip on={releases === disco.singles} label={tr('Singles and EPs')} onClick={() => setKind('singles')} />
+              </span>
+            )}
+          </>
+        }
+      >
+        <CardRow>
+          {releases.map((a) => (
+            <AlbumCard key={a.album} a={a} sub={trn(a.tracks.length, '{n} song', '{n} songs')} />
+          ))}
+        </CardRow>
+      </Section>
+    ),
+    about: yt?.about && (
+      <Section title={tr('About {artist}', { artist: artistName(artist) })}>
+        <ArtistAbout text={yt.about} />
+      </Section>
+    ),
+    links: <ArtistLinks artist={artist} />,
+    shelves: <PageBoundary fallback={null}>{yt?.shelves.map((s) => <YouTubeShelf key={s.title} shelf={s} />)}</PageBoundary>,
+  }
   if (all)
     return (
       <>
@@ -396,59 +464,9 @@ export function ArtistView({ artist }: { artist: string }) {
     <div className="-mx-6 -mt-5 flex min-h-0 flex-1 flex-col gap-9 overflow-y-auto px-6 pt-5 pb-8 phone:-mx-4 phone:-mt-3 phone:gap-7 phone:px-4 phone:pt-3">
       {header}
       <HiddenExplicit tracks={hiddenHere} />
-      {top.length > 0 && (
-        <Section title={tr('Your most played')} side={shown.length > top.length && <SideLink label={tr('All {n} songs', { n: formatCount(shown.length) })} onClick={() => setAll('mine')} />}>
-          <ul className="-mt-1 flex flex-col">
-            {top.map((t, i) => (
-              <SongRow key={t.id} list={top} i={i} cover extra={<span className="hidden w-56 truncate text-xs text-ink-2 md:block">{t.album}</span>} sub={stats[t.id]?.[0] ? trn(stats[t.id][0], '{n} play', '{n} plays') : undefined} />
-            ))}
-          </ul>
-        </Section>
-      )}
-      {ytSongs.length > 0 && (
-        <Section
-          title={
-            <>
-              <SourceIcon source="youtube" size={18} /> {tr('Top songs')}
-            </>
-          }
-          side={yt?.allSongs && <SideLink label={tr('Show all')} onClick={() => openEvery(yt.allSongs!)} />}
-        >
-          <ul className="-mt-1 flex flex-col">
-            {ytSongs.map((t, i) => (
-              <SongRow key={t.id} list={ytSongs} i={i} cover extra={<span className="hidden w-56 truncate text-xs text-ink-2 md:block">{t.album}</span>} sub={artistName(t.artist)} />
-            ))}
-          </ul>
-        </Section>
-      )}
-      {releases.length > 0 && (
-        <Section
-          title={
-            <>
-              {tr('Discography')}
-              {disco.albums.length > 0 && disco.singles.length > 0 && (
-                <span role="tablist" className="flex gap-2 text-xs font-normal tracking-normal">
-                  <LedChip on={releases === disco.albums} label={tr('Albums')} onClick={() => setKind('albums')} />
-                  <LedChip on={releases === disco.singles} label={tr('Singles and EPs')} onClick={() => setKind('singles')} />
-                </span>
-              )}
-            </>
-          }
-        >
-          <CardRow>
-            {releases.map((a) => (
-              <AlbumCard key={a.album} a={a} sub={trn(a.tracks.length, '{n} song', '{n} songs')} />
-            ))}
-          </CardRow>
-        </Section>
-      )}
-      {yt?.about && (
-        <Section title={tr('About {artist}', { artist: artistName(artist) })}>
-          <ArtistAbout text={yt.about} />
-        </Section>
-      )}
-      <ArtistLinks artist={artist} />
-      <PageBoundary fallback={null}>{yt?.shelves.map((s) => <YouTubeShelf key={s.title} shelf={s} />)}</PageBoundary>
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
     </div>
   )
 }

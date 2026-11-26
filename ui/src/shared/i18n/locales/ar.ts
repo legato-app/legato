@@ -1262,6 +1262,8 @@ const ar: Record<string, string> = {
   'Colors only': 'الألوان فقط',
   'Parts of the bars moved or hidden': 'نُقلت أجزاء من الأشرطة أو أُخفيت',
   'Page headers arranged another way': 'رؤوس الصفحات مرتّبة بشكل مختلف',
+  'Album pages arranged their own way': 'صفحات الألبومات مرتّبة بطريقتها',
+  'Artist pages arranged their own way': 'صفحات الفنانين مرتّبة بطريقتها',
   'Default layout': 'التخطيط الافتراضي',
   'Themes no longer arrange the app': 'لم تعد السمات ترتّب التطبيق',
   'This theme’s layout didn’t work: the default layout is back': 'تعذّر تطبيق تخطيط هذه السمة: عاد التخطيط الافتراضي',

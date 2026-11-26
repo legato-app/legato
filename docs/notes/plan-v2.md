@@ -747,8 +747,14 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-26): `{ art, artSize, kicker, sub, actions }`, art 120 to 320 px and only on pages with
       art (the art redrawn at that size); Settings and Add-ons keep their own header; Spotify's attribution moved to a
       `notice` line a theme can't leave out; the summary says it in one line.
-  - [ ] `M` 8. `PAGE_PARTS`, `usePageParts`, the album, playlist and artist pages. Tests: per-page sanitize (fixed
-    parts never hidden, unknown dropped, new parts at their default place).
+  - [x] `M` 8. `PAGE_PARTS`, `usePageParts`, the album, playlist and artist pages. Tests: per-page sanitize (fixed
+    parts never hidden, unknown dropped, new parts at their default place). 2026-11-26: done for album and artist;
+    the playlist page has only its list under the header, so no parts yet (its header follows `pages.header`). Seen in
+    the browser demo (invented data, one album: "More by" never seen moved), never in the app.
+    - Decided alone (2026-11-26): the header stays first (`pages.header` arranges it; its band bleeds into the pane's
+      top); album: songs (fixed) and More by the artist; artist: most played, Top songs, discography, About, links,
+      YouTube shelves, the hideable ones being discography, About and the shelves (links have no menu elsewhere); an
+      unnamed part follows its usual neighbor; `usePageParts` reads the shell's context, not the settings.
   - [ ] `M` 9. Songs, Albums, Artists, and column order in `TrackTable`. Tests: column order resolve (Title and Artist
     first, the heart and Time last, the user's set kept).
   - [ ] `S` 10. Home's frame parts, `homeSections` in `LOOK_KEYS`. Tests: `sanitizeLook` keeps a theme's Home order,

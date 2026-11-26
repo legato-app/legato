@@ -1298,6 +1298,8 @@ const pt: Record<string, string> = {
   'Colors only': 'Só cores',
   'Parts of the bars moved or hidden': 'Partes das barras movidas ou ocultas',
   'Page headers arranged another way': 'Cabeçalhos das páginas organizados de outro jeito',
+  'Album pages arranged their own way': 'Páginas de álbum organizadas do jeito dele',
+  'Artist pages arranged their own way': 'Páginas de artista organizadas do jeito dele',
   'Default layout': 'Disposição padrão',
   'Themes no longer arrange the app': 'Os temas não organizam mais o app',
   'This theme’s layout didn’t work: the default layout is back': 'A disposição deste tema não funcionou: a padrão voltou',

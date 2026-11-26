@@ -1298,6 +1298,8 @@ const ja: Record<string, string> = {
   'Colors only': '色のみ',
   'Parts of the bars moved or hidden': 'バーの一部を移動または非表示',
   'Page headers arranged another way': 'ページ上部の配置を変更',
+  'Album pages arranged their own way': 'アルバムページは独自の配置',
+  'Artist pages arranged their own way': 'アーティストページは独自の配置',
   'Default layout': '標準の配置',
   'Themes no longer arrange the app': 'テーマはアプリを配置しなくなりました',
   'This theme’s layout didn’t work: the default layout is back': 'このテーマの配置は使えませんでした。標準の配置に戻しました',

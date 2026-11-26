@@ -1262,6 +1262,8 @@ const he: Record<string, string> = {
   'Colors only': 'צבעים בלבד',
   'Parts of the bars moved or hidden': 'חלקים מהסרגלים הוזזו או הוסתרו',
   'Page headers arranged another way': 'כותרות העמודים מסודרות אחרת',
+  'Album pages arranged their own way': 'עמודי האלבומים מסודרים בדרך משלהם',
+  'Artist pages arranged their own way': 'עמודי האמנים מסודרים בדרך משלהם',
   'Default layout': 'פריסת ברירת המחדל',
   'Themes no longer arrange the app': 'ערכות הנושא כבר לא מסדרות את האפליקציה',
   'This theme’s layout didn’t work: the default layout is back': 'הפריסה של ערכת הנושא לא עבדה: פריסת ברירת המחדל חזרה',

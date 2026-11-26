@@ -1298,6 +1298,8 @@ const nl: Record<string, string> = {
   'Colors only': 'Alleen kleuren',
   'Parts of the bars moved or hidden': 'Onderdelen van de balken verplaatst of verborgen',
   'Page headers arranged another way': 'Paginakoppen anders ingedeeld',
+  'Album pages arranged their own way': 'Albumpagina’s op hun eigen manier ingedeeld',
+  'Artist pages arranged their own way': 'Artiestpagina’s op hun eigen manier ingedeeld',
   'Default layout': 'Standaardindeling',
   'Themes no longer arrange the app': 'Thema’s delen de app niet meer in',
   'This theme’s layout didn’t work: the default layout is back': 'De indeling van dit thema werkte niet: de standaardindeling is terug',

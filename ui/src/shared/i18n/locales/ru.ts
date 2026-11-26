@@ -1298,6 +1298,8 @@ const ru: Record<string, string> = {
   'Colors only': 'Только цвета',
   'Parts of the bars moved or hidden': 'Части панелей перемещены или скрыты',
   'Page headers arranged another way': 'Заголовки страниц расположены иначе',
+  'Album pages arranged their own way': 'Страницы альбомов расположены по-своему',
+  'Artist pages arranged their own way': 'Страницы исполнителей расположены по-своему',
   'Default layout': 'Расположение по умолчанию',
   'Themes no longer arrange the app': 'Темы больше не меняют расположение элементов',
   'This theme’s layout didn’t work: the default layout is back': 'Расположение этой темы не сработало: возвращено расположение по умолчанию',

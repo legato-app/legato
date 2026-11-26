@@ -1298,6 +1298,8 @@ const zh: Record<string, string> = {
   'Colors only': '仅颜色',
   'Parts of the bars moved or hidden': '栏中的部分内容被移动或隐藏',
   'Page headers arranged another way': '页面顶部的排列方式不同',
+  'Album pages arranged their own way': '专辑页面使用自己的排列',
+  'Artist pages arranged their own way': '艺人页面使用自己的排列',
   'Default layout': '默认布局',
   'Themes no longer arrange the app': '主题不再调整应用布局',
   'This theme’s layout didn’t work: the default layout is back': '此主题的布局无法使用：已恢复默认布局',

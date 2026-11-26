@@ -1298,6 +1298,8 @@ const ko: Record<string, string> = {
   'Colors only': '색만',
   'Parts of the bars moved or hidden': '막대의 일부를 옮기거나 숨김',
   'Page headers arranged another way': '페이지 머리글의 배치 변경',
+  'Album pages arranged their own way': '앨범 페이지의 자체 배치',
+  'Artist pages arranged their own way': '아티스트 페이지의 자체 배치',
   'Default layout': '기본 배치',
   'Themes no longer arrange the app': '이제 테마가 앱 배치를 바꾸지 않습니다',
   'This theme’s layout didn’t work: the default layout is back': '이 테마의 배치가 작동하지 않아 기본 배치로 돌아왔습니다',
