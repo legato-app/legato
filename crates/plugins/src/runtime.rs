@@ -237,7 +237,7 @@ fn run(m: Manifest, granted: Vec<Permission>, code: String, app_version: &str, o
         }
     };
 
-    let info = json!({ "id": m.id, "api": crate::manifest::API, "appVersion": app_version }).to_string();
+    let info = json!({ "id": m.id, "api": m.api, "appVersion": app_version }).to_string();
     arm();
     let started: Result<(), String> = ctx.with(|ctx| {
         let g = ctx.globals();
@@ -365,6 +365,13 @@ mod tests {
         // No player:read: the track event never reached it.
         assert!(!spy.logs.lock().unwrap().iter().any(|l| l.contains("track Song")));
         assert_eq!(spy.calls.lock().unwrap()[0].method, "ui.addCommand");
+    }
+
+    #[test]
+    fn app_api_is_the_one_the_manifest_declares() {
+        let (_running, spy) = start("console.log(app.api)", vec![]);
+        wait_for(|| !spy.logs.lock().unwrap().is_empty());
+        assert_eq!(spy.logs.lock().unwrap()[0], "info: 1");
     }
 
     #[test]

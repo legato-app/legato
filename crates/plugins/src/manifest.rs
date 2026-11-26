@@ -65,7 +65,7 @@ impl Manifest {
         if m.api > API {
             bail!("This plugin needs a newer version of Legato (plugin API {}, this app has {API})", m.api);
         }
-        ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to plugin.json");
+        ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to the manifest");
         ensure!(m.permissions.len() <= 32, "manifest: too many permissions");
         for p in &m.permissions {
             Permission::parse(p)?;

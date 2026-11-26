@@ -75,7 +75,7 @@ when a permission is missing ("Permission needed: player:control") or the call f
 ## `app` reference (API 1)
 
 ```js
-app.id, app.api, app.appVersion
+app.id, app.api, app.appVersion   // app.api: the API your manifest declares
 
 // Events. Returns a function that removes the handler.
 app.on('track', (t) => {})      // song started: { title, artist, trackId (library id or null), via } or null
