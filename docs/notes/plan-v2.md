@@ -356,7 +356,7 @@ copies, downloads for offline), their accounts, limits and paid plan.
       no Scoop (decided alone).
 - [ ] 17. `L` Listening rooms over the internet, no server of ours: sealed control messages through a public relay (the
       owner's call), or the LAN. Takes in "Listen together on the local network".
-      - [ ] The internet half (the owner's choice 2026-11-07): WebRTC data channels, offers sealed with the room code
+      - [x] The internet half (the owner's choice 2026-11-07): WebRTC data channels, offers sealed with the room code
         and swapped once through public Nostr relays (relay.damus.io, nos.lol), Cloudflare's STUN for each side's public
         address; no TURN, so two strict NATs can't meet. The relays see the room's random id, both public IPs and the
         times, never songs, names or reactions: a privacy row says so.
@@ -374,11 +374,11 @@ copies, downloads for offline), their accounts, limits and paid plan.
         (`stun.rs`, tested on a local UDP socket). Slice 2 done: the str0m data channel as that stream (`roomlink.rs`
         `dial`/`accept`, candidates sent with the offer, no trickle; 20 s to open or "Couldn’t reach the room"); a real
         room runs over it on 127.0.0.1 (welcome, code, a song). Never tried across two networks or through a NAT.
-        Left: slice 3, the UI ("Over the internet" in the room dialog: the invite link with id and code, the host listening
-        on the relays, each side's LAN address and STUN, "two strict networks can't meet" said, 17 locales) and the shell
-        commands in `src-tauri/src/rooms.rs` (desktop only); slice 4 with it, as nothing reaches the relays or STUN until
-        then: the privacy row "Listening rooms" (`content.tsx`) and Settings › Privacy's hosts gain the relays and STUN
-        with what they see (`connect` and `public_address` already note their hosts).
+        2026-11-26, slices 3 and 4: "Invite over the internet" in the room's view, the invite link (`legato://room?c=…&r=…`)
+        pasted or opened then Join; the host listens on both relays (`roommeet.rs`, a new code listens again); the privacy
+        row and Settings › Privacy name the relays and STUN. Desktop only. Decided alone (2026-11-26): an opened invite
+        never joins by itself; the guest asks through the first relay that answers. Never seen, never tried across two
+        networks.
 - [ ] 18. `L` A Linux build (AppImage, deb): WebKitGTK, the MPRIS media panel, the tray, PipeWire for the detector.
       Built by GitHub's Actions (the owner's word, 2026-11-07); local tries in WSL or a VM once the owner sets one up
       (a system change, theirs). 19 the same, on a macOS runner.
