@@ -693,9 +693,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - Rules for every slice: whole-word names, one job per function, comments for the why; `layout.ts` tested in
     `layout.test.ts`; no IPC command, ts-rs type or host added (no `add-connector`); every new text through `tr` in
     every locale file. Slices 1-5 first, 6-11 in any order after, 12 before the website says anything.
-  - [ ] `M` 1. Core `layout.ts`: types, `LAYOUT_API`, `DEFAULT_LAYOUT`, `sanitizeLayout`, `resolveLayout` with the
+  - [x] `M` 1. Core `layout.ts`: types, `LAYOUT_API`, `DEFAULT_LAYOUT`, `sanitizeLayout`, `resolveLayout` with the
     forced rules, `Theme.layout` kept by `sanitizeTheme`. Tests: `layout.test.ts` (unknown ids, duplicates, newer `v`,
     clamps, forced rules, default = today's order), `theme.test.ts` (no layout unchanged, a layout round-trips).
+    2026-11-26: done; pure, not tried for real (nothing draws it in this slice).
+    - Decided alone (2026-11-26): each surface fits some sides only (sidebar and side panel left or right, player bar
+      top or bottom, top bar top only: it holds the window's buttons and the search list opens under it); the side
+      panel is 260 to 420 px (the sidebar limits moved to `layout.ts`); a newer version's layout is kept as it came up
+      to 8 000 characters (above, its version only), so a save or a sync from an older app doesn't lose it; an unnamed
+      logo goes with the top bar.
   - [ ] `M` 2. The shell drawn from the resolved layout, and the setting (on). Tests: a pure `layoutRegions`, the
     default in today's order, the setting's sanitize and search entry. Skills: `add-setting` (new key, default true,
     no `DEFAULTS_VERSION` bump, synced), i18n.

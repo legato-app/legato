@@ -2,6 +2,7 @@
 import { LANGUAGES, msg, tr } from '../i18n/i18n'
 import { ACTIONS, validCombo, type Custom } from '../../app/keys'
 import { cleanCss } from '../css'
+import { sanitizeLayout, SIDEBAR_MAX, SIDEBAR_MIN, type Layout } from './layout'
 import { DEFAULT_MENU_LAYOUT, readLayout, type MenuLayout } from '../ui/menuShape'
 import type { GroupSort, Sort } from '../../features/library/filter'
 import type { Levelling } from '../generated/Levelling'
@@ -25,6 +26,8 @@ export interface Theme extends Palette {
   look?: Look
   /** Advanced: the theme's own CSS (cleaned; Legato's name, logo and legal notices stay). */
   css?: string
+  /** Where the app's parts go (`layout.ts`). */
+  layout?: Layout
 }
 
 export const RADII = ['sharp', 'soft', 'round'] as const
@@ -784,9 +787,7 @@ const BG_NAME = /^bg-[0-9a-f]{16}\.(png|jpg|webp|gif|mp4|webm)$/
 /** A background that plays (muted, looped) instead of a picture. */
 export const isVideo = (name: string) => /\.(mp4|webm)$/.test(name)
 const isHex = (v: unknown): v is string => typeof v === 'string' && HEX.test(v)
-/** Sidebar width bounds: its chips fit at the least, the page keeps room at the most. */
-export const SIDEBAR_MIN = 220
-export const SIDEBAR_MAX = 420
+export { SIDEBAR_MAX, SIDEBAR_MIN }
 
 const num = (v: unknown, min: number, max: number, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : fallback)
 const pick = <T,>(v: unknown, allowed: readonly T[], fallback: T): T => (allowed.includes(v as T) ? (v as T) : fallback)
@@ -815,6 +816,7 @@ export function sanitizeTheme(raw: unknown): Theme | null {
     b && typeof b.image === 'string' && BG_NAME.test(b.image) ? { image: b.image, fit: pick(b.fit, FITS, 'cover'), dim: num(b.dim, 0, 90, 30), blur: num(b.blur, 0, 40, 0), panels: num(b.panels, 40, 100, 80) } : undefined
   const look = sanitizeLook(r.look)
   const css = cleanCss(r.css, MAX_THEME_CSS).trim()
+  const layout = sanitizeLayout(r.layout)
   return {
     id,
     name,
@@ -826,6 +828,7 @@ export function sanitizeTheme(raw: unknown): Theme | null {
     ...(background && { background }),
     ...(look && { look }),
     ...(css && { css }),
+    ...(layout && { layout }),
   }
 }
 

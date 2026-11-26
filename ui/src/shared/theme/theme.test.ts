@@ -134,6 +134,15 @@ describe('resolveTheme', () => {
     expect(sanitize({ sleepButton: true, defaultsVersion: 10 }).sleepButton).toBe(true)
   })
 
+  it('keeps a theme’s layout, checked; a theme without one stays without', () => {
+    const base = PRESETS[0]
+    expect(sanitizeTheme({ ...base })).not.toHaveProperty('layout')
+    const arranged = sanitizeTheme({ ...base, layout: { v: 1, regions: { right: ['sidebar'] }, extra: 1 } })!
+    expect(arranged.layout).toEqual({ v: 1, regions: { right: ['sidebar'] } })
+    expect(sanitizeTheme(JSON.parse(JSON.stringify(arranged)))!.layout).toEqual(arranged.layout)
+    expect(sanitizeTheme({ ...base, layout: 'right' })).not.toHaveProperty('layout')
+  })
+
   it('mix covers are varied by default; the old default grid moves once (v12), a pick of one’s own stays', () => {
     expect(sanitize({}).mixCovers).toBe('varied')
     expect(sanitize({ mixCovers: 'grid', defaultsVersion: 11 }).mixCovers).toBe('varied')
