@@ -648,6 +648,82 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   Xbox Game Bar widget (a UWP package, nothing here could build or load it).
 - [ ] `L` A theme file alone can change the app's whole layout, A to Z (owner's ask 2026-11-26): not only colours and CSS, the arrangement of every surface (sidebar, player bar, pages, panels). To design first: what the file may say (a layout schema read by the shell, not raw code), how `BRAND_GUARD` and the right-click menus survive, how a broken file falls back to the default look.
   - Further (owner, 2026-11-26): a theme may also bring extra features with reactive code (JS or similar), always checked by Rust. Lead to weigh: the theme's script runs like a plugin (`crates/plugins`: rquickjs sandbox, permissions approved by the user and checked in Rust, no secrets, files or raw IPC, `docs/plugins.md`); the layout file binds to data the shell exposes (now playing, queue, lyrics…) instead of the script touching the DOM.
+  - Owner (2026-11-26): no theme scripts in v1; after v1, a theme may name a plugin installed on its own (the usual
+    permission review) whose panel goes into the layout. The setting "Let themes arrange the app" is on by default,
+    with a warning when importing a theme that changes the layout. PC only in v1. v1 also covers the inside of pages
+    (headers, columns, sections), not only the regions and bars.
+  - Design (2026-11-26). File: an optional `layout` key in the theme JSON (`Theme`, `.theme` files already keep any
+    key through `themefile::pack/unpack`), data only, never code or HTML: `{ v, regions, sizes, hidden, parts, pages }`.
+    Fixed regions `top, left, right, bottom` around `main` (always the page); fixed surface ids the shell owns
+    (`brand, topbar, sidebar, sidePanel, playerBar`); sizes clamped to the existing limits; unknown keys and ids
+    dropped; a surface not named keeps its default place (the `sanitizeHome` rule). `LAYOUT_API = 1`, additions only
+    within a version, like `manifest::API`; a newer `v` ignores the layout whole (colours and CSS still apply) and the
+    theme card says it needs a newer Legato. No `layout` = `DEFAULT_LAYOUT`, today's tree: CSS themes unchanged.
+    Under 640 px the phone layout stays.
+  - Validation: a pure TS module `ui/src/shared/theme/layout.ts` (`sanitizeLayout`, `resolveLayout`), called from
+    `sanitizeTheme`, never importing `app/settings`. Not Rust: a layout grants access to nothing, it only moves the
+    shell's own components; Rust stays the boundary for code. Forced rules: `main` and `brand` always shown, the
+    sidebar and the top bar never both hidden.
+  - Brand and menus: the brand mark (`data-brand`, now inside the top bar in `App.tsx`) becomes its own surface,
+    never hidden, and `BRAND_GUARD` is unchanged. Menus belong to components, not places: each surface keeps its
+    `onMenu` wherever it is drawn, `ContextMenuHost` stays outside the layout, and a layout never adds or removes
+    menu items (the `menuLayout` setting does).
+  - Ways back no layout can remove: Ctrl+Comma, right-click › "Default layout" (fallback menu, while a layout is on),
+    the setting. A region or page part that throws drops the layout for this run, with a toast.
+  - Import warning: in both import paths (Theme Studio's Import, a `.theme` dropped on the window), when the setting
+    is on and the layout differs from the default. A dialog in the app's own look: "This theme rearranges Legato",
+    the changes listed (a pure `layoutSummary`, at most 6 lines), how to go back; Use its layout / Colours only
+    (imported without `layout`) / Cancel. Themes arriving through Sync Mode were warned about on the other PC. No
+    `DEFAULTS_VERSION` bump: the setting is a new key, and nothing changes on screen until a theme with a layout is
+    imported (no preset carries one); a preset shipping one later bumps it then.
+  - Page parts: choices that are already settings ride the theme's `look` (applied when the theme is picked, the
+    user's to change after): `columns`, `density`, `listCovers` already, and Home's order (`homeSections` added to
+    `LOOK_KEYS`), so the user's own reordering wins. The frame of each page is layout-only (`pages`), applied live:
+    one pure table `PAGE_PARTS` (each part `fixed` or not: a fixed part moves but never hides), a hook
+    `usePageParts(page)` in its own file, the page drawing its existing blocks in that order. Reordered in React,
+    never with CSS `order` (keyboard and screen readers follow). A hidden part's actions stay in the page's More and
+    right-click. The shared `PageHeader` takes `pages.header` (art start / end / top / none, its size clamped, kicker
+    and sub, actions beside or below). Column order: `pages.lists.columns` over `COLUMNS`, Title and Artist first,
+    the heart and Time last; which columns show stays the user's `columns`. Pages in order: album, playlist, artist;
+    Songs, Albums, Artists; Home (its frame; its sections through `look`); Now Playing on the PC. Other pages get the
+    shared header in v1, their own parts later as additions.
+  - Fixed whatever the layout: Settings and Add-ons whole (the way back; the permission review looks like the app's
+    own), dialogs, menus, toasts, the welcome, Karaoke, the mini player, the connect wizard, the phone, and each page's
+    main list or grid.
+  - Rules for every slice: whole-word names, one job per function, comments for the why; `layout.ts` tested in
+    `layout.test.ts`; no IPC command, ts-rs type or host added (no `add-connector`); every new text through `tr` in
+    every locale file. Slices 1-5 first, 6-11 in any order after, 12 before the website says anything.
+  - [ ] `M` 1. Core `layout.ts`: types, `LAYOUT_API`, `DEFAULT_LAYOUT`, `sanitizeLayout`, `resolveLayout` with the
+    forced rules, `Theme.layout` kept by `sanitizeTheme`. Tests: `layout.test.ts` (unknown ids, duplicates, newer `v`,
+    clamps, forced rules, default = today's order), `theme.test.ts` (no layout unchanged, a layout round-trips).
+  - [ ] `M` 2. The shell drawn from the resolved layout, and the setting (on). Tests: a pure `layoutRegions`, the
+    default in today's order, the setting's sanitize and search entry. Skills: `add-setting` (new key, default true,
+    no `DEFAULTS_VERSION` bump, synced), i18n.
+  - [ ] `S` 3. The brand as its own surface, never hidden. Tests: a table of hostile layouts keeps it; `css.test.ts`
+    unchanged.
+  - [ ] `M` 4. The import warning: `layoutSummary`, `withoutLayout` (pure), the dialog in both import paths. Tests:
+    summary lines per difference, capped; Colours only drops `layout`; no question without a layout or with the
+    setting off. Skills: i18n.
+  - [ ] `S` 5. Ways back: "Default layout" in the fallback menu; a throwing region or part drops the layout + toast.
+    Tests: the entry only while a layout is on; the boundary drops it. Skills: i18n.
+  - [ ] `M` 6. The bars' parts: player bar, top bar, sidebar (order, hidden, each hidden part still in More). Tests:
+    per-surface part sanitize.
+  - [ ] `M` 7. The shared page header (`pages.header` in `PageHeader`). Tests: a pure `headerLayout` (clamps, unknown
+    values dropped, phone ignored).
+  - [ ] `M` 8. `PAGE_PARTS`, `usePageParts`, the album, playlist and artist pages. Tests: per-page sanitize (fixed
+    parts never hidden, unknown dropped, new parts at their default place).
+  - [ ] `M` 9. Songs, Albums, Artists, and column order in `TrackTable`. Tests: column order resolve (Title and Artist
+    first, the heart and Time last, the user's set kept).
+  - [ ] `S` 10. Home's frame parts, `homeSections` in `LOOK_KEYS`. Tests: `sanitizeLook` keeps a theme's Home order,
+    picking the theme writes it, the user's later order wins.
+  - [ ] `M` 11. Now Playing's parts on the PC (cover side, the title block's order, the controls row). Tests: parts
+    resolve for its blocks.
+  - [ ] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);
+    the website copy ("Make it look like yours", `site/components/content.tsx` and its locales). Tests: a
+    `themefile.rs` round-trip with a `layout` key.
+  - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
+    enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
+  - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
 - [ ] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
