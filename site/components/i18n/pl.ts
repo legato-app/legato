@@ -12,8 +12,8 @@ export const pl: Copy = {
     free: 'Za darmo · Windows 10 i 11',
     version: 'Wersja {version}',
     android: 'Beta na Androida',
-    works: 'Działa z',
-    spotify: 'Spotify (playlisty, twój klucz aplikacji)',
+    works: 'Twoja muzyka',
+    spotify: 'Importuje twoje playlisty ze Spotify',
     apple: 'Apple Music (katalog, fragmenty)',
     folders: 'Twoje foldery',
   },
@@ -147,5 +147,5 @@ export const pl: Copy = {
     ],
   },
   community: { title: 'Dołącz do społeczności', text: 'Pytania, pomysły, pomoc i wieści od innych słuchaczy i od autora, na Discordzie.', join: 'Dołącz do Discorda', discussions: 'GitHub Discussions' },
-  footer: { community: 'Społeczność', legal: 'Informacje prawne', code: 'Kod źródłowy dostępny. Darmowy w użyciu. Kod na [GitHubie].', releases: 'Wydania', docs: 'Dokumentacja dla programistów', license: 'Licencja', notices: 'Licencje stron trzecich', font: 'Licencja czcionki', marks: 'Spotify, YouTube i Apple Music są znakami towarowymi ich właścicieli.' },
+  footer: { community: 'Społeczność', legal: 'Informacje prawne', code: 'Kod źródłowy dostępny. Darmowy w użyciu. Kod na [GitHubie].', releases: 'Wydania', docs: 'Dokumentacja dla programistów', license: 'Licencja', notices: 'Licencje stron trzecich', font: 'Licencja czcionki', marks: 'Spotify, YouTube i Apple Music są znakami towarowymi ich właścicieli.', unaffiliated: 'Spotify jest znakiem towarowym Spotify AB. Legato nie jest powiązane ze Spotify ani przez nie popierane.' },
 }

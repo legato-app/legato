@@ -12,8 +12,8 @@ export const tr: Copy = {
     free: 'Ücretsiz · Windows 10 ve 11',
     version: 'Sürüm {version}',
     android: 'Android betası',
-    works: 'Şunlarla çalışır',
-    spotify: 'Spotify (çalma listeleri, kendi uygulama anahtarın)',
+    works: 'Müziğin',
+    spotify: 'Spotify çalma listelerini içe aktarır',
     apple: 'Apple Music (katalog, önizlemeler)',
     folders: 'Klasörlerin',
   },
@@ -147,5 +147,5 @@ export const tr: Copy = {
     ],
   },
   community: { title: 'Topluluğa katıl', text: 'Diğer dinleyicilerden ve yazardan sorular, fikirler, yardım ve haberler, Discord’da.', join: 'Discord’a katıl', discussions: 'GitHub Discussions' },
-  footer: { community: 'Topluluk', legal: 'Yasal', code: 'Kaynağı erişilebilir. Kullanımı ücretsiz. Kod [GitHub]’da.', releases: 'Sürümler', docs: 'Geliştiriciler için belgeler', license: 'Lisans', notices: 'Üçüncü taraf lisansları', font: 'Yazı tipi lisansı', marks: 'Spotify, YouTube ve Apple Music, sahiplerinin ticari markalarıdır.' },
+  footer: { community: 'Topluluk', legal: 'Yasal', code: 'Kaynağı erişilebilir. Kullanımı ücretsiz. Kod [GitHub]’da.', releases: 'Sürümler', docs: 'Geliştiriciler için belgeler', license: 'Lisans', notices: 'Üçüncü taraf lisansları', font: 'Yazı tipi lisansı', marks: 'Spotify, YouTube ve Apple Music, sahiplerinin ticari markalarıdır.', unaffiliated: 'Spotify, Spotify AB’nin ticari markasıdır. Legato’nun Spotify ile bir bağlantısı yoktur ve Spotify tarafından onaylanmamıştır.' },
 }

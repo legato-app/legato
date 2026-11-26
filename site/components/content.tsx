@@ -41,7 +41,7 @@ export type Copy = {
   /** href: where an answer's `[label]` leads. */
   faq: { title: string; intro: string; items: { q: string; a: string; href?: string }[] }
   community: { title: string; text: string; join: string; discussions: string }
-  footer: { community: string; legal: string; code: string; releases: string; docs: string; license: string; notices: string; font: string; marks: string }
+  footer: { community: string; legal: string; code: string; releases: string; docs: string; license: string; notices: string; font: string; marks: string; unaffiliated: string }
 }
 
 export const FEATURE_ICONS: IconName[] = ['Playlist', 'Sparkle', 'FolderSimple', 'Devices', 'PuzzlePiece', 'Translate']
@@ -142,8 +142,8 @@ export const en: Copy = {
     free: 'Free · Windows 10 and 11',
     version: 'Version {version}',
     android: 'Android beta',
-    works: 'Works with',
-    spotify: 'Spotify (playlists, your app key)',
+    works: 'Your music',
+    spotify: 'Imports your Spotify playlists',
     apple: 'Apple Music (catalog, previews)',
     folders: 'Your folders',
   },
@@ -267,5 +267,5 @@ export const en: Copy = {
     ],
   },
   community: { title: 'Join the community', text: 'Questions, ideas, help and news from other listeners and from the author, on Discord.', join: 'Join the Discord', discussions: 'GitHub Discussions' },
-  footer: { community: 'Community', legal: 'Legal', code: 'Source-available. Free to use. Code on [GitHub].', releases: 'Releases', docs: 'Docs for developers', license: 'License', notices: 'Third-party licenses', font: 'Font license', marks: 'Spotify, YouTube and Apple Music are trademarks of their owners.' },
+  footer: { community: 'Community', legal: 'Legal', code: 'Source-available. Free to use. Code on [GitHub].', releases: 'Releases', docs: 'Docs for developers', license: 'License', notices: 'Third-party licenses', font: 'Font license', marks: 'Spotify, YouTube and Apple Music are trademarks of their owners.', unaffiliated: 'Spotify is a trademark of Spotify AB. Legato is not affiliated with or endorsed by Spotify.' },
 }

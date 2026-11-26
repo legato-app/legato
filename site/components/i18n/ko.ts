@@ -12,8 +12,8 @@ export const ko: Copy = {
     free: '무료 · Windows 10 및 11',
     version: '버전 {version}',
     android: 'Android 베타 버전',
-    works: '지원 서비스',
-    spotify: 'Spotify(재생목록, 내 앱 키)',
+    works: '내 음악',
+    spotify: 'Spotify 재생목록 가져오기',
     apple: 'Apple Music(카탈로그, 미리 듣기)',
     folders: '내 폴더',
   },
@@ -147,5 +147,5 @@ export const ko: Copy = {
     ],
   },
   community: { title: '커뮤니티 참여', text: '다른 청취자와 제작자의 질문, 아이디어, 도움, 소식을 Discord에서.', join: 'Discord 참여', discussions: 'GitHub Discussions' },
-  footer: { community: '커뮤니티', legal: '법적 고지', code: '소스 공개. 무료로 사용. 코드는 [GitHub]에.', releases: '릴리스', docs: '개발자 문서', license: '라이선스', notices: '서드 파티 라이선스', font: '글꼴 라이선스', marks: 'Spotify, YouTube, Apple Music은 각 소유자의 상표입니다.' },
+  footer: { community: '커뮤니티', legal: '법적 고지', code: '소스 공개. 무료로 사용. 코드는 [GitHub]에.', releases: '릴리스', docs: '개발자 문서', license: '라이선스', notices: '서드 파티 라이선스', font: '글꼴 라이선스', marks: 'Spotify, YouTube, Apple Music은 각 소유자의 상표입니다.', unaffiliated: 'Spotify는 Spotify AB의 상표입니다. Legato는 Spotify와 제휴하거나 Spotify의 보증을 받지 않았습니다.' },
 }

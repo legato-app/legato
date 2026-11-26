@@ -12,8 +12,8 @@ export const ru: Copy = {
     free: 'Бесплатно · Windows 10 и 11',
     version: 'Версия {version}',
     android: 'Бета для Android',
-    works: 'Работает с',
-    spotify: 'Spotify (плейлисты, ваш ключ приложения)',
+    works: 'Ваша музыка',
+    spotify: 'Импортирует ваши плейлисты Spotify',
     apple: 'Apple Music (каталог, отрывки)',
     folders: 'Ваши папки',
   },
@@ -147,5 +147,5 @@ export const ru: Copy = {
     ],
   },
   community: { title: 'Присоединяйтесь к сообществу', text: 'Вопросы, идеи, помощь и новости от других слушателей и от автора, в Discord.', join: 'Войти в Discord', discussions: 'GitHub Discussions' },
-  footer: { community: 'Сообщество', legal: 'Правовая информация', code: 'Исходники доступны. Бесплатно. Код на [GitHub].', releases: 'Версии', docs: 'Документация для разработчиков', license: 'Лицензия', notices: 'Сторонние лицензии', font: 'Лицензия шрифта', marks: 'Spotify, YouTube и Apple Music — товарные знаки их владельцев.' },
+  footer: { community: 'Сообщество', legal: 'Правовая информация', code: 'Исходники доступны. Бесплатно. Код на [GitHub].', releases: 'Версии', docs: 'Документация для разработчиков', license: 'Лицензия', notices: 'Сторонние лицензии', font: 'Лицензия шрифта', marks: 'Spotify, YouTube и Apple Music — товарные знаки их владельцев.', unaffiliated: 'Spotify — товарный знак Spotify AB. Legato не связан со Spotify и не одобрен им.' },
 }

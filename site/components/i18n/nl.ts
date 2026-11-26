@@ -12,8 +12,8 @@ export const nl: Copy = {
     free: 'Gratis · Windows 10 en 11',
     version: 'Versie {version}',
     android: 'Android-bèta',
-    works: 'Werkt met',
-    spotify: 'Spotify (afspeellijsten, je eigen app-sleutel)',
+    works: 'Je muziek',
+    spotify: 'Importeert je Spotify-afspeellijsten',
     apple: 'Apple Music (catalogus, fragmenten)',
     folders: 'Je mappen',
   },
@@ -147,5 +147,5 @@ export const nl: Copy = {
     ],
   },
   community: { title: 'Word lid van de community', text: 'Vragen, ideeën, hulp en nieuws van andere luisteraars en van de maker, op Discord.', join: 'Naar de Discord', discussions: 'GitHub Discussions' },
-  footer: { community: 'Community', legal: 'Juridisch', code: 'Broncode inzichtelijk. Gratis te gebruiken. Code op [GitHub].', releases: 'Releases', docs: 'Documentatie voor ontwikkelaars', license: 'Licentie', notices: 'Licenties van derden', font: 'Licentie van het lettertype', marks: 'Spotify, YouTube en Apple Music zijn handelsmerken van hun eigenaars.' },
+  footer: { community: 'Community', legal: 'Juridisch', code: 'Broncode inzichtelijk. Gratis te gebruiken. Code op [GitHub].', releases: 'Releases', docs: 'Documentatie voor ontwikkelaars', license: 'Licentie', notices: 'Licenties van derden', font: 'Licentie van het lettertype', marks: 'Spotify, YouTube en Apple Music zijn handelsmerken van hun eigenaars.', unaffiliated: 'Spotify is een handelsmerk van Spotify AB. Legato is niet verbonden aan of onderschreven door Spotify.' },
 }

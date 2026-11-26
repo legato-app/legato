@@ -12,8 +12,8 @@ export const hi: Copy = {
     free: 'मुफ़्त · Windows 10 और 11',
     version: 'वर्ज़न {version}',
     android: 'Android बीटा',
-    works: 'इनके साथ चलता है',
-    spotify: 'Spotify (प्लेलिस्ट, आपकी अपनी ऐप कुंजी)',
+    works: 'आपका संगीत',
+    spotify: 'आपकी Spotify प्लेलिस्ट इंपोर्ट करता है',
     apple: 'Apple Music (कैटलॉग, झलकियाँ)',
     folders: 'आपके फ़ोल्डर',
   },
@@ -147,5 +147,5 @@ export const hi: Copy = {
     ],
   },
   community: { title: 'समुदाय से जुड़ें', text: 'दूसरे श्रोताओं और लेखक से सवाल, विचार, मदद और ख़बरें, Discord पर।', join: 'Discord से जुड़ें', discussions: 'GitHub Discussions' },
-  footer: { community: 'समुदाय', legal: 'कानूनी', code: 'सोर्स उपलब्ध। इस्तेमाल मुफ़्त। कोड [GitHub] पर।', releases: 'रिलीज़', docs: 'डेवलपर के लिए दस्तावेज़', license: 'लाइसेंस', notices: 'तीसरे पक्ष के लाइसेंस', font: 'फ़ॉन्ट लाइसेंस', marks: 'Spotify, YouTube और Apple Music अपने मालिकों के ट्रेडमार्क हैं।' },
+  footer: { community: 'समुदाय', legal: 'कानूनी', code: 'सोर्स उपलब्ध। इस्तेमाल मुफ़्त। कोड [GitHub] पर।', releases: 'रिलीज़', docs: 'डेवलपर के लिए दस्तावेज़', license: 'लाइसेंस', notices: 'तीसरे पक्ष के लाइसेंस', font: 'फ़ॉन्ट लाइसेंस', marks: 'Spotify, YouTube और Apple Music अपने मालिकों के ट्रेडमार्क हैं।', unaffiliated: 'Spotify, Spotify AB का ट्रेडमार्क है। Legato का Spotify से कोई संबंध नहीं है और न ही Spotify इसका समर्थन करता है।' },
 }

@@ -12,8 +12,8 @@ export const id: Copy = {
     free: 'Gratis · Windows 10 dan 11',
     version: 'Versi {version}',
     android: 'Beta Android',
-    works: 'Bekerja dengan',
-    spotify: 'Spotify (playlist, kunci aplikasimu sendiri)',
+    works: 'Musikmu',
+    spotify: 'Mengimpor playlist Spotify-mu',
     apple: 'Apple Music (katalog, cuplikan)',
     folders: 'Foldermu',
   },
@@ -147,5 +147,5 @@ export const id: Copy = {
     ],
   },
   community: { title: 'Gabung dengan komunitas', text: 'Pertanyaan, ide, bantuan, dan kabar dari pendengar lain dan penulisnya, di Discord.', join: 'Gabung ke Discord', discussions: 'GitHub Discussions' },
-  footer: { community: 'Komunitas', legal: 'Legal', code: 'Sumber bisa dilihat. Gratis dipakai. Kode di [GitHub].', releases: 'Rilis', docs: 'Dokumen untuk pengembang', license: 'Lisensi', notices: 'Lisensi pihak ketiga', font: 'Lisensi font', marks: 'Spotify, YouTube, dan Apple Music adalah merek dagang pemiliknya.' },
+  footer: { community: 'Komunitas', legal: 'Legal', code: 'Sumber bisa dilihat. Gratis dipakai. Kode di [GitHub].', releases: 'Rilis', docs: 'Dokumen untuk pengembang', license: 'Lisensi', notices: 'Lisensi pihak ketiga', font: 'Lisensi font', marks: 'Spotify, YouTube, dan Apple Music adalah merek dagang pemiliknya.', unaffiliated: 'Spotify adalah merek dagang Spotify AB. Legato tidak berafiliasi dengan atau didukung oleh Spotify.' },
 }

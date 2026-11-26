@@ -12,8 +12,8 @@ export const zh: Copy = {
     free: '免费 · Windows 10 和 11',
     version: '版本 {version}',
     android: 'Android 测试版',
-    works: '支持',
-    spotify: 'Spotify（歌单，你自己的应用密钥）',
+    works: '你的音乐',
+    spotify: '导入你的 Spotify 歌单',
     apple: 'Apple Music（曲库，试听）',
     folders: '你的文件夹',
   },
@@ -147,5 +147,5 @@ export const zh: Copy = {
     ],
   },
   community: { title: '加入社区', text: '来自其他听众和作者的提问、想法、帮助和消息，在 Discord 上。', join: '加入 Discord', discussions: 'GitHub Discussions' },
-  footer: { community: '社区', legal: '法律信息', code: '源码公开。免费使用。代码在 [GitHub] 上。', releases: '版本发布', docs: '开发者文档', license: '许可证', notices: '第三方许可证', font: '字体许可证', marks: 'Spotify、YouTube 和 Apple Music 是其各自所有者的商标。' },
+  footer: { community: '社区', legal: '法律信息', code: '源码公开。免费使用。代码在 [GitHub] 上。', releases: '版本发布', docs: '开发者文档', license: '许可证', notices: '第三方许可证', font: '字体许可证', marks: 'Spotify、YouTube 和 Apple Music 是其各自所有者的商标。', unaffiliated: 'Spotify 是 Spotify AB 的商标。Legato 与 Spotify 没有关联，也未获其认可。' },
 }

@@ -12,8 +12,8 @@ export const it: Copy = {
     free: 'Gratis · Windows 10 e 11',
     version: 'Versione {version}',
     android: 'Beta per Android',
-    works: 'Funziona con',
-    spotify: 'Spotify (playlist, la tua chiave app)',
+    works: 'La tua musica',
+    spotify: 'Importa le tue playlist di Spotify',
     apple: 'Apple Music (catalogo, anteprime)',
     folders: 'Le tue cartelle',
   },
@@ -147,5 +147,5 @@ export const it: Copy = {
     ],
   },
   community: { title: 'Unisciti alla community', text: 'Domande, idee, aiuto e novità da altri ascoltatori e dall’autore, su Discord.', join: 'Unisciti al Discord', discussions: 'GitHub Discussions' },
-  footer: { community: 'Community', legal: 'Note legali', code: 'Sorgente disponibile. Gratis da usare. Codice su [GitHub].', releases: 'Versioni', docs: 'Documentazione per sviluppatori', license: 'Licenza', notices: 'Licenze di terze parti', font: 'Licenza del carattere', marks: 'Spotify, YouTube e Apple Music sono marchi dei rispettivi proprietari.' },
+  footer: { community: 'Community', legal: 'Note legali', code: 'Sorgente disponibile. Gratis da usare. Codice su [GitHub].', releases: 'Versioni', docs: 'Documentazione per sviluppatori', license: 'Licenza', notices: 'Licenze di terze parti', font: 'Licenza del carattere', marks: 'Spotify, YouTube e Apple Music sono marchi dei rispettivi proprietari.', unaffiliated: 'Spotify è un marchio di Spotify AB. Legato non è affiliato a Spotify né approvato da Spotify.' },
 }

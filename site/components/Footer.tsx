@@ -57,6 +57,7 @@ export function Footer({ base = '' }: { base?: string }) {
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-x-8 gap-y-2 border-t border-line-soft px-(--pad) py-6 text-[13px] text-ink-2">
         <p>{linked(c.footer.code, GITHUB, 'text-ink underline decoration-line underline-offset-4 hover:decoration-ink')}</p>
         <p>{c.footer.marks} Simple Icons (CC0).</p>
+        <p data-brand>{c.footer.unaffiliated}</p>
       </div>
     </footer>
   )
