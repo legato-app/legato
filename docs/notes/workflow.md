@@ -59,6 +59,8 @@ need. The repository is public: nothing about a person, a machine, an account or
 - A Beta every 30 points only (the owner, 2026-11-26: too many versions): count the lines ticked since the last Beta
   (`S` = 1, `M` = 2, `L` = 3; see "The plan"). Below 30, the work stays local; a push that must go out sooner (an
   urgent fix, the owner's ask) or a docs-only push carries `[skip release]` on its head commit.
+- Between Betas, push `platforms` itself (never `master`) after each reviewed batch: `check` runs on it (macOS and e2e
+  included) and no release follows, so a red CI is found on the batch that caused it.
 - Only on the owner's word. A push to `master` is a Beta release (`release.yml`) and can deploy the website. Stable is
   never promoted without the owner trying the Beta first.
 - Before a push, the leak check on the whole range, not only the tree:

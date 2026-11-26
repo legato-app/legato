@@ -74,6 +74,10 @@ account. Old share links are not read any more (the owner's word).
 - Written for a human contributor (the owner's word, 2026-11-25): names say what a thing is in whole words
   (`playlistSort`, not `ps`; one letter only in a tiny lambda or a loop index), one job per function, a comment for
   the why the code can't show. New code follows it; old code gets renamed when a change touches it, not in bulk.
+- Backward compatible (the owner's word, 2026-11-26): a big change keeps what users already have working. A library,
+  settings, theme, `.lmix`, plugin or sync file written by an older version still opens (migrate it, never drop it);
+  a newer one opened by an older version is kept as is, not rewritten; synced PCs on two versions don't undo each
+  other. Each migration gets a test with an old fixture.
 - `shared/api.ts` is the only place that calls `invoke`; its types come from Rust (ts-rs, `pnpm types` →
   `shared/generated/`, committed), never written by hand.
 - No network from the front end, images included: `shared/art.ts` → the `art` scheme (host allowlist, disk cache).
