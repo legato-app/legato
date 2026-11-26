@@ -451,7 +451,7 @@ mod tests {
 
     #[test]
     fn state_moves_on_while_playing() {
-        let n = NowPlaying { title: "A".into(), artist: "B".into(), album: None, playing: false, position_ms: 5_000, duration_ms: Some(6_000) };
+        let n = NowPlaying { title: "A".into(), artist: "B".into(), album: None, playing: false, position_ms: 5_000, duration_ms: Some(6_000), youtube: false };
         set_now(Some(&n), None, Some("https://i.ytimg.com/vi/x/hq.jpg"));
         let first: serde_json::Value = serde_json::from_str(&state_json()).unwrap();
         assert_eq!((first["positionMs"].as_u64(), first["cover"].as_u64().is_some()), (Some(5_000), true));

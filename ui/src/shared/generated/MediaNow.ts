@@ -4,4 +4,8 @@ export type MediaNow = { title: string, artist: string, album: string | null, pl
 /**
  * None = unknown yet: no seek bar.
  */
-durationMs: number | null, };
+durationMs: number | null, 
+/**
+ * YouTube plays it (the Discord presence's artist picture is asked of YouTube Music only then).
+ */
+youtube: boolean, };

@@ -15,6 +15,9 @@ pub struct NowPlaying {
     pub position_ms: u64,
     /// None = unknown yet: no seek bar.
     pub duration_ms: Option<u64>,
+    /// YouTube plays it (the Discord presence's artist picture is asked of YouTube Music only then).
+    #[serde(default)]
+    pub youtube: bool,
 }
 
 /// ms → WinRT TimeSpan ticks (100 ns).

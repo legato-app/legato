@@ -7,7 +7,7 @@ import { nowTrack, type NowPlaying, usePlayer } from './store'
 /** Windows media panel / tray payload. Library row gives album and cover. */
 export function mediaNow(now: NowPlaying | undefined, playing: boolean, track?: LibraryTrack, positionMs = 0, durationMs: number | null = null): MediaNow | null {
   if (!now) return null
-  return { title: now.title, artist: now.artist, album: track?.album ?? null, playing, positionMs: Math.max(0, Math.round(positionMs)), durationMs: durationMs && Math.round(durationMs) }
+  return { title: now.title, artist: now.artist, album: track?.album ?? null, playing, positionMs: Math.max(0, Math.round(positionMs)), durationMs: durationMs && Math.round(durationMs), youtube: now.via === 'youtube' }
 }
 
 /** Media keys and panel buttons; toggle comes from the tray menu. */
@@ -37,7 +37,7 @@ export interface Pushed {
 export function needsPush(last: Pushed | null, info: MediaNow | null, now: number): boolean {
   if (!last || !last.info || !info) return last?.info !== info
   const a = last.info
-  if (a.title !== info.title || a.artist !== info.artist || a.album !== info.album || a.playing !== info.playing || a.durationMs !== info.durationMs) return true
+  if (a.title !== info.title || a.artist !== info.artist || a.album !== info.album || a.playing !== info.playing || a.durationMs !== info.durationMs || a.youtube !== info.youtube) return true
   const expected = a.positionMs + (a.playing ? now - last.at : 0)
   return Math.abs(info.positionMs - expected) > 2000 || (info.playing && now - last.at > 10_000)
 }

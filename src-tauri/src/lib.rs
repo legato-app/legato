@@ -193,6 +193,8 @@ struct AppState {
     media_last: Mutex<Option<String>>,
     /// Notification area icon. None if it couldn't be created.
     tray: Option<tray::Tray>,
+    /// The artist of the song playing, and whether YouTube plays it (`media_update`): Discord's small picture.
+    playing_artist: Mutex<Option<(String, bool)>>,
     /// Discord Rich Presence, for the plugins allowed to set it (idle until one does).
     discord: discord::Discord,
 }
@@ -294,6 +296,9 @@ struct Caches {
     /// Mixes' discoveries: radios of their leading songs, asked a few times a day.
     radios: Ttl<Vec<Track>>,
     artists: Ttl<Option<Artist>>,
+    /// The Rich Presence's artist pages, found by name with no song to check them against (the first of that name, unchecked): NEVER
+    /// read by `artist_picture` / `ytm_artist`, or a wrong same-named artist would be served as theirs (lot 51).
+    presence_artists: Ttl<Option<Artist>>,
     /// Album pages from the Apple catalog (None = not in the store): change rarely.
     albums: Ttl<Option<music_connectors::itunes::Album>>,
     /// Video → may it play in an embed (oEmbed).
@@ -315,6 +320,7 @@ impl Default for Caches {
             lists: Ttl::new(Duration::from_secs(15 * 60), 30),
             radios: Ttl::new(Duration::from_secs(12 * 3600), 16),
             artists: Ttl::new(Duration::from_secs(30 * 60), 32),
+            presence_artists: Ttl::new(Duration::from_secs(30 * 60), 32),
             albums: Ttl::new(Duration::from_secs(24 * 3600), 64),
             embeds: Ttl::new(Duration::from_secs(24 * 3600), 2000),
         }
@@ -598,6 +604,7 @@ fn hold_page(app: tauri::AppHandle) {
 #[tauri::command]
 async fn media_update(app: tauri::AppHandle, state: State<'_, AppState>, now: Option<media::NowPlaying>, track_id: Option<i64>, art: Option<String>) -> CmdResult<()> {
     remote::set_now(now.as_ref(), track_id, art.as_deref());
+    *state.playing_artist.lock().unwrap() = now.as_ref().map(|n| (n.artist.clone(), n.youtube));
     let playing = now.as_ref().is_some_and(|n| n.playing);
     background::set_playing(playing);
     background::played(&app, playing, now.as_ref().map_or(0, |n| n.position_ms));
@@ -856,7 +863,7 @@ pub fn run() {
                 }
             });
 
-            app.manage(AppState { app: app.handle().clone(), lib: Mutex::new(lib), store: secrets::store(&app.config().identifier, &dir), open, player: Player::spawn(), shield, art: music_connectors::art::ArtCache::new(dir.join("art"), 500 << 20), cache: Caches::default(), nearby: Arc::new(Mutex::new(NearbyState::Idle)), nearby_task: Mutex::default(), media, media_last: Mutex::default(), tray, discord: discord::Discord::spawn() });
+            app.manage(AppState { app: app.handle().clone(), lib: Mutex::new(lib), store: secrets::store(&app.config().identifier, &dir), open, player: Player::spawn(), shield, art: music_connectors::art::ArtCache::new(dir.join("art"), 500 << 20), cache: Caches::default(), nearby: Arc::new(Mutex::new(NearbyState::Idle)), nearby_task: Mutex::default(), media, media_last: Mutex::default(), tray, playing_artist: Mutex::default(), discord: discord::Discord::spawn() });
             // The output device picked in the player menu.
             outputs::apply(&app.state::<AppState>());
             // Reads the library's settings: after AppState.
@@ -889,6 +896,21 @@ pub fn run() {
 mod tests {
     use super::*;
 
+    /// Lot 51: the Rich Presence looks an artist up by name with no songs to check it, so its page must never be what `artist_picture`
+    /// and `ytm_artist` read (a wrong same-named artist's picture and songs).
+    #[test]
+    fn an_unchecked_presence_page_is_invisible_to_the_checked_lookups() {
+        let c = Caches::default();
+        let page = Artist { name: "Strano".into(), art: Some("https://x/y".into()), songs: vec![], all_songs: None, shelves: vec![], about: None, related: vec![] };
+        for key in ["strano", "", "a|b", "STRANO".to_lowercase().as_str()] {
+            c.presence_artists.put(key, Some(page.clone()));
+            assert!(c.artists.get(key).is_none(), "{key:?}");
+            assert!(c.presence_artists.get(key).is_some());
+        }
+        // The other way round is allowed: a checked page may serve the presence.
+        c.artists.put("other", Some(page));
+        assert!(c.presence_artists.get("other").is_none() && c.artists.get("other").is_some());
+    }
     use crate::versions::checked_hit;
 
     /// CLAUDE.md: a sync command runs on the window's thread, so one that locks the library freezes the app (a sync

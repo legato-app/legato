@@ -89,8 +89,36 @@ impl Pace {
     }
 }
 
+/// Between two lookups nobody waits for.
+const SPARSE_GAP: Duration = Duration::from_secs(60);
 /// After a refusal of lookups and lists: three times a real block (5 min, 2026-10-31).
 const REFUSED_WAIT: Duration = Duration::from_secs(15 * 60);
+
+/// Lookups nobody waits for (Discord's artist picture, the owner's choice 2026-11-06): one a minute at most, none for
+/// 15 minutes after a refusal. One not taken just isn't asked.
+#[derive(Default)]
+pub struct Sparse {
+    next: Option<Instant>,
+}
+
+impl Sparse {
+    pub const fn new() -> Self {
+        Sparse { next: None }
+    }
+
+    /// May one start now; if so, the next waits a minute.
+    pub fn take(&mut self, now: Instant) -> bool {
+        if self.next.is_some_and(|at| now < at) {
+            return false;
+        }
+        self.next = Some(now + SPARSE_GAP);
+        true
+    }
+
+    pub fn refused(&mut self, now: Instant) {
+        self.next = Some(now + REFUSED_WAIT);
+    }
+}
 
 /// YouTube Music's lists and radios (Up next's end, a mix, the Mixes page, a Home card): after a refusal none is asked for
 /// 15 minutes, by any of them; they answer at once from the cache or with an error (2026-11-18: each run-out asked again).
@@ -249,6 +277,18 @@ mod tests {
         assert!(l.may_ask("abba", t0 + Duration::from_secs(7 * 3600)));
         l.refused(t0);
         assert!(!l.may_ask("queen", t0 + Duration::from_secs(600)) && l.may_ask("queen", t0 + Duration::from_secs(16 * 60)));
+    }
+
+    #[test]
+    fn sparse_lookups_one_a_minute_none_for_a_quarter_hour_after_a_refusal() {
+        let t = Instant::now();
+        let mut s = Sparse::new();
+        assert!(s.take(t));
+        assert!(!s.take(t + 59 * SECOND));
+        assert!(s.take(t + 60 * SECOND));
+        s.refused(t + 61 * SECOND);
+        assert!(!s.take(t + 61 * SECOND + 14 * 60 * SECOND));
+        assert!(s.take(t + 61 * SECOND + 15 * 60 * SECOND));
     }
 
     fn song(title: &str, artist: &str) -> Track {

@@ -75,7 +75,8 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 256 characters at most, not a Discord link, else left out)`, buttons?: [{ label, url }]` (2, label 1-32, https, 512
 characters at most)`, playing, positionMs, durationMs?, shows: 'name' | 'artist' | 'song' | 'both' }`. Title, artist
 and album are cut at 128 characters. Updates are spaced 4 s apart and retried while Discord is closed; `set` answers
-the state known so far.
+the state known so far. The app adds the small round picture of the playing song's artist by itself (for a song
+YouTube plays, asked of YouTube Music sparingly; it may come a moment later).
 
 `app.library.search(query, limit)` (`library:read`): title, artist or album; 100 results at most (the default); a query
 of 200 characters at most; one search at a time. It gives songs as `library.tracks()` does. Songs now carry `art`: an

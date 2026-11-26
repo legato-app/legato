@@ -99,7 +99,7 @@ mod tests {
     use super::*;
 
     fn np(title: &str) -> NowPlaying {
-        NowPlaying { title: title.into(), artist: "Daft Punk".into(), album: None, playing: true, position_ms: 0, duration_ms: None }
+        NowPlaying { title: title.into(), artist: "Daft Punk".into(), album: None, playing: true, position_ms: 0, duration_ms: None, youtube: false }
     }
 
     #[test]

@@ -227,8 +227,25 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
             Ok(json!({ "id": p.id, "name": p.name, "custom": p.custom, "tracks": tracks.iter().map(track_json).collect::<Vec<_>>() }))
         }
         "discord.set" => {
-            let (client_id, presence) = music_connectors::discord::from_plugin(a.clone()).map_err(|e| e.to_string())?;
+            let (client_id, mut presence) = music_connectors::discord::from_plugin(a.clone()).map_err(|e| e.to_string())?;
+            // The artist's small picture, of the song the app plays (never a name only the plugin gave). The plugin's
+            // answer waits for no request: a picture not known yet is asked for behind, for a song YouTube plays.
+            let playing = state.playing_artist.lock().unwrap().clone();
+            let unknown = playing.filter(|(artist, _)| crate::discord::same_artist(&presence.artist, crate::discord::looked_up(artist))).and_then(|(artist, youtube)| {
+                let name = crate::discord::looked_up(&artist).to_string();
+                match crate::discord::known_picture(&state, &name) {
+                    Some(picture) => {
+                        presence.artist_art = picture;
+                        None
+                    }
+                    None => youtube.then_some(name),
+                }
+            });
             state.discord.send(crate::discord::Update::Set { client_id, presence: Some(presence) });
+            if let Some(name) = unknown {
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move { crate::discord::find_picture(&app.state::<AppState>(), name).await });
+            }
             Ok(json!(state.discord.status()))
         }
         "discord.clear" => {
