@@ -38,8 +38,12 @@ function hero(theme, device) {
   render(['--variant', theme, '--shot', device, '--frames', String(HERO.frames), '--size', HERO.size, '--out', `${frames}####`])
   const input = ['-y', '-framerate', String(HERO.rate), '-i', `${frames}%04d.png`]
   const name = join(out, `${device}-${theme}`)
-  run('ffmpeg', [...input, ...onPage(theme, HERO.size), '-c:v', 'libvpx-vp9', '-crf', '40', '-b:v', '0', '-row-mt', '1', '-an', `${name}.webm`])
-  run('ffmpeg', [...input, ...onPage(theme, HERO.size), '-c:v', 'libx264', '-crf', '27', '-preset', 'slow', '-movflags', '+faststart', '-an', `${name}.mp4`])
+  // The phone's move is played by the scroll (site DeviceScene): a keyframe every frame, so a seek lands at once; a
+  // little more compression keeps it near 1 MB. The others play once.
+  const scrubbed = device === 'phone'
+  const [webm, mp4] = scrubbed ? [['-g', '1', '-crf', '46'], ['-g', '1', '-crf', '30']] : [['-crf', '40'], ['-crf', '27']]
+  run('ffmpeg', [...input, ...onPage(theme, HERO.size), '-c:v', 'libvpx-vp9', ...webm, '-b:v', '0', '-row-mt', '1', '-an', `${name}.webm`])
+  run('ffmpeg', [...input, ...onPage(theme, HERO.size), '-c:v', 'libx264', ...mp4, '-preset', 'slow', '-movflags', '+faststart', '-an', `${name}.mp4`])
   const last = `${frames}${String(HERO.frames).padStart(4, '0')}.png`
   run('ffmpeg', ['-y', '-i', last, ...onPage(theme, HERO.size), '-frames:v', '1', '-c:v', 'libwebp', '-quality', '80', `${name}.webp`])
 }

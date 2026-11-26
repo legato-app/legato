@@ -14,6 +14,8 @@ floating around them. Nothing is modelled by hand, so the renders can be made ag
     - anything else → the monitor.
   - Each move is a WebM (VP9) with an MP4 (H.264) fallback, plus its last frame as a WebP poster. Reduced motion shows
     the poster only.
+  - On a phone the scroll plays the move (the scene rises, then fades into the phone with the live demo), so the phone's
+    files have a keyframe on every frame (`-g 1`, about 1 MB each); the others play once at load.
   - Files: `site/public/landing/{phone,monitor,laptop}-{dark,light}.{webm,mp4,webp}`.
   - The videos are laid on the page colour (`#131313` / `#FFFFFF`), not transparent, because Safari plays no WebM with
     alpha.
