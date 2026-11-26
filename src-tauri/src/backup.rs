@@ -2,7 +2,25 @@
 
 use crate::{AppState, CmdResult, err};
 use std::path::Path;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
+
+/// Once, after the first screen: the mixes older versions synced leave the library (`library::mix_cleanup`), after a
+/// copy of it next to it. No copy, no cleanup (tried again next start).
+pub fn remove_old_mixes(app: &AppHandle) {
+    let Some(state) = app.try_state::<AppState>() else { return };
+    if !matches!(state.lib().mix_cleanup_pending(), Ok(true)) {
+        return;
+    }
+    let copied = app.path().app_data_dir().map_err(anyhow::Error::from).and_then(|dir| music_core::library::back_up_before_mix_cleanup(&dir.join("library.db")));
+    // The library is locked only once the copy is made.
+    match copied.and_then(|_| state.lib().remove_made_up_mixes()) {
+        Ok(removed) => {
+            crate::diag::info("library", "old YouTube mixes removed", &format!("{} lists, {} songs", removed.playlists, removed.songs));
+            let _ = app.emit_to("main", "local-changed", 0);
+        }
+        Err(e) => crate::diag::warn("library", "old YouTube mixes not removed", &format!("{e:#}")),
+    }
+}
 
 /// A consistent copy of the library at `path`, the user's pick.
 #[tauri::command]

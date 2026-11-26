@@ -5,6 +5,7 @@
 use anyhow::{Context, Result, bail};
 use async_trait::async_trait;
 use music_core::lyrics::Line;
+use music_core::library::is_made_up_mix;
 use music_core::matching::{best_match, is_count};
 use music_core::model::{Connector, PlaylistRead, PlaylistRef, Source, Track};
 use music_core::musicness::{Clues, VideoType, classify};
@@ -559,7 +560,7 @@ impl Connector for YouTubeMusic {
             // SE = Episodes for Later (podcasts, not music). RD = a mix YouTube makes up again at each request (a radio,
             // "My Supermix", a mood mix saved to the library): synced, it brought ~1,000 songs never chosen into Songs at
             // every sync (2026-11-19). Opened from Home instead. RDCLAK = YouTube's own playlists: fixed, kept.
-            if id == "SE" || (id.starts_with("RD") && !id.starts_with("RDCLAK")) {
+            if is_made_up_mix(id) {
                 continue;
             }
             let mut name = item.get("title").and_then(text).unwrap_or_else(|| id.to_string());

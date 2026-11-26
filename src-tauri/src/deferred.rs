@@ -53,6 +53,10 @@ fn start(app: &AppHandle, cause: Cause) {
     if let Some(state) = app.try_state::<crate::AppState>() {
         state.art.prune_later();
     }
+    {
+        let app = app.clone();
+        tauri::async_runtime::spawn_blocking(move || crate::backup::remove_old_mixes(&app));
+    }
     // Each plugin opens a QuickJS runtime and a thread: off the async workers' way.
     #[cfg(desktop)]
     {

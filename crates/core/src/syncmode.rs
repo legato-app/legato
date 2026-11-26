@@ -6,7 +6,7 @@
 //! ChaCha20-Poly1305). Secrets travel only sealed; otherwise other PCs get the account list and sign in again.
 //! Local files stay per PC: their songs are matched by title, artist and length on the other side.
 
-use crate::library::{Library, now_ms};
+use crate::library::{Library, is_made_up_mix, now_ms};
 use crate::model::{Source, Track};
 use anyhow::{Context, Result, anyhow, bail, ensure};
 use chacha20poly1305::aead::{Aead, KeyInit};
@@ -17,7 +17,7 @@ use flate2::write::GzEncoder;
 use rusqlite::{OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::io::Read;
 use std::path::PathBuf;
 
@@ -94,6 +94,33 @@ pub struct PlaylistSnap {
     /// Merged one by one, not replaced with the playlist (a PC that never saw an add must not drop it); absent from older files.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub added: Vec<(u32, i64)>,
+}
+
+impl PlaylistSnap {
+    fn made_up_mix(&self) -> bool {
+        !self.custom && self.key.strip_prefix("youtube:").is_some_and(is_made_up_mix)
+    }
+}
+
+impl Snapshot {
+    /// Tracks (indexes) its made-up mixes hold and nothing of the user's names: no other list, add, preference,
+    /// rating, play or edit.
+    fn only_in_made_up_mixes(&self) -> HashSet<u32> {
+        let (mixes, others): (Vec<&PlaylistSnap>, Vec<&PlaylistSnap>) = self.playlists.iter().partition(|p| p.made_up_mix());
+        let mut only: HashSet<u32> = mixes.iter().flat_map(|p| p.tracks.iter().copied()).collect();
+        let named = others
+            .iter()
+            .flat_map(|p| p.tracks.iter().copied())
+            .chain(self.playlists.iter().flat_map(|p| p.added.iter().map(|(i, _)| *i)))
+            .chain(self.prefs.iter().map(|(i, ..)| *i))
+            .chain(self.ratings.iter().map(|(i, ..)| *i))
+            .chain(self.plays.iter().map(|(i, ..)| *i))
+            .chain(self.edits.iter().filter_map(|e| e.song.as_deref()?.strip_prefix("t#")?.parse().ok()));
+        for i in named {
+            only.remove(&i);
+        }
+        only
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -557,14 +584,17 @@ impl Library {
             local.insert(i, id);
             Ok(id)
         };
-        for i in &s.library {
+        // A PC not cleaned of the made-up mixes yet (`library::mix_cleanup`): neither they nor the songs only they hold
+        // come back.
+        let only_in_mixes = s.only_in_made_up_mixes();
+        for i in s.library.iter().filter(|i| !only_in_mixes.contains(i)) {
             row(*i, &mut m)?;
         }
 
         // 4. Playlists: the newer one wins whole (name, songs, order); the songs added to an imported one merge one by one.
         for p in &s.playlists {
             let Some((source, source_id)) = p.key.split_once(':') else { continue };
-            if serde_json::from_value::<Source>(Value::String(source.into())).is_err() || p.updated <= self.gone_at("playlist", &p.key)? {
+            if serde_json::from_value::<Source>(Value::String(source.into())).is_err() || p.made_up_mix() || p.updated <= self.gone_at("playlist", &p.key)? {
                 continue;
             }
             let here: Option<(i64, i64)> = self.db.query_row("SELECT id, updated FROM playlists WHERE source = ?1 AND source_id = ?2", params![source, source_id], |r| Ok((r.get(0)?, r.get(1)?))).optional()?;
@@ -1125,6 +1155,17 @@ mod tests {
         assert!(names(&b).is_empty());
         a.merge(&old_b)?;
         assert!(names(&a).is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn another_pcs_made_up_mixes_do_not_come_back() -> Result<()> {
+        let (a, b) = (Library::in_memory()?, Library::in_memory()?);
+        a.save_playlist(Source::Youtube, "RDTMAK5", "My Mix", &[song("Only", "o1"), song("Kept", "k1")])?;
+        a.save_playlist(Source::Youtube, "PL1", "Mine", &[song("Kept", "k1")])?;
+        b.merge(&a.snapshot("pc-a", "A", Default::default(), None)?)?;
+        assert_eq!(b.playlists()?.into_iter().map(|p| p.source_id).collect::<Vec<_>>(), ["PL1"]);
+        assert_eq!(b.tracks()?.into_iter().map(|t| t.track.title).collect::<Vec<_>>(), ["Kept"]);
         Ok(())
     }
 
