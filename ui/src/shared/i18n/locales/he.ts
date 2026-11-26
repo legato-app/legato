@@ -1261,6 +1261,7 @@ const he: Record<string, string> = {
   'Keep the current look': 'שמירת המראה הנוכחי',
   'Colors only': 'צבעים בלבד',
   'Parts of the bars moved or hidden': 'חלקים מהסרגלים הוזזו או הוסתרו',
+  'Page headers arranged another way': 'כותרות העמודים מסודרות אחרת',
   'Default layout': 'פריסת ברירת המחדל',
   'Themes no longer arrange the app': 'ערכות הנושא כבר לא מסדרות את האפליקציה',
   'This theme’s layout didn’t work: the default layout is back': 'הפריסה של ערכת הנושא לא עבדה: פריסת ברירת המחדל חזרה',

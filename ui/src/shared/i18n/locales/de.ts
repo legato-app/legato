@@ -1297,6 +1297,7 @@ const de: Record<string, string> = {
   'Keep the current look': 'Aktuellen Look behalten',
   'Colors only': 'Nur Farben',
   'Parts of the bars moved or hidden': 'Teile der Leisten verschoben oder ausgeblendet',
+  'Page headers arranged another way': 'Seitenköpfe anders angeordnet',
   'Default layout': 'Standardanordnung',
   'Themes no longer arrange the app': 'Themes ordnen die App nicht mehr an',
   'This theme’s layout didn’t work: the default layout is back': 'Die Anordnung dieses Themes hat nicht funktioniert: Die Standardanordnung ist zurück',

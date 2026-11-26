@@ -1297,6 +1297,7 @@ const uk: Record<string, string> = {
   'Keep the current look': 'Зберегти поточний вигляд',
   'Colors only': 'Лише кольори',
   'Parts of the bars moved or hidden': 'Частини панелей переміщено або приховано',
+  'Page headers arranged another way': 'Заголовки сторінок розташовано інакше',
   'Default layout': 'Типове розташування',
   'Themes no longer arrange the app': 'Теми більше не змінюють розташування елементів',
   'This theme’s layout didn’t work: the default layout is back': 'Розташування цієї теми не спрацювало: повернено типове',

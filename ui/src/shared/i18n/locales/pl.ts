@@ -1297,6 +1297,7 @@ const pl: Record<string, string> = {
   'Keep the current look': 'Zachowaj obecny styl',
   'Colors only': 'Tylko kolory',
   'Parts of the bars moved or hidden': 'Części pasków przeniesione lub ukryte',
+  'Page headers arranged another way': 'Nagłówki stron ułożone inaczej',
   'Default layout': 'Domyślny układ',
   'Themes no longer arrange the app': 'Motywy nie układają już aplikacji',
   'This theme’s layout didn’t work: the default layout is back': 'Układ tego motywu nie zadziałał: wrócił domyślny',

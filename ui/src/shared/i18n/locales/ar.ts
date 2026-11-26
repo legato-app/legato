@@ -1261,6 +1261,7 @@ const ar: Record<string, string> = {
   'Keep the current look': 'احتفظ بالمظهر الحالي',
   'Colors only': 'الألوان فقط',
   'Parts of the bars moved or hidden': 'نُقلت أجزاء من الأشرطة أو أُخفيت',
+  'Page headers arranged another way': 'رؤوس الصفحات مرتّبة بشكل مختلف',
   'Default layout': 'التخطيط الافتراضي',
   'Themes no longer arrange the app': 'لم تعد السمات ترتّب التطبيق',
   'This theme’s layout didn’t work: the default layout is back': 'تعذّر تطبيق تخطيط هذه السمة: عاد التخطيط الافتراضي',

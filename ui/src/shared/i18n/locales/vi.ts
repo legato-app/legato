@@ -1297,6 +1297,7 @@ const vi: Record<string, string> = {
   'Keep the current look': 'Giữ phong cách hiện tại',
   'Colors only': 'Chỉ màu sắc',
   'Parts of the bars moved or hidden': 'Một số phần của các thanh được di chuyển hoặc ẩn',
+  'Page headers arranged another way': 'Đầu trang được sắp xếp khác',
   'Default layout': 'Bố cục mặc định',
   'Themes no longer arrange the app': 'Chủ đề không còn sắp xếp ứng dụng',
   'This theme’s layout didn’t work: the default layout is back': 'Bố cục của chủ đề này không hoạt động: đã trở lại bố cục mặc định',

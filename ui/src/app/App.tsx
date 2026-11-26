@@ -12,6 +12,7 @@ import { appMenu, navMenu } from '../features/menus'
 import { startUpdates } from '../features/update/updates'
 import { startDeferred } from './deferred'
 import { PageBoundary } from './PageBoundary'
+import { PageLayout } from '../shared/ui/pageLayout'
 import { startBookmarks } from '../features/player/bookmarks'
 import { startMedia } from '../features/player/media'
 import { resumeSession, startSessionSaving } from '../features/player/session'
@@ -412,6 +413,8 @@ export function App() {
           {/* New page: a short rise (styles.css .page-in), not when only its details change. Its padding is what a
               page band undoes to reach the pane's edges (PageHeader). */}
           <div key={pageKey(view)} className="page-in flex min-h-0 flex-1 flex-col px-6 pt-5 phone:px-4 phone:pt-3">
+            {/* Settings and Add-ons keep the app's own pages, whatever the theme: the way back, the permission review. */}
+            <PageLayout.Provider value={view.name === 'settings' || view.name === 'addons' ? DEFAULT_LAYOUT.pages : placement.pages}>
             <PageBoundary>
               {view.name === 'home' && <HomeView />}
               {view.name === 'add' && <AddView />}
@@ -436,6 +439,7 @@ export function App() {
               {view.name === 'settings' && <SettingsView section={view.section} />}
               {view.name === 'addons' && <AddonsView />}
             </PageBoundary>
+            </PageLayout.Provider>
           </div>
         </main>
         {shell.regions.right.map((surface) => column(surface, 'right'))}

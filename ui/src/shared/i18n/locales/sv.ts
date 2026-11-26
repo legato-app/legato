@@ -1297,6 +1297,7 @@ const sv: Record<string, string> = {
   'Keep the current look': 'Behåll det nuvarande utseendet',
   'Colors only': 'Bara färger',
   'Parts of the bars moved or hidden': 'Delar av fälten flyttade eller dolda',
+  'Page headers arranged another way': 'Sidhuvudena ordnade annorlunda',
   'Default layout': 'Standardlayout',
   'Themes no longer arrange the app': 'Teman ordnar inte längre om appen',
   'This theme’s layout didn’t work: the default layout is back': 'Temats layout fungerade inte: standardlayouten är tillbaka',

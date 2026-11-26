@@ -1306,6 +1306,7 @@ const fr: Record<string, string> = {
   'Keep the current look': 'Garder l’apparence actuelle',
   'Colors only': 'Couleurs seulement',
   'Parts of the bars moved or hidden': 'Des éléments des barres déplacés ou masqués',
+  'Page headers arranged another way': 'Les en-têtes des pages disposés autrement',
   'Default layout': 'Disposition par défaut',
   'Themes no longer arrange the app': 'Les thèmes ne disposent plus l’application',
   'This theme’s layout didn’t work: the default layout is back': 'La disposition de ce thème n’a pas fonctionné : celle par défaut est revenue',

@@ -741,8 +741,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Add-ons; the sidebar's entries): the song, the progress bar, More, the search, Offline and the library only
       move; the top bar gets a More beside Settings when it hides something (a hidden top bar too), the library's
       header one for hidden entries; the warning says it in one line.
-  - [ ] `M` 7. The shared page header (`pages.header` in `PageHeader`). Tests: a pure `headerLayout` (clamps, unknown
-    values dropped, phone ignored).
+  - [x] `M` 7. The shared page header (`pages.header` in `PageHeader`). Tests: a pure `headerLayout` (clamps, unknown
+    values dropped, phone ignored). 2026-11-26: done (a `PageLayout` context from the shell); tests only, not seen in
+    this commit.
+    - Decided alone (2026-11-26): `{ art, artSize, kicker, sub, actions }`, art 120 to 320 px and only on pages with
+      art (the art redrawn at that size); Settings and Add-ons keep their own header; Spotify's attribution moved to a
+      `notice` line a theme can't leave out; the summary says it in one line.
   - [ ] `M` 8. `PAGE_PARTS`, `usePageParts`, the album, playlist and artist pages. Tests: per-page sanitize (fixed
     parts never hidden, unknown dropped, new parts at their default place).
   - [ ] `M` 9. Songs, Albums, Artists, and column order in `TrackTable`. Tests: column order resolve (Title and Artist

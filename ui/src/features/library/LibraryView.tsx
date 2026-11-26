@@ -390,12 +390,9 @@ export function PlaylistView({ id }: { id: number }) {
         }
         kicker={playlist.custom ? tr('Your playlist') : tr('Playlist · {source} · imported', { source: tr(sourceLabel[playlist.source]) })}
         title={playlist.custom ? <EditableTitle key={playlist.name} id={id} name={playlist.name} /> : playlist.name}
-        sub={
-          <>
-            {`${trn(playlist.trackCount, '{n} song', '{n} songs')} · ${totalTime(playlistTracks)}`}
-            {playlist.source === 'spotify' && !playlist.custom && <SpotifyAttribution sourceId={playlist.sourceId} />}
-          </>
-        }
+        sub={`${trn(playlist.trackCount, '{n} song', '{n} songs')} · ${totalTime(playlistTracks)}`}
+        // Spotify's policy: a theme can't leave it out.
+        notice={playlist.source === 'spotify' && !playlist.custom && <SpotifyAttribution sourceId={playlist.sourceId} />}
         actions={
           <>
             <PlayAll tracks={shown} />

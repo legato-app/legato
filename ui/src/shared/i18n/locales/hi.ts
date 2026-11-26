@@ -1297,6 +1297,7 @@ const hi: Record<string, string> = {
   'Keep the current look': 'मौजूदा लुक रखें',
   'Colors only': 'सिर्फ़ रंग',
   'Parts of the bars moved or hidden': 'पट्टियों के कुछ हिस्से खिसकाए या छिपाए गए',
+  'Page headers arranged another way': 'पेज के शीर्ष अलग तरह से लगाए गए',
   'Default layout': 'डिफ़ॉल्ट व्यवस्था',
   'Themes no longer arrange the app': 'थीम अब ऐप की व्यवस्था नहीं बदलती',
   'This theme’s layout didn’t work: the default layout is back': 'इस थीम की व्यवस्था काम नहीं कर पाई: डिफ़ॉल्ट व्यवस्था लौट आई है',

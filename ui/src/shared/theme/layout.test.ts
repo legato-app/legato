@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arrangeParts, DEFAULT_LAYOUT, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, headerLayout, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -71,6 +71,22 @@ describe('a bar’s parts', () => {
     const summary = (parts: unknown) => layoutSummary(sanitizeLayout({ v: 1, parts }) ?? undefined)
     expect(summary({ topbar: { hidden: ['addons'] } })).toEqual(['Parts of the bars moved or hidden'])
     expect(summary({ topbar: { order: ['history', 'search'] } })).toEqual([])
+  })
+})
+
+describe('headerLayout', () => {
+  it('keeps what differs from the page’s own, the size clamped, unknown values dropped', () => {
+    expect(headerLayout({ art: 'end', artSize: 900, kicker: false, sub: false, actions: 'beside', color: 'red' })).toEqual({ art: 'end', artSize: 320, kicker: false, sub: false, actions: 'beside' })
+    expect(headerLayout({ artSize: 3 })).toEqual({ artSize: 120 })
+    for (const raw of [undefined, 'top', {}, { art: 'start', kicker: true, sub: 'no' }, { art: 'left', artSize: '200', actions: 'above' }]) expect(headerLayout(raw), JSON.stringify(raw)).toBeUndefined()
+  })
+
+  it('travels in the layout, said in the warning, ignored on a phone', () => {
+    const layout = sanitizeLayout({ v: 1, pages: { header: { art: 'none' }, home: {} } })!
+    expect(layout.pages).toEqual({ header: { art: 'none' } })
+    expect(layoutSummary(layout)).toEqual(['Page headers arranged another way'])
+    expect(resolveLayout(layout).pages.header).toEqual({ art: 'none' })
+    expect(resolveLayout(layout, true).pages).toEqual({})
   })
 })
 

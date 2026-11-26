@@ -1297,6 +1297,7 @@ const id: Record<string, string> = {
   'Keep the current look': 'Simpan gaya saat ini',
   'Colors only': 'Hanya warna',
   'Parts of the bars moved or hidden': 'Bagian bilah dipindahkan atau disembunyikan',
+  'Page headers arranged another way': 'Kepala halaman ditata berbeda',
   'Default layout': 'Tata letak bawaan',
   'Themes no longer arrange the app': 'Tema tidak lagi menata aplikasi',
   'This theme’s layout didn’t work: the default layout is back': 'Tata letak tema ini gagal: tata letak bawaan dipakai lagi',

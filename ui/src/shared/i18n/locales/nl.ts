@@ -1297,6 +1297,7 @@ const nl: Record<string, string> = {
   'Keep the current look': 'Huidige look bewaren',
   'Colors only': 'Alleen kleuren',
   'Parts of the bars moved or hidden': 'Onderdelen van de balken verplaatst of verborgen',
+  'Page headers arranged another way': 'Paginakoppen anders ingedeeld',
   'Default layout': 'Standaardindeling',
   'Themes no longer arrange the app': 'Thema’s delen de app niet meer in',
   'This theme’s layout didn’t work: the default layout is back': 'De indeling van dit thema werkte niet: de standaardindeling is terug',

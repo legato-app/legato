@@ -1297,6 +1297,7 @@ const ru: Record<string, string> = {
   'Keep the current look': 'Сохранить текущий вид',
   'Colors only': 'Только цвета',
   'Parts of the bars moved or hidden': 'Части панелей перемещены или скрыты',
+  'Page headers arranged another way': 'Заголовки страниц расположены иначе',
   'Default layout': 'Расположение по умолчанию',
   'Themes no longer arrange the app': 'Темы больше не меняют расположение элементов',
   'This theme’s layout didn’t work: the default layout is back': 'Расположение этой темы не сработало: возвращено расположение по умолчанию',

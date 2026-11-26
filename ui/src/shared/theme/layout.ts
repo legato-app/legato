@@ -44,6 +44,27 @@ export interface PartsChoice {
 }
 type Parts = Partial<Record<PartedSurface, PartsChoice>>
 
+/** A page header's art: before the words, after them, over them, or left out. */
+const HEADER_ART = ['start', 'end', 'top', 'none'] as const
+const HEADER_ACTIONS = ['beside', 'below'] as const
+/** The art's size, px: a cover still reads, the title keeps its room. */
+const ART_MIN = 120
+const ART_MAX = 320
+
+/** The theme file's `pages.header`; what is absent stays the page's own. */
+export interface HeaderChoice {
+  art?: (typeof HEADER_ART)[number]
+  artSize?: number
+  /** false: the small line over the title is left out. */
+  kicker?: boolean
+  /** false: the line under the title is left out (a legal notice stays). */
+  sub?: boolean
+  actions?: (typeof HEADER_ACTIONS)[number]
+}
+export interface Pages {
+  header?: HeaderChoice
+}
+
 /** The theme file's `layout` key. */
 export interface Layout {
   v: number
@@ -51,6 +72,7 @@ export interface Layout {
   sizes?: Partial<Record<SizedSurface, number>>
   hidden?: Surface[]
   parts?: Parts
+  pages?: Pages
 }
 
 /** What the shell draws: every surface in one region, in order. */
@@ -59,10 +81,11 @@ export interface Placement {
   sizes: Partial<Record<SizedSurface, number>>
   hidden: Surface[]
   parts: Parts
+  pages: Pages
 }
 
 /** The app's own arrangement. */
-export const DEFAULT_LAYOUT: Placement = { regions: { top: ['brand', 'topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, sizes: {}, hidden: [], parts: {} }
+export const DEFAULT_LAYOUT: Placement = { regions: { top: ['brand', 'topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, sizes: {}, hidden: [], parts: {}, pages: {} }
 
 const record = (value: unknown): Record<string, unknown> | null => (value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null)
 
@@ -103,6 +126,27 @@ function sanitizeSizes(raw: unknown): Layout['sizes'] {
   return sizes.length ? Object.fromEntries(sizes) : undefined
 }
 
+/** A page header's choice: sizes clamped, unknown values and the app's own dropped; undefined when nothing is left. */
+export function headerLayout(raw: unknown): HeaderChoice | undefined {
+  const given = record(raw)
+  const art = HEADER_ART.find((place) => place === given?.art && place !== 'start')
+  const actions = HEADER_ACTIONS.find((place) => place === given?.actions)
+  const size = given?.artSize
+  const header: HeaderChoice = {
+    ...(art && { art }),
+    ...(typeof size === 'number' && Number.isFinite(size) && { artSize: Math.min(ART_MAX, Math.max(ART_MIN, Math.round(size))) }),
+    ...(given?.kicker === false && { kicker: false }),
+    ...(given?.sub === false && { sub: false }),
+    ...(actions && { actions }),
+  }
+  return Object.keys(header).length ? header : undefined
+}
+
+function sanitizePages(raw: unknown): Pages | undefined {
+  const header = headerLayout(record(raw)?.header)
+  return header && { header }
+}
+
 /** Trust boundary (a theme file, stored settings): what is valid is kept; null when nothing is. */
 export function sanitizeLayout(raw: unknown): Layout | null {
   const given = record(raw)
@@ -114,8 +158,9 @@ export function sanitizeLayout(raw: unknown): Layout | null {
   const sizes = sanitizeSizes(given.sizes)
   const hidden = surfaceList(given.hidden)
   const parts = sanitizeParts(given.parts)
-  if (!regions && !sizes && !hidden.length && !parts) return null
-  return { v: version, ...(regions && { regions }), ...(sizes && { sizes }), ...(hidden.length > 0 && { hidden }), ...(parts && { parts }) }
+  const pages = sanitizePages(given.pages)
+  if (!regions && !sizes && !hidden.length && !parts && !pages) return null
+  return { v: version, ...(regions && { regions }), ...(sizes && { sizes }), ...(hidden.length > 0 && { hidden }), ...(parts && { parts }), ...(pages && { pages }) }
 }
 
 /** `named`, then each of `defaults` not yet `placed`, at its default place (after its closest neighbor there). */
@@ -208,6 +253,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     !!sizes.sidebar && !hides('sidebar') && tr('The sidebar {n} px wide', { n: sizes.sidebar }),
     !!sizes.sidePanel && !hides('sidePanel') && tr('The side panel {n} px wide', { n: sizes.sidePanel }),
     partsChanged && tr('Parts of the bars moved or hidden'),
+    !!placement.pages.header && tr('Page headers arranged another way'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
 }
@@ -225,5 +271,5 @@ export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
 /** The arrangement to draw for a checked layout; the app's own without one, from a newer app, or on a phone. */
 export function resolveLayout(layout: Layout | undefined, phone = false): Placement {
   if (!layout || phone || layout.v > LAYOUT_API) return DEFAULT_LAYOUT
-  return { regions: placeEverySurface(layout.regions ?? {}), sizes: layout.sizes ?? {}, hidden: allowedHidden(layout.hidden ?? []), parts: layout.parts ?? {} }
+  return { regions: placeEverySurface(layout.regions ?? {}), sizes: layout.sizes ?? {}, hidden: allowedHidden(layout.hidden ?? []), parts: layout.parts ?? {}, pages: layout.pages ?? {} }
 }
