@@ -17,12 +17,17 @@ export function FitTitle({ title, floor, className }: { title: string; floor: nu
         element.style.fontSize = `${candidate}px`
         const style = getComputedStyle(element)
         const height = element.offsetHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
-        return element.scrollWidth <= element.clientWidth && height <= 2 * parseFloat(style.lineHeight) + 1
+        // "normal" parses to no number.
+        const lineHeight = parseFloat(style.lineHeight) || 1.1 * candidate
+        return element.scrollWidth <= element.clientWidth && height <= 2 * lineHeight + 1
       })
       element.style.fontSize = `${size}px`
       element.style.overflowWrap = 'anywhere'
     }
     fit()
+    // Measured again with the real font, should it come in after.
+    let mounted = true
+    void document.fonts.ready.then(() => mounted && fit())
     // Again when the room changes, not when only the height does (ours).
     let width = element.clientWidth
     const watch = new ResizeObserver(() => {
@@ -31,11 +36,9 @@ export function FitTitle({ title, floor, className }: { title: string; floor: nu
       fit()
     })
     watch.observe(element)
-    // The window's own size sets the classes' size too (a taller or shorter one at the same width).
-    window.addEventListener('resize', fit)
     return () => {
+      mounted = false
       watch.disconnect()
-      window.removeEventListener('resize', fit)
     }
   }, [title, floor, className])
   return (
