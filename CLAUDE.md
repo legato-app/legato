@@ -98,12 +98,11 @@ account. Old share links are not read any more (the owner's word).
 
 ## Commands
 - `pnpm dev`: the app with its own data (`app.legato.desktop.devbuild`), never the installed app's library.
-- `pnpm check`: types (Rust → TS) + typecheck + lint + Vitest + clippy + cargo test, green before every commit.
-- `pnpm test`, `cargo test --workspace`; `pnpm e2e`: smoke test of the built app; `pnpm build`: installer; `pnpm bench`:
-  start time, RAM and CPU on 10 000 songs (`app.legato.desktop.bench`, `docs/performance.md`).
-- Android: `. C:\dev\android\env.ps1; pnpm tauri android build --debug --target x86_64 --apk` (emulator AVD
-  `legato36`); a phone: `--target aarch64 --apk`, signed when `src-tauri/gen/android/keystore.properties` exists (never
-  in git).
+- Before a commit, only targeted tests, one at a time: `cargo test -p <crate> <name>`, `pnpm vitest run <file>`. The
+  full gate, `pnpm check` (types Rust → TS + typecheck + lint + Vitest + clippy + cargo test), runs in CI; `pnpm check`,
+  `cargo test --workspace`, `pnpm e2e`, `pnpm build` (installer) and `pnpm bench` (`docs/performance.md`) run locally
+  only when the owner asks.
+- Android builds: the `android-build` skill.
 
 ## Conventions
 - Comments in English, caveman style: `// Feb 2026: own playlists only.`
