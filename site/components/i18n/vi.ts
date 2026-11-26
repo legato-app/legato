@@ -8,15 +8,10 @@ export const vi: Copy = {
   hero: {
     lines: ['TẤT CẢ', 'trong một.'],
     criteria: ['Không có máy chủ riêng', 'Đa nền tảng', 'Giao diện hiện đại', 'Mã nguồn công khai'],
-    lead: 'Legato gom YouTube Music, Spotify, Apple Music và các tệp trên PC của bạn vào một thư viện và một trình phát, trên Windows, không cần tài khoản nào của chúng tôi.',
+    lead: 'YouTube, máy chủ nhạc và các tệp của bạn phát trong một trình phát; Spotify mang danh sách phát của bạn vào. Trên điện thoại, máy tính bàn và laptop của bạn.',
     download: 'Tải cho Windows',
     free: 'Miễn phí · Windows 10 và 11',
-    version: 'Phiên bản {version}',
     android: 'Bản beta Android',
-    works: 'Nhạc của bạn',
-    spotify: 'Nhập playlist Spotify của bạn',
-    apple: 'Apple Music (danh mục, đoạn nghe thử)',
-    folders: 'Thư mục của bạn',
   },
   story: {
     frame: 'Giao diện của Legato',

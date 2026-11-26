@@ -8,15 +8,10 @@ export const tr: Copy = {
   hero: {
     lines: ['HEPSİ', 'bir arada.'],
     criteria: ['Bize ait sunucu yok', 'Çok platformlu', 'Modern arayüz', 'Kaynak kodu erişilebilir'],
-    lead: 'Legato; YouTube Music, Spotify, Apple Music ve bilgisayarındaki dosyaları Windows’ta tek bir kitaplıkta ve tek bir oynatıcıda toplar, bizde hiçbir hesap gerekmeden.',
+    lead: 'YouTube, müzik sunucuların ve dosyaların tek bir oynatıcıda çalar; Spotify çalma listelerini getirir. Telefonunda, masaüstünde ve dizüstünde.',
     download: 'Windows için indir',
     free: 'Ücretsiz · Windows 10 ve 11',
-    version: 'Sürüm {version}',
     android: 'Android betası',
-    works: 'Müziğin',
-    spotify: 'Spotify çalma listelerini içe aktarır',
-    apple: 'Apple Music (katalog, önizlemeler)',
-    folders: 'Klasörlerin',
   },
   story: {
     frame: 'Legato’nun arayüzü',

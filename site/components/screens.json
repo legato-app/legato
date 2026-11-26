@@ -1,0 +1,20 @@
+{
+  "phone": {
+    "left": 0.1633,
+    "right": 0.8367,
+    "top": 0.09,
+    "bottom": 0.91
+  },
+  "monitor": {
+    "left": 0.1347,
+    "right": 0.8653,
+    "top": 0.09,
+    "bottom": 0.91
+  },
+  "laptop": {
+    "left": 0.1354,
+    "right": 0.8646,
+    "top": 0.09,
+    "bottom": 0.91
+  }
+}

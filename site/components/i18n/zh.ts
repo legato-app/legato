@@ -8,15 +8,10 @@ export const zh: Copy = {
   hero: {
     lines: ['全部，', '合而为一。'],
     criteria: ['没有我们的服务器', '多平台', '现代界面', '源代码公开'],
-    lead: 'Legato 把 YouTube Music、Spotify、Apple Music 和你电脑上的文件，放进 Windows 上的同一个音乐库、同一个播放器。不需要我们的账号。',
+    lead: 'YouTube、你的音乐服务器和你的文件，在同一个播放器里播放；Spotify 带来你的歌单。手机、台式机、笔记本，都一样。',
     download: '下载 Windows 版',
     free: '免费 · Windows 10 和 11',
-    version: '版本 {version}',
     android: 'Android 测试版',
-    works: '你的音乐',
-    spotify: '导入你的 Spotify 歌单',
-    apple: 'Apple Music（曲库，试听）',
-    folders: '你的文件夹',
   },
   story: {
     frame: 'Legato 的界面',

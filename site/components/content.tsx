@@ -24,7 +24,7 @@ export type Copy = {
   title: string
   skip: string
   nav: { fixes: string; why: string; features: string; privacy: string; next: string; faq: string; docs: string; download: string; top: string; sections: string; language: string }
-  hero: { lines: string[]; criteria: string[]; lead: string; download: string; free: string; version: string; android: string; works: string; spotify: string; apple: string; folders: string }
+  hero: { lines: string[]; criteria: string[]; lead: string; download: string; free: string; android: string }
   /** real: under the demo while the visitor drives it; window, phone: under the last chapter. */
   story: { frame: string; back: string; chapters: string; upNext: string; tryIt: string; android: string; iphone: string; real: string; window: string; phone: string }
   /** CHAPTER_SCENES' text, in their order. */
@@ -139,15 +139,10 @@ export const en: Copy = {
     lines: ['Get ALL', 'in one.'],
     // The owner's frame (Figma « Landing / Dark »): what holds whatever the visitor's device.
     criteria: ['No server of ours', 'Multi-platform', 'Modern UI', 'Source available'],
-    lead: 'Legato puts YouTube Music, Spotify, Apple Music and the files on your PC into one library and one player, on Windows, with no account of ours.',
+    lead: 'YouTube, your music servers and your files play in one player; Spotify brings in your playlists. On your phone, your desktop and your laptop.',
     download: 'Download for Windows',
     free: 'Free · Windows 10 and 11',
-    version: 'Version {version}',
     android: 'Android beta',
-    works: 'Your music',
-    spotify: 'Imports your Spotify playlists',
-    apple: 'Apple Music (catalog, previews)',
-    folders: 'Your folders',
   },
   story: { frame: "Legato's interface", back: 'Back to the page', chapters: 'Chapters', upNext: 'Up next: {title}', tryIt: 'Try it here', android: 'Get the Android app', iphone: 'No iPhone app yet: [the FAQ says more].', real: "Legato's real interface, with invented songs and no sound.", window: 'That window is the real interface, with invented songs and no sound.', phone: 'That phone is the real interface, with invented songs and no sound.' },
   chapters: [

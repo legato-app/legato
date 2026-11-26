@@ -8,15 +8,10 @@ export const ru: Copy = {
   hero: {
     lines: ['ВСЁ', 'в одном.'],
     criteria: ['Без наших серверов', 'Кроссплатформенность', 'Современный интерфейс', 'Исходный код доступен'],
-    lead: 'Legato собирает YouTube Music, Spotify, Apple Music и файлы на вашем ПК в одну медиатеку и один плеер, в Windows, без всякого аккаунта у нас.',
+    lead: 'YouTube, ваши музыкальные серверы и ваши файлы играют в одном плеере; Spotify приносит ваши плейлисты. На телефоне, компьютере и ноутбуке.',
     download: 'Скачать для Windows',
     free: 'Бесплатно · Windows 10 и 11',
-    version: 'Версия {version}',
     android: 'Бета для Android',
-    works: 'Ваша музыка',
-    spotify: 'Импортирует ваши плейлисты Spotify',
-    apple: 'Apple Music (каталог, отрывки)',
-    folders: 'Ваши папки',
   },
   story: {
     frame: 'Интерфейс Legato',

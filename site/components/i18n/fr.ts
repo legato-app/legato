@@ -8,15 +8,10 @@ export const fr: Copy = {
   hero: {
     lines: ['TOUT,', 'en un.'],
     criteria: ['Aucun serveur à nous', 'Multiplateforme', 'Interface moderne', 'Code source disponible'],
-    lead: 'Legato réunit YouTube Music, Spotify, Apple Music et les fichiers de votre PC dans une seule bibliothèque et un seul lecteur, sous Windows, sans compte chez nous.',
+    lead: 'YouTube, vos serveurs de musique et vos fichiers jouent dans un seul lecteur ; Spotify y apporte vos playlists. Sur votre téléphone, votre PC et votre portable.',
     download: 'Télécharger pour Windows',
     free: 'Gratuit · Windows 10 et 11',
-    version: 'Version {version}',
     android: 'Bêta Android',
-    works: 'Votre musique',
-    spotify: 'Importe vos playlists Spotify',
-    apple: 'Apple Music (catalogue, extraits)',
-    folders: 'Vos dossiers',
   },
   story: {
     frame: 'L’interface de Legato',

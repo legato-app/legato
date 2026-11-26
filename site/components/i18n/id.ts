@@ -8,15 +8,10 @@ export const id: Copy = {
   hero: {
     lines: ['SEMUA', 'dalam satu.'],
     criteria: ['Tanpa server kami', 'Multiplatform', 'Antarmuka modern', 'Kode sumber tersedia'],
-    lead: 'Legato menyatukan YouTube Music, Spotify, Apple Music, dan file di PC-mu dalam satu koleksi dan satu pemutar, di Windows, tanpa akun apa pun di kami.',
+    lead: 'YouTube, server musikmu, dan file-mu diputar di satu pemutar; Spotify membawa playlist-mu. Di ponsel, desktop, dan laptop-mu.',
     download: 'Unduh untuk Windows',
     free: 'Gratis · Windows 10 dan 11',
-    version: 'Versi {version}',
     android: 'Beta Android',
-    works: 'Musikmu',
-    spotify: 'Mengimpor playlist Spotify-mu',
-    apple: 'Apple Music (katalog, cuplikan)',
-    folders: 'Foldermu',
   },
   story: {
     frame: 'Antarmuka Legato',

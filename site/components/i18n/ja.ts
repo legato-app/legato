@@ -8,15 +8,10 @@ export const ja: Copy = {
   hero: {
     lines: ['すべてを、', 'ひとつに。'],
     criteria: ['自前のサーバーなし', 'マルチプラットフォーム', 'モダンなUI', 'ソースコード公開'],
-    lead: 'Legato は YouTube Music、Spotify、Apple Music、そして PC 内のファイルを、Windows 上のひとつのライブラリとひとつのプレーヤーにまとめます。私たちのアカウントは不要です。',
+    lead: 'YouTube、あなたの音楽サーバー、あなたのファイルがひとつのプレーヤーで鳴ります。Spotify からはプレイリストを。スマホでも、デスクトップでも、ノート PC でも。',
     download: 'Windows 版をダウンロード',
     free: '無料 · Windows 10 / 11',
-    version: 'バージョン {version}',
     android: 'Android ベータ版',
-    works: 'あなたの音楽',
-    spotify: 'Spotify のプレイリストを読み込み',
-    apple: 'Apple Music（カタログ、試聴）',
-    folders: '手元のフォルダー',
   },
   story: {
     frame: 'Legato のインターフェース',

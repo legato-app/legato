@@ -8,15 +8,10 @@ export const nl: Copy = {
   hero: {
     lines: ['ALLES', 'in één.'],
     criteria: ['Geen eigen server', 'Multiplatform', 'Moderne interface', 'Broncode beschikbaar'],
-    lead: 'Legato zet YouTube Music, Spotify, Apple Music en de bestanden op je pc in één bibliotheek en één speler, op Windows, zonder account bij ons.',
+    lead: 'YouTube, je muziekservers en je bestanden spelen in één speler; Spotify brengt je playlists mee. Op je telefoon, je desktop en je laptop.',
     download: 'Downloaden voor Windows',
     free: 'Gratis · Windows 10 en 11',
-    version: 'Versie {version}',
     android: 'Android-bèta',
-    works: 'Je muziek',
-    spotify: 'Importeert je Spotify-afspeellijsten',
-    apple: 'Apple Music (catalogus, fragmenten)',
-    folders: 'Je mappen',
   },
   story: {
     frame: 'De interface van Legato',

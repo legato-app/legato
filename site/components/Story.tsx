@@ -9,8 +9,8 @@ import { rootOf } from './langs'
 import { Hero } from './Hero'
 import { useAndroid, useLatest } from './latest'
 import { EASE } from './motion'
-import { DeviceScene } from './DeviceScene'
-import { sceneProgress } from './scene'
+import { DeviceMove, screenOn, useVisitor } from './DeviceScene'
+import type { Device } from './device'
 
 // The app's first window (tauri.conf.json); the stage scales it.
 const APP = { w: 1360, h: 860 }
@@ -26,32 +26,40 @@ const POCKET = '(width < 1000px) and (prefers-reduced-motion: no-preference)'
 // Animations off: chapters stack, each with its picture (the phone's screen under 1000 px).
 const STACKED = 'mx-(--pad) block h-auto w-[calc(100%-2*var(--pad))] max-w-[880px] rounded-lg outline outline-line story:hidden max-[1000px]:mx-auto max-[1000px]:w-[min(300px,72vw)] max-[1000px]:rounded-[28px]'
 
-const HERO_POSE: Pose = { x: 0.3, y: 0.14, rx: 7, ry: -24, zoom: 0.92 }
-const STAGES: { scene: string; pose: Pose }[] = [{ scene: 'library', pose: HERO_POSE }, ...CHAPTER_SCENES]
+// Stage 0 is the visitor's screen at the end of the hero's 3D move (poseAt's `first`): no pose of its own.
+const STAGES: { scene: string; pose: Pose }[] = [{ scene: 'library', pose: { x: 0, y: 0, rx: 0, ry: 0, zoom: 1 } }, ...CHAPTER_SCENES]
 // The phone's poses: less tilt than the window's, always under the text ([rotateX, rotateY]). Its hero: tipped back, its top
 // under the headline.
 const TILT: Record<string, [number, number]> = { library: [5, -8], import: [3, 7], search: [4, -6], player: [2, 8], karaoke: [0, -4], visualizer: [0, 0], editor: [3, 6], themes: [0, -3] }
-const PHONE_POSES: Pose[] = [{ x: 0.03, y: 0, rx: 24, ry: -12, zoom: 1.1 }, ...CHAPTER_SCENES.map(({ scene }) => ({ x: 0, y: 0, rx: TILT[scene]?.[0] ?? 0, ry: TILT[scene]?.[1] ?? 0, zoom: 1 }))]
+const PHONE_POSES: Pose[] = [{ x: 0, y: 0, rx: 0, ry: 0, zoom: 1 }, ...CHAPTER_SCENES.map(({ scene }) => ({ x: 0, y: 0, rx: TILT[scene]?.[0] ?? 0, ry: TILT[scene]?.[1] ?? 0, zoom: 1 }))]
 const LAST = CHAPTER_SCENES.length
 // The last stage has no next one to scroll into: room for its screen to finish.
 const TAIL = 0.25
 const BLACK = STAGES.findIndex((s) => 'black' in s)
+// The hero's 3D move comes before stage 0, in stages of scroll: `at` runs from -INTRO, the move done at 0.
+const INTRO = 1.5
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v))
 const smooth = (t: number) => t * t * (3 - 2 * t)
 const mix = (a: number, b: number, t: number) => a + (b - a) * t
 /** How dark the page is: full while the visualizer holds. */
 const shade = (at: number) => 1 - clamp((Math.abs(at - BLACK) - 0.3) / 0.2)
+/** How far the hero's 3D move is: 0 at the top of the page, 1 once the camera is in the visitor's screen. */
+const moveOf = (at: number) => clamp(1 + at / INTRO)
+/** The live window comes in over the scene's screen as the move ends. */
+const arrived = (at: number) => clamp((moveOf(at) - 0.94) / 0.06)
+/** The stage a scroll position shows, the move counting as stage 0. */
+const stageOf = (at: number) => Math.max(0, Math.round(Math.min(at, LAST)))
 /** Between stage i and the next: 0 while i holds, 1 once the next one does. */
 const step = (at: number) => {
-  const i = Math.min(Math.floor(at), LAST - 1)
+  const i = Math.max(0, Math.min(Math.floor(at), LAST - 1))
   return [i, smooth(clamp((at - i - 0.25) / 0.5))] as const
 }
 
-/** at = stage number, in fractions: each stage holds around its number, the window travels between. */
-function poseAt(at: number): Pose {
+/** at = stage number, in fractions: each stage holds around its number, the window travels between. `first`: stage 0's. */
+function poseAt(at: number, first: Pose): Pose {
   const [i, t] = step(at)
-  const [a, b] = [STAGES[i].pose, STAGES[i + 1].pose]
+  const [a, b] = [i ? STAGES[i].pose : first, STAGES[i + 1].pose]
   return { x: mix(a.x, b.x, t), y: mix(a.y, b.y, t), rx: mix(a.rx, b.rx, t), ry: mix(a.ry, b.ry, t), zoom: mix(a.zoom, b.zoom, t) }
 }
 
@@ -59,13 +67,16 @@ type Stand = { x: number; y: number; s: number; rx: number; ry: number }
 
 /** Where the phone stands at stage i: as big as the room under the stage's text (`tops`: each text's bottom). */
 function standAt(i: number, w: number, h: number, tops: number[]): Stand {
+  // Stage 0: on the scene's phone screen, as the hero's 3D move ends (DeviceMove).
+  if (!i) {
+    const screen = screenOn('phone', w, h)
+    return { x: screen.x, y: screen.y, s: screen.h / PHONE.h, rx: 0, ry: 0 }
+  }
   const pose = PHONE_POSES[i]
   const top = (k: number) => (tops[k] ?? h * 0.3) + GAP
   const fit = (k: number) => Math.max(0.2, Math.min((h - BAR - GAP - top(k)) / DEVICE.h, (w * 0.8) / DEVICE.w))
-  // The hero's text is tall: the first chapter's size. At the hero it stands mid-screen, where the 3D scene's move ends
-  // (DeviceScene), and comes in as that scene fades.
-  const s = fit(Math.max(i, 1)) * pose.zoom
-  const y = i ? top(i) + (h - BAR - GAP - top(i)) / 2 : h / 2
+  const s = fit(i) * pose.zoom
+  const y = top(i) + (h - BAR - GAP - top(i)) / 2
   return { x: w / 2 + pose.x * w, y, s, rx: pose.rx, ry: pose.ry }
 }
 
@@ -140,7 +151,7 @@ function Demo({ at, ready, live, phone, onReady, onLeave, onFail }: { at: Motion
 
   const say = (message: object) => frame.current?.contentWindow?.postMessage(message, location.origin)
   const send = (a: number) => {
-    const i = Math.round(Math.min(a, LAST))
+    const i = stageOf(a)
     const message = seen.current ? { legato: 'scene', name: STAGES[i].scene, p: Math.round(clamp((a - i + 0.25) / 0.45) * 100) / 100 } : { legato: 'scene', name: 'rest', p: 0 }
     const said = JSON.stringify(message)
     if (said === last.current) return
@@ -224,24 +235,29 @@ function useStage(box: RefObject<HTMLDivElement | null>, w0: number, h0: number)
 type WindowProps = { at: MotionValue<number>; take: MotionValue<number>; ready: boolean; live: boolean; onReady: () => void; onLeave: () => void }
 
 /** The window: one transform, from the scroll, the stage's size and the visitor's turn. No demo: each chapter's picture. */
-function AppWindow({ at, take, ready, live, onReady, onLeave }: WindowProps) {
+function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowProps & { device: Device }) {
   const box = useRef<HTMLDivElement>(null)
   const [still, setStill] = useState('library')
-  useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[Math.round(Math.min(a, LAST))].scene))
+  useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[stageOf(a)].scene))
   const [w, h] = useStage(box, 1440, 900)
   // Its own layer while it moves: no repaint of the interface each frame. Dropped at rest, so a zoom above 1 is sharp again.
   const willChange = useMotionValue('auto')
   useMotionValueEvent(at, 'animationStart', () => willChange.set('transform'))
   useMotionValueEvent(at, 'animationComplete', () => willChange.set('auto'))
+  const opacity = useTransform(at, arrived)
   const transform = useTransform(() => {
-    const p = poseAt(at.get())
+    const fitting = Math.min((w.get() * 0.66) / APP.w, (h.get() * 0.84) / APP.h)
+    // Stage 0: square on the scene's screen, as big as it lands.
+    const screen = screenOn(device, w.get(), h.get())
+    const first = { x: screen.x / w.get() - 0.5, y: screen.y / h.get() - 0.5, rx: 0, ry: 0, zoom: Math.min(screen.w / APP.w, screen.h / APP.h) / fitting }
+    const p = poseAt(at.get(), first)
     const t = take.get()
-    const fit = Math.min((w.get() * 0.66) / APP.w, (h.get() * 0.84) / APP.h) * p.zoom
+    const fit = fitting * p.zoom
     const full = Math.min((w.get() * 0.94) / APP.w, (h.get() * 0.82) / APP.h)
     return `translate3d(${mix(p.x, 0, t) * w.get()}px, ${mix(p.y, 0.005, t) * h.get()}px, 0) rotateX(${mix(p.rx, 0, t)}deg) rotateY(${mix(p.ry, 0, t)}deg) scale(${mix(fit, full, t)})`
   })
   return (
-    <motion.div ref={box} aria-hidden={!live} style={{ transform, willChange, width: APP.w, height: APP.h, marginLeft: -APP.w / 2, marginTop: -APP.h / 2 }} className="absolute top-1/2 left-1/2 overflow-hidden rounded-[10px] bg-panel shadow-(--shot-shadow) outline outline-line">
+    <motion.div ref={box} aria-hidden={!live} style={{ transform, opacity, willChange, width: APP.w, height: APP.h, marginLeft: -APP.w / 2, marginTop: -APP.h / 2 }} className="absolute top-1/2 left-1/2 overflow-hidden rounded-[10px] bg-panel shadow-(--shot-shadow) outline outline-line">
       <Still name={still} alt="" className="absolute inset-0 size-full" />
       <Demo at={at} ready={ready} live={live} onReady={onReady} onLeave={onLeave} />
     </motion.div>
@@ -255,12 +271,12 @@ function AppWindow({ at, take, ready, live, onReady, onLeave }: WindowProps) {
 function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, onFail }: WindowProps & { failed: boolean; tops: MotionValue<number[]>; onFail: () => void }) {
   const box = useRef<HTMLDivElement>(null)
   const [still, setStill] = useState('library')
-  useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[Math.round(Math.min(a, LAST))].scene))
+  useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[stageOf(a)].scene))
   const [w, h] = useStage(box, 390, 760)
   const [flat, setFlat] = useState(false)
   useMotionValueEvent(take, 'change', (t) => setFlat(t >= 0.5))
-  // It comes in as the hero's 3D scene plays out and fades (DeviceScene): the scene's phone becomes this one.
-  const opacity = useTransform(() => Math.abs(1 - 2 * take.get()) * clamp((sceneProgress(at.get()) - 0.75) / 0.25))
+  // It comes in over the scene's phone as the hero's 3D move ends (DeviceMove).
+  const opacity = useTransform(() => Math.abs(1 - 2 * take.get()) * arrived(at.get()))
   const transform = useTransform(() => {
     if (take.get() >= 0.5) return 'none'
     const [i, t] = step(at.get())
@@ -284,24 +300,14 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
   )
 }
 
-/** The phone's hero: the 3D scene under the text, the scroll playing it (DeviceScene), before the phone with the demo. */
-function PhoneScene({ at, tops }: { at: MotionValue<number>; tops: MotionValue<number[]> }) {
-  const top = useTransform(tops, (all) => all[0] ?? 0)
-  return (
-    <motion.div style={{ top }} className="pointer-events-none absolute inset-x-0 px-(--pad)">
-      <DeviceScene scroll={at} />
-    </motion.div>
-  )
-}
-
 /** One stage's text: there while the window holds, gone while it travels. Hidden once out, so Tab skips it. */
 function Panel({ i, at, take, mode, right, tops, children }: { i: number; at: MotionValue<number>; take: MotionValue<number>; mode: 'pc' | 'phone' | null; right?: boolean; tops: MotionValue<number[]>; children: ReactNode }) {
   const own = useRef<HTMLElement>(null)
   const here = (a: number) => (i === LAST ? Math.min(a, i) : a)
-  // The phone's hero text leaves early: the 3D scene rises over it (PhoneScene).
-  const leaving = (a: number) => (i === 0 && mode === 'phone' ? 1 - clamp((a - 0.06) / 0.12) : 1 - clamp((Math.abs(here(a) - i) - 0.22) / 0.14))
+  // The hero leaves as the 3D move starts, rising: the camera goes past it.
+  const leaving = (a: number) => (i ? 1 - clamp((Math.abs(here(a) - i) - 0.22) / 0.14) : 1 - clamp((moveOf(a) - 0.04) / 0.14))
   const opacity = useTransform(() => leaving(at.get()) * (1 - take.get()))
-  const y = useTransform(at, (a) => (i - here(a)) * (mode === 'phone' ? 24 : 56))
+  const y = useTransform(at, (a) => (i ? (i - here(a)) * (mode === 'phone' ? 24 : 56) : -moveOf(a) * 400))
   const visibility = useTransform(opacity, (o) => (o < 0.01 ? 'hidden' : 'visible'))
   // The phone stands under the text: where it ends.
   useEffect(() => {
@@ -317,7 +323,7 @@ function Panel({ i, at, take, mode, right, tops, children }: { i: number; at: Mo
     watch.observe(el)
     return () => watch.disconnect()
   }, [mode, i, tops])
-  const spot = !i ? 'pinned:left-(--pad) pinned:w-[min(40vw,620px)] pocket:pt-[78px]' : right ? 'pinned:right-(--pad) pinned:w-[min(27vw,460px)] story:opacity-0' : 'pinned:left-(--pad) pinned:w-[min(27vw,460px)] story:opacity-0'
+  const spot = !i ? 'pinned:inset-x-0 pinned:justify-start pocket:bottom-0' : right ? 'pinned:right-(--pad) pinned:w-[min(27vw,460px)] story:opacity-0' : 'pinned:left-(--pad) pinned:w-[min(27vw,460px)] story:opacity-0'
   return (
     <motion.article ref={own} style={mode ? { opacity, y, visibility } : undefined} className={`pinned:absolute pinned:inset-y-0 pinned:flex pinned:flex-col pinned:justify-center pocket:absolute pocket:inset-x-0 pocket:top-0 ${spot}`}>
       {children}
@@ -427,7 +433,13 @@ export function Story() {
   const mode = useMode()
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
   // The stage glides after the scroll: a wheel's notches and a dragged scrollbar arrive as one movement. No overshoot.
-  const at = useSpring(useTransform(scrollYProgress, [0, 1], [0, LAST + TAIL]), { stiffness: 220, damping: 32, restDelta: 0.0005 })
+  const at = useSpring(useTransform(scrollYProgress, [0, 1], [-INTRO, LAST + TAIL]), { stiffness: 220, damping: 32, restDelta: 0.0005 })
+  const move = useTransform(at, moveOf)
+  // The scene goes once the live window holds its screen, before the window leaves for the first chapter.
+  const sceneOpacity = useTransform(at, (a) => 1 - clamp(a / 0.2))
+  const visitor = useVisitor()
+  // A phone's stage stands up: the phone's move. A PC's: its own device (device.ts), an Android tablet a laptop.
+  const device: Device | null = mode === 'phone' ? 'phone' : visitor.device && (visitor.device === 'monitor' ? 'monitor' : 'laptop')
   const night = useTransform(at, shade)
   const zIndex = useTransform(night, (d) => (d > 0 ? 30 : 0))
   const [black, setBlack] = useState(false)
@@ -469,13 +481,14 @@ export function Story() {
 
   const windowProps = { at, take, ready, live: taken, onReady: () => setReady(true), onLeave: back }
   return (
-    <section ref={section} style={{ ['--stages' as string]: LAST + TAIL }} className="story:relative story:-mt-[78px] story:h-[calc(100svh+var(--stages)*130svh)]">
-      {mode && CHAPTER_SCENES.map(({ scene }, n) => <span key={scene} id={`chapter-${scene}`} style={{ top: `${(n + 1) * 130}svh` }} className="absolute" />)}
+    <section ref={section} style={{ ['--stages' as string]: INTRO + LAST + TAIL }} className="story:relative story:-mt-[78px] story:h-[calc(100svh+var(--stages)*130svh)]">
+      {mode && CHAPTER_SCENES.map(({ scene }, n) => <span key={scene} id={`chapter-${scene}`} style={{ top: `${(INTRO + n + 1) * 130}svh` }} className="absolute" />)}
       <motion.div data-black={black || undefined} style={mode ? { perspective: mode === 'phone' ? 900 : 1800, zIndex } : undefined} className="text-ink story:sticky story:top-0 story:h-svh story:overflow-hidden">
         {/* The playback blue's light behind the window: the app's one colour, nothing else on the page glows. */}
         <div aria-hidden className="pointer-events-none absolute hidden pinned:block top-[8%] right-[-12%] size-[min(70vw,980px)] rounded-full bg-accent/18 blur-[150px]" />
+        {mode && device && <DeviceMove device={device} dark={visitor.dark} move={move} opacity={sceneOpacity} />}
         {mode && <motion.div aria-hidden style={{ opacity: night }} className="absolute inset-0 bg-[#131313]" />}
-        {mode === 'pc' && <AppWindow {...windowProps} />}
+        {mode === 'pc' && device && <AppWindow {...windowProps} device={device} />}
         {mode === 'phone' && (
           <PhoneWindow
             {...windowProps}
@@ -491,7 +504,6 @@ export function Story() {
           <Hero />
           <Stacked name="library" alt={c.chapters[0].alt} />
         </Panel>
-        {mode === 'phone' && <PhoneScene at={at} tops={tops} />}
         {CHAPTER_SCENES.map(({ scene, pose }, n) => ({ scene, pose, ...c.chapters[n] })).map(({ scene, title, text, alt, pose }, n) => (
           <Panel key={scene} i={n + 1} at={at} take={take} mode={mode} tops={tops} right={pose.x < 0}>
             <div className="px-(--pad) py-10 pinned:p-0 pocket:pt-5 pocket:pb-0">

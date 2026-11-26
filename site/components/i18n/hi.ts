@@ -8,15 +8,10 @@ export const hi: Copy = {
   hero: {
     lines: ['सब कुछ', 'एक में।'],
     criteria: ['हमारा कोई सर्वर नहीं', 'मल्टी-प्लेटफ़ॉर्म', 'आधुनिक इंटरफ़ेस', 'सोर्स कोड उपलब्ध'],
-    lead: 'Legato, YouTube Music, Spotify, Apple Music और आपके PC की फ़ाइलों को Windows पर एक लाइब्रेरी और एक प्लेयर में ले आता है, हमारे किसी अकाउंट के बिना।',
+    lead: 'YouTube, आपके संगीत सर्वर और आपकी फ़ाइलें एक ही प्लेयर में चलती हैं; Spotify आपकी प्लेलिस्ट ले आता है। आपके फ़ोन, डेस्कटॉप और लैपटॉप पर।',
     download: 'Windows के लिए डाउनलोड करें',
     free: 'मुफ़्त · Windows 10 और 11',
-    version: 'वर्ज़न {version}',
     android: 'Android बीटा',
-    works: 'आपका संगीत',
-    spotify: 'आपकी Spotify प्लेलिस्ट इंपोर्ट करता है',
-    apple: 'Apple Music (कैटलॉग, झलकियाँ)',
-    folders: 'आपके फ़ोल्डर',
   },
   story: {
     frame: 'Legato का इंटरफ़ेस',

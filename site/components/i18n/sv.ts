@@ -8,15 +8,10 @@ export const sv: Copy = {
   hero: {
     lines: ['ALLT', 'i ett.'],
     criteria: ['Ingen egen server', 'Flera plattformar', 'Modernt gränssnitt', 'Källkoden tillgänglig'],
-    lead: 'Legato samlar YouTube Music, Spotify, Apple Music och filerna på din dator i ett bibliotek och en spelare, i Windows, utan något konto hos oss.',
+    lead: 'YouTube, dina musikservrar och dina filer spelas i en spelare; Spotify tar med dina spellistor. På din telefon, din dator och din laptop.',
     download: 'Ladda ned för Windows',
     free: 'Gratis · Windows 10 och 11',
-    version: 'Version {version}',
     android: 'Android-beta',
-    works: 'Din musik',
-    spotify: 'Importerar dina Spotify-spellistor',
-    apple: 'Apple Music (katalog, förhandslyssning)',
-    folders: 'Dina mappar',
   },
   story: {
     frame: 'Legatos gränssnitt',

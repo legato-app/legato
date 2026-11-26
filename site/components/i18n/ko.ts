@@ -8,15 +8,10 @@ export const ko: Copy = {
   hero: {
     lines: ['모든 것을', '하나로.'],
     criteria: ['자체 서버 없음', '멀티 플랫폼', '모던 UI', '소스 코드 공개'],
-    lead: 'Legato는 YouTube Music, Spotify, Apple Music, 그리고 PC의 파일을 Windows에서 하나의 보관함과 하나의 플레이어로 모읍니다. 저희 계정은 필요 없습니다.',
+    lead: 'YouTube, 내 음악 서버, 내 파일이 하나의 플레이어에서 재생됩니다. Spotify는 플레이리스트를 가져옵니다. 휴대폰, 데스크톱, 노트북에서.',
     download: 'Windows용 다운로드',
     free: '무료 · Windows 10 및 11',
-    version: '버전 {version}',
     android: 'Android 베타 버전',
-    works: '내 음악',
-    spotify: 'Spotify 재생목록 가져오기',
-    apple: 'Apple Music(카탈로그, 미리 듣기)',
-    folders: '내 폴더',
   },
   story: {
     frame: 'Legato의 인터페이스',
