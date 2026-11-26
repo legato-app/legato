@@ -2,6 +2,7 @@ import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { askText } from '../../shared/ui/Ask'
+import { withoutBlocked } from './blockedArtists'
 import { startSleep } from './sleep'
 import { parseMinutes, sessionSongs, type SessionKind } from './focusMix'
 import { usePlayer } from './store'
@@ -15,7 +16,8 @@ export async function startSession(kind: SessionKind) {
   const { tracks, stats, notify } = useStore.getState()
   const minutes = parseMinutes((await askText({ title: tr('Session length in minutes (5 to 240)'), ok: tr('Start'), value: kind === 'focus' ? '25' : '30' })) ?? '')
   if (minutes === null) return
-  const list = sessionSongs(kind, tracks, stats, useSettings.getState().settings.hideExplicit)
+  const { hideExplicit, blockedArtists } = useSettings.getState().settings
+  const list = sessionSongs(kind, withoutBlocked(tracks, blockedArtists), stats, hideExplicit)
   if (!list.length) return notify(kind === 'focus' ? tr('Not enough songs you have played for a focus session') : tr('Not enough songs tagged 120 BPM or more for a workout'))
   usePlayer.getState().playTracks(list, 0)
   startSleep(minutes)

@@ -10,6 +10,11 @@ describe('artists never played again', () => {
     expect(artistBlocked('Bandits', ['Band'])).toBe(false)
     expect(artistBlocked('Band', [])).toBe(false)
   })
+  it('accents and punctuation aside', () => {
+    expect(artistBlocked('Beyoncé', ['Beyonce'])).toBe(true)
+    expect(artistBlocked('AC/DC', ['ac dc'])).toBe(true)
+    expect(artistBlocked('???', ['!!!'])).toBe(false)
+  })
   it('the pickers pass over them', () => {
     const songs = [{ id: 1, artist: 'Band' }, { id: 2, artist: 'Other' }]
     expect(withoutBlocked(songs, ['Band'])).toEqual([songs[1]])

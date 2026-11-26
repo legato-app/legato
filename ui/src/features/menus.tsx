@@ -410,13 +410,12 @@ function removeFrom(t: LibraryTrack): MenuEntry {
   }
 }
 
-/** ctx.list / index = where it sits (play from there). playlistId + position = custom playlist row. queueIndex = row of the Up next panel. */
 /** "Never play this artist again" (or back): for radio, mixes and autoplay; a song picked by hand still plays. */
 export function neverArtistItem(artist: string): MenuEntry {
   const { settings, update } = useSettings.getState()
   const blocked = artistBlocked(artist, settings.blockedArtists)
   const set = (blockedArtists: string[]) => update({ blockedArtists })
-  const allow = () => set(useSettings.getState().settings.blockedArtists.filter((name) => name.toLowerCase() !== artist.toLowerCase()))
+  const allow = () => set(useSettings.getState().settings.blockedArtists.filter((name) => !artistBlocked(artist, [name])))
   const block = () => {
     set([...useSettings.getState().settings.blockedArtists, artist])
     app().notify(tr('{name} won’t come up in radio, mixes or autoplay', { name: artist }), { kind: 'removed', action: { label: tr('Undo'), run: allow } })
@@ -445,6 +444,7 @@ export function shaped(kind: MenuKind, entries: MenuEntry[]): MenuEntry[] {
   return shapeMenu(kind, entries, useSettings.getState().settings.menuLayout, (items) => ({ id: 'more', label: tr('More…'), icon: <DotsThree size={16} />, items }))
 }
 
+/** ctx.list / index = where it sits (play from there). playlistId + position = custom playlist row. queueIndex = row of the Up next panel. */
 export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?: number; playlistId?: number; position?: number; queueIndex?: number } = {}): MenuEntry[] {
   const list = ctx.list ?? [t]
   const index = ctx.index ?? 0

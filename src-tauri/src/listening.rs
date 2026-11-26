@@ -22,22 +22,26 @@ fn blocked_artists(state: &AppState) -> Vec<String> {
     ui.and_then(|ui| serde_json::from_value(ui.get("blockedArtists")?.clone()).ok()).unwrap_or_default()
 }
 
+fn hash_of(value: &impl std::hash::Hash) -> u64 {
+    std::hash::BuildHasher::hash_one(&std::hash::BuildHasherDefault::<std::hash::DefaultHasher>::default(), value)
+}
+
 /// Mixes for today. `utc_offset` = local minus UTC, seconds (from the UI clock).
 #[tauri::command]
 pub async fn mixes(state: State<'_, AppState>, utc_offset: i64) -> CmdResult<Response> {
     let utc_offset = utc_offset.clamp(-14 * 3600, 14 * 3600);
     let now = unix_now();
+    // Artists never played again: neither their songs here nor those the radios find.
+    let never = blocked_artists(&state);
     let (stamp, (tracks, plays, playlists, saved, liked, prefs)) = {
         let lib = state.lib();
-        // Same data, same day, same hour: same mixes.
-        let stamp = (lib.versions.library(), lib.versions.history(), today(), (now + utc_offset).div_euclid(3600));
+        // Same data, same day, same hour, same artists never played (changed here or by a sync): same mixes.
+        let stamp = (lib.versions.library(), lib.versions.history(), today(), (now + utc_offset).div_euclid(3600), hash_of(&never));
         if let Some(hit) = state.cache.mixes.peek(&utc_offset, &stamp) {
             return Ok(json(hit));
         }
         (stamp, (lib.tracks().map_err(err)?, lib.plays().map_err(err)?, lib.custom_playlists().map_err(err)?, lib.saved_playlists().map_err(err)?, lib.liked_tracks().map_err(err)?, lib.prefs().map_err(err)?))
     };
-    // Artists never played again: neither their songs here nor those the radios find.
-    let never = blocked_artists(&state);
     let tracks: Vec<_> = tracks.into_iter().filter(|t| !music_core::mixes::artist_blocked(&t.track.artist, &never)).collect();
     let input = music_core::mixes::Input { tracks: &tracks, plays: &plays, playlists: &playlists, saved: &saved, liked: &liked, prefs: &prefs, now, utc_offset, seed: today(), found: &[] };
     let mut found = music_core::mixes::without_blocked(radios(&state, music_core::mixes::seeds(&input)).await, &blocked_finds(&state));
