@@ -3,6 +3,8 @@ import { PRESETS, type Theme } from '../../shared/theme/theme'
 
 const settings = { themeLayouts: true }
 const answer = vi.fn()
+const platform = vi.hoisted(() => ({ phoneApp: false }))
+vi.mock('../../shared/platform', () => platform)
 vi.mock('../../app/settings', () => ({ useSettings: { getState: () => ({ settings }) } }))
 vi.mock('../../shared/ui/Ask', () => ({ askChoice: (question: unknown) => answer(question) }))
 const { askAboutLayout } = await import('./themeLayoutImport')
@@ -22,6 +24,13 @@ it('asks nothing without a layout, with one that changes nothing, or with the se
   settings.themeLayouts = false
   expect(await askAboutLayout(arranged)).toBe(arranged)
   expect(answer).not.toHaveBeenCalled()
+})
+
+it('asks nothing on a phone and keeps the layout, for the PC', async () => {
+  platform.phoneApp = true
+  expect(await askAboutLayout(arranged)).toBe(arranged)
+  expect(answer).not.toHaveBeenCalled()
+  platform.phoneApp = false
 })
 
 it('lists the changes and takes the user’s pick', async () => {

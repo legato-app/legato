@@ -722,7 +722,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     setting off. Skills: i18n. 2026-11-26: done (`themeLayoutImport.ts`); the dialog and moved layouts seen in the
     browser demo (invented data), no file imported in the app.
     - Decided alone (2026-11-26): "Paste a theme" asks too; a dropped file keeps its first question ("Use the theme?")
-      before this one; asked on the phone too (the theme syncs to a PC); the dialog names Settings (Ctrl+,) only, not
+      before this one; nothing asked on the phone, the layout kept for the PC (review); the dialog names Settings (Ctrl+,) only, not
       right-click › Default layout, which slice 5 adds (its words to extend then); six changes listed, then "And more".
   - [ ] `S` 5. Ways back: "Default layout" in the fallback menu; a throwing region or part drops the layout + toast.
     Tests: the entry only while a layout is on; the boundary drops it. Skills: i18n. Review of 4: the import warning's
