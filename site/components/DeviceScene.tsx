@@ -34,7 +34,8 @@ export function DeviceScene() {
   }, [])
   const name = device && `${root}landing/${device}-${dark ? 'dark' : 'light'}`
   return (
-    <div aria-hidden className="aspect-[16/10] w-full max-w-[440px] [@media(max-height:860px)]:hidden">
+    // A PC's short window has no room under the headline; a phone always shows it (Android's is its own device).
+    <div aria-hidden className="aspect-[16/10] w-full max-w-[440px] [@media(min-width:1000px)_and_(max-height:860px)]:hidden">
       {name &&
         (still ? (
           <img src={`${name}.webp`} alt="" width={1280} height={800} className="size-full" />
