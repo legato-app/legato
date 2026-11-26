@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { useStore } from '../../app/store'
-import { api, type PluginCall, type PluginEventName, type PluginInfo } from '../../shared/api'
+import { api, type PluginCall, type PluginInfo } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
 import { setEffects, useEditor } from '../editor/editor'
 import { cleanEffects } from '../player/effects'
@@ -175,7 +175,7 @@ export function startPlugins(): () => void {
   const states = api.onPluginState(() => void loadPlugins())
   const offStyles = usePlugins.subscribe((s, prev) => s.styles !== prev.styles && syncStyles(s.styles))
   const listening = () => usePlugins.getState().list.some((p) => p.running)
-  const tell = (name: PluginEventName, payload: unknown) => void (listening() && api.pluginEvent(name, payload).catch(() => {}))
+  const tell = (name: Parameters<typeof api.pluginEvent>[0], payload: unknown) => void (listening() && api.pluginEvent(name, payload).catch(() => {}))
   const offEnded = onListenEnd((play) => tell('ended', { trackId: play.trackId, listenedMs: play.listenedMs, completed: play.completed }))
   const seeked = (ms: number) => tell('seek', { positionMs: Math.max(0, Math.round(ms)) })
   seekListeners.add(seeked)
