@@ -1205,6 +1205,7 @@ const vi: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'Cài đặt và mọi thứ nó đã lưu sẽ bị xóa.',
   'Star on GitHub': 'Gắn sao trên GitHub',
   'Website': 'Trang web',
+  Verified: 'Đã xác minh',
   'See the play queue': 'Xem hàng chờ phát',
   'Read your listening history': 'Đọc lịch sử nghe của bạn',
   'Sees what you listened to and when': 'Thấy bạn đã nghe gì và khi nào',

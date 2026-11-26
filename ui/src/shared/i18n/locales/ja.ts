@@ -1205,6 +1205,7 @@ const ja: Record<string, string> = {
   'Its settings and everything it stored are erased.': '設定と保存したデータがすべて消去されます。',
   'Star on GitHub': 'GitHub でスターを付ける',
   'Website': 'ウェブサイト',
+  Verified: '確認済み',
   'See the play queue': '再生キューを見る',
   'Read your listening history': '再生履歴を読む',
   'Sees what you listened to and when': '何をいつ聴いたかが分かります',

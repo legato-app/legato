@@ -1205,6 +1205,7 @@ const uk: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'Налаштування й усе збережене буде видалено.',
   'Star on GitHub': 'Поставити зірку на GitHub',
   'Website': 'Сайт',
+  Verified: 'Перевірено',
   'See the play queue': 'Бачити чергу відтворення',
   'Read your listening history': 'Читати історію прослуховування',
   'Sees what you listened to and when': 'Бачить, що й коли ви слухали',

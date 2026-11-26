@@ -1170,6 +1170,7 @@ const he: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'ההגדרות שלו וכל מה ששמר יימחקו.',
   'Star on GitHub': 'כוכב ב-GitHub',
   'Website': 'אתר',
+  Verified: 'מאומת',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

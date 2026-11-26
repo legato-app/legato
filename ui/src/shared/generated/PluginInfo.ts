@@ -5,4 +5,8 @@ export type PluginInfo = { id: string, manifest: PluginManifest | null, on: bool
 /**
  * Broken plugin.json, or why it stopped.
  */
-error: string | null, folder: string, };
+error: string | null, folder: string, 
+/**
+ * Signed by an author the app knows, and unchanged since (`music_plugins::verify`).
+ */
+verified: boolean, };

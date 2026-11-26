@@ -1205,6 +1205,7 @@ const sv: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'Inställningarna och allt som sparats raderas.',
   'Star on GitHub': 'Ge en stjärna på GitHub',
   'Website': 'Webbplats',
+  Verified: 'Verifierad',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

@@ -1205,6 +1205,7 @@ const id: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'Pengaturannya dan semua yang disimpannya dihapus.',
   'Star on GitHub': 'Beri bintang di GitHub',
   'Website': 'Situs web',
+  Verified: 'Terverifikasi',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',

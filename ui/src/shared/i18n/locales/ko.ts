@@ -1205,6 +1205,7 @@ const ko: Record<string, string> = {
   'Its settings and everything it stored are erased.': '설정과 저장한 모든 내용이 지워집니다.',
   'Star on GitHub': 'GitHub에서 별 주기',
   'Website': '웹사이트',
+  Verified: '확인됨',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

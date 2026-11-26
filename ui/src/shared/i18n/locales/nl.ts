@@ -1205,6 +1205,7 @@ const nl: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'De instellingen en alles wat het heeft opgeslagen worden gewist.',
   'Star on GitHub': 'Een ster geven op GitHub',
   'Website': 'Website',
+  Verified: 'Geverifieerd',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

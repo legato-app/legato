@@ -1205,6 +1205,7 @@ const zh: Record<string, string> = {
   'Its settings and everything it stored are erased.': '它的设置和存储的所有内容都会被清除。',
   'Star on GitHub': '在 GitHub 上加星标',
   'Website': '网站',
+  Verified: '已验证',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

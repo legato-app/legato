@@ -8,6 +8,7 @@ pub mod net;
 pub mod perms;
 pub mod quiz;
 pub mod runtime;
+pub mod verify;
 
 pub use manifest::{API, Manifest};
 pub use perms::{Permission, Route};

@@ -1170,6 +1170,7 @@ const ar: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'تُمحى إعداداته وكل ما خزّنه.',
   'Star on GitHub': 'منح نجمة على GitHub',
   'Website': 'الموقع',
+  Verified: 'موثّق',
   'See the play queue': 'رؤية قائمة التشغيل',
   'Read your listening history': 'قراءة سجل استماعك',
   'Sees what you listened to and when': 'يرى ما استمعت إليه ومتى',

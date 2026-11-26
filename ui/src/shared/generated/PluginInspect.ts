@@ -12,4 +12,4 @@ installed: string | null,
 /**
  * Permissions not approved before (all of them for a new plugin).
  */
-newPermissions: Array<string>, files: number, size: number, };
+newPermissions: Array<string>, files: number, size: number, verified: boolean, };

@@ -1205,6 +1205,7 @@ const hi: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'इसकी सेटिंग्स और इसका सहेजा सारा डेटा मिट जाएगा।',
   'Star on GitHub': 'GitHub पर स्टार दें',
   'Website': 'वेबसाइट',
+  Verified: 'सत्यापित',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

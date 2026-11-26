@@ -7,6 +7,7 @@
 use crate::{AppState, CmdResult, err};
 use music_plugins::discord_move;
 use music_plugins::quiz;
+use music_plugins::verify;
 use music_plugins::net::{Gateway, Request};
 use music_plugins::{Call, Manifest, Outbox, Permission, Route, Running};
 use serde::{Deserialize, Serialize};
@@ -45,6 +46,8 @@ pub struct PluginInfo {
     /// Broken plugin.json, or why it stopped.
     error: Option<String>,
     folder: String,
+    /// Signed by an author the app knows, and unchanged since (`music_plugins::verify`).
+    verified: bool,
 }
 
 /// A folder before installing it: what it is and what it asks for.
@@ -59,6 +62,7 @@ pub struct Inspect {
     new_permissions: Vec<String>,
     files: usize,
     size: u64,
+    verified: bool,
 }
 
 #[derive(Default)]
@@ -111,7 +115,7 @@ fn files(folder: &Path, m: &Manifest) -> anyhow::Result<Vec<(PathBuf, u64)>> {
         let e = e?;
         let meta = std::fs::symlink_metadata(e.path())?;
         let kind_ok = e.path().extension().and_then(|x| x.to_str()).is_some_and(|x| FILE_KINDS.contains(&x.to_lowercase().as_str()))
-            || e.file_name().to_str().is_some_and(|name| music_plugins::manifest::FILES.contains(&name));
+            || e.file_name().to_str().is_some_and(|name| music_plugins::manifest::FILES.contains(&name) || [verify::FILE_LIST, verify::SIGNATURE].contains(&name));
         if meta.is_file() && kind_ok {
             out.push((e.path(), meta.len()));
         }
@@ -336,6 +340,7 @@ pub async fn plugins_list(app: AppHandle, state: State<'_, AppState>, plugins: S
     let reg = registry(&state);
     let root = dir(&app)?;
     let mut out = Vec::new();
+    let trusted = verify::trusted();
     for e in std::fs::read_dir(&root).into_iter().flatten().flatten() {
         let Some(id) = e.file_name().to_str().map(String::from) else { continue };
         if !e.path().is_dir() {
@@ -347,6 +352,7 @@ pub async fn plugins_list(app: AppHandle, state: State<'_, AppState>, plugins: S
             Err(e) => (None, Some(e.to_string())),
         };
         out.push(PluginInfo {
+            verified: manifest.as_ref().is_some_and(|m| verify::verified(&e.path(), &m.author, &trusted)),
             running: plugins.running.lock().unwrap().contains_key(&id),
             error: broken.or_else(|| plugins.errors.lock().unwrap().get(&id).cloned()),
             folder: e.path().display().to_string(),
@@ -367,7 +373,8 @@ pub async fn plugin_inspect(app: AppHandle, state: State<'_, AppState>, folder: 
     let files = files(&folder, &m).map_err(err)?;
     let installed = Manifest::read(&dir(&app)?.join(&m.id)).ok().map(|x| x.version);
     let granted = registry(&state).get(&m.id).map(|e| e.granted.clone()).unwrap_or_default();
-    Ok(Inspect { new_permissions: music_plugins::perms::added(&granted, &m.permissions), installed, files: files.len(), size: files.iter().map(|(_, s)| s).sum(), manifest: m })
+    let verified = verify::verified(&folder, &m.author, &verify::trusted());
+    Ok(Inspect { verified, new_permissions: music_plugins::perms::added(&granted, &m.permissions), installed, files: files.len(), size: files.iter().map(|(_, s)| s).sum(), manifest: m })
 }
 
 /// Installs (or updates) the plugin in `folder`, its permissions approved by the user, and turns it on.

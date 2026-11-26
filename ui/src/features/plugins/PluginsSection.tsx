@@ -1,4 +1,4 @@
-import { FolderOpen, Gear, GithubLogo, Globe, Info, PuzzlePiece, Star, Warning, WarningCircle } from '@phosphor-icons/react'
+import { FolderOpen, Gear, GithubLogo, Globe, Info, PuzzlePiece, SealCheck, Star, Warning, WarningCircle } from '@phosphor-icons/react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -39,6 +39,17 @@ function Permissions({ list, fresh }: { list: string[]; fresh?: string[] }) {
   )
 }
 
+/** Who made it, and whether Rust found their signature on every file (docs/plugins.md › Verified). */
+function Standing({ verified }: { verified: boolean }) {
+  return verified ? (
+    <span className="flex items-center gap-1 font-medium text-ink-2">
+      <SealCheck size={14} weight="fill" className="text-accent-ink" /> {tr('Verified')}
+    </span>
+  ) : (
+    <>{tr('Not verified')}</>
+  )
+}
+
 /** Before installing: who made it, what it can do. Nothing is copied or run until the user agrees. */
 function Approve({ folder, onClose }: { folder: string; onClose: () => void }) {
   const [info, setInfo] = useState<PluginInspect>()
@@ -71,7 +82,15 @@ function Approve({ folder, onClose }: { folder: string; onClose: () => void }) {
         <>
           <p className="text-[0.8125rem] text-ink-2">{m.description || tr('No description.')}</p>
           <p className="flex items-center gap-1.5 text-xs text-ink-2">
-            <WarningCircle size={14} /> {tr('By {author} · not checked by the app’s developer', { author: m.author })}
+            {info.verified ? (
+              <>
+                {m.author} · <Standing verified />
+              </>
+            ) : (
+              <>
+                <WarningCircle size={14} /> {tr('By {author} · not checked by the app’s developer', { author: m.author })}
+              </>
+            )}
           </p>
           <section className="flex flex-col gap-2">
             <h3 className="text-[0.8125rem] font-semibold">{tr('It will be able to:')}</h3>
@@ -149,7 +168,9 @@ function Details({ p, onClose }: { p: PluginInfo; onClose: () => void }) {
                 {[...m.author.trim()][0]}
               </span>
               {m.author}
-              <span className="text-xs text-ink-3">{tr('Not verified')}</span>
+              <span className="text-xs text-ink-3">
+                <Standing verified={p.verified} />
+              </span>
             </p>
           </Section>
         </>
@@ -203,7 +224,9 @@ function Card({ p, onDetails }: { p: PluginInfo; onDetails: () => void }) {
       <Tags list={p.manifest?.tags} />
       {p.error && <p className="text-xs text-[#F23F43]">{p.error}</p>}
       <footer className="mt-auto flex items-center gap-2 border-t border-line-soft pt-2.5 text-[0.6875rem] text-ink-3">
-        <WarningCircle size={14} /> {p.manifest ? `${p.manifest.author} · ${tr('Not verified')}` : tr('Not verified')}
+        {!p.verified && <WarningCircle size={14} />}
+        {p.manifest && `${p.manifest.author} · `}
+        <Standing verified={p.verified} />
         <span className="flex-1" />
         {p.manifest && <span>v{p.manifest.version}</span>}
       </footer>

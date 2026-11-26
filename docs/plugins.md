@@ -226,6 +226,27 @@ Frames come only while your look is on screen with music playing, so a plugin dr
 When your plugin is off or stopped, the visualizer shows its bars in your look's place. Example:
 `examples/plugins/rings`.
 
+## Verified
+
+A plugin shows **Verified** next to its author when Legato finds that author's signature on it: the author is in the
+list built into the app (`crates/plugins/trusted-authors.json`), the signature holds for their key, and every file in
+the folder is the one signed. A file changed, added or removed since, another name in the manifest, or any other key:
+**Not verified**. It says who made the plugin and that it is unchanged, nothing more: the permissions asked at install
+still apply, and nobody reads your code for you. Everyone else's plugins work the same, as Not verified.
+
+A listed author signs a folder that holds only what the app installs (the manifest and `.js`, `.json`, `.md`, `.txt`,
+`.png` and `.css` files, no sub-folder), after the last change to any of them, from Legato's repository:
+
+```sh
+node scripts/plugin-files.mjs path/to/my-plugin
+pnpm tauri signer sign -f path/to/private.key path/to/my-plugin/legato.files
+```
+
+The first writes `legato.files` (each file's SHA-256 and name), the second `legato.files.sig`; ship both with the
+plugin. The files must reach the user byte for byte (a Git checkout that rewrites line endings breaks the signature:
+`* -text` in the plugin's `.gitattributes`). The key pair comes from `pnpm tauri signer generate -w path/to/private.key`;
+the private key never goes in a repository.
+
 ## During a blind test
 
 While a blind test is open, plugins learn nothing of what plays: it would give the answer away.

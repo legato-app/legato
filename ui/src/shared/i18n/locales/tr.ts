@@ -1205,6 +1205,7 @@ const tr: Record<string, string> = {
   'Its settings and everything it stored are erased.': 'Ayarları ve kaydettiği her şey silinir.',
   'Star on GitHub': 'GitHub’da yıldız ver',
   'Website': 'Web sitesi',
+  Verified: 'Doğrulandı',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',
