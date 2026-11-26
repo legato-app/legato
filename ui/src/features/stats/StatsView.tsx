@@ -16,7 +16,6 @@ import { trackMenu, tracksMenu } from '../menus'
 import { usePlayer } from '../player/store'
 import { recapSpans } from './recap'
 import { hours, statsOf, type Period } from './stats'
-import { phoneApp } from '../../shared/platform'
 
 function Tile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -78,7 +77,7 @@ export function StatsView() {
   const weekdays = useMemo(() => Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(lang, { weekday: 'short' })), [lang])
   const bucket = (t: number) => new Date(t).toLocaleDateString(lang, period === 'year' || period === 'all' ? { month: 'short', year: period === 'all' ? '2-digit' : undefined } : { day: 'numeric', month: 'short' })
 
-  const sub = phoneApp ? tr('From what you played in Legato on this phone') : tr('From what you played in Legato on this PC')
+  const sub = tr('From what you played in Legato')
   const header = (
     <PageHeader
       title={tr('Your stats')}
