@@ -424,6 +424,17 @@ pub async fn plugin_set(app: AppHandle, state: State<'_, AppState>, id: String, 
     }
 }
 
+/// Everything the plugin stored (its settings) erased; a running one starts again on its defaults.
+#[tauri::command]
+pub async fn plugin_reset(app: AppHandle, state: State<'_, AppState>, id: String) -> CmdResult<()> {
+    let reg = registry(&state);
+    let entry = reg.get(&id).ok_or("Plugin not installed")?;
+    // Stopped first: nothing of the old run writes after the erasure.
+    stop(&app, &id);
+    state.lib().set_setting(&storage_key(&id), &Value::Null).map_err(err)?;
+    if entry.on { start(&app, &id, &entry.granted) } else { Ok(()) }
+}
+
 /// Removes the plugin, its storage and its log.
 #[tauri::command]
 pub async fn plugin_uninstall(app: AppHandle, state: State<'_, AppState>, plugins: State<'_, Plugins>, id: String) -> CmdResult<()> {

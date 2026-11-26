@@ -30,6 +30,7 @@ no `legato.manifest`, and it still works:
   "api": 1,
   "main": "main.js",
   "permissions": ["player:read", "ui"],
+  "tags": ["Player"],
   "homepage": "https://example.com/my-plugin",
   "repository": "https://example.com/my-plugin/code"
 }
@@ -41,7 +42,9 @@ no `legato.manifest`, and it still works:
   a newer version of Legato". Versions only grow: a later app keeps running API 1 plugins. The API 2 permissions need
   `"api": 2` (see below).
 - `main`: a `.js` file next to the manifest, 2 MB at most.
-- `homepage`, `repository`: https links, optional.
+- `tags`: optional, 5 words at most (20 characters each), shown on the plugin's card.
+- `homepage`, `repository`: https links, optional: the buttons at the bottom of the plugin's details (a repository on
+  GitHub also gets a star button).
 
 ## Permissions
 

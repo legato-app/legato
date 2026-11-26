@@ -30,6 +30,9 @@ pub struct Manifest {
     pub main: String,
     #[serde(default)]
     pub permissions: Vec<String>,
+    /// A few words saying what it is about, shown on its card.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub tags: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub homepage: Option<String>,
     /// Where the plugin's code lives.
@@ -66,6 +69,7 @@ impl Manifest {
             bail!("This plugin needs a newer version of Legato (plugin API {}, this app has {API})", m.api);
         }
         ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to the manifest");
+        ensure!(m.tags.len() <= 5 && m.tags.iter().all(|tag| !tag.trim().is_empty() && tag.chars().count() <= 20), "manifest: tags must be 5 at most, 1-20 characters each");
         ensure!(m.permissions.len() <= 32, "manifest: too many permissions");
         for p in &m.permissions {
             let since = Permission::parse(p)?.since_api();
@@ -97,6 +101,8 @@ mod tests {
         let m = Manifest::parse(&json(r#","permissions":["player:control","network:api.example.com"]"#)).unwrap();
         assert_eq!(m.main, "main.js");
         assert_eq!(m.permissions().len(), 2);
+        assert!(m.tags.is_empty());
+        assert_eq!(Manifest::parse(&json(r#","tags":["Social"]"#)).unwrap().tags, ["Social"]);
     }
 
     #[test]
@@ -131,6 +137,9 @@ mod tests {
             json(r#","main":"../x.js""#),
             json(r#","main":"main.py""#),
             json(r#","homepage":"http://x""#),
+            json(r#","tags":["a","b","c","d","e","f"]"#),
+            json(r#","tags":[" "]"#),
+            json(r#","tags":["a tag far too long to fit"]"#),
             json(r#","permissions":["network:*"]"#),
             r#"{"id":"../evil","name":"x","version":"1","author":"a","api":1}"#.into(),
             r#"{"id":"ok.id","name":"","version":"1","author":"a","api":1}"#.into(),

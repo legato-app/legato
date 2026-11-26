@@ -12,7 +12,11 @@ api: number,
 /**
  * Script file, next to the manifest.
  */
-main: string, permissions: Array<string>, homepage?: string | null, 
+main: string, permissions: Array<string>, 
+/**
+ * A few words saying what it is about, shown on its card.
+ */
+tags?: Array<string>, homepage?: string | null, 
 /**
  * Where the plugin's code lives.
  */

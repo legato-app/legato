@@ -351,6 +351,8 @@ export const api = {
   pluginInstall: (folder: string) => invoke<string>('plugin_install', { folder }),
   pluginSet: (id: string, on: boolean) => invoke<void>('plugin_set', { id, on }),
   pluginUninstall: (id: string) => invoke<void>('plugin_uninstall', { id }),
+  /** Its storage (settings) erased, a running one restarted. */
+  pluginReset: (id: string) => invoke<void>('plugin_reset', { id }),
   pluginReply: (plugin: string, id: number, ok: boolean, value?: unknown, error?: string) => invoke<void>('plugin_reply', { plugin, id, ok, value: value ?? null, error: error ?? null }),
   /** A blind test opened or closed: while open, plugins learn nothing of what plays. */
   pluginQuiz: (open: boolean) => invoke<void>('plugin_quiz', { open }),
