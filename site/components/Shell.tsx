@@ -1,15 +1,14 @@
-import type { Metadata, Viewport } from 'next'
-import localFont from 'next/font/local'
+import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import og from '@/assets/og.jpg'
 import { Motion } from './motion'
 import { COPIES } from './copies'
 import { LANGS } from './langs'
+import { roboto } from './page'
 import { pick, SAVED } from './pick'
 import '../app/globals.css'
 
-// Served from here (OFL, public/roboto-LICENSE.txt): no font host sees the visitors.
-const roboto = localFont({ src: '../app/fonts/roboto.woff2', weight: '100 900', variable: '--font-roboto', display: 'swap' })
+export { VIEWPORT } from './page'
 
 // Absolute: the pages of every language point at each other (hreflang).
 const SITE = '/legato/'
@@ -27,14 +26,6 @@ export function metadataOf(code: string): Metadata {
     openGraph: { type: 'website', title: 'Legato', description: c.hero.lead, url: path, images: [{ url: og.src, width: og.width, height: og.height }] },
     twitter: { card: 'summary_large_image' },
   }
-}
-
-export const VIEWPORT: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#131313' },
-  ],
 }
 
 /** The English root sends a visitor to their own language's page before the first paint (`pick`; nothing leaves the browser). */

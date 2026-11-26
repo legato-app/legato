@@ -1,0 +1,25 @@
+/* The docs' own style sheet: the site's (Tailwind, the tokens), Fumadocs' on top. No other page loads it. */
+@import '../globals.css';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Fumadocs' colors are Legato's: the tokens already follow the system's light or dark (globals.css). */
+:root,
+:root.dark {
+  --color-fd-background: var(--bg);
+  --color-fd-foreground: var(--ink);
+  --color-fd-muted: var(--panel);
+  --color-fd-muted-foreground: var(--ink-2);
+  --color-fd-popover: var(--bg);
+  --color-fd-popover-foreground: var(--ink);
+  --color-fd-card: var(--panel);
+  --color-fd-card-foreground: var(--ink);
+  --color-fd-border: var(--line-soft);
+  --color-fd-primary: var(--accent-ink);
+  --color-fd-primary-foreground: var(--bg);
+  --color-fd-secondary: var(--panel);
+  --color-fd-secondary-foreground: var(--ink);
+  --color-fd-accent: var(--raised);
+  --color-fd-accent-foreground: var(--ink);
+  --color-fd-ring: var(--ink);
+}
