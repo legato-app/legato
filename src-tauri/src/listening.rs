@@ -16,6 +16,12 @@ pub async fn record_play(state: State<'_, AppState>, play: Play) -> CmdResult<()
     state.lib().record_play(&play).map_err(err)
 }
 
+/// The interface's `blockedArtists` setting.
+fn blocked_artists(state: &AppState) -> Vec<String> {
+    let ui = state.lib().setting("ui").ok().flatten();
+    ui.and_then(|ui| serde_json::from_value(ui.get("blockedArtists")?.clone()).ok()).unwrap_or_default()
+}
+
 /// Mixes for today. `utc_offset` = local minus UTC, seconds (from the UI clock).
 #[tauri::command]
 pub async fn mixes(state: State<'_, AppState>, utc_offset: i64) -> CmdResult<Response> {
@@ -30,8 +36,14 @@ pub async fn mixes(state: State<'_, AppState>, utc_offset: i64) -> CmdResult<Res
         }
         (stamp, (lib.tracks().map_err(err)?, lib.plays().map_err(err)?, lib.custom_playlists().map_err(err)?, lib.saved_playlists().map_err(err)?, lib.liked_tracks().map_err(err)?, lib.prefs().map_err(err)?))
     };
+    // Artists never played again: neither their songs here nor those the radios find.
+    let never = blocked_artists(&state);
+    let tracks: Vec<_> = tracks.into_iter().filter(|t| !music_core::mixes::artist_blocked(&t.track.artist, &never)).collect();
     let input = music_core::mixes::Input { tracks: &tracks, plays: &plays, playlists: &playlists, saved: &saved, liked: &liked, prefs: &prefs, now, utc_offset, seed: today(), found: &[] };
-    let found = music_core::mixes::without_blocked(radios(&state, music_core::mixes::seeds(&input)).await, &blocked_finds(&state));
+    let mut found = music_core::mixes::without_blocked(radios(&state, music_core::mixes::seeds(&input)).await, &blocked_finds(&state));
+    for (_, songs) in &mut found {
+        songs.retain(|song| !music_core::mixes::artist_blocked(&song.artist, &never));
+    }
     let answer = state.cache.mixes.get_or(utc_offset, stamp, || serde_json::to_string(&music_core::mixes::mixes(&music_core::mixes::Input { found: &found, ..input })).map_err(err))?;
     Ok(json(answer))
 }

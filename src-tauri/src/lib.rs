@@ -348,8 +348,13 @@ async fn save_settings(#[cfg_attr(mobile, allow(unused_variables))] app: tauri::
     }
     #[cfg(desktop)]
     let channel = update::Channel::from_ui(state.lib().setting("ui").map_err(err)?.as_ref());
+    // Another list of artists never played: the day's mixes are made again.
+    let blocked_before = state.lib().setting("ui").map_err(err)?.and_then(|ui| ui.get("blockedArtists").cloned());
     // Stamped key by key: Sync Mode merges settings by their newest change.
     state.lib().save_ui_settings(&settings, music_core::library::now_ms()).map_err(err)?;
+    if blocked_before.as_ref() != settings.get("blockedArtists") {
+        state.cache.mixes.clear();
+    }
     // Update channel picked: the updater looks at the new one now (saved first, it reads the setting).
     #[cfg(desktop)]
     if update::Channel::from_ui(Some(&settings)) != channel

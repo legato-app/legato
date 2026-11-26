@@ -64,6 +64,19 @@ pub fn first_artist(artist: &str) -> &str {
     artist[..end].trim()
 }
 
+/// Every credited artist as written, cut where `first_artist` cuts.
+pub fn credits(artist: &str) -> Vec<&str> {
+    let shielded = shield(artist);
+    let (mut names, mut from) = (Vec::new(), 0);
+    for separator in ARTIST_SPLIT.find_iter(&shielded) {
+        names.push(artist[from..separator.start()].trim());
+        from = separator.end();
+    }
+    names.push(artist[from..].trim());
+    names.retain(|name| !name.is_empty());
+    names
+}
+
 /// First credited artist, normalized ("A, B & C feat. D" → "a").
 pub fn primary_artist(artist: &str) -> String {
     normalize(first_artist(artist))

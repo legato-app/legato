@@ -13,6 +13,7 @@ import { primaryArtist } from '../library/filter'
 import type { PickWhy } from './pickWhy'
 import { usePickWhy } from './pickWhyStore'
 import { loadTaste, tasteFor, useTaste } from './taste'
+import { withoutBlocked } from './blockedArtists'
 
 const keyOf = (t: LibraryTrack) => t.ids.youtube ?? `#${t.id}`
 
@@ -62,7 +63,9 @@ export async function startRadioFrom(songs: LibraryTrack[], name = radioName(son
   if (!lead) return
   const more = await similarTo(seeds, new Set(songs.map(keyOf)), 30)
   if (!more.length) return notify(tr('No similar songs found'))
-  playRadio(radioQueue(lead, more, shuffled(songs.filter((t) => t !== lead))), name)
+  // The song asked for leads, whoever sings it; what follows passes over blocked artists.
+  const { blockedArtists } = useSettings.getState().settings
+  playRadio(radioQueue(lead, withoutBlocked(more, blockedArtists), withoutBlocked(shuffled(songs.filter((t) => t !== lead)), blockedArtists)), name)
 }
 
 /** The local hour for the time-of-day signal, only once there are enough plays of history to read it from. */
@@ -79,7 +82,7 @@ async function around(seeds: LibraryTrack[], extra: (t: LibraryTrack) => Promise
   candidates.push(...radios, ...(await extra(seeds[0])).filter((c) => fresh(c.track)))
   // Never in mixes and recent skips come from the taste store (loaded when idle; asked here only if it is still empty).
   if (!useTaste.getState().loaded) await loadTaste()
-  return { candidates, library: tracks, taste: tasteFor(stats, useTaste.getState().signals), variety: settings.similarVariety, hour: timeOfDay(stats) }
+  return { candidates, library: tracks, taste: tasteFor(stats, useTaste.getState().signals, useSettings.getState().settings.blockedArtists), variety: settings.similarVariety, hour: timeOfDay(stats) }
 }
 
 /**
@@ -132,7 +135,7 @@ export async function startDiscovery(home: YtmHome) {
   if (!useTaste.getState().loaded) await loadTaste()
   const why = new Map<number, PickWhy>()
   const { pickSimilar } = await import('./similarRank')
-  const picks = pickSimilar(candidates, recent, recent.length - 1, tasteFor(stats, useTaste.getState().signals), settings.similarVariety, 20, Math.random, tracks, timeOfDay(stats), why)
+  const picks = pickSimilar(candidates, recent, recent.length - 1, tasteFor(stats, useTaste.getState().signals, useSettings.getState().settings.blockedArtists), settings.similarVariety, 20, Math.random, tracks, timeOfDay(stats), why)
   if (picks.length < 2) return notify(tr('No similar songs found'))
   playPicks(picks, why)
   if (usePlayer.getState().list === picks) usePlayer.setState({ from: tr('New for you'), fromKind: 'mix', fromId: undefined })

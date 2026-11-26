@@ -55,6 +55,7 @@ export const MENU_ITEMS: Record<MenuKind, ItemDef[]> = {
     def('removeFrom', msg('Remove from library'), 'library', 'essential'),
     def('goToAlbum', 'Go to album', 'go', 'essential'),
     def('goToArtist', 'Go to artist', 'go', 'essential'),
+    def('neverArtist', msg('Never play this artist again'), 'go', 'detail'),
     def('findFull', 'Find full version', 'go', 'detail'),
     def('rate', 'Rating', 'taste', 'essential'),
     def('mixes', 'Mixes', 'taste', 'detail'),

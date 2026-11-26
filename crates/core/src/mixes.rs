@@ -455,6 +455,16 @@ pub fn set_blocked(all: &mut HashSet<String>, title: &str, artist: &str, block: 
     all.insert(key);
 }
 
+/// Any artist of the credit is one the user never wants played ("Never play this artist again"). The interface's
+/// twin: `blockedArtists.ts`.
+pub fn artist_blocked(artist: &str, blocked: &[String]) -> bool {
+    if blocked.is_empty() {
+        return false;
+    }
+    let blocked: Vec<String> = blocked.iter().map(|name| crate::matching::normalize(name)).collect();
+    crate::matching::credits(artist).iter().any(|name| blocked.contains(&crate::matching::normalize(name.trim_end_matches(" - Topic"))))
+}
+
 /// The radios' songs without the ones the user said never to see in mixes (`blocked`: `matching::match_key` of title and
 /// artist, since a discovered song has no library row to hold the choice).
 pub fn without_blocked(found: Vec<(i64, Vec<Track>)>, blocked: &HashSet<String>) -> Vec<(i64, Vec<Track>)> {
@@ -986,6 +996,15 @@ mod tests {
         }
         plays.extend((101..=112).map(|i| play(i, NOW - 2 * DAY + i * 240, true)));
         (tracks, plays, (1..=12).collect())
+    }
+
+    #[test]
+    fn a_blocked_artist_is_any_whole_name_of_the_credit() {
+        let blocked = vec!["Band".to_string()];
+        for credit in ["Band", "band - Topic", "Other feat. Band", "Other & Band"] {
+            assert!(artist_blocked(credit, &blocked), "{credit}");
+        }
+        assert!(!artist_blocked("Bandits", &blocked) && !artist_blocked("Band", &[]));
     }
 
     #[test]

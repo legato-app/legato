@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { api, type LibraryTrack, type TasteSignal } from '../../shared/api'
 import { onListenEnd, REPLAY_GAP, session } from './listens'
 import type { Taste } from './score'
+import { artistBlocked } from './blockedArtists'
 
 /**
  * The taste signals of the library (decayed plays, last played, recent skips, liked, less, never), read once from Rust and kept in memory
@@ -45,7 +46,7 @@ function replayedNow(id: number, lastPlayed: number): boolean {
 }
 
 /** What the model reads about a song: the store's stats (`stats[id]` = listens, last start, rating) and the signals. */
-export function tasteFor(stats: Record<number, [plays: number, last: number, stars?: number] | undefined>, signals: Map<number, TasteSignal>): Taste {
+export function tasteFor(stats: Record<number, [plays: number, last: number, stars?: number] | undefined>, signals: Map<number, TasteSignal>, blocked: readonly string[] = []): Taste {
   return {
     rating: (t: LibraryTrack) => stats[t.id]?.[2] ?? 0,
     plays: (t: LibraryTrack) => stats[t.id]?.[0] ?? 0,
@@ -53,7 +54,7 @@ export function tasteFor(stats: Record<number, [plays: number, last: number, sta
     skips: (t: LibraryTrack) => Math.max(signals.get(t.id)?.skipsRecent ?? 0, session.skips.get(t.id) ?? 0),
     heard: (t: LibraryTrack) => session.last.get(t.id) ?? 0,
     near: (t: LibraryTrack) => signals.get(t.id)?.near ?? [],
-    never: (t: LibraryTrack) => signals.get(t.id)?.never ?? false,
+    never: (t: LibraryTrack) => (signals.get(t.id)?.never ?? false) || artistBlocked(t.artist, blocked),
     less: (t: LibraryTrack) => signals.get(t.id)?.less ?? false,
     // A song heard again within a day is a strong like, beside Liked Music (Rust counts the replays from the stored plays).
     liked: (t: LibraryTrack) => (signals.get(t.id)?.liked ?? false) || (signals.get(t.id)?.replays ?? 0) > 0 || replayedNow(t.id, signals.get(t.id)?.lastPlayed ?? 0),

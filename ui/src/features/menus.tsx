@@ -57,6 +57,7 @@ import { msg, tr, trn } from '../shared/i18n/i18n'
 import { ask, askText } from '../shared/ui/Ask'
 import { phoneApp } from '../shared/platform'
 import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, useBookmarks } from './player/bookmarks'
+import { artistBlocked } from './player/blockedArtists'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
@@ -412,6 +413,19 @@ function removeFrom(t: LibraryTrack): MenuEntry {
 }
 
 /** ctx.list / index = where it sits (play from there). playlistId + position = custom playlist row. queueIndex = row of the Up next panel. */
+/** "Never play this artist again" (or back): for radio, mixes and autoplay; a song picked by hand still plays. */
+export function neverArtistItem(artist: string): MenuEntry {
+  const { settings, update } = useSettings.getState()
+  const blocked = artistBlocked(artist, settings.blockedArtists)
+  const set = (blockedArtists: string[]) => update({ blockedArtists })
+  const allow = () => set(useSettings.getState().settings.blockedArtists.filter((name) => name.toLowerCase() !== artist.toLowerCase()))
+  const block = () => {
+    set([...useSettings.getState().settings.blockedArtists, artist])
+    app().notify(tr('{name} won’t come up in radio, mixes or autoplay', { name: artist }), { kind: 'removed', action: { label: tr('Undo'), run: allow } })
+  }
+  return { id: 'neverArtist', label: blocked ? tr('Allow this artist again') : tr('Never play this artist again'), icon: <Prohibit size={16} />, onSelect: blocked ? allow : block }
+}
+
 /** Your rating: whole stars here (halves in a list's Rating column); the one it has, picked again, takes it off. */
 function rateItem(t: LibraryTrack): MenuEntry {
   const was = app().stats[t.id]?.[2] ?? 0
@@ -456,6 +470,7 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
     '-',
     t.album && { id: 'goToAlbum', label: tr('Go to album'), icon: <Disc size={16} />, onSelect: () => go({ name: 'album', album: t.album!, artist: primaryArtist(t.artist) }) },
     { id: 'goToArtist', label: tr('Go to artist'), icon: <MicrophoneStage size={16} />, onSelect: () => go({ name: 'artist', artist: primaryArtist(t.artist) }) },
+    neverArtistItem(primaryArtist(t.artist)),
     !isFull(t) &&
       app().status.youtube.connected && {
         id: 'findFull',

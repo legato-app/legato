@@ -189,7 +189,7 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `S` Playlist icons default to a grid of 4 covers (`39122055`).
 - [x] `S` « Made from songs you love » mixes take their seed song's cover (`c449f71d`).
 - [ ] `M` Right-click › Hide for parts of the interface (first the Now Playing panel's cards), shown again from Settings › Appearance. A live interface editor for themes comes later.
-- [ ] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back.
+- [x] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back. 2026-11-26: song and artist menus, Settings › Playback › Auto-DJ › Artists never played; synced. Never seen.
 - [ ] `M` Mix covers in several styles, different from one mix to the next, instead of 2×2 grids everywhere.
 - [ ] `M` Normal videos (a story web series) counted as music: rework the detection; no « Like » mix seeded from a non-music video.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.

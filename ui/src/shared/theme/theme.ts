@@ -374,6 +374,8 @@ export interface Settings {
   sidebarCounts: boolean
   /** Sidebar entries hidden (right-click one, or Settings › Appearance). Per PC; a hidden page is still reachable. */
   hiddenNav: NavItem[]
+  /** Artists never played again: radio, mixes and autoplay pass over them (an artist's right-click menu; Settings). */
+  blockedArtists: string[]
   /** Songs a source marked explicit left out of Songs, playlists and mixes. Off: a parent's choice, not a default. */
   hideExplicit: boolean
   /** Cover Art Archive covers on Home's "New from your artists" (a new host: archive.org). Off by default, for privacy. */
@@ -626,6 +628,7 @@ export const DEFAULTS: Settings = {
   motion: true,
   sidebarCounts: true,
   hiddenNav: [],
+  blockedArtists: [],
   hideExplicit: false,
   releaseCovers: false,
   // Covers on every song row, compact too (user's pick 2026-10-29, over the mockup's coverless compact rows).
@@ -901,6 +904,7 @@ export function sanitize(raw: unknown): Settings {
     motion: typeof r.motion === 'boolean' ? r.motion : DEFAULTS.motion,
     sidebarCounts: typeof r.sidebarCounts === 'boolean' ? r.sidebarCounts : DEFAULTS.sidebarCounts,
     hiddenNav: NAV_ITEMS.filter((n) => Array.isArray(r.hiddenNav) && r.hiddenNav.includes(n)),
+    blockedArtists: Array.isArray(r.blockedArtists) ? [...new Set(r.blockedArtists.filter((name): name is string => typeof name === 'string' && !!name.trim() && name.length <= 200))].slice(0, 500) : [],
     hideExplicit: r.hideExplicit === true,
     releaseCovers: r.releaseCovers === true,
     listCovers: typeof r.listCovers === 'boolean' ? r.listCovers : DEFAULTS.listCovers,

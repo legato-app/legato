@@ -7,6 +7,7 @@ import { ownLiked, youtubeLiked } from '../library/likedMusic'
 import { djPick, djWhy, likedArtists, type DjRules, type DjWhy } from './autoDjPick'
 import { vias } from './sources'
 import { usePlayer } from './store'
+import { withoutBlocked } from './blockedArtists'
 
 /** Songs the Auto-DJ queues at a time: at its start, then each time Up next runs out. */
 const BATCH = 10
@@ -27,7 +28,7 @@ export const whyText = (w: DjWhy) =>
 function pick(pool: readonly number[], queue: readonly LibraryTrack[]): LibraryTrack[] {
   const { tracks, stats, raw } = useStore.getState()
   const keep = new Set(pool)
-  const songs = tracks.filter((t) => keep.has(t.id) && vias(t).length > 0)
+  const songs = withoutBlocked(tracks.filter((t) => keep.has(t.id) && vias(t).length > 0), useSettings.getState().settings.blockedArtists)
   // Liked Music, the account's and yours: their artists come up more.
   const liked = new Set([youtubeLiked(raw.playlists), ownLiked(raw.playlists)].flatMap((p) => (p ? (raw.orders[p.id] ?? []) : [])))
   const by = likedArtists(tracks, liked)

@@ -21,7 +21,7 @@ import { CardRow, MediaCard } from '../../shared/ui/Section'
 import { SourceIcon, sourceLabel } from '../../shared/ui/SourceIcon'
 import { PageBoundary } from '../../app/PageBoundary'
 import { YouTubeShelf } from '../../app/pages'
-import { trackMenu, tracksMenu } from '../menus'
+import { neverArtistItem, trackMenu, tracksMenu } from '../menus'
 import { toggleLike, useLikedIds } from '../player/like'
 import { startRadioFrom } from '../player/radio'
 import { canPlay, remoteTrack, usePlayer } from '../player/store'
@@ -359,7 +359,7 @@ export function ArtistView({ artist }: { artist: string }) {
   const photo = photoOf(picture, shown.length || !yt?.art ? firstArt(shown) : [remoteArt(yt.art)])
   const tint = useCoverTint(photo[0])
   // Only an artist of the library has a walk (it follows what you listen to together).
-  const walk: MenuEntry[] = shown.length ? ['-', { label: tr('Walk to another artist…'), icon: <MicrophoneStage size={16} />, onSelect: () => void import('./artistWalk').then((m) => m.walkFrom(artist)) }] : []
+  const walk: MenuEntry[] = shown.length ? ['-', { label: tr('Walk to another artist…'), icon: <MicrophoneStage size={16} />, onSelect: () => void import('./artistWalk').then((m) => m.walkFrom(artist)) }, neverArtistItem(artist)] : [neverArtistItem(artist)]
   const header = (
     <PageHeader
       onContextMenu={onMenu(() => tracksMenu(playable, walk))}

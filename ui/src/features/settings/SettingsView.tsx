@@ -1077,6 +1077,22 @@ function PlaybackSection() {
       </Group>
       <Group title={msg('Auto-DJ')}>
         <div className="rounded-xl border border-line bg-raised">
+          <Row setting="blockedArtists" label={msg('Artists never played')} sub={tr('Radio, mixes and autoplay pass over them; add one from an artist’s right-click menu. A song you pick still plays')}>
+            {s.blockedArtists.length ? (
+              <ul className="flex flex-col gap-1.5">
+                {s.blockedArtists.map((name) => (
+                  <li key={name} className="flex items-center justify-between gap-3 text-[0.8125rem]">
+                    <span className="truncate">{name}</span>
+                    <Button variant="ghost" onClick={() => update({ blockedArtists: s.blockedArtists.filter((other) => other !== name) })}>
+                      {tr('Allow again')}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-xs text-ink-3">{tr('None')}</span>
+            )}
+          </Row>
           <Row setting="djFresh" label={msg('Songs heard lately')} sub={tr('A song heard within this time waits until the others have played')}>
             <Segmented label={tr('Songs heard lately')} value={String(s.djFresh)} onChange={(v) => update({ djFresh: +v })} options={DJ_FRESH.map((d) => ({ value: String(d), label: tr(freshLabels[d]) }))} />
           </Row>
