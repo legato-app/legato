@@ -313,10 +313,17 @@ fn stop(app: &AppHandle, id: &str) {
     let _ = app.emit_to("main", "plugin-state", id);
 }
 
-/// At launch: the plugins left on.
+/// At launch: the plugins left on, the bundled one refreshed first.
 pub fn start_all(app: &AppHandle) {
     let state = app.state::<AppState>();
-    for (id, e) in registry(&state) {
+    let reg = registry(&state);
+    if let (Ok(root), Ok(bundled)) = (dir(app), Manifest::parse(discord_move::FILES[0].1))
+        && reg.contains_key(&bundled.id)
+        && let Err(error) = discord_move::refresh(&root.join(&bundled.id))
+    {
+        crate::diag::warn("plugins", "bundled plugin not refreshed", &format!("{error:#}"));
+    }
+    for (id, e) in reg {
         if !e.on {
             continue;
         }

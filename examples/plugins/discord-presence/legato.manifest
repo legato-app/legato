@@ -1,7 +1,7 @@
 {
   "id": "app.legato.discord-presence",
   "name": "Discord presence",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Legato",
   "description": "Shows what you play on your Discord profile, with your own Discord application.",
   "api": 2,

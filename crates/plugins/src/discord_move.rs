@@ -1,13 +1,37 @@
 //! The built-in Discord presence became a plugin (examples/plugins/discord-presence): what moves with a user who had
 //! it on.
 
+use crate::Manifest;
+use anyhow::Result;
 use serde_json::{Value, json};
+use std::path::Path;
 
 /// The bundled plugin, written into the app's plugin folder: (file name, content).
 pub const FILES: [(&str, &str); 2] = [
     ("legato.manifest", include_str!("../../../examples/plugins/discord-presence/legato.manifest")),
     ("main.js", include_str!("../../../examples/plugins/discord-presence/main.js")),
 ];
+
+/// An installed copy older than the bundled one gets the bundled files: true when it did. Storage and granted
+/// permissions are the library's, not touched here.
+pub fn refresh(folder: &Path) -> Result<bool> {
+    let bundled = Manifest::parse(FILES[0].1)?;
+    let installed = Manifest::read(folder)?;
+    let older = matches!((numbers(&installed.version), numbers(&bundled.version)), (Some(old), Some(new)) if old < new);
+    if installed.id != bundled.id || !older {
+        return Ok(false);
+    }
+    // The manifest last: a copy cut short still reads as old, and is done again at the next launch.
+    for (name, content) in FILES.iter().rev() {
+        std::fs::write(folder.join(name), content)?;
+    }
+    Ok(true)
+}
+
+/// "1.2.10" as numbers. None for anything else: that copy is the user's own, left alone.
+fn numbers(version: &str) -> Option<Vec<u32>> {
+    version.split('.').map(|part| part.parse().ok()).collect()
+}
 
 /// The old add-on's settings (`settings.discord`) as the plugin's storage. One that isn't there stays unset: the
 /// plugin's own default holds.
@@ -20,7 +44,24 @@ pub fn storage(settings: &Value) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Manifest;
+
+    #[test]
+    fn only_an_older_copy_gets_the_bundled_files() {
+        let folder = std::env::temp_dir().join(format!("legato-discord-refresh-test-{}", std::process::id()));
+        std::fs::create_dir_all(&folder).unwrap();
+        let bundled = Manifest::parse(FILES[0].1).unwrap();
+        let at = |version: &str| FILES[0].1.replace(&format!("\"version\": \"{}\"", bundled.version), &format!("\"version\": \"{version}\""));
+        for (version, refreshed) in [("1.0.0", true), ("0.9.9", true), (bundled.version.as_str(), false), ("1.0.10", false), ("2.0.0", false), ("1.0.0-mine", false)] {
+            std::fs::write(folder.join("legato.manifest"), at(version)).unwrap();
+            std::fs::write(folder.join("main.js"), "mine").unwrap();
+            assert_eq!(refresh(&folder).unwrap(), refreshed, "{version}");
+            assert_eq!(std::fs::read_to_string(folder.join("main.js")).unwrap() == FILES[1].1, refreshed, "{version}");
+        }
+        std::fs::remove_dir_all(&folder).unwrap();
+        // Not installed: nothing written.
+        assert!(refresh(&folder).is_err());
+        assert!(!folder.exists());
+    }
 
     #[test]
     fn the_old_settings_become_the_plugins_storage() {
