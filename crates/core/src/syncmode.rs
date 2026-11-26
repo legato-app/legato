@@ -103,8 +103,8 @@ impl PlaylistSnap {
 }
 
 impl Snapshot {
-    /// Tracks (indexes) its made-up mixes hold and nothing of the user's names: no other list, add, preference,
-    /// rating, play or edit.
+    /// Tracks (indexes) its made-up mixes hold, only YouTube can play and nothing of the user's names: no other list,
+    /// add, preference, rating, play or edit (`library::mix_cleanup`'s rule, as far as a snapshot tells).
     fn only_in_made_up_mixes(&self) -> HashSet<u32> {
         let (mixes, others): (Vec<&PlaylistSnap>, Vec<&PlaylistSnap>) = self.playlists.iter().partition(|p| p.made_up_mix());
         let mut only: HashSet<u32> = mixes.iter().flat_map(|p| p.tracks.iter().copied()).collect();
@@ -119,6 +119,8 @@ impl Snapshot {
         for i in named {
             only.remove(&i);
         }
+        let edited: HashSet<&str> = self.edits.iter().filter_map(|e| e.song.as_deref()?.strip_prefix("yt:")).collect();
+        only.retain(|i| self.tracks.get(*i as usize).is_none_or(|t| t.ids.iter().all(|(source, id)| *source == Source::Youtube && !edited.contains(id.as_str()))));
         only
     }
 }
@@ -1166,6 +1168,21 @@ mod tests {
         b.merge(&a.snapshot("pc-a", "A", Default::default(), None)?)?;
         assert_eq!(b.playlists()?.into_iter().map(|p| p.source_id).collect::<Vec<_>>(), ["PL1"]);
         assert_eq!(b.tracks()?.into_iter().map(|t| t.track.title).collect::<Vec<_>>(), ["Kept"]);
+        Ok(())
+    }
+
+    #[test]
+    fn a_mix_song_with_another_source_or_an_edit_still_comes() -> Result<()> {
+        let (a, b) = (Library::in_memory()?, Library::in_memory()?);
+        let mut two_sources = song("Two", "t1");
+        two_sources.ids.insert(Source::Spotify, "s1".into());
+        a.save_playlist(Source::Youtube, "RDTMAK5", "My Mix", &[two_sources, song("Edited", "e1"), song("Only", "o1")])?;
+        let mut snapshot = a.snapshot("pc-a", "A", Default::default(), None)?;
+        snapshot.edits.push(EditSnap { uid: "u1".into(), song: Some("yt:e1".into()), name: "x".into(), effects: "{}".into(), active: true, updated: 1 });
+        b.merge(&snapshot)?;
+        let mut titles: Vec<String> = b.tracks()?.into_iter().map(|t| t.track.title).collect();
+        titles.sort();
+        assert_eq!(titles, ["Edited", "Two"]);
         Ok(())
     }
 
