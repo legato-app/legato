@@ -34,7 +34,7 @@ export function DeviceScene() {
   }, [])
   const name = device && `${root}landing/${device}-${dark ? 'dark' : 'light'}`
   return (
-    <div aria-hidden className="aspect-[16/10] w-full max-w-[640px] [@media(max-height:760px)]:hidden">
+    <div aria-hidden className="aspect-[16/10] w-full max-w-[440px] [@media(max-height:860px)]:hidden">
       {name &&
         (still ? (
           <img src={`${name}.webp`} alt="" width={1280} height={800} className="size-full" />
