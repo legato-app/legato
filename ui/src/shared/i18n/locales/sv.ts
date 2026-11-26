@@ -1198,6 +1198,8 @@ const sv: Record<string, string> = {
   'Open Spotify': 'Öppna Spotify',
   'This PC is also signed out of Spotify’s page.': 'Den här datorn loggas också ut från Spotifys sida.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'De tas bort på den här datorn; en dator som fortfarande är ansluten till Spotify hämtar tillbaka dem.',
+  'Discord presence: your plugin is in Add-ons': 'Discord-närvaro: ditt tillägg finns under Tillägg',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'Kopior av biblioteket som gjorts före uppdateringar behåller historiken tills de ersätts.',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

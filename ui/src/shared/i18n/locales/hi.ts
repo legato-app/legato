@@ -1198,6 +1198,8 @@ const hi: Record<string, string> = {
   'Open Spotify': 'Spotify खोलें',
   'This PC is also signed out of Spotify’s page.': 'यह PC Spotify के पेज से भी साइन आउट हो गया है।',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'ये इस PC से हटाई जाती हैं; Spotify से अब भी जुड़ा कोई PC इन्हें वापस ले आता है।',
+  'Discord presence: your plugin is in Add-ons': 'Discord प्रेज़ेंस: आपका प्लगइन ऐड-ऑन में है',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'अपडेट से पहले बनी लाइब्रेरी की कॉपियाँ बदले जाने तक इतिहास रखती हैं।',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

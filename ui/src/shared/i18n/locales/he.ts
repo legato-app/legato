@@ -1163,6 +1163,8 @@ const he: Record<string, string> = {
   'Open Spotify': 'פתיחת Spotify',
   'This PC is also signed out of Spotify’s page.': 'המחשב הזה גם מנותק מדף Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'הם יוסרו במחשב הזה; מחשב שעדיין מחובר ל-Spotify יחזיר אותם.',
+  'Discord presence: your plugin is in Add-ons': 'נוכחות ב-Discord: התוסף שלכם נמצא בתוספים',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'עותקי הספרייה שנוצרו לפני עדכונים שומרים את ההיסטוריה עד שיוחלפו.',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

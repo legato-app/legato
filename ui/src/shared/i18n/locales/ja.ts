@@ -1198,6 +1198,8 @@ const ja: Record<string, string> = {
   'Open Spotify': 'Spotify を開く',
   'This PC is also signed out of Spotify’s page.': 'この PC は Spotify のページからもサインアウトします。',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'この PC から削除されます。Spotify に接続したままの PC があると元に戻ります。',
+  'Discord presence: your plugin is in Add-ons': 'Discord の表示：お使いのプラグインはアドオンにあります',
+  'Copies of the library made before updates keep the history until they’re replaced.': '更新前に作られたライブラリのコピーには、置き換えられるまで履歴が残ります。',
   'See the play queue': '再生キューを見る',
   'Read your listening history': '再生履歴を読む',
   'Sees what you listened to and when': '何をいつ聴いたかが分かります',

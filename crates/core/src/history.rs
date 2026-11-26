@@ -245,6 +245,10 @@ impl Library {
         self.gone("history", "")?;
         // Whole-table delete skips the update hook (SQLite's truncate optimization).
         self.versions.touch("plays");
+        // The copy made before the mixes' cleanup holds the history too.
+        if let Some(path) = self.db.path().filter(|path| !path.is_empty()) {
+            crate::library::remove_mix_cleanup_backups(std::path::Path::new(path), std::time::Duration::ZERO)?;
+        }
         Ok(())
     }
 

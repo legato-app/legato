@@ -383,16 +383,17 @@ pub async fn plugin_install(app: AppHandle, state: State<'_, AppState>, folder: 
 const DISCORD_MOVED: &str = "discordPluginMoved1";
 
 /// For who had the built-in Discord presence on (`settings`: its settings): the bundled plugin installed, its
-/// permissions granted, the settings moved into its storage. True: done now, so the interface switches the old one off.
+/// permissions granted, the settings moved into its storage. Done now: "moved", or "kept" for a plugin installed by
+/// hand already (left as the user set it); the interface switches the old one off. None: done before.
 #[tauri::command]
-pub async fn plugin_adopt_discord(app: AppHandle, state: State<'_, AppState>, settings: Value) -> CmdResult<bool> {
+pub async fn plugin_adopt_discord(app: AppHandle, state: State<'_, AppState>, settings: Value) -> CmdResult<Option<&'static str>> {
     if state.lib().setting(DISCORD_MOVED).map_err(err)?.is_some() {
-        return Ok(false);
+        return Ok(None);
     }
     let manifest = Manifest::parse(discord_move::FILES[0].1).map_err(err)?;
     let mut reg = registry(&state);
-    // Installed by hand already: left as the user set it.
-    if !reg.contains_key(&manifest.id) {
+    let new = !reg.contains_key(&manifest.id);
+    if new {
         let target = dir(&app)?.join(&manifest.id);
         std::fs::create_dir_all(&target).map_err(err)?;
         for (name, content) in discord_move::FILES {
@@ -405,7 +406,7 @@ pub async fn plugin_adopt_discord(app: AppHandle, state: State<'_, AppState>, se
         let _ = app.emit_to("main", "plugin-state", &manifest.id);
     }
     state.lib().set_setting(DISCORD_MOVED, &json!(true)).map_err(err)?;
-    Ok(true)
+    Ok(Some(if new { "moved" } else { "kept" }))
 }
 
 #[tauri::command]

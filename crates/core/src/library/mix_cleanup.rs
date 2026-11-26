@@ -20,11 +20,32 @@ pub struct MixesRemoved {
     pub songs: usize,
 }
 
-/// The copy made before the cleanup, next to the library, kept.
+const BACKUP_PREFIX: &str = "library-before-mix-cleanup-";
+
+/// Removes the copies made before the cleanup that are `older_than` or more: they hold the listening history too.
+/// Returns how many.
+pub fn remove_mix_cleanup_backups(library: &Path, older_than: std::time::Duration) -> Result<usize> {
+    let Some(folder) = library.parent() else { return Ok(0) };
+    let mut removed = 0;
+    for entry in std::fs::read_dir(folder)?.flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !name.starts_with(BACKUP_PREFIX) || !name.ends_with(".db") {
+            continue;
+        }
+        // A date ahead of the clock: as new as can be.
+        if entry.metadata()?.modified()?.elapsed().unwrap_or_default() >= older_than {
+            std::fs::remove_file(entry.path())?;
+            removed += 1;
+        }
+    }
+    Ok(removed)
+}
+
+/// The copy made before the cleanup, next to the library: kept 30 days, or until the history is reset.
 pub fn back_up_before_mix_cleanup(library: &Path) -> Result<std::path::PathBuf> {
     let db = Connection::open_with_flags(library, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
     let today: String = db.query_row("SELECT date('now', 'localtime')", [], |row| row.get(0))?;
-    let to = library.with_file_name(format!("library-before-mix-cleanup-{today}.db"));
+    let to = library.with_file_name(format!("{BACKUP_PREFIX}{today}.db"));
     copy_to(&db, &to)?;
     Ok(to)
 }
@@ -124,5 +145,25 @@ mod tests {
         // Once.
         assert!(!lib.mix_cleanup_pending()?);
         Ok(())
+    }
+
+    #[test]
+    fn the_copies_leave_after_30_days_or_with_the_history() {
+        let folder = tempfile::tempdir().unwrap();
+        let library = folder.path().join("library.db");
+        let lib = Library::open(&library).unwrap();
+        let day = std::time::Duration::from_secs(86_400);
+        let file = |name: &str, age: u32| {
+            let path = folder.path().join(name);
+            let made = std::fs::File::create(&path).unwrap();
+            made.set_modified(std::time::SystemTime::now() - day * age).unwrap();
+            path
+        };
+        let (old, recent) = (file("library-before-mix-cleanup-2026-01-01.db", 31), file("library-before-mix-cleanup-2026-03-01.db", 29));
+        let other = file("library-before-restore.db", 99);
+        assert_eq!(remove_mix_cleanup_backups(&library, day * 30).unwrap(), 1);
+        assert!(!old.exists() && recent.exists() && other.exists());
+        lib.clear_history().unwrap();
+        assert!(!recent.exists() && other.exists() && library.exists());
     }
 }

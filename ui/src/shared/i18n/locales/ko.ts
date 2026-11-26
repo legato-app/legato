@@ -1198,6 +1198,8 @@ const ko: Record<string, string> = {
   'Open Spotify': 'Spotify 열기',
   'This PC is also signed out of Spotify’s page.': '이 PC는 Spotify 페이지에서도 로그아웃됩니다.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': '이 PC에서 삭제됩니다. Spotify에 아직 연결된 PC가 있으면 다시 가져옵니다.',
+  'Discord presence: your plugin is in Add-ons': 'Discord 상태 표시: 사용 중인 플러그인은 애드온에 있습니다',
+  'Copies of the library made before updates keep the history until they’re replaced.': '업데이트 전에 만든 보관함 사본은 교체될 때까지 기록을 보관합니다.',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

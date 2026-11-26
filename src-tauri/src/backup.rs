@@ -39,6 +39,15 @@ pub fn drop_spotify_art(app: &AppHandle) {
     }
 }
 
+/// After the first screen: the copy made before the mixes' cleanup leaves after 30 days.
+pub fn drop_old_mix_backups(app: &AppHandle) {
+    let kept = std::time::Duration::from_secs(30 * 86_400);
+    let removed = app.path().app_data_dir().map_err(anyhow::Error::from).and_then(|dir| music_core::library::remove_mix_cleanup_backups(&dir.join("library.db"), kept));
+    if let Err(e) = removed {
+        crate::diag::warn("library", "an old copy of the library not removed", &format!("{e:#}"));
+    }
+}
+
 /// A consistent copy of the library at `path`, the user's pick.
 #[tauri::command]
 pub async fn library_backup(app: AppHandle, path: String) -> CmdResult<()> {

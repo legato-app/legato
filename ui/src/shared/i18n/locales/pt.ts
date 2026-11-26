@@ -1198,6 +1198,8 @@ const pt: Record<string, string> = {
   'Open Spotify': 'Abrir o Spotify',
   'This PC is also signed out of Spotify’s page.': 'Este PC também sai da página do Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Elas são removidas neste PC; um PC ainda conectado ao Spotify as traz de volta.',
+  'Discord presence: your plugin is in Add-ons': 'Presença no Discord: seu plugin está em Complementos',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'As cópias da biblioteca feitas antes das atualizações guardam o histórico até serem substituídas.',
   'See the play queue': 'Ver a fila de reprodução',
   'Read your listening history': 'Ler seu histórico de reprodução',
   'Sees what you listened to and when': 'Vê o que você ouviu e quando',

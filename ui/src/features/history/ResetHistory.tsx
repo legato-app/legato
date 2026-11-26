@@ -11,7 +11,7 @@ export function ResetHistory({ onDone }: { onDone: () => void }) {
     <Button
       variant="ghost"
       onClick={async () => {
-        if (!(await ask({ title: tr('Forget your listening history?'), body: tr('Your plays and “less / never” choices go; mixes start over. Your library stays as it is.'), ok: tr('Forget') }))) return
+        if (!(await ask({ title: tr('Forget your listening history?'), body: `${tr('Your plays and “less / never” choices go; mixes start over. Your library stays as it is.')}\n${tr('Copies of the library made before updates keep the history until they’re replaced.')}`, ok: tr('Forget') }))) return
         await api.clearHistory().catch((e) => useStore.setState({ error: String(e) }))
         onDone()
       }}

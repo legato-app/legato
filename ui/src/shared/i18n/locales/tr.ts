@@ -1198,6 +1198,8 @@ const tr: Record<string, string> = {
   'Open Spotify': 'Spotify’ı aç',
   'This PC is also signed out of Spotify’s page.': 'Bu bilgisayarda Spotify sayfasındaki oturum da kapatılır.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Bu bilgisayarda kaldırılır; Spotify’a hâlâ bağlı bir bilgisayar onları geri getirir.',
+  'Discord presence: your plugin is in Add-ons': 'Discord durumu: eklentin Eklentiler’de',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'Güncellemelerden önce alınan kitaplık kopyaları, yenileri gelene kadar geçmişi saklar.',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

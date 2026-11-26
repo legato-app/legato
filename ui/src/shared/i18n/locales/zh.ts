@@ -1198,6 +1198,8 @@ const zh: Record<string, string> = {
   'Open Spotify': '打开 Spotify',
   'This PC is also signed out of Spotify’s page.': '此电脑也会退出 Spotify 网页的登录。',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': '它们会从此电脑移除；仍连接着 Spotify 的电脑会把它们带回来。',
+  'Discord presence: your plugin is in Add-ons': 'Discord 状态：你的插件在附加组件中',
+  'Copies of the library made before updates keep the history until they’re replaced.': '更新前制作的音乐库副本会保留历史记录，直到被替换。',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

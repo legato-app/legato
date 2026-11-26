@@ -352,13 +352,12 @@ export const api = {
   pluginSet: (id: string, on: boolean) => invoke<void>('plugin_set', { id, on }),
   pluginUninstall: (id: string) => invoke<void>('plugin_uninstall', { id }),
   pluginReply: (plugin: string, id: number, ok: boolean, value?: unknown, error?: string) => invoke<void>('plugin_reply', { plugin, id, ok, value: value ?? null, error: error ?? null }),
-  /** App events for plugins allowed to hear them: 'track', 'playing'. */
-  /** What the player tells running plugins (`perms::EVENTS` checks each one's permission). */
   /** A blind test opened or closed: while open, plugins learn nothing of what plays. */
   pluginQuiz: (open: boolean) => invoke<void>('plugin_quiz', { open }),
+  /** What the player tells running plugins (`perms::EVENTS` checks each one's permission). */
   pluginEvent: (name: 'track' | 'playing' | 'ended' | 'seek' | 'volume' | 'queue', payload: unknown) => invoke<void>('plugin_event', { name, payload }),
-  /** The built-in Discord presence's user moved to the bundled plugin, once. True: done now. */
-  pluginAdoptDiscord: (settings: unknown) => invoke<boolean>('plugin_adopt_discord', { settings }),
+  /** The built-in Discord presence's user moved to the bundled plugin, once. null: done before. */
+  pluginAdoptDiscord: (settings: unknown) => invoke<'moved' | 'kept' | null>('plugin_adopt_discord', { settings }),
   /** A plugin's menu item ('command') or panel control ('panel') was used. */
   pluginInput: (plugin: string, name: 'command' | 'panel', payload: unknown) => invoke<void>('plugin_input', { plugin, name, payload }),
   /** The visualizer's frame for the plugin whose look shows: the latest only, never queued. */

@@ -1198,6 +1198,8 @@ const id: Record<string, string> = {
   'Open Spotify': 'Buka Spotify',
   'This PC is also signed out of Spotify’s page.': 'PC ini juga keluar dari halaman Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Dihapus di PC ini; PC yang masih terhubung ke Spotify akan membawanya kembali.',
+  'Discord presence: your plugin is in Add-ons': 'Kehadiran Discord: plugin-mu ada di Add-on',
+  'Copies of the library made before updates keep the history until they’re replaced.': 'Salinan koleksi yang dibuat sebelum pembaruan menyimpan riwayat sampai diganti.',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',
