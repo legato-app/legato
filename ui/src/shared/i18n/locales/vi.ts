@@ -1231,7 +1231,7 @@ const vi: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Gửi và nhận dữ liệu từ {host} (có thể gửi tới đó những gì nó đọc được)',
   'See what plays and when it changes': 'Xem bài đang phát và khi nào nó thay đổi',
   'Show what you play on Discord': 'Hiển thị trên Discord bài bạn đang nghe',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Hiển thị trên hồ sơ Discord bài bạn đang phát, qua ứng dụng Discord trên máy này',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Có thể hiển thị văn bản và liên kết bất kỳ trên hồ sơ Discord của bạn, qua ứng dụng Discord trên máy này',
   'See the play queue': 'Xem hàng chờ phát',
   'Read your listening history': 'Đọc lịch sử nghe của bạn',
   'Sees what you listened to and when': 'Thấy bạn đã nghe gì và khi nào',

@@ -1231,7 +1231,7 @@ const it: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Inviare e ricevere dati da {host} (può inviarci ciò che può leggere)',
   'See what plays and when it changes': 'Vedere cosa suona e quando cambia',
   'Show what you play on Discord': 'Mostrare su Discord cosa ascolti',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Mostra sul tuo profilo Discord cosa riproduci, tramite l’app Discord di questo PC',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Può mostrare qualsiasi testo e link sul tuo profilo Discord, tramite l’app Discord di questo PC',
   'See the play queue': 'Vedere la coda di riproduzione',
   'Read your listening history': 'Leggere la tua cronologia di ascolto',
   'Sees what you listened to and when': 'Vede cosa hai ascoltato e quando',

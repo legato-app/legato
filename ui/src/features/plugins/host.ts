@@ -210,7 +210,7 @@ export function permissionText(p: string): { text: string; risky: boolean; warni
   if (p.startsWith('network:')) return { text: tr('Send and receive data from {host} (it can send there what it can read)', { host: p.slice(8) }), risky: true }
   switch (p) {
     case 'discord:presence':
-      return { text: tr('Show what you play on Discord'), risky: true, warning: tr('Shows what you play on your Discord profile, through the Discord app on this PC') }
+      return { text: tr('Show what you play on Discord'), risky: true, warning: tr('Can show any text and links on your Discord profile, through the Discord app on this PC') }
     case 'player:queue':
       return { text: tr('See the play queue'), risky: false }
     case 'history:read':

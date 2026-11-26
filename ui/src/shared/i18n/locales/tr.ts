@@ -1231,7 +1231,7 @@ const tr: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': '{host} ile veri gönder ve al (okuyabildiğini oraya gönderebilir)',
   'See what plays and when it changes': 'Neyin çaldığını ve ne zaman değiştiğini görmek',
   'Show what you play on Discord': 'Dinlediğini Discord’da göstermek',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Bu bilgisayardaki Discord uygulaması üzerinden, çaldığını Discord profilinde gösterir',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Bu bilgisayardaki Discord uygulaması üzerinden Discord profilinde her türlü metni ve bağlantıyı gösterebilir',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

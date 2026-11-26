@@ -60,7 +60,7 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 
 | Permission | Lets the plugin | Said under it at install |
 |---|---|---|
-| `discord:presence` | show what plays on your Discord profile | Shows what you play on your Discord profile, through the Discord app on this PC |
+| `discord:presence` | show what plays on your Discord profile | Can show any text and links on your Discord profile, through the Discord app on this PC |
 | `player:queue` | see the play queue | |
 | `history:read` | read your listening history | Sees what you listened to and when |
 

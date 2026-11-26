@@ -1231,7 +1231,7 @@ const ja: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': '{host}とデータを送受信（読み取れるものをそこに送信できます）',
   'See what plays and when it changes': '再生中の曲と、その切り替わりを確認',
   'Show what you play on Discord': '聴いている曲を Discord に表示',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'この PC の Discord アプリを通じて、再生中の曲を Discord プロフィールに表示します',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'この PC の Discord アプリを通じて、Discord プロフィールに任意のテキストとリンクを表示できます',
   'See the play queue': '再生キューを見る',
   'Read your listening history': '再生履歴を読む',
   'Sees what you listened to and when': '何をいつ聴いたかが分かります',

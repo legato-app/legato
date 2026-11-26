@@ -1231,7 +1231,7 @@ const nl: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Gegevens versturen naar en ontvangen van {host} (hij kan daarheen sturen wat hij kan lezen)',
   'See what plays and when it changes': 'Zien wat er speelt en wanneer het verandert',
   'Show what you play on Discord': 'Op Discord tonen wat je afspeelt',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Toont op je Discord-profiel wat je afspeelt, via de Discord-app op deze pc',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Kan elke tekst en links op je Discord-profiel tonen, via de Discord-app op deze pc',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

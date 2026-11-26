@@ -1231,7 +1231,7 @@ const ko: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': '{host}와(과) 데이터 주고받기 (읽을 수 있는 내용을 그곳으로 보낼 수 있음)',
   'See what plays and when it changes': '재생 중인 곡과 바뀌는 시점 보기',
   'Show what you play on Discord': '듣는 곡을 Discord에 표시',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': '이 PC의 Discord 앱을 통해 재생 중인 곡을 Discord 프로필에 표시합니다',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': '이 PC의 Discord 앱을 통해 Discord 프로필에 어떤 글과 링크든 표시할 수 있습니다',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

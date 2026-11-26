@@ -1231,7 +1231,7 @@ const uk: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Надсилати й отримувати дані з {host} (може надіслати туди те, що може прочитати)',
   'See what plays and when it changes': 'Бачити, що грає і коли це змінюється',
   'Show what you play on Discord': 'Показувати в Discord, що ви слухаєте',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Показує у вашому профілі Discord, що грає, через застосунок Discord на цьому ПК',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Може показувати будь-який текст і посилання у вашому профілі Discord через застосунок Discord на цьому ПК',
   'See the play queue': 'Бачити чергу відтворення',
   'Read your listening history': 'Читати історію прослуховування',
   'Sees what you listened to and when': 'Бачить, що й коли ви слухали',

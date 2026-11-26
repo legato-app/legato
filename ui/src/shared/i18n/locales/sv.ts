@@ -1231,7 +1231,7 @@ const sv: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Skicka och ta emot data från {host} (det kan skicka dit det som det kan läsa)',
   'See what plays and when it changes': 'Se vad som spelas och när det ändras',
   'Show what you play on Discord': 'Visa på Discord vad du spelar',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Visar på din Discord-profil vad du spelar, via Discord-appen på den här datorn',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Kan visa valfri text och länkar på din Discord-profil, via Discord-appen på den här datorn',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

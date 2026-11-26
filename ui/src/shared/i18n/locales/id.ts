@@ -1231,7 +1231,7 @@ const id: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'Mengirim dan menerima data dari {host} (bisa mengirim ke sana apa yang bisa dibacanya)',
   'See what plays and when it changes': 'Melihat apa yang diputar dan kapan berubah',
   'Show what you play on Discord': 'Menampilkan yang kamu putar di Discord',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'Menampilkan yang kamu putar di profil Discord-mu, lewat aplikasi Discord di PC ini',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Bisa menampilkan teks dan tautan apa pun di profil Discord-mu, lewat aplikasi Discord di PC ini',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',

@@ -1196,7 +1196,7 @@ const he: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': 'שליחה וקבלה של נתונים מ-{host} (הוא יכול לשלוח לשם את מה שהוא קורא)',
   'See what plays and when it changes': 'לראות מה מתנגן ומתי זה משתנה',
   'Show what you play on Discord': 'להציג ב-Discord את מה שמתנגן',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'מציג בפרופיל ה-Discord שלכם את מה שאתם מנגנים, דרך אפליקציית Discord במחשב הזה',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'יכול להציג כל טקסט וקישורים בפרופיל ה-Discord שלכם, דרך אפליקציית Discord במחשב הזה',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

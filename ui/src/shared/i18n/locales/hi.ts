@@ -1231,7 +1231,7 @@ const hi: Record<string, string> = {
   'Send and receive data from {host} (it can send there what it can read)': '{host} से डेटा भेजें और पाएं (यह जो पढ़ सकता है वह वहां भेज सकता है)',
   'See what plays and when it changes': 'देखें क्या चल रहा है और कब बदलता है',
   'Show what you play on Discord': 'आप जो सुनते हैं उसे Discord पर दिखाना',
-  'Shows what you play on your Discord profile, through the Discord app on this PC': 'इस PC के Discord ऐप से, आपकी Discord प्रोफ़ाइल पर दिखाता है कि आप क्या चला रहे हैं',
+  'Can show any text and links on your Discord profile, through the Discord app on this PC': 'इस PC के Discord ऐप से, आपकी Discord प्रोफ़ाइल पर कोई भी टेक्स्ट और लिंक दिखा सकता है',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',
