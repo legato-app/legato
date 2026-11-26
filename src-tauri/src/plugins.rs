@@ -6,12 +6,14 @@
 
 use crate::{AppState, CmdResult, err};
 use music_plugins::discord_move;
+use music_plugins::quiz;
 use music_plugins::net::{Gateway, Request};
 use music_plugins::{Call, Manifest, Outbox, Permission, Route, Running};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -65,6 +67,8 @@ pub struct Plugins {
     errors: Mutex<HashMap<String, String>>,
     logs: Mutex<HashMap<String, VecDeque<String>>>,
     gateway: Gateway,
+    /// A blind test is open (`plugin_quiz`): plugins learn nothing of what plays.
+    quiz: AtomicBool,
     /// Plugins with a library search running: one at a time each (a search reads the whole library).
     searching: Mutex<HashSet<String>>,
 }
@@ -136,12 +140,16 @@ struct Bridge(AppHandle);
 impl Outbox for Bridge {
     fn call(&self, call: Call) {
         let app = self.0.clone();
-        if call.route != Route::Shell {
+        let blank = quiz::blank_answer(&call.method).filter(|_| app.state::<Plugins>().quiz.load(Ordering::Relaxed));
+        if call.route != Route::Shell && blank.is_none() {
             let _ = app.emit_to("main", "plugin-call", UiCall { plugin: call.plugin, id: call.id, method: call.method, args: call.args });
             return;
         }
         tauri::async_runtime::spawn(async move {
-            let result = shell_call(&app, &call).await;
+            let result = match blank {
+                Some(empty) => Ok(empty),
+                None => shell_call(&app, &call).await,
+            };
             if let Some(p) = app.state::<Plugins>().running.lock().unwrap().get(&call.plugin) {
                 p.reply(call.id, result);
             }
@@ -446,9 +454,18 @@ pub fn plugin_event(plugins: State<Plugins>, name: String, payload: Value) {
     if !["track", "playing", "ended", "seek", "volume", "queue"].contains(&name.as_str()) {
         return;
     }
+    if plugins.quiz.load(Ordering::Relaxed) && quiz::hides_event(&name) {
+        return;
+    }
     for p in plugins.running.lock().unwrap().values() {
         p.event(&name, payload.clone());
     }
+}
+
+/// A blind test opened or closed. Sync, like `plugin_event`: the two keep the order the interface sent them in.
+#[tauri::command]
+pub fn plugin_quiz(plugins: State<Plugins>, open: bool) {
+    plugins.quiz.store(open, Ordering::Relaxed);
 }
 
 /// One plugin's menu item or panel control was used.

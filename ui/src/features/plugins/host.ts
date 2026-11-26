@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { useStore } from '../../app/store'
 import { api, type PluginCall, type PluginInfo } from '../../shared/api'
+import { useBlind } from '../blind/blindOpen'
 import { tr } from '../../shared/i18n/i18n'
 import { setEffects, useEditor } from '../editor/editor'
 import { cleanEffects } from '../player/effects'
@@ -179,6 +180,17 @@ export function startPlugins(): () => void {
   const offEnded = onListenEnd((play) => tell('ended', { trackId: play.trackId, listenedMs: play.listenedMs, completed: play.completed }))
   const seeked = (ms: number) => tell('seek', { positionMs: Math.max(0, Math.round(ms)) })
   seekListeners.add(seeked)
+  // A blind test: Rust holds back what plays; once it closes, plugins are told how the player stands.
+  void api.pluginQuiz(useBlind.getState().open).catch(() => {})
+  const offQuiz = useBlind.subscribe((quiz, before) => {
+    if (quiz.open === before.open) return
+    void api.pluginQuiz(quiz.open).catch(() => {})
+    if (quiz.open) return
+    const { playing, list, order, index } = usePlayer.getState()
+    tell('track', nowTrack())
+    tell('playing', playing)
+    tell('queue', pluginQueue(list, order, index))
+  })
   let queueTimer: ReturnType<typeof setTimeout> | undefined
   const offPlayer = usePlayer.subscribe((s, prev) => {
     if (!listening()) return
@@ -198,6 +210,7 @@ export function startPlugins(): () => void {
     void states.then((f) => f())
     offStyles()
     offPlayer()
+    offQuiz()
     offEnded()
     seekListeners.delete(seeked)
     clearTimeout(queueTimer)

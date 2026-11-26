@@ -354,6 +354,8 @@ export const api = {
   pluginReply: (plugin: string, id: number, ok: boolean, value?: unknown, error?: string) => invoke<void>('plugin_reply', { plugin, id, ok, value: value ?? null, error: error ?? null }),
   /** App events for plugins allowed to hear them: 'track', 'playing'. */
   /** What the player tells running plugins (`perms::EVENTS` checks each one's permission). */
+  /** A blind test opened or closed: while open, plugins learn nothing of what plays. */
+  pluginQuiz: (open: boolean) => invoke<void>('plugin_quiz', { open }),
   pluginEvent: (name: 'track' | 'playing' | 'ended' | 'seek' | 'volume' | 'queue', payload: unknown) => invoke<void>('plugin_event', { name, payload }),
   /** The built-in Discord presence's user moved to the bundled plugin, once. True: done now. */
   pluginAdoptDiscord: (settings: unknown) => invoke<boolean>('plugin_adopt_discord', { settings }),

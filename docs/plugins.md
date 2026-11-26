@@ -82,6 +82,10 @@ and `page` (the song's https page, else null). Events: `ended` `{ trackId, liste
 `seek` `{ positionMs }`, `volume` `{ volume }` (all `player:read`), and `queue` (`player:queue`, the same shape as
 `queue()`, once every 500 ms at most).
 
+While a blind test is open, nothing says what plays: no `track`, `playing`, `seek`, `ended` or `queue` event, and
+`player.state()` and `player.queue()` answer as with nothing playing (`volume` 0). When it closes, `track`, `playing`
+and `queue` are sent once with how the player stands.
+
 Without any permission a plugin still has its own storage, timers and log.
 
 Never available, whatever the permissions: the user's passwords, tokens and sign-ins, files on the PC, other

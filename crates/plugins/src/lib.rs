@@ -6,6 +6,7 @@ pub mod discord_move;
 pub mod manifest;
 pub mod net;
 pub mod perms;
+pub mod quiz;
 pub mod runtime;
 
 pub use manifest::{API, Manifest};
