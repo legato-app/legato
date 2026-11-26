@@ -24,17 +24,25 @@ export function PageHeader({ kicker, title, sub, notice, actions, side, art, tin
   if (art) {
     const place = choice?.art ?? 'start'
     const beside = choice?.actions === 'beside'
+    // Beside, in a row: a narrow pane gives the actions a line of their own, so the title keeps its room.
+    const wraps = beside && place !== 'top'
     const picture = place !== 'none' && (
       // The phone: the cover centered over the title, as phone players do.
       <div className="shrink-0 phone:self-center phone:*:size-40!">{resized(art, choice?.artSize)}</div>
     )
     const words = (
-      <div className={`flex min-w-0 flex-col gap-2 ${backdrop ? 'max-w-[70%] phone:max-w-none' : ''} ${place === 'end' ? 'flex-1' : ''}`}>
+      <div className={`flex min-w-0 flex-col gap-2 ${backdrop ? 'max-w-[70%] phone:max-w-none' : ''} ${wraps || place === 'end' ? 'flex-1' : ''}`}>
         {kickerLine}
         {/* Display L (docs/design.md): Roboto Black, 56 / 60. Phone layout: 28, two lines, the cover above. */}
         <h1 className="truncate pb-1 text-[3.5rem] leading-[1.07] font-black tracking-[-0.015em] phone:line-clamp-2 phone:text-[1.75rem] phone:whitespace-normal">{title}</h1>
         {subLine}
       </div>
+    )
+    const artAndWords = (
+      <>
+        {place === 'end' ? words : picture}
+        {place === 'end' ? picture : words}
+      </>
     )
     const buttons = (actions || side) && (
       <div className={beside ? 'ms-auto flex flex-wrap items-center justify-end gap-3' : 'flex flex-wrap items-center gap-3 px-6 py-5 phone:gap-1.5 phone:px-4 phone:py-3'}>
@@ -47,14 +55,14 @@ export function PageHeader({ kicker, title, sub, notice, actions, side, art, tin
       // The page's px-6 / pt-5 undone (main pane's edges); a page that scrolls around it gives it the same room.
       <div className="-mx-6 -mt-5 flex shrink-0 flex-col phone:-mx-4 phone:-mt-3">
         {/* `backdrop`: drawn behind the header at its own size (a playlist's wall of covers); the text goes white over it. */}
-        <header onContextMenu={onContextMenu} style={backdrop ? undefined : tint} className={`relative flex min-w-0 gap-7 px-6 py-5 transition-colors duration-500 phone:flex-col phone:items-stretch phone:gap-3 phone:px-4 phone:pt-4 phone:pb-4 ${place === 'top' ? 'flex-col items-start' : 'items-end'} ${backdrop ? 'isolate overflow-hidden bg-bg text-white [&_.kicker]:text-white/85! [&_.text-ink-2]:text-white/90!' : 'bg-bg'}`}>
+        <header onContextMenu={onContextMenu} style={backdrop ? undefined : tint} className={`relative flex min-w-0 gap-7 px-6 py-5 transition-colors duration-500 phone:flex-col phone:items-stretch phone:gap-3 phone:px-4 phone:pt-4 phone:pb-4 ${place === 'top' ? 'flex-col items-start' : 'items-end'} ${wraps ? 'flex-wrap' : ''} ${backdrop ? 'isolate overflow-hidden bg-bg text-white [&_.kicker]:text-white/85! [&_.text-ink-2]:text-white/90!' : 'bg-bg'}`}>
           {backdrop && (
             <div aria-hidden className="absolute inset-0 -z-10">
               {backdrop}
             </div>
           )}
-          {place === 'end' ? words : picture}
-          {place === 'end' ? picture : words}
+          {/* Together while they have 640 px or the whole line: the buttons wrap first. */}
+          {wraps ? <div className="flex min-w-0 flex-1 basis-160 items-end gap-7">{artAndWords}</div> : artAndWords}
           {beside && buttons}
         </header>
         {!beside && buttons}
