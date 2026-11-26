@@ -12,12 +12,13 @@ Discord profile).
 
 ```
 my-plugin/
-  legato.manifest   the manifest (plugin.json, the older name, still works)
+  legato.manifest   the manifest
   main.js       the code (one file: bundle if you use several)
   README.md     optional; .md .txt .png .css .json files are copied too (50 files, 5 MB at most)
 ```
 
-The manifest, JSON. `legato.manifest` is read first, else `plugin.json`:
+The manifest, JSON. The app reads `legato.manifest` first; `plugin.json` (the older name) is read only when there is
+no `legato.manifest`, and it still works:
 
 ```json
 {
@@ -37,8 +38,8 @@ The manifest, JSON. `legato.manifest` is read first, else `plugin.json`:
 - `id`: 3-64 characters, `a-z 0-9 . -`. Installing a folder with the same id updates the plugin; new permissions
   are pointed out and approved again.
 - `api`: the plugin API version you wrote for. This app offers **2**; a plugin asking for more is refused with "needs
-  a newer version of Legato". Versions only grow: a later app keeps running API 1 plugins. API 2 adds
-  `legato.manifest` and `repository`.
+  a newer version of Legato". Versions only grow: a later app keeps running API 1 plugins. The API 2 permissions need
+  `"api": 2` (see below).
 - `main`: a `.js` file next to the manifest, 2 MB at most.
 - `homepage`, `repository`: https links, optional.
 
@@ -46,9 +47,9 @@ The manifest, JSON. `legato.manifest` is read first, else `plugin.json`:
 
 | Permission | Lets the plugin |
 |---|---|
-| `player:read` | see what plays (`app.player.state()`), hear `track` and `playing` events |
+| `player:read` | see what plays (`app.player.state()`), hear `track`, `playing`, `ended`, `seek` and `volume` events |
 | `player:control` | play, pause, skip, seek, set the volume, play songs from the library |
-| `library:read` | read songs and playlists (no file paths) |
+| `library:read` | read songs and playlists (no file paths), search the library |
 | `library:write` | make playlists and add songs to them |
 | `ui` | add menu items, show a panel, show notifications (named after the plugin) |
 | `ui:style` | restyle the whole interface with CSS |
@@ -61,31 +62,25 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 | Permission | Lets the plugin | Said under it at install |
 |---|---|---|
 | `discord:presence` | show what plays on your Discord profile | Can show any text and links on your Discord profile, through the Discord app on this PC |
-| `player:queue` | see the play queue | |
+| `player:queue` | see the play queue, and the `queue` event | |
 | `history:read` | read your listening history | Sees what you listened to and when |
 
 `discord:presence` methods: `app.discord.set(presence)` → `{ connected, error }`, `app.discord.clear()`,
 `app.discord.status()`. `presence`: `{ clientId` (your Discord app's id, digits)`, title, artist, album?, art?` (https,
-256 at most, else left out)`, buttons?: [{ label, url }]` (2, label 1-32, https)`, playing, positionMs, durationMs?,
-shows: 'name' | 'artist' | 'song' | 'both' }`. Updates are spaced 4 s apart and retried while Discord is closed;
-`set` answers the state known so far.
+256 characters at most, not a Discord link, else left out)`, buttons?: [{ label, url }]` (2, label 1-32, https, 512
+characters at most)`, playing, positionMs, durationMs?, shows: 'name' | 'artist' | 'song' | 'both' }`. Title, artist
+and album are cut at 128 characters. Updates are spaced 4 s apart and retried while Discord is closed; `set` answers
+the state known so far.
 
-`app.library.search(query, limit)` (`library:read`, title, artist or album, 100 at most; a query of 200 characters at most, one search at a time) gives songs as
-`library.tracks()` does. Songs now carry `art`: an https cover, else null. `app.history.recent({ before?, limit })`
-(`history:read`, 500 at most, newest first, `before` in unix seconds) →
-`[{ trackId, title, artist, startedAt, listenedMs, completed }]`.
+`app.library.search(query, limit)` (`library:read`): title, artist or album; 100 results at most (the default); a query
+of 200 characters at most; one search at a time. It gives songs as `library.tracks()` does. Songs now carry `art`: an
+https cover, else null. `app.history.recent({ before?, limit? })` (`history:read`, 500 at most, 100 by default, newest
+first, `before` in unix seconds) → `[{ trackId, title, artist, startedAt, listenedMs, completed }]`.
 
 `app.player.queue()` (`player:queue`) → `{ index, tracks: [{ trackId, title, artist, durationMs }] }`, in play order,
 500 around the current song. `app.player.enqueue(trackIds, { next })` (`player:control`, library songs, 500 at most).
 The `track` event and `player.state().track` also carry `album`, `durationMs`, `art` (https, else null), `youtubeId`
-and `page` (the song's https page, else null). Events: `ended` `{ trackId, listenedMs, completed }` (library songs),
-`seek` `{ positionMs }`, `volume` `{ volume }` (all `player:read`), and `queue` (`player:queue`, the same shape as
-`queue()`, once every 500 ms at most).
-
-While a blind test is open, nothing says what plays: `playing` false is sent as it opens, then no `track`, `playing`,
-`seek`, `ended` or `queue` event, `player.state()` and `player.queue()` answer as with nothing playing (`volume` 0) and
-`history.recent()` answers `[]`. When it closes, `track`, `playing` and `queue` are sent once with how the player
-stands.
+and `page` (the song's https page, else null).
 
 Without any permission a plugin still has its own storage, timers and log.
 
@@ -104,7 +99,7 @@ why. 256 calls can wait for an answer at once.
 Everything else goes through the global `app` object. Every call returns a `Promise`; it is rejected with an `Error`
 when a permission is missing ("Permission needed: player:control") or the call fails.
 
-## `app` reference (API 1)
+## `app` reference
 
 ```js
 app.id, app.api, app.appVersion   // app.api: the API your manifest declares
@@ -160,9 +155,30 @@ const r = await app.net.fetch('https://api.example.com/v1/x', { method: 'POST', 
 // { status, contentType, body (text) }; JSON.parse(r.body) for JSON
 ```
 
-Network rules: `https://` only, to an approved host; redirects only within that host; the host must resolve to a
-public address (no LAN, no localhost); no cookies, no proxy; 1 MB sent, 2 MB received, 15 seconds; `Cookie`,
-`Host`, `Origin` and `Sec-*` headers can't be set.
+### API 2 calls and events
+
+```js
+// player:read: events
+app.on('ended', ({ trackId, listenedMs, completed }) => {})  // library songs
+app.on('seek', ({ positionMs }) => {})
+app.on('volume', ({ volume }) => {})
+
+// player:queue
+app.on('queue', (queue) => {})                 // the same shape as queue(); once every 500 ms at most
+await app.player.queue()                       // { index, tracks: [{ trackId, title, artist, durationMs }] }
+await app.player.enqueue([trackId, …], { next: true })   // player:control
+
+// library:read
+await app.library.search('query', 20)          // songs, as library.tracks() gives them
+
+// history:read
+await app.history.recent({ before, limit })    // newest first
+
+// discord:presence
+await app.discord.set({ clientId, title, artist, album, art, buttons, playing, positionMs, durationMs, shows })
+await app.discord.clear()
+await app.discord.status()
+```
 
 ### Panel parts
 
@@ -204,6 +220,15 @@ Frames come only while your look is on screen with music playing, so a plugin dr
 When your plugin is off or stopped, the visualizer shows its bars in your look's place. Example:
 `examples/plugins/rings`.
 
+## During a blind test
+
+While a blind test is open, plugins learn nothing of what plays: it would give the answer away.
+
+- `playing` false is sent as it opens, then no `track`, `playing`, `seek`, `ended` or `queue` event.
+- `player.state()` and `player.queue()` answer as with nothing playing (`volume` 0).
+- `history.recent()` answers `[]`.
+- When it closes, `track`, `playing` and `queue` are sent once with how the player stands.
+
 ## Try it
 
 1. Write the folder anywhere.
@@ -213,8 +238,15 @@ When your plugin is off or stopped, the visualizer shows its bars in your look's
 
 ## Versions of this API
 
-- **1** (2026-10): everything above; `visualizer` (permission, calls, event, shapes) added
-  within API 1 in 2026-11.
+- **1** (2026-10): everything in the API 1 part of the reference: the events `track`, `playing`, `panel`, `command`;
+  the player, library, playlist, `ui`, `ui:style`, `editor`, `network` and storage calls. `visualizer` (permission,
+  calls, event, shapes) added within API 1 in 2026-11.
+- **2** (2026-11): the permissions `discord:presence`, `player:queue` and `history:read`, and the calls and events under
+  "API 2 calls and events" (`app.discord.*`, `app.history.recent`, `app.library.search`, `app.player.queue` and
+  `enqueue`, the `ended`, `seek`, `volume` and `queue` events). The `track` event and `player.state().track` gain
+  `album`, `durationMs`, `art`, `youtubeId` and `page`. A plugin asking for an API 2 permission needs `"api": 2` in its
+  manifest; an API 1 manifest asking for one is refused. The manifest's `repository` field and the `legato.manifest`
+  name are read whatever the `api` says.
 
-New features come as new methods, events or parts within API 1 when nothing existing changes meaning; anything that
-would break a plugin waits for API 2, and API 1 plugins keep working.
+New features come as new methods, events or parts within the current API when nothing existing changes meaning;
+anything that would break a plugin waits for a new API version, and older plugins keep working.
