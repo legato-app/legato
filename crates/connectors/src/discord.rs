@@ -43,6 +43,58 @@ pub struct Presence {
     pub status: StatusShows,
 }
 
+/// What a plugin's `discord.set` may send (API 2).
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PluginPresence {
+    client_id: String,
+    title: String,
+    artist: String,
+    album: Option<String>,
+    art: Option<String>,
+    #[serde(default)]
+    buttons: Vec<PluginButton>,
+    playing: bool,
+    position_ms: f64,
+    duration_ms: Option<f64>,
+    shows: StatusShows,
+}
+
+#[derive(Deserialize)]
+struct PluginButton {
+    label: String,
+    url: String,
+}
+
+/// A plugin's presence, checked (it is untrusted): the Discord app's id to show it under, and the track. An art link
+/// that isn't a short https one is left out; anything else out of bounds is refused.
+pub fn from_plugin(value: serde_json::Value) -> Result<(String, Presence)> {
+    let sent: PluginPresence = serde_json::from_value(value).map_err(|e| anyhow::anyhow!("discord.set: {e}"))?;
+    anyhow::ensure!((1..=32).contains(&sent.client_id.len()) && sent.client_id.bytes().all(|b| b.is_ascii_digit()), "discord.set: clientId is up to 32 digits");
+    anyhow::ensure!(sent.buttons.len() <= 2, "discord.set: 2 buttons at most");
+    for button in &sent.buttons {
+        anyhow::ensure!((1..=32).contains(&button.label.chars().count()), "discord.set: a button's label is 1-32 characters");
+        anyhow::ensure!(button.url.starts_with("https://") && button.url.len() <= 512, "discord.set: a button's url is an https link");
+    }
+    let milliseconds = |value: f64| {
+        anyhow::ensure!(value >= 0.0 && value.is_finite(), "discord.set: times are 0 or more");
+        Ok(value.round() as u64)
+    };
+    let presence = Presence {
+        title: field(&sent.title),
+        artist: field(&sent.artist),
+        album: sent.album.as_deref().map(field),
+        art: sent.art.filter(|art| https(&art.as_str())),
+        artist_art: None,
+        buttons: sent.buttons.into_iter().map(|button| (button.label, button.url)).collect(),
+        playing: sent.playing,
+        position_ms: milliseconds(sent.position_ms)?,
+        duration_ms: sent.duration_ms.map(milliseconds).transpose()?,
+        status: sent.shows,
+    };
+    Ok((sent.client_id, presence))
+}
+
 /// Discord field: 2 to 128 characters.
 fn field(s: &str) -> String {
     let s = s.trim();
@@ -257,6 +309,26 @@ mod tests {
             position_ms: 30_000,
             duration_ms: Some(197_000),
             status: StatusShows::Song,
+        }
+    }
+
+    #[test]
+    fn a_plugins_presence_is_checked() {
+        let good = serde_json::json!({ "clientId": "123", "title": "A", "artist": "Band", "art": "http://x/y.jpg", "buttons": [{ "label": "Listen", "url": "https://example.com" }], "playing": true, "positionMs": 30000.4, "durationMs": 200000, "shows": "song" });
+        let (client, presence) = from_plugin(good.clone()).unwrap();
+        assert_eq!((client.as_str(), presence.position_ms, presence.art, presence.artist_art), ("123", 30_000, None, None));
+        assert_eq!(presence.title.chars().count(), 2);
+        for (key, bad) in [
+            ("clientId", serde_json::json!("12a")),
+            ("clientId", serde_json::json!("1".repeat(33))),
+            ("positionMs", serde_json::json!(-1)),
+            ("shows", serde_json::json!("all")),
+            ("buttons", serde_json::json!([{ "label": "x", "url": "http://example.com" }])),
+            ("buttons", serde_json::json!([{ "label": "", "url": "https://example.com" }])),
+        ] {
+            let mut sent = good.clone();
+            sent[key] = bad;
+            assert!(from_plugin(sent).is_err(), "{key}");
         }
     }
 

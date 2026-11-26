@@ -141,6 +141,11 @@
       remove: (key) => call('storage.remove', { key }),
       keys: () => call('storage.keys'),
     },
+    discord: Object.freeze({
+      set: (presence) => call('discord.set', presence),
+      clear: () => call('discord.clear'),
+      status: () => call('discord.status'),
+    }),
     net: {
       fetch: (url, opts = {}) => call('net.fetch', { url, method: opts.method, headers: Object.entries(opts.headers ?? {}), body: opts.body }),
     },

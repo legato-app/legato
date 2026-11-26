@@ -140,6 +140,9 @@ pub const METHODS: &[(&str, Option<&str>, Route)] = &[
     ("visualizer.register", Some("visualizer"), Route::Ui),
     ("visualizer.draw", Some("visualizer"), Route::UiNote),
     ("net.fetch", Some("network"), Route::Shell),
+    ("discord.set", Some("discord:presence"), Route::Shell),
+    ("discord.clear", Some("discord:presence"), Route::Shell),
+    ("discord.status", Some("discord:presence"), Route::Shell),
 ];
 
 /// Events a plugin may receive, and the permission each needs.

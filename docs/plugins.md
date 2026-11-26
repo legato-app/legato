@@ -63,6 +63,12 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 | `player:queue` | see the play queue | |
 | `history:read` | read your listening history | Sees what you listened to and when |
 
+`discord:presence` methods: `app.discord.set(presence)` → `{ connected, error }`, `app.discord.clear()`,
+`app.discord.status()`. `presence`: `{ clientId` (your Discord app's id, digits)`, title, artist, album?, art?` (https,
+256 at most, else left out)`, buttons?: [{ label, url }]` (2, label 1-32, https)`, playing, positionMs, durationMs?,
+shows: 'name' | 'artist' | 'song' | 'both' }`. Updates are spaced 4 s apart and retried while Discord is closed;
+`set` answers the state known so far.
+
 Without any permission a plugin still has its own storage, timers and log.
 
 Never available, whatever the permissions: the user's passwords, tokens and sign-ins, files on the PC, other

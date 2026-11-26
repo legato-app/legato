@@ -196,6 +196,16 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
             let tracks = lib.playlist_tracks(id).map_err(err)?;
             Ok(json!({ "id": p.id, "name": p.name, "custom": p.custom, "tracks": tracks.iter().map(track_json).collect::<Vec<_>>() }))
         }
+        "discord.set" => {
+            let (client_id, presence) = music_connectors::discord::from_plugin(a.clone()).map_err(|e| e.to_string())?;
+            state.discord.send(crate::discord::Update::Set { client_id, presence: Some(presence) });
+            Ok(json!(state.discord.status()))
+        }
+        "discord.clear" => {
+            state.discord.send(crate::discord::Update::Off);
+            Ok(Value::Null)
+        }
+        "discord.status" => Ok(json!(state.discord.status())),
         "net.fetch" => {
             let req: Request = serde_json::from_value(a.clone()).map_err(|_| "net.fetch: bad request".to_string())?;
             let r = app.state::<Plugins>().gateway.fetch(&req).await.map(|r| json!(r)).map_err(|e| e.to_string());
@@ -230,7 +240,11 @@ fn start(app: &AppHandle, id: &str, granted: &[String]) -> CmdResult<()> {
 
 fn stop(app: &AppHandle, id: &str) {
     // Dropping it stops its thread.
-    app.state::<Plugins>().running.lock().unwrap().remove(id);
+    let stopped = app.state::<Plugins>().running.lock().unwrap().remove(id);
+    // What it showed on Discord goes with it.
+    if stopped.is_some_and(|running| running.granted().contains(&Permission::DiscordPresence)) {
+        app.state::<AppState>().discord.send(crate::discord::Update::Off);
+    }
     let _ = app.emit_to("main", "plugin-state", id);
 }
 
