@@ -18,6 +18,9 @@ use std::time::{Duration, Instant};
 use tauri::async_runtime::JoinHandle;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tokio::net::TcpListener;
+
+#[cfg(desktop)]
+mod internet;
 use tokio::sync::mpsc;
 
 /// A search waits this long at most for the pace's gap (a refusal's wait: the song isn't found here).
@@ -41,6 +44,8 @@ enum Mode {
 }
 
 struct Hosting {
+    /// Listening for invited listeners on the relays, one task each; empty: not open to the internet.
+    internet: Vec<JoinHandle<()>>,
     host: Host,
     id: String,
     room: String,
@@ -92,6 +97,8 @@ pub struct Status {
     code: Option<String>,
     link: Option<String>,
     qr: Option<(usize, String)>,
+    /// The host's, once open to the internet: the invite link (room id and code).
+    invite: Option<String>,
     /// A listener's: what plays in the room, on this device's clock.
     now: Option<Now>,
     next: Vec<RoomSong>,
@@ -135,15 +142,16 @@ fn emit(app: &AppHandle, e: Event) {
 }
 
 fn status_of(mode: &Mode) -> Status {
-    let off = Status { role: Role::Off, room: String::new(), host: String::new(), people: Vec::new(), code: None, link: None, qr: None, now: None, next: Vec::new() };
+    let off = Status { role: Role::Off, room: String::new(), host: String::new(), people: Vec::new(), code: None, link: None, qr: None, invite: None, now: None, next: Vec::new() };
     match mode {
         Mode::Off => off,
         Mode::Host(h) => {
             let code = h.host.code();
             let hosts: Vec<SocketAddrV4> = crate::devices::lan_ips().into_iter().map(|ip| SocketAddrV4::new(ip, h.port)).collect();
             let link = (!hosts.is_empty()).then(|| RoomLink { code: code.clone(), hosts, id: h.id.clone() }.text());
+            let invite = (!h.internet.is_empty()).then(|| RoomLink { code: code.clone(), hosts: Vec::new(), id: h.id.clone() }.text());
             let qr = link.as_deref().and_then(music_core::share::qr_modules).map(|(n, m)| (n, m.iter().map(|&b| if b { '1' } else { '0' }).collect()));
-            Status { role: Role::Host, room: h.room.clone(), host: h.name.clone(), people: h.host.people(), code: Some(code), link, qr, ..off }
+            Status { role: Role::Host, room: h.room.clone(), host: h.name.clone(), people: h.host.people(), code: Some(code), link, qr, invite, ..off }
         }
         Mode::Listen(l) => Status { role: Role::Listener, room: l.room.clone(), host: l.host.clone(), people: l.people.clone(), now: Some(l.local()), next: l.next.clone(), ..off },
     }
@@ -189,7 +197,18 @@ pub async fn room_start(app: AppHandle, rooms: State<'_, Rooms>) -> CmdResult<St
                     announce(&a);
                     emit(&a, Event::State);
                 }
-                HostEvent::NewCode(_) => emit(&a, Event::State),
+                HostEvent::NewCode(_) => {
+                    // The relays' key comes from the code: listened for again under the new one.
+                    #[cfg(desktop)]
+                    let open = matches!(&*rooms_mode(&a), Mode::Host(h) if !h.internet.is_empty());
+                    #[cfg(desktop)]
+                    if open
+                        && let Err(e) = internet::open(&a).await
+                    {
+                        crate::diag::warn("rooms", "the invite couldn't be renewed", &e);
+                    }
+                    emit(&a, Event::State);
+                }
                 HostEvent::React { from, reaction } => emit(&a, Event::React { from, reaction }),
             }
         }
@@ -201,12 +220,21 @@ pub async fn room_start(app: AppHandle, rooms: State<'_, Rooms>) -> CmdResult<St
             task.abort();
             return Ok(status_of(&mode));
         }
-        *mode = Mode::Host(Box::new(Hosting { host, id: rm::new_id(), room: name.clone(), name, port, advert, task }));
+        *mode = Mode::Host(Box::new(Hosting { internet: Vec::new(), host, id: rm::new_id(), room: name.clone(), name, port, advert, task }));
         status_of(&mode)
     };
     announce(&app);
     emit(&app, Event::State);
     Ok(status)
+}
+
+/// Opens the room led here to the internet: its invite link in the status.
+#[cfg(desktop)]
+#[tauri::command]
+pub async fn room_open_internet(app: AppHandle) -> CmdResult<Status> {
+    internet::open(&app).await?;
+    emit(&app, Event::State);
+    Ok(status_of(&rooms_mode(&app)))
 }
 
 /// This device's name as the room says it.
@@ -220,8 +248,9 @@ pub async fn room_end(app: AppHandle, rooms: State<'_, Rooms>) -> CmdResult<()> 
     let taken = std::mem::take(&mut *rooms.mode.lock().unwrap());
     match taken {
         Mode::Host(h) => {
-            let Hosting { host, advert, task, .. } = *h;
+            let Hosting { host, advert, task, internet, .. } = *h;
             task.abort();
+            internet.into_iter().for_each(|listening| listening.abort());
             drop(advert);
             host.end().await;
         }
@@ -279,9 +308,14 @@ pub async fn room_join(app: AppHandle, rooms: State<'_, Rooms>, id: Option<Strin
     if !matches!(*rooms.mode.lock().unwrap(), Mode::Off) {
         return Err("Already in a room".into());
     }
+    // An invite over the internet: a link without an address.
+    let mut invited = None;
     let (code, addrs) = match link.as_deref() {
         Some(text) => {
             let l = RoomLink::parse(text).ok_or("Not a Legato room code")?;
+            if l.hosts.is_empty() {
+                invited = Some(l.clone());
+            }
             (l.code, l.hosts.into_iter().map(SocketAddr::V4).collect::<Vec<_>>())
         }
         None => {
@@ -294,10 +328,18 @@ pub async fn room_join(app: AppHandle, rooms: State<'_, Rooms>, id: Option<Strin
             (code, addrs)
         }
     };
-    if addrs.is_empty() {
+    if addrs.is_empty() && invited.is_none() {
         return Err("No room on this network".into());
     }
-    let Joined { welcome, link, mut messages } = wire::join(&addrs, &code, &rm_name(&crate::syncmode::device_name())).await.map_err(|e| {
+    let name = rm_name(&crate::syncmode::device_name());
+    let joined = match invited {
+        #[cfg(desktop)]
+        Some(invite) => internet::join(invite, &name).await,
+        #[cfg(mobile)]
+        Some(_) => return Err("Rooms over the internet need Legato on a computer".into()),
+        None => wire::join(&addrs, &code, &name).await,
+    };
+    let Joined { welcome, link, mut messages } = joined.map_err(|e| {
         if e.is::<WrongCode>() {
             "Wrong code".to_string()
         } else if e.is::<Full>() {

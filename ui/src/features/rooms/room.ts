@@ -20,9 +20,14 @@ export const useRoom = create<{
   own: boolean
   /** A listener's: the room's song is being looked for. */
   finding: boolean
-}>(() => ({ status: null, open: false, floats: [], missing: null, own: false, finding: false }))
+  /** An invite link Windows handed to the app, waiting in the room's view for a Join. */
+  invite: string
+}>(() => ({ status: null, open: false, floats: [], missing: null, own: false, finding: false, invite: '' }))
 
 export const openRoom = () => useRoom.setState({ open: true })
+export const ROOM_LINK = 'legato://room?'
+/** An opened invite: shown, never joined by itself (joining tells the relays this device's address). */
+export const openInvite = (invite: string) => useRoom.setState({ open: true, invite })
 export const closeRoom = () => useRoom.setState({ open: false })
 
 /** In a room, as host or listener. */

@@ -16,6 +16,10 @@ people: Array<string>,
  */
 code: string | null, link: string | null, qr: [number, string] | null, 
 /**
+ * The host's, once open to the internet: the invite link (room id and code).
+ */
+invite: string | null, 
+/**
  * A listener's: what plays in the room, on this device's clock.
  */
 now: RoomNow | null, next: Array<RoomSong>, };

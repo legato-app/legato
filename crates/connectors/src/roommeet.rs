@@ -20,8 +20,16 @@ const AT_ONCE: usize = 4;
 /// The host waits for offers as long as the room is open: its task is dropped with the room.
 const FOREVER: Duration = Duration::from_secs(365 * 24 * 3600);
 
+/// A relay's connection, as `connect` makes it.
+pub type Tls = TlsStream<TcpStream>;
+
+/// The host's: listening on this relay for the invite's offers.
+pub async fn listen(relay: &str, invite: Invite) -> Result<Listening<Tls>> {
+    Listening::start(connect(relay).await?, invite).await
+}
+
 /// The first of the public relays that answers.
-pub async fn first_relay() -> Result<Relay<TlsStream<TcpStream>>> {
+pub async fn first_relay() -> Result<Relay<Tls>> {
     for host in RELAYS {
         if let Ok(relay) = connect(host).await {
             return Ok(relay);

@@ -154,7 +154,7 @@ const status = (): PlayerStatus => {
 const shot = new URLSearchParams(location.search)
 
 // Listen together: an invented room, led here or joined (no network: two invented friends, one invented host).
-const ROOM_OFF: RoomStatus = { role: 'off', room: '', host: '', people: [], code: null, link: null, qr: null, now: null, next: [] }
+const ROOM_OFF: RoomStatus = { role: 'off', room: '', host: '', people: [], code: null, link: null, qr: null, invite: null, now: null, next: [] }
 let room: RoomStatus = ROOM_OFF
 const FRIENDS = ['Pixel 8', 'Léa’s laptop']
 function roomSet(next: RoomStatus) {

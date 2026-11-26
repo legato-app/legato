@@ -1,6 +1,7 @@
 import { ArrowClockwise, QrCode, UsersThree } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../app/settings'
+import { useStore } from '../../app/store'
 import { api, type RoomHeard, type RoomReaction, type RoomStatus } from '../../shared/api'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
@@ -8,9 +9,9 @@ import { Button } from '../../shared/ui/Button'
 import { Dialog } from '../../shared/ui/Dialog'
 import { qrPath } from '../share/qr'
 import { scanWebcam } from '../share/webcam'
-import { closeRoom, REACTIONS, useRoom } from './room'
+import { closeRoom, REACTIONS, ROOM_LINK, useRoom } from './room'
 import { RoomFloats } from './RoomPill'
-import { catchUp, endRoom, joinRoom, leaveRoom, react, roomError, startRoom } from './rooms'
+import { catchUp, endRoom, joinRoom, leaveRoom, openRoomToInternet, react, roomError, startRoom } from './rooms'
 
 /** Each reaction's name, for screen readers and tooltips. */
 function reactionName(r: RoomReaction): string {
@@ -72,6 +73,7 @@ function Hosting({ s }: { s: RoomStatus }) {
           </svg>
         )}
       </div>
+      {!phoneApp && <Invite link={s.invite} />}
       <People s={s} />
       <Reactions />
       <p className="text-xs text-ink-2">{tr('Friends hear what plays here, each from their own source: YouTube or their own files. No sound is sent, only the song and where it is, sealed with the code.')}</p>
@@ -80,6 +82,66 @@ function Hosting({ s }: { s: RoomStatus }) {
           {tr('End room')}
         </Button>
       </div>
+    </div>
+  )
+}
+
+const internetNote = () => tr('Friends far away join with the invite link. Two public relays and Cloudflare see your internet address and when, never songs, names or reactions. Two strict networks can’t meet.')
+
+/** The host's way in over the internet: asked for, then the link to send. */
+function Invite({ link }: { link: string | null }) {
+  const [busy, setBusy] = useState(false)
+  const open = () => {
+    setBusy(true)
+    void openRoomToInternet().finally(() => setBusy(false))
+  }
+  const copy = (text: string) =>
+    navigator.clipboard.writeText(text).then(
+      () => useStore.getState().notify(tr('Link copied')),
+      (e: unknown) => useStore.setState({ error: String(e) }),
+    )
+  return (
+    <div className="flex flex-col gap-2 border-t border-line pt-4">
+      <span className="kicker">{tr('Over the internet')}</span>
+      {link ? (
+        <div className="flex items-center gap-2">
+          <input readOnly value={link} aria-label={tr('Invite link')} onFocus={(e) => e.target.select()} className="h-10 min-w-0 flex-1 rounded-[9px] border border-line bg-raised px-3 text-xs outline-none focus:border-ink" />
+          <Button variant="ghost" onClick={() => void copy(link)}>
+            {tr('Copy link')}
+          </Button>
+        </div>
+      ) : (
+        <Button variant="ghost" className="w-fit" disabled={busy} onClick={open}>
+          {tr('Invite over the internet')}
+        </Button>
+      )}
+      <p className="text-xs text-ink-2">{internetNote()}</p>
+    </div>
+  )
+}
+
+/** A guest's way in over the internet: the invite link pasted (or opened), then Join. */
+function JoinInvite({ busy, join }: { busy: boolean; join: (link: string) => void }) {
+  const link = useRoom((x) => x.invite)
+  const ready = link.trim().startsWith(ROOM_LINK)
+  return (
+    <div className="flex flex-col gap-2 border-t border-line pt-4">
+      <span className="kicker">{tr('Over the internet')}</span>
+      <div className="flex items-center gap-2">
+        <input
+          value={link}
+          onChange={(e) => useRoom.setState({ invite: e.target.value })}
+          onKeyDown={(e) => e.key === 'Enter' && ready && !busy && join(link.trim())}
+          autoComplete="off"
+          placeholder={tr('Paste an invite link')}
+          aria-label={tr('Invite link')}
+          className="h-10 min-w-0 flex-1 rounded-[9px] border border-line bg-raised px-3 text-xs outline-none placeholder:text-sm focus:border-ink"
+        />
+        <Button variant="primary" disabled={busy || !ready} onClick={() => join(link.trim())}>
+          {tr('Join')}
+        </Button>
+      </div>
+      <p className="text-xs text-ink-2">{tr('Joining shows your internet address to two public relays, Cloudflare and the host. Two strict networks can’t meet.')}</p>
     </div>
   )
 }
@@ -156,7 +218,7 @@ function Off() {
   const scan = async () => {
     try {
       const text = await (phoneApp ? api.scanQr() : scanWebcam())
-      if (text?.startsWith('legato://room?')) await join(text)
+      if (text?.startsWith(ROOM_LINK)) await join(text)
       else if (text) setError(tr('Not a Legato room code'))
     } catch (e) {
       setError(roomError(e))
@@ -164,7 +226,7 @@ function Off() {
   }
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-xs text-ink-2">{tr('Friends on the same Wi-Fi follow what plays here, each from their own source. No sound is sent, no server: the local network only.')}</p>
+      <p className="text-xs text-ink-2">{phoneApp ? tr('Friends on the same Wi-Fi follow what plays here, each from their own source. No sound is sent, no server: the local network only.') : tr('Friends follow what plays here, each from their own source: on the same Wi-Fi, or over the internet with an invite link. No sound is sent.')}</p>
       <Button variant="accent" className="w-fit" onClick={() => void startRoom()}>
         <UsersThree size={16} /> {tr('Start a room')}
       </Button>
@@ -213,18 +275,19 @@ function Off() {
             </Button>
           )}
         </div>
-        {error && <p className="text-xs text-[#F23F43]">{error}</p>}
       </div>
+      {!phoneApp && <JoinInvite busy={busy} join={(link) => void join(link)} />}
+      {error && <p className="text-xs text-[#F23F43]">{error}</p>}
     </div>
   )
 }
 
-/** Listen together on the local network: start a room or join one, or the room you're in (its code, who listens,
+/** Listen together: start a room or join one, or the room you're in (its code, who listens,
  *  reactions, End room / Leave). */
 export function RoomDialog() {
   const s = useRoom((x) => x.status)
   const title = !s || s.role === 'off' ? tr('Listen together') : tr('{name}’s room', { name: s.host })
-  const kicker = s?.role === 'host' ? tr('Your room') : s?.role === 'listener' ? tr('You follow this room') : tr('Same network')
+  const kicker = s?.role === 'host' ? tr('Your room') : s?.role === 'listener' ? tr('You follow this room') : phoneApp ? tr('Same network') : tr('Same network or the internet')
   return (
     <Dialog title={title} kicker={kicker} onClose={closeRoom}>
       {s?.role === 'host' ? <Hosting s={s} /> : s?.role === 'listener' ? <Listening s={s} /> : <Off />}

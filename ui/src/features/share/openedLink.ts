@@ -1,6 +1,7 @@
 import { useStore } from '../../app/store'
 import { api } from '../../shared/api'
 import { isRemixLink } from '../editor/remixLink'
+import { openInvite, ROOM_LINK } from '../rooms/room'
 import { isShareCode } from './shareCode'
 
 /**
@@ -17,6 +18,7 @@ export function startOpenedLinks(): () => void {
         if (isRemixLink(text)) void import('../editor/remixFile').then((m) => m.openRemixLink(text))
         // A `.lmix` file double-clicked (protocol.rs `file_of`): read as a dropped one (`lmix_read` checks it again).
         else if (/\.lmix$/i.test(text)) void import('../editor/remixFile').then((m) => m.openRemix(text))
+        else if (text.startsWith(ROOM_LINK)) openInvite(text)
         else if (isShareCode(text)) useStore.setState({ incoming: text })
       })
       .catch(() => {})

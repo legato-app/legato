@@ -316,6 +316,8 @@ export const api = {
   roomStatus: () => invoke<RoomStatus>('room_status'),
   roomStart: () => invoke<RoomStatus>('room_start'),
   roomEnd: () => invoke<void>('room_end'),
+  /** The room led here opened to the internet (desktop): its invite link comes in the status. */
+  roomOpenInternet: () => invoke<RoomStatus>('room_open_internet'),
   /** The host's player: what plays now (its time is taken in Rust). */
   roomHostNow: (now: RoomNow) => invoke<void>('room_host_now', { now }),
   roomHostNext: (songs: RoomSong[]) => invoke<void>('room_host_next', { songs }),

@@ -51,7 +51,15 @@ export function roomError(e: unknown): string {
     'This room runs another version of Legato': tr('This room runs another version of Legato'),
     // Joins shut a while after too many wrong codes (Rust's `rooms::shut_ms`).
     'Too many wrong codes': tr('Too many requests for now: wait a few minutes, then try again.'),
+    // Over the internet.
+    'Couldn’t reach the room': tr('Couldn’t reach the room: two strict networks can’t meet. Try the same Wi-Fi, or another connection.'),
+    'No answer from the room': tr('No answer from the room. Is it still open?'),
+    'No relay reachable': tr('No relay answered. Check your connection, then try again.'),
+    'No network': tr('No relay answered. Check your connection, then try again.'),
+    'Rooms over the internet need Legato on a computer': tr('Rooms over the internet need Legato on a computer.'),
   }
+  // The relay's own reason follows its first words.
+  if (text.startsWith('The relay refused')) return tr('The relay refused this room. Try again later.')
   return known[text] ?? text
 }
 
@@ -76,7 +84,15 @@ export async function endRoom(): Promise<void> {
   await refreshRoom()
 }
 
-/** Joins a room heard (`id`) or scanned (`link`). Throws the interface's words. */
+export async function openRoomToInternet(): Promise<void> {
+  try {
+    status(await api.roomOpenInternet())
+  } catch (e) {
+    notify(roomError(e), 'error')
+  }
+}
+
+/** Joins a room heard (`id`), scanned or invited to (`link`). Throws the interface's words. */
 export async function joinRoom(id: string | null, link: string | null, code: string): Promise<void> {
   try {
     status(await api.roomJoin(id, link, code))

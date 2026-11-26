@@ -7,6 +7,8 @@ const setState = vi.fn()
 vi.mock('../../shared/api', () => ({ api: { linkPending, onLink: () => Promise.resolve(() => {}) } }))
 vi.mock('../../app/store', () => ({ useStore: { setState } }))
 vi.mock('../editor/remixFile', () => ({ openRemix, openRemixLink }))
+const openInvite = vi.fn()
+vi.mock('../rooms/room', () => ({ openInvite, ROOM_LINK: 'legato://room?' }))
 const { startOpenedLinks } = await import('./openedLink')
 const settle = () => new Promise((r) => setTimeout(r, 10))
 
@@ -14,6 +16,7 @@ it('a double-clicked .lmix file opens as a dropped one; links as before; other t
   for (const [text, call] of [
     [String.raw`C:\Users\me\My mixes\Été · remix.LMIX`, openRemix],
     ['legato://remix/abc', openRemixLink],
+    ['legato://room?c=042917&r=0123456789abcdef', openInvite],
   ] as const) {
     linkPending.mockResolvedValueOnce(text)
     startOpenedLinks()()
