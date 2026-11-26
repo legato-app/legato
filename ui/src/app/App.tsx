@@ -1,7 +1,7 @@
 import { ArrowsIn, ArrowsOut, CaretDown, CopySimple, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
 import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AddonsView, AddView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
@@ -50,8 +50,9 @@ import { isShareCode } from '../features/share/shareCode'
 import { Logo } from '../shared/ui/Logo'
 import { searchShift } from './searchShift'
 import { useSettings } from './settings'
-import { useShellLayout } from './shellLayout'
-import { layoutRegions, type Surface } from '../shared/theme/layout'
+import { dropLayout, useShellLayout } from './shellLayout'
+import { LayoutBoundary } from './LayoutBoundary'
+import { DEFAULT_LAYOUT, layoutRegions, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
@@ -357,16 +358,23 @@ export function App() {
   const shell = layoutRegions(placement, full)
   // Open wide, the library stands in for the page: only with a sidebar to hold it.
   const sidebarShown = shell.regions.left.includes('sidebar') || shell.regions.right.includes('sidebar')
+  // A part that throws under a theme's layout drops it (LayoutBoundary).
+  const arranged = placement !== DEFAULT_LAYOUT
+  const part = (surface: Surface, drawn: ReactNode) => (
+    <LayoutBoundary key={surface} on={arranged} drop={dropLayout}>
+      {drawn}
+    </LayoutBoundary>
+  )
   // Above and under the middle row; the player bar is drawn apart.
   const bar = (surface: Surface) => {
-    if (surface === 'topbar') return <TopBar key={surface} brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} />
-    return surface === 'brand' && <Brand key={surface} className="mx-4 my-1 shrink-0 self-start" order={shell.order?.brand} />
+    if (surface === 'topbar') return part(surface, <TopBar brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} />)
+    return surface === 'brand' && part(surface, <Brand className="mx-4 my-1 shrink-0 self-start" order={shell.order?.brand} />)
   }
   // The columns keep off the window's edge when no bar is under them.
   const nothingUnder = !shell.regions.bottom.some((surface) => surface !== 'playerBar' || !shell.playerBarHidden)
   const column = (surface: Surface, side: 'left' | 'right') => {
-    if (surface === 'sidebar') return <Sidebar key={surface} side={side} fixedWidth={placement.sizes.sidebar} />
-    return surface === 'brand' ? <Brand key={surface} className="shrink-0 self-start" /> : <SidePanel key={surface} width={placement.sizes.sidePanel} />
+    if (surface === 'sidebar') return part(surface, <Sidebar side={side} fixedWidth={placement.sizes.sidebar} />)
+    return part(surface, surface === 'brand' ? <Brand className="shrink-0 self-start" /> : <SidePanel width={placement.sizes.sidePanel} />)
   }
 
   return (
@@ -417,7 +425,7 @@ export function App() {
       </div>
       {shell.regions.bottom.map(bar)}
       {/* Here whatever the layout (a moved video frame reloads): shown above by its flex order. */}
-      <PlayerBar hidden={shell.playerBarHidden} order={shell.order?.playerBar} />
+      {part('playerBar', <PlayerBar hidden={shell.playerBarHidden} order={shell.order?.playerBar} />)}
       <PhoneTabs />
       <MiniPlayer />
       <VolumeHud />

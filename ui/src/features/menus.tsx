@@ -1,8 +1,9 @@
 /** Right-click menus, one builder per kind of thing (track, playlist, album, artist, player, app). Built when opened: fresh state. */
-import { UsersThree, Devices, DotsThree, ArrowCounterClockwise, ArrowsClockwise, ArrowsOutSimple, ArrowSquareOut, ClipboardText, Copy, CopySimple, Disc, DownloadSimple, ChartBar, Eye, EyeSlash, MusicNotesSimple, FolderOpen, FolderSimple, FolderSimplePlus, FrameCorners, PushPin, PushPinSlash, Info, Power, ImageSquare, Gear, Link, Timer, SpeakerHifi, Users, ListBullets, ListPlus, MagnifyingGlass, MicrophoneStage, MinusCircle, Moon, Palette, Gradient, Gauge, Equalizer, FlipVertical, Pause, PencilSimple, PictureInPicture, Play, Playlist, Plus, PlusCircle, Prohibit, PuzzlePiece, Queue, Books, Microphone, Television, Radio, Repeat, Scales, ShareNetwork, Shuffle, SlidersHorizontal, Sparkle, Star, SortAscending, SkipBack, SkipForward, SpeakerHigh, Swatches, ThumbsDown, Trash, UploadSimple, VinylRecord, BookmarkSimple, Alarm, ArrowsIn, Question } from '@phosphor-icons/react'
+import { UsersThree, Devices, DotsThree, ArrowCounterClockwise, ArrowsClockwise, ArrowsOutSimple, ArrowSquareOut, ClipboardText, Layout, Copy, CopySimple, Disc, DownloadSimple, ChartBar, Eye, EyeSlash, MusicNotesSimple, FolderOpen, FolderSimple, FolderSimplePlus, FrameCorners, PushPin, PushPinSlash, Info, Power, ImageSquare, Gear, Link, Timer, SpeakerHifi, Users, ListBullets, ListPlus, MagnifyingGlass, MicrophoneStage, MinusCircle, Moon, Palette, Gradient, Gauge, Equalizer, FlipVertical, Pause, PencilSimple, PictureInPicture, Play, Playlist, Plus, PlusCircle, Prohibit, PuzzlePiece, Queue, Books, Microphone, Television, Radio, Repeat, Scales, ShareNetwork, Shuffle, SlidersHorizontal, Sparkle, Star, SortAscending, SkipBack, SkipForward, SpeakerHigh, Swatches, ThumbsDown, Trash, UploadSimple, VinylRecord, BookmarkSimple, Alarm, ArrowsIn, Question } from '@phosphor-icons/react'
 import { ArrowLeft, ArrowRight } from '../shared/ui/directional'
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useSettings } from '../app/settings'
+import { shellLayoutOn } from '../app/shellLayout'
 import { playlistSongs, useStore, type SettingsSection, type View } from '../app/store'
 import { api, playlistKey, type Edit, type LibraryPlaylist, type PluginInfo, type LibraryTrack, type SearchHit } from '../shared/api'
 import { pickFile, saveFile } from '../shared/files'
@@ -1059,6 +1060,8 @@ export function appMenu(): MenuEntry[] {
     '-',
     player().now && { id: 'nowPlaying', label: tr('Now playing'), icon: <ArrowsOutSimple size={16} />, onSelect: () => player().setFull(true) },
     tag('room', roomItem()),
+    // The way back from a theme's layout: no id, so no menu setting folds or hides it. The theme keeps its layout.
+    shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: () => useSettings.getState().update({ themeLayouts: false }) },
     { id: 'settings', label: tr('Settings'), icon: <Gear size={16} />, onSelect: () => go({ name: 'settings', section: 'general' }) },
   ])
 }

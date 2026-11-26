@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LAYOUT, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { DEFAULT_LAYOUT, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -72,6 +72,13 @@ describe('layoutSummary', () => {
     const lines = summary({ v: 1, regions: { right: ['sidebar'], left: ['sidePanel', 'brand'], top: ['topbar', 'playerBar'] }, sizes: { sidebar: 300, sidePanel: 360 }, hidden: ['topbar'] })
     expect(lines).toHaveLength(7)
     expect(lines.at(-1)).toBe('And more')
+  })
+
+  it('says a layout is on only when themes may and it changes something', () => {
+    expect(layoutOn(true, { v: 1, hidden: ['sidebar'] })).toBe(true)
+    expect(layoutOn(false, { v: 1, hidden: ['sidebar'] })).toBe(false)
+    expect(layoutOn(true, undefined)).toBe(false)
+    expect(layoutOn(true, { v: 1, regions: { left: ['sidebar'] } })).toBe(false)
   })
 
   it('takes a layout off a theme, nothing else', () => {

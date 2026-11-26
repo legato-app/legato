@@ -170,6 +170,9 @@ export function layoutSummary(layout: Layout | undefined): string[] {
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
 }
 
+/** A layout is on: themes may arrange the app and this one changes something. */
+export const layoutOn = (allowed: boolean, layout: Layout | undefined) => allowed && layoutSummary(layout).length > 0
+
 /** The same theme, colors and CSS only. */
 export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
   const copy = { ...theme }
