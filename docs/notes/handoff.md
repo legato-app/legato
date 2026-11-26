@@ -19,12 +19,14 @@ versions are in git. Updated 2026-11-26.
 - **Stable**: only on the owner's word, never on a Beta's green CI.
 
 ## Next, in order
-1. **Lite build**: plan-v2's `L` line "A Lite build next to the full one", with its design and slices under it.
-2. **Profiles on one PC**: plan-v2's `M-L` line, with its design under it.
-3. **Open plan lines**, by title (numbers move): "Now Playing panel: the album line", "Phone: the artist names bold",
+1. **Theme file as a whole layout**: plan-v2's `L` line "A theme file alone can change the app's whole layout". Design
+   only, first; the script question is in its sub-point.
+2. **Lite build**: plan-v2's `L` line "A Lite build next to the full one", with its design and slices under it.
+3. **Profiles on one PC**: plan-v2's `M-L` line, with its design under it.
+4. **Open plan lines**, by title (numbers move): "Now Playing panel: the album line", "Phone: the artist names bold",
    "Right-click › Hide", "Mix covers in several styles", "Normal videos counted as music", "Much fuller diagnostics",
    "Playlist edits sent back to the server", "Server songs levelled", "The remaining JSX moved into one component".
-4. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
+5. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
 
 ## Waiting on the owner
 Waiting on the owner's answer: the Spotify legal questions, removing Spotify-only songs on disconnect, and keeping the
