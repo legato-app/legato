@@ -189,7 +189,7 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `S` Playlist icons default to a grid of 4 covers (`39122055`).
 - [x] `S` « Made from songs you love » mixes take their seed song's cover (`c449f71d`).
 - [ ] `M` Right-click › Hide for parts of the interface (first the Now Playing panel's cards), shown again from Settings › Appearance. A live interface editor for themes comes later.
-- [x] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back. 2026-11-26: song and artist menus, Settings › Playback › Auto-DJ › Artists never played; synced. Never seen.
+- [x] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back. 2026-11-26: song and artist menus, Settings › Playback › Auto-DJ › Artists never played; synced. Never seen. Smart shuffle isn't filtered; focus sessions not yet.
 - [ ] `M` Mix covers in several styles, different from one mix to the next, instead of 2×2 grids everywhere.
 - [ ] `M` Normal videos (a story web series) counted as music: rework the detection; no « Like » mix seeded from a non-music video.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.
@@ -431,6 +431,28 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       karaoke, living-room TV, podcasts, audiobooks). Animations stay. Windows and Android. Built and attached on every
       Beta and Stable, same release. For Opus: the design first (identity::installed(), rename.rs, updater, Sync Mode
       between a full and a Lite PC), then slices; measured against the full one with `pnpm bench`.
+  - Design (Opus, 2026-11-26):
+    - Rust: feature `lite` in `src-tauri/Cargo.toml` next to `e2e`. `crates/plugins` (rquickjs), the rooms' internet half
+      (connectors feature `rooms`: str0m and relays) and the Music Detector (player feature) become optional. Their commands
+      sit behind `#[cfg(not(feature = "lite"))]` in `generate_handler`, and `deferred.rs` starts the same way.
+    - UI: Vite define `__LITE__`, read in one `shared/edition.ts`. `pages.ts` points cut pages at a stub. Sidebar, menus,
+      the settings catalog and `keys.ts` read the same table. Setting keys stay in the type and in `sanitize`, so cut
+      values pass through untouched.
+    - Tauri: overlay `src-tauri/tauri.lite.conf.json` (like `tauri.bench.conf.json`) with productName "Legato Lite",
+      identifier `app.legato.lite` (Android `app.legato.lite.mobile`), its own NSIS and Run entry names, and the feed
+      `…/releases/latest/download/latest-lite.json`. Beta feed: `…/download/beta/latest-lite.json` (`update.rs`
+      `BETA_ENDPOINT` per edition). The full app's `latest.json` URL stays unchanged. Same signing key.
+    - Identity: `identity::installed()` accepts `app.legato.desktop` or `app.legato.lite`. `rename.rs`, the old Run entry
+      and `hooks.nsh` are compiled out for Lite.
+    - Sync Mode: same snapshot and `_legato._tcp`; Lite never deletes what it doesn't show.
+    - Decided during the 2026-11-26 run: both editions can be installed side by side, and Lite doesn't register
+      `legato://` when the full app is there. Windows first, Android after. CI time roughly doubles at each release
+      (accepted). The site offers a second download, "Legato Lite: the essentials, lighter on your PC" (through the
+      site's i18n).
+    - Slices: 1 edition plumbing (feature, overlay, define, `edition.ts`, identity, feeds, `pnpm build:lite`); 2 UI cut
+      table and a test that every cut entry is absent when lite; 3 Rust cfgs and optional deps (`cargo check --features
+      lite` in CI); 4 `release.yml` second build and feed; 5 `pnpm bench` Lite vs full in `docs/performance.md`; 6 docs
+      and the site's download line.
 - [ ] `L+` Mobile version, well optimised, the Rust code reused (the owner's ask 2026-11-02): Tauri 2's Android target
       with the same crates and `ui/`, Android first, iPhone after. Spec, seven phases, what stays desktop-only and the
       owner's calls (Android SDK / NDK on this PC, a phone, GitHub or Play Store, YouTube sign-in in a WebView):
