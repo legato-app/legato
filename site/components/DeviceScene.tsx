@@ -66,8 +66,9 @@ export function DeviceScene({ scroll }: { scroll?: MotionValue<number> }) {
   }, [scroll])
 
   return (
-    // A PC's short window has no room under the headline; a phone always shows it (Android's is its own device).
-    <div ref={box} aria-hidden className="aspect-[16/10] w-full max-w-[440px] will-change-transform max-[1000px]:mx-auto [@media(min-width:1000px)_and_(max-height:860px)]:hidden">
+    // A PC's window: as tall as the room the hero's text leaves (about 730 px of it), none in a short one. A phone always
+    // shows it (Android's is its own device).
+    <div ref={box} aria-hidden className="aspect-[16/10] w-full max-w-[440px] will-change-transform max-[1000px]:mx-auto pinned:w-[min(440px,calc((100vh-730px)*1.6))] [@media(min-width:1000px)_and_(max-height:860px)]:hidden">
       {name &&
         (still ? (
           <img src={`${name}.webp`} alt="" width={1280} height={800} className="size-full" />
