@@ -74,6 +74,10 @@ account. Old share links are not read any more (the owner's word).
 - Written for a human contributor (the owner's word, 2026-11-25): names say what a thing is in whole words
   (`playlistSort`, not `ps`; one letter only in a tiny lambda or a loop index), one job per function, a comment for
   the why the code can't show. New code follows it; old code gets renamed when a change touches it, not in bulk.
+- Reuse before writing (the owner's word, 2026-11-26: AI-written code repeats itself): before a new helper, hook,
+  component or Rust function, look for one that does it (`graphify query`, then grep `ui/src/shared`,
+  `crates/core`); use it or extend it. A pattern written a second time moves into one shared helper (`shared/` or
+  `crates/core`) with its test, and the copies call it. Deleting duplicated lines beats adding new ones.
 - Backward compatible (the owner's word, 2026-11-26): a big change keeps what users already have working. A library,
   settings, theme, `.lmix`, plugin or sync file written by an older version still opens (migrate it, never drop it);
   a newer one opened by an older version is kept as is, not rewritten; synced PCs on two versions don't undo each

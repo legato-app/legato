@@ -868,6 +868,15 @@ colours, mirror, reflection.
 
 ## Workflow (how we build it)
 
+- [ ] `L` Code quality: the same code written again and again, merged into shared helpers (the owner, 2026-11-26:
+  « les IA ont tendance à refaire un peu le même code de partout… faut vraiment bosser sur la code quality »).
+  - Audit first (Opus, read-only): clusters of near-duplicate code in `ui/src` and `crates/` + `src-tauri/src`
+    (same fetch-and-cache, list sorting and filtering, menu entries, time and number formatting, settings rows,
+    error-to-notice mapping, Rust row readers, HTTP client setup…), each with its files, the shared helper it would
+    become (an existing one first), the lines it would remove, and its risk. Ranked by lines saved over risk.
+  - Then slices, one cluster per commit, behaviour unchanged, covered by the existing tests plus one for the helper;
+    the biggest savings first. No new dependency for it.
+
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md
 ~15 kB read by every session.
