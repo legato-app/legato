@@ -91,7 +91,7 @@ mod tests {
     fn only_the_songs_a_made_up_mix_brought_leave() -> Result<()> {
         assert!(is_made_up_mix("RDTMAK5") && is_made_up_mix("SE~1") && !is_made_up_mix("RDCLAK5uy") && !is_made_up_mix("PL1") && !is_made_up_mix("LM"));
         let lib = Library::in_memory()?;
-        let kept = ["normal", "played", "rated", "preferred", "liked", "added", "local", "bookmarked", "edited", "marked"];
+        let kept = ["normal", "played", "rated", "preferred", "liked", "added", "local", "bookmarked", "edited", "marked", "cleared", "songedit"];
         let mut in_mix: Vec<Track> = kept.iter().map(|name| song(name)).collect();
         in_mix.push(song("alone"));
         in_mix[6].ids.insert(Source::Local, "C:/a.flac".into());
@@ -109,6 +109,9 @@ mod tests {
         lib.db.execute("INSERT INTO bookmarks (track_id, ms, note, created) VALUES (?1, 1, '', 1)", [id("bookmarked")?])?;
         lib.db.execute("INSERT INTO edits (song, name, effects, active, updated) VALUES ('yt:edited', 'x', '{}', 1, 1)", [])?;
         lib.db.execute("UPDATE tracks SET musicness = 'user:music' WHERE id = ?1", [id("marked")?])?;
+        // Explicit mark lifted by hand, and an edit saved under the song itself.
+        lib.db.execute("UPDATE tracks SET explicit = 2 WHERE id = ?1", [id("cleared")?])?;
+        lib.db.execute("INSERT INTO edits (song, name, effects, active, updated) VALUES ('t:' || ?1, 'y', '{}', 1, 1)", [id("songedit")?])?;
         assert!(lib.mix_cleanup_pending()?);
         assert_eq!(lib.remove_made_up_mixes()?, MixesRemoved { playlists: 2, songs: 1 });
         let mut left: Vec<String> = lib.tracks()?.into_iter().map(|t| t.track.title).collect();
