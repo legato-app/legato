@@ -9,6 +9,7 @@ use music_connectors::ytmusic::Artist;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use tauri::{AppHandle, Manager};
 
 const GAP: Duration = Duration::from_secs(4);
 const RETRY: Duration = Duration::from_secs(15);
@@ -18,7 +19,8 @@ static LOOKS: Mutex<Sparse> = Mutex::new(Sparse::new());
 
 /// The artist a picture is looked up for: the first credited, a channel's " - Topic" aside.
 pub fn looked_up(artist: &str) -> &str {
-    first_artist(artist.trim().trim_end_matches(" - Topic"))
+    // The suffix first: trimming the front would take its space from a name that is nothing else.
+    first_artist(artist.trim_end().trim_end_matches(" - Topic"))
 }
 
 /// Is this presence's artist the one a picture was found for? A plugin words its own: only a match takes the picture.
@@ -36,6 +38,43 @@ fn picture(page: &Option<Artist>) -> Option<String> {
 pub fn known_picture(state: &AppState, artist: &str) -> Option<Option<String>> {
     let key = artist.to_lowercase();
     state.cache.artists.get(&key).or_else(|| state.cache.presence_artists.get(&key)).map(|page| picture(&page))
+}
+
+/// The name to find a picture for: the playing song's artist, when the presence waiting for one (`waiting`, its
+/// artist) shows that artist. None too for a blank or absurd name: nothing is asked about it.
+fn wanted<'a>(waiting: Option<&str>, playing: &'a str) -> Option<&'a str> {
+    let name = looked_up(playing);
+    (!name.is_empty() && name.chars().count() <= 200 && waiting.is_some_and(|presence| same_artist(presence, name))).then_some(name)
+}
+
+/// After `update`: the artist of the presence shown without a picture, if any.
+fn note(waiting: &mut Option<String>, update: &Update) {
+    match update {
+        Update::Set { presence, .. } => *waiting = presence.as_ref().filter(|presence| presence.artist_art.is_none()).map(|presence| presence.artist.clone()),
+        Update::ArtistArt { artist, .. } => {
+            if waiting.as_deref().is_some_and(|presence| same_artist(presence, artist)) {
+                *waiting = None;
+            }
+        }
+        Update::Off => *waiting = None,
+    }
+}
+
+/// A presence and the song the app plays have met (whichever came last): the picture it lacks goes on, from the pages
+/// known, else asked for behind (`find_picture`) for a song YouTube plays.
+pub fn fill_picture(app: &AppHandle) {
+    let state = app.state::<AppState>();
+    let Some((artist, youtube)) = state.playing_artist.lock().unwrap().clone() else { return };
+    let Some(name) = state.discord.wanted(&artist) else { return };
+    match known_picture(&state, &name) {
+        Some(Some(art)) => state.discord.send(Update::ArtistArt { artist: name, art }),
+        Some(None) => {}
+        None if youtube => {
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move { find_picture(&app.state::<AppState>(), name).await });
+        }
+        None => {}
+    }
 }
 
 /// Asks YouTube Music for an unknown artist's page, by name alone (the owner's choice, 2026-11-06): never during an
@@ -98,6 +137,8 @@ pub struct Status {
 pub struct Discord {
     tx: Sender<Update>,
     status: Arc<Mutex<Status>>,
+    /// The artist of the presence sent without a picture (`note`).
+    waiting: Mutex<Option<String>>,
 }
 
 impl Discord {
@@ -106,10 +147,15 @@ impl Discord {
         let status = Arc::new(Mutex::new(Status::default()));
         let s = status.clone();
         std::thread::Builder::new().name("discord".into()).spawn(move || run(rx, s)).expect("discord thread");
-        Self { tx, status }
+        Self { tx, status, waiting: Mutex::default() }
+    }
+
+    fn wanted(&self, playing: &str) -> Option<String> {
+        wanted(self.waiting.lock().unwrap().as_deref(), playing).map(String::from)
     }
 
     pub fn send(&self, u: Update) {
+        note(&mut self.waiting.lock().unwrap(), &u);
         let _ = self.tx.send(u);
     }
 
@@ -200,6 +246,27 @@ mod tests {
     fn shown(want: &Option<Update>) -> (Option<&str>, u64) {
         let Some(Update::Set { presence: Some(presence), .. }) = want else { panic!("no presence") };
         (presence.artist_art.as_deref(), presence.position_ms)
+    }
+
+    #[test]
+    fn the_picture_is_wanted_whichever_of_the_presence_and_the_song_comes_last() {
+        let mut waiting = None;
+        // The plugin's new song lands while the app still says the one before.
+        note(&mut waiting, set("Muse", true).as_ref().unwrap());
+        assert_eq!(wanted(waiting.as_deref(), "Daft Punk"), None);
+        // Then the app's own word of it: now.
+        assert_eq!(wanted(waiting.as_deref(), "Muse - Topic"), Some("Muse"));
+        note(&mut waiting, &picture_of("Daft Punk"));
+        assert!(waiting.is_some());
+        note(&mut waiting, &picture_of("muse"));
+        assert_eq!(wanted(waiting.as_deref(), "Muse"), None, "it has one");
+        note(&mut waiting, set("Muse", true).as_ref().unwrap());
+        note(&mut waiting, &Update::Off);
+        assert_eq!(wanted(waiting.as_deref(), "Muse"), None);
+        // A blank name is never asked about, even for a blank presence.
+        for blank in ["", "  ", " - Topic"] {
+            assert_eq!(wanted(Some(blank), blank), None, "{blank:?}");
+        }
     }
 
     #[test]

@@ -604,7 +604,11 @@ fn hold_page(app: tauri::AppHandle) {
 #[tauri::command]
 async fn media_update(app: tauri::AppHandle, state: State<'_, AppState>, now: Option<media::NowPlaying>, track_id: Option<i64>, art: Option<String>) -> CmdResult<()> {
     remote::set_now(now.as_ref(), track_id, art.as_deref());
-    *state.playing_artist.lock().unwrap() = now.as_ref().map(|n| (n.artist.clone(), n.youtube));
+    let playing_artist = now.as_ref().map(|n| (n.artist.clone(), n.youtube));
+    // Another artist: a Discord presence that got here first may be waiting for their picture.
+    if std::mem::replace(&mut *state.playing_artist.lock().unwrap(), playing_artist.clone()) != playing_artist {
+        discord::fill_picture(&app);
+    }
     let playing = now.as_ref().is_some_and(|n| n.playing);
     background::set_playing(playing);
     background::played(&app, playing, now.as_ref().map_or(0, |n| n.position_ms));
