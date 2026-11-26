@@ -83,6 +83,15 @@ export function Hero() {
       <motion.div variants={rise} className="w-full pocket:hidden">
         <DeviceScene />
       </motion.div>
+      {/* What holds whatever the device: plain words, no frame (the owner's band). Two by two on a phone. */}
+      <motion.ul variants={rise} className="grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] font-semibold tracking-wide text-ink-2 uppercase min-[1000px]:flex min-[1000px]:flex-wrap">
+        {c.hero.criteria.map((criterion) => (
+          <li key={criterion} className="flex items-center gap-2">
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
+            {criterion}
+          </li>
+        ))}
+      </motion.ul>
     </motion.div>
   )
 }

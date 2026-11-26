@@ -6,7 +6,8 @@ export const sv: Copy = {
   skip: 'Hoppa till innehållet',
   nav: { fixes: 'Vad den löser', why: 'Varför Legato', features: 'Funktioner', privacy: 'Integritet', next: 'Kommande', faq: 'Frågor', docs: 'Dokumentation', download: 'Ladda ned', top: 'Legato, sidans början', sections: 'Avsnitt', language: 'Språk' },
   hero: {
-    lines: ['Din musik bor', 'i fyra appar.', 'Spela den i en.'],
+    lines: ['ALLT', 'i ett.'],
+    criteria: ['Ingen egen server', 'Flera plattformar', 'Modernt gränssnitt', 'Källkoden tillgänglig'],
     lead: 'Legato samlar YouTube Music, Spotify, Apple Music och filerna på din dator i ett bibliotek och en spelare, i Windows, utan något konto hos oss.',
     download: 'Ladda ned för Windows',
     free: 'Gratis · Windows 10 och 11',

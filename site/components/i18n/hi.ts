@@ -6,7 +6,8 @@ export const hi: Copy = {
   skip: 'सामग्री पर जाएँ',
   nav: { fixes: 'क्या सुधारता है', why: 'Legato क्यों', features: 'सुविधाएँ', privacy: 'गोपनीयता', next: 'आगे', faq: 'सवाल', docs: 'दस्तावेज़', download: 'डाउनलोड', top: 'Legato, पेज की शुरुआत', sections: 'हिस्से', language: 'भाषा' },
   hero: {
-    lines: ['आपका संगीत', 'चार ऐप में है।', 'सुनिए एक में।'],
+    lines: ['सब कुछ', 'एक में।'],
+    criteria: ['हमारा कोई सर्वर नहीं', 'मल्टी-प्लेटफ़ॉर्म', 'आधुनिक इंटरफ़ेस', 'सोर्स कोड उपलब्ध'],
     lead: 'Legato, YouTube Music, Spotify, Apple Music और आपके PC की फ़ाइलों को Windows पर एक लाइब्रेरी और एक प्लेयर में ले आता है, हमारे किसी अकाउंट के बिना।',
     download: 'Windows के लिए डाउनलोड करें',
     free: 'मुफ़्त · Windows 10 और 11',

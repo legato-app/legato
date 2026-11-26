@@ -6,7 +6,8 @@ export const tr: Copy = {
   skip: 'İçeriğe geç',
   nav: { fixes: 'Neyi çözüyor', why: 'Neden Legato', features: 'Özellikler', privacy: 'Gizlilik', next: 'Sırada', faq: 'SSS', docs: 'Belgeler', download: 'İndir', top: 'Legato, sayfanın başı', sections: 'Bölümler', language: 'Dil' },
   hero: {
-    lines: ['Müziğin dört', 'uygulamada.', 'Tek yerden dinle.'],
+    lines: ['HEPSİ', 'bir arada.'],
+    criteria: ['Bize ait sunucu yok', 'Çok platformlu', 'Modern arayüz', 'Kaynak kodu erişilebilir'],
     lead: 'Legato; YouTube Music, Spotify, Apple Music ve bilgisayarındaki dosyaları Windows’ta tek bir kitaplıkta ve tek bir oynatıcıda toplar, bizde hiçbir hesap gerekmeden.',
     download: 'Windows için indir',
     free: 'Ücretsiz · Windows 10 ve 11',

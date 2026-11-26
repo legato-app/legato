@@ -6,7 +6,8 @@ export const it: Copy = {
   skip: 'Vai al contenuto',
   nav: { fixes: 'Cosa risolve', why: 'Perché Legato', features: 'Funzioni', privacy: 'Privacy', next: 'In arrivo', faq: 'Domande', docs: 'Documentazione', download: 'Scarica', top: 'Legato, inizio pagina', sections: 'Sezioni', language: 'Lingua' },
   hero: {
-    lines: ['La tua musica vive', 'in quattro app.', 'Ascoltala da una.'],
+    lines: ['TUTTO', 'in uno.'],
+    criteria: ['Nessun server nostro', 'Multipiattaforma', 'Interfaccia moderna', 'Codice disponibile'],
     lead: 'Legato mette YouTube Music, Spotify, Apple Music e i file del tuo PC in un’unica libreria e un unico lettore, su Windows, senza alcun account nostro.',
     download: 'Scarica per Windows',
     free: 'Gratis · Windows 10 e 11',

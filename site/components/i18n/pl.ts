@@ -6,7 +6,8 @@ export const pl: Copy = {
   skip: 'Przejdź do treści',
   nav: { fixes: 'Co naprawia', why: 'Dlaczego Legato', features: 'Funkcje', privacy: 'Prywatność', next: 'Wkrótce', faq: 'Pytania', docs: 'Dokumentacja', download: 'Pobierz', top: 'Legato, początek strony', sections: 'Sekcje', language: 'Język' },
   hero: {
-    lines: ['Muzyka w czterech', 'aplikacjach?', 'Słuchaj w jednej.'],
+    lines: ['WSZYSTKO', 'w jednym.'],
+    criteria: ['Bez naszego serwera', 'Wieloplatformowy', 'Nowoczesny interfejs', 'Kod źródłowy dostępny'],
     lead: 'Legato łączy YouTube Music, Spotify, Apple Music i pliki z twojego komputera w jedną bibliotekę i jeden odtwarzacz, na Windowsie, bez żadnego konta u nas.',
     download: 'Pobierz na Windows',
     free: 'Za darmo · Windows 10 i 11',

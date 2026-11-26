@@ -6,7 +6,8 @@ export const vi: Copy = {
   skip: 'Đến nội dung',
   nav: { fixes: 'Sửa được gì', why: 'Vì sao Legato', features: 'Tính năng', privacy: 'Quyền riêng tư', next: 'Sắp tới', faq: 'Hỏi đáp', docs: 'Tài liệu', download: 'Tải xuống', top: 'Legato, đầu trang', sections: 'Các phần', language: 'Ngôn ngữ' },
   hero: {
-    lines: ['Nhạc của bạn ở', 'bốn ứng dụng.', 'Nghe trong một.'],
+    lines: ['TẤT CẢ', 'trong một.'],
+    criteria: ['Không có máy chủ riêng', 'Đa nền tảng', 'Giao diện hiện đại', 'Mã nguồn công khai'],
     lead: 'Legato gom YouTube Music, Spotify, Apple Music và các tệp trên PC của bạn vào một thư viện và một trình phát, trên Windows, không cần tài khoản nào của chúng tôi.',
     download: 'Tải cho Windows',
     free: 'Miễn phí · Windows 10 và 11',
