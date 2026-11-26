@@ -9,7 +9,8 @@ import { rootOf } from './langs'
 import { Hero } from './Hero'
 import { useAndroid, useLatest } from './latest'
 import { EASE } from './motion'
-import { DeviceMove, screenOn, useVisitor } from './DeviceScene'
+import { cornersAt, DeviceMove, frameOf, screenOn, useVisitor } from './DeviceScene'
+import { homography } from './homography'
 import type { Device } from './device'
 
 // The app's first window (tauri.conf.json); the stage scales it.
@@ -46,8 +47,6 @@ const mix = (a: number, b: number, t: number) => a + (b - a) * t
 const shade = (at: number) => 1 - clamp((Math.abs(at - BLACK) - 0.3) / 0.2)
 /** How far the hero's 3D move is: 0 at the top of the page, 1 once the camera is in the visitor's screen. */
 const moveOf = (at: number) => clamp(1 + at / INTRO)
-/** The live window comes in over the scene's screen as the move ends. */
-const arrived = (at: number) => clamp((moveOf(at) - 0.94) / 0.06)
 /** The stage a scroll position shows, the move counting as stage 0. */
 const stageOf = (at: number) => Math.max(0, Math.round(Math.min(at, LAST)))
 /** Between stage i and the next: 0 while i holds, 1 once the next one does. */
@@ -244,8 +243,15 @@ function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowPr
   const willChange = useMotionValue('auto')
   useMotionValueEvent(at, 'animationStart', () => willChange.set('transform'))
   useMotionValueEvent(at, 'animationComplete', () => willChange.set('auto'))
-  const opacity = useTransform(at, arrived)
+  // During the hero's 3D move it rides the scene's screen, corner on corner: the interface stays sharp all the way in.
+  const transformOrigin = useTransform(at, (a) => (a < 0 ? '0 0' : '50% 50%'))
   const transform = useTransform(() => {
+    if (at.get() < 0) {
+      // Its place in the stage, before any transform (centred by its margins).
+      const [left, top] = [w.get() / 2 - APP.w / 2, h.get() / 2 - APP.h / 2]
+      const corners = cornersAt(device, frameOf(device, moveOf(at.get())), w.get(), h.get())
+      return homography(APP.w, APP.h, corners.map(([x, y]) => [x - left, y - top]))
+    }
     const fitting = Math.min((w.get() * 0.66) / APP.w, (h.get() * 0.84) / APP.h)
     // Stage 0: square on the scene's screen, as big as it lands.
     const screen = screenOn(device, w.get(), h.get())
@@ -257,7 +263,7 @@ function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowPr
     return `translate3d(${mix(p.x, 0, t) * w.get()}px, ${mix(p.y, 0.005, t) * h.get()}px, 0) rotateX(${mix(p.rx, 0, t)}deg) rotateY(${mix(p.ry, 0, t)}deg) scale(${mix(fit, full, t)})`
   })
   return (
-    <motion.div ref={box} aria-hidden={!live} style={{ transform, opacity, willChange, width: APP.w, height: APP.h, marginLeft: -APP.w / 2, marginTop: -APP.h / 2 }} className="absolute top-1/2 left-1/2 overflow-hidden rounded-[10px] bg-panel shadow-(--shot-shadow) outline outline-line">
+    <motion.div ref={box} aria-hidden={!live} style={{ transform, transformOrigin, willChange, width: APP.w, height: APP.h, marginLeft: -APP.w / 2, marginTop: -APP.h / 2 }} className="absolute top-1/2 left-1/2 overflow-hidden rounded-[10px] bg-panel shadow-(--shot-shadow) outline outline-line">
       <Still name={still} alt="" className="absolute inset-0 size-full" />
       <Demo at={at} ready={ready} live={live} onReady={onReady} onLeave={onLeave} />
     </motion.div>
@@ -275,10 +281,12 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
   const [w, h] = useStage(box, 390, 760)
   const [flat, setFlat] = useState(false)
   useMotionValueEvent(take, 'change', (t) => setFlat(t >= 0.5))
-  // It comes in over the scene's phone as the hero's 3D move ends (DeviceMove).
-  const opacity = useTransform(() => Math.abs(1 - 2 * take.get()) * arrived(at.get()))
+  const opacity = useTransform(take, (t) => Math.abs(1 - 2 * t))
+  // During the hero's 3D move its screen rides the scene's phone screen, corner on corner (the edge around it, outside).
+  const transformOrigin = useTransform(at, (a) => (a < 0 ? '0 0' : '50% 50%'))
   const transform = useTransform(() => {
     if (take.get() >= 0.5) return 'none'
+    if (at.get() < 0) return `${homography(PHONE.w, PHONE.h, cornersAt('phone', frameOf('phone', moveOf(at.get())), w.get(), h.get()))} translate(${-RIM}px, ${-RIM}px)`
     const [i, t] = step(at.get())
     const [a, b] = [standAt(i, w.get(), h.get(), tops.get()), standAt(i + 1, w.get(), h.get(), tops.get())]
     const x = mix(a.x, b.x, t) - DEVICE.w / 2
@@ -289,7 +297,7 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
     <motion.div
       ref={box}
       aria-hidden={!live}
-      style={{ transform, opacity, ...(flat ? { width: '100%', height: `calc(100% - ${BAR}px)` } : { width: DEVICE.w, height: DEVICE.h }) }}
+      style={{ transform, transformOrigin, opacity, ...(flat ? { width: '100%', height: `calc(100% - ${BAR}px)` } : { width: DEVICE.w, height: DEVICE.h }) }}
       className={`absolute top-0 left-0 ${flat ? '' : 'rounded-[52px] bg-[#0c0c0c] p-[9px] shadow-(--shot-shadow) outline outline-white/10 will-change-transform'}`}
     >
       <div className={`relative size-full overflow-hidden bg-panel ${flat ? '' : 'rounded-[43px]'}`}>
@@ -437,6 +445,10 @@ export function Story() {
   const move = useTransform(at, moveOf)
   // The scene goes once the live window holds its screen, before the window leaves for the first chapter.
   const sceneOpacity = useTransform(at, (a) => 1 - clamp(a / 0.2))
+  // No perspective of the stage's own while the window rides the film's screen: the corners carry the film's.
+  const [riding, setRiding] = useState(true)
+  useMotionValueEvent(at, 'change', (a) => setRiding(a < 0))
+  const perspective = riding ? 'none' : mode === 'phone' ? 900 : 1800
   const visitor = useVisitor()
   // A phone's stage stands up: the phone's move. A PC's: its own device (device.ts), an Android tablet a laptop.
   const device: Device | null = mode === 'phone' ? 'phone' : visitor.device && (visitor.device === 'monitor' ? 'monitor' : 'laptop')
@@ -483,7 +495,7 @@ export function Story() {
   return (
     <section ref={section} style={{ ['--stages' as string]: INTRO + LAST + TAIL }} className="story:relative story:-mt-[78px] story:h-[calc(100svh+var(--stages)*130svh)]">
       {mode && CHAPTER_SCENES.map(({ scene }, n) => <span key={scene} id={`chapter-${scene}`} style={{ top: `${(INTRO + n + 1) * 130}svh` }} className="absolute" />)}
-      <motion.div data-black={black || undefined} style={mode ? { perspective: mode === 'phone' ? 900 : 1800, zIndex } : undefined} className="text-ink story:sticky story:top-0 story:h-svh story:overflow-hidden">
+      <motion.div data-black={black || undefined} style={mode ? { perspective, zIndex } : undefined} className="text-ink story:sticky story:top-0 story:h-svh story:overflow-hidden">
         {/* The playback blue's light behind the window: the app's one colour, nothing else on the page glows. */}
         <div aria-hidden className="pointer-events-none absolute hidden pinned:block top-[8%] right-[-12%] size-[min(70vw,980px)] rounded-full bg-accent/18 blur-[150px]" />
         {mode && device && <DeviceMove device={device} dark={visitor.dark} move={move} opacity={sceneOpacity} />}

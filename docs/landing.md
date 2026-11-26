@@ -17,8 +17,9 @@ floating around them. Nothing is modelled by hand, so the renders can be made ag
     once. Each is an MP4 (H.264), about half the size of its WebM (VP9) twin, the fallback.
   - The poster is the first frame, the wide view: the page's first look, and all that reduced motion shows. The film
     loads after the page (or at the first scroll).
-  - `site/components/screens.json`: where each screen lands in the last frame, written by the render. The live window
-    is laid on it.
+  - The live interface rides the visitor's screen the whole way, sharper than any render: the film shows that screen
+    dark, and `site/components/screens.json` (written by the render) holds its four corners in every frame, which the
+    site maps the live window onto (`site/components/homography.ts`). The poster keeps every screen lit.
   - Files: `site/public/landing/{phone,monitor,laptop}-{dark,light}.{webm,mp4,webp}`.
   - The screens show `site/public/shots`, which predate the interface's latest words (« Your library », now
     « Library »). Re-capture the shots, then render again; nothing captures them yet.

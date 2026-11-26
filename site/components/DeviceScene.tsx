@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useCopy } from './copy'
 import { deviceOf, type Device } from './device'
 import { rootOf } from './langs'
+import type { Point } from './homography'
 import SCREENS from './screens.json'
 
 type BatteryNavigator = Navigator & { getBattery?: () => Promise<{ charging: boolean; level: number }> }
@@ -12,16 +13,25 @@ type BatteryNavigator = Navigator & { getBattery?: () => Promise<{ charging: boo
 /** Each move's frame (scripts/landing/render.mjs): the phone's stands up. */
 export const FRAME: Record<Device, { w: number; h: number }> = { phone: { w: 900, h: 1600 }, monitor: { w: 1600, h: 900 }, laptop: { w: 1600, h: 900 } }
 
+/** The film's frame showing at `move` (0-1): the one the scroll seeks (DeviceMove) and the screen's corners follow. */
+export const frameOf = (device: Device, move: number) => Math.min(SCREENS[device].length - 1, Math.floor(move * SCREENS[device].length))
+
 /**
- * Where the visitor's screen lands, in px of a `w`×`h` stage the move covers (object-fit: cover): the live demo is laid
- * on it as the move ends (Story.tsx).
+ * The visitor's screen in a frame of the move, in px of a `w`×`h` stage the film covers (object-fit: cover): its
+ * corners, top left first, clockwise. The live interface is laid on them all the way in (Story.tsx).
  */
+export function cornersAt(device: Device, frame: number, w: number, h: number): Point[] {
+  const size = FRAME[device]
+  const k = Math.max(w / size.w, h / size.h)
+  const [left, top] = [(w - size.w * k) / 2, (h - size.h * k) / 2]
+  const at = SCREENS[device][frame]
+  return [0, 2, 4, 6].map((n) => [left + at[n] * size.w * k, top + at[n + 1] * size.h * k])
+}
+
+/** Where the screen lands as the move ends: its centre and size, square on. */
 export function screenOn(device: Device, w: number, h: number) {
-  const frame = FRAME[device]
-  const rect = SCREENS[device]
-  const k = Math.max(w / frame.w, h / frame.h)
-  const [left, top] = [(w - frame.w * k) / 2, (h - frame.h * k) / 2]
-  return { x: left + ((rect.left + rect.right) / 2) * frame.w * k, y: top + ((rect.top + rect.bottom) / 2) * frame.h * k, w: (rect.right - rect.left) * frame.w * k, h: (rect.bottom - rect.top) * frame.h * k }
+  const [[left, top], , [right, bottom]] = cornersAt(device, SCREENS[device].length - 1, w, h)
+  return { x: (left + right) / 2, y: (top + bottom) / 2, w: right - left, h: bottom - top }
 }
 
 /** The device the visitor holds (device.ts) and the page's theme. Null until the browser has told. */
@@ -78,8 +88,9 @@ export function DeviceMove({ device, dark, move, opacity }: { device: Device; da
   }, [wanted, name])
   const seek = () => {
     const video = film.current
-    const to = move.get() * (video?.duration || 0)
-    // Every frame is a keyframe (render.mjs: -g 1), so a seek lands at once.
+    // The middle of the frame the screen's corners belong to. Every frame is a keyframe (render.mjs: -g 1), so a seek
+    // lands at once.
+    const to = ((frameOf(device, move.get()) + 0.5) / SCREENS[device].length) * (video?.duration || 0)
     if (video?.duration && Math.abs(video.currentTime - to) > 0.02) video.currentTime = to
   }
   useMotionValueEvent(move, 'change', seek)

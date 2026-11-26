@@ -3,7 +3,7 @@
 Blender 5.x, headless (scripts/landing/render.mjs runs every render the site and README use):
   blender -b -P scripts/landing/scene.py -- --variant dark --out render.png
       [--shot wide|phone|monitor|laptop] [--frames 48] [--size 2880x1200] [--only "Phone,Vinyl"]
-      [--samples 64] [--scale 100] [--blend scene.blend] [--tex site/public/shots] [--rect screen.json] [--frame 96]
+      [--samples 64] [--scale 100] [--blend scene.blend] [--tex site/public/shots] [--rect screen.json] [--frame 96] [--dark-screen]
 A device shot writes numbered frames (--out frame-####). Screens: the site's own shots (WebP).
 Background stays transparent (film_transparent): the page's colour shows through.
 """
@@ -40,6 +40,7 @@ BLEND = arg("blend", "")
 # A move: where to write the screen's place in its last frame (JSON). --frame N renders that frame alone (a test still).
 RECT = arg("rect", "")
 STILL = arg("frame", "")
+DARK_SCREEN = "--dark-screen" in ARGS
 DARK = VARIANT == "dark"
 R = math.radians
 
@@ -422,16 +423,27 @@ else:
         camob.keyframe_insert("rotation_quaternion", frame=frame)
         cam.keyframe_insert("shift_y", frame=frame)
     scene.frame_end = FRAMES
-    scene.frame_set(FRAMES)
-    # Where the screen lands in the last frame, 0-1 from the top left: the site lays the live demo on it (DeviceScene).
+    # The site lays the live interface on this screen all the way in, sharper than any render: the film shows it dark.
+    if DARK_SCREEN:
+        face.data.materials[0] = material("Screen off", (0.006, 0.006, 0.007), rough=0.35)
+    # Where the screen stands in each frame: its corners (top left, top right, bottom right, bottom left), 0-1 from the
+    # frame's top left. The site maps the live window onto them (Story.tsx).
     if RECT:
-        # Projected by hand: world_to_camera_view reads a portrait frame's height wrong with the horizontal sensor fit.
-        view = camob.matrix_world.inverted()
+        local = [v.co for v in face.data.vertices]
+        xs, zs = (min(v.x for v in local), max(v.x for v in local)), (min(v.z for v in local), max(v.z for v in local))
+        edges = [world @ Vector((x, 0, z)) for x, z in ((xs[0], zs[1]), (xs[1], zs[1]), (xs[1], zs[0]), (xs[0], zs[0]))]
         half_width = cam.sensor_width / 2 / cam.lens
-        seen = [((p.x / -p.z) / half_width, (p.y / -p.z) / half_height) for p in (view @ c for c in corners)]
-        box = {"left": min(x for x, _ in seen), "right": max(x for x, _ in seen), "top": -max(y for _, y in seen), "bottom": -min(y for _, y in seen)}
+        frames = []
+        for frame in range(1, FRAMES + 1):
+            scene.frame_set(frame)
+            # Projected by hand: world_to_camera_view reads a portrait frame's height wrong with the horizontal sensor
+            # fit. The lens shift moves the frame by its larger side.
+            view = camob.matrix_world.inverted()
+            lift = cam.shift_y * 2 * (half_width if WIDTH >= HEIGHT else half_height)
+            seen = [((p.x / -p.z) / half_width, (p.y / -p.z - lift) / half_height) for p in (view @ c for c in edges)]
+            frames.append([round(value, 4) for x, y in seen for value in ((x + 1) / 2, (1 - y) / 2)])
         with open(RECT, "w") as file:
-            json.dump({side: round((value + 1) / 2, 4) for side, value in box.items()}, file)
+            json.dump(frames, file, separators=(",", ":"))
     scene.frame_set(int(STILL or FRAMES))
 
 if ONLY:

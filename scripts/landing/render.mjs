@@ -27,7 +27,7 @@ export const DEVICES = ['phone', 'monitor', 'laptop']
 export const LAYERS = [['Phone shadow', 'Monitor shadow', 'Laptop shadow'], ['Vinyl'], ['Monitor'], ['Phone'], ['Laptop'], ['Eighth note'], ['Headphones'], ['Sync']]
 // The phone's frame stands up, as its screen does. 96 frames: the scroll plays them (site DeviceScene).
 const HERO = { size: { phone: '900x1600', monitor: '1600x900', laptop: '1600x900' }, frames: 96, rate: 24 }
-/** Where each device's screen lands in the move's last frame (0-1): the site lays the live demo on it. */
+/** Where each device's screen stands in every frame of its move (corners, 0-1): the site lays the live interface on it. */
 const SCREENS = join(here, '..', '..', 'site', 'components', 'screens.json')
 const screens = {}
 const README = { width: 1440, height: 600 }
@@ -41,15 +41,18 @@ function hero(theme, device) {
   const frames = join(work, `${theme}-${device}-`)
   const size = HERO.size[device]
   const rect = join(work, `${device}.json`)
-  render(['--variant', theme, '--shot', device, '--frames', String(HERO.frames), '--size', size, '--rect', rect, '--out', `${frames}####`])
+  // The visitor's screen dark: the live interface covers it, sharper than the film.
+  render(['--variant', theme, '--shot', device, '--frames', String(HERO.frames), '--size', size, '--rect', rect, '--dark-screen', '--out', `${frames}####`])
   screens[device] = JSON.parse(readFileSync(rect, 'utf8'))
   const input = ['-y', '-framerate', String(HERO.rate), '-i', `${frames}%04d.png`]
   const name = join(out, `${device}-${theme}`)
   // The scroll seeks the move: a keyframe every frame, so a seek lands at once.
   run('ffmpeg', [...input, ...onPage(theme, size), '-c:v', 'libvpx-vp9', '-g', '1', '-crf', '46', '-b:v', '0', '-row-mt', '1', '-an', `${name}.webm`])
   run('ffmpeg', [...input, ...onPage(theme, size), '-c:v', 'libx264', '-g', '1', '-crf', '30', '-preset', 'slow', '-movflags', '+faststart', '-an', `${name}.mp4`])
-  // The poster is the wide view the move starts from: the page's first look, and all that reduced motion shows.
-  run('ffmpeg', ['-y', '-i', `${frames}0001.png`, ...onPage(theme, size), '-frames:v', '1', '-c:v', 'libwebp', '-quality', '80', `${name}.webp`])
+  // The poster is the wide view the move starts from, every screen lit: the page's first look, and all that reduced
+  // motion shows.
+  render(['--variant', theme, '--shot', device, '--frames', String(HERO.frames), '--size', size, '--frame', '1', '--out', `${frames}lit.png`])
+  run('ffmpeg', ['-y', '-i', `${frames}lit.png`, ...onPage(theme, size), '-frames:v', '1', '-c:v', 'libwebp', '-quality', '80', `${name}.webp`])
 }
 
 /** The README picture: each layer rendered alone (transparent), embedded as WebP, floated by CSS (plays in an <img>). */
@@ -85,6 +88,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (only !== 'readme') DEVICES.forEach((device) => hero(theme, device))
     if (only !== 'hero') readme(theme)
   }
-  if (only !== 'readme') writeFileSync(SCREENS, `${JSON.stringify(screens, null, 2)}
-`)
+  // One device a line: 96 frames of corners each.
+  const lines = Object.entries(screens).map(([device, frames]) => `  ${JSON.stringify(device)}: ${JSON.stringify(frames)}`)
+  if (only !== 'readme') writeFileSync(SCREENS, `{\n${lines.join(',\n')}\n}\n`)
 }
