@@ -21,9 +21,12 @@ pub fn refresh(folder: &Path) -> Result<bool> {
     if installed.id != bundled.id || !older {
         return Ok(false);
     }
-    // The manifest last: a copy cut short still reads as old, and is done again at the next launch.
+    // The manifest last, each file swapped in whole: a copy cut short still reads as old, and is done again at the
+    // next launch.
     for (name, content) in FILES.iter().rev() {
-        std::fs::write(folder.join(name), content)?;
+        let temporary = folder.join(format!("{name}.tmp"));
+        std::fs::write(&temporary, content)?;
+        std::fs::rename(&temporary, folder.join(name))?;
     }
     Ok(true)
 }
@@ -56,7 +59,20 @@ mod tests {
             std::fs::write(folder.join("main.js"), "mine").unwrap();
             assert_eq!(refresh(&folder).unwrap(), refreshed, "{version}");
             assert_eq!(std::fs::read_to_string(folder.join("main.js")).unwrap() == FILES[1].1, refreshed, "{version}");
+            assert_eq!(std::fs::read_dir(&folder).unwrap().count(), 2, "{version}: a temporary file left");
         }
+        // A manifest that can't be written (a folder sits where its temporary file goes): the old one still reads, and
+        // the next launch does the copy.
+        std::fs::write(folder.join("legato.manifest"), at("1.0.0")).unwrap();
+        std::fs::create_dir(folder.join("legato.manifest.tmp")).unwrap();
+        assert!(refresh(&folder).is_err());
+        assert_eq!(Manifest::read(&folder).unwrap().version, "1.0.0");
+        std::fs::remove_dir(folder.join("legato.manifest.tmp")).unwrap();
+        // Half a temporary file from a cut run is written over.
+        std::fs::write(folder.join("main.js.tmp"), "half").unwrap();
+        assert!(refresh(&folder).unwrap());
+        assert_eq!(Manifest::read(&folder).unwrap().version, bundled.version);
+        assert!(!folder.join("main.js.tmp").exists());
         std::fs::remove_dir_all(&folder).unwrap();
         // Not installed: nothing written.
         assert!(refresh(&folder).is_err());
