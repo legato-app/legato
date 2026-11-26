@@ -8,9 +8,11 @@ Where the work stands, for a session with no history here. Read this first, then
 versions are in git. Updated 2026-11-26.
 
 ## Where things stand
-- **Repository**: `legato-app/legato`. **master** = `a4412ea1` (Beta content: the Discord artist picture is back; plugin authors verified by signature, the trusted list empty); `platforms` is the same commit. Work goes to master by
-  push only, on the owner's word.
-- **Last Beta**: v1.2.288 = `69fb248c` (the Now Playing title settles). Stable **1.2.10** (2026-11-14).
+- **Repository**: `legato-app/legato`. **master** on origin = `aaab322c`; `platforms` is the same commit. The local
+  `master` checkout lags: use `origin/master`. Work goes to master by push only, on the owner's word.
+- **Last Beta**: v1.2.298 = `a4412ea1` (2026-11-26: the Discord artist picture comes with the presence; plugin authors
+  verified by signature, the trusted list empty). Since then only docs commits (`78c0af78`..`aaab322c`): no release.
+  Before it, v1.2.288 = `69fb248c`. Stable **1.2.10** (2026-11-14).
 - **Discord presence** is a plugin, in `legato-app/discord-presence` (MIT), on API 2.
 - **Docs site**: Fumadocs (`fumadocs-core` / `fumadocs-ui` 16.19, `fumadocs-mdx` 15.6), its own `(docs)` root layout,
   static search at `/legato/api/search`. Pushed as `[skip release]` (`c382ba3d..0e7acc6b`). A `site` job in `check.yml`
@@ -59,8 +61,9 @@ Two Windows PCs, kept alike through GitHub; one holds the signing keys and the A
 
 ## Sessions
 For a new orchestrating session: read `CLAUDE.md`, this file, then the useful parts of `plan-v2.md`. One session per
-model, reused: Sonnet `local_1f865683-e7e7-4c1e-b422-4199295d93b4` (builds), Opus `local_c797dcef-a048-4ede-adbe-a2b52134a564`
-(reviews, designs), Haiku `local_56454edc-071e-4ca5-84df-c4b643800e1f` (docs). One writer at a time; stage by name.
+model, reused: Opus `local_f29d17e4-a03b-4179-bf7c-2a6ebd93b333` (designs, reviews), Sonnet
+`local_c41fd475-c928-4160-815b-a05f053c4f82` (builds), Haiku `local_25834cd1-06af-48e4-9e8b-b22fad7585d2` (docs). One writer
+at a time; stage by name.
 
 ## History
 Rename to Legato (2026-10-29); Stable 1.2.10 (2026-11-14); organization moved to `legato-app` (2026-11-25). The rest is in
