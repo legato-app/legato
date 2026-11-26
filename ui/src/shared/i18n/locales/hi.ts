@@ -926,7 +926,7 @@ const hi: Record<string, string> = {
   'immersive blurry flou sharp': 'इमर्सिव धुंधला साफ़ immersive blurry flou sharp',
   'immersive dark veil brightness': 'इमर्सिव गहरा परदा ब्राइटनेस immersive dark veil brightness',
   'immersive animation drift': 'इमर्सिव एनिमेशन तैरना immersive animation drift',
-  'mixes artwork grid daily template image': 'मिक्स आर्टवर्क ग्रिड डेली टेम्पलेट इमेज mixes artwork grid daily template image',
+  'mixes artwork grid daily template image varied tile': 'मिक्स आर्टवर्क ग्रिड डेली टेम्पलेट इमेज mixes artwork grid daily template image विविध टाइल',
   'launch boot login sign in windows task manager autostart start automatically': 'लॉन्च बूट लॉगिन साइन इन windows कार्य प्रबंधक ऑटोस्टार्ट अपने आप शुरू launch boot login sign in task manager autostart start automatically',
   'tray background close minimize system tray quit discord': 'ट्रे बैकग्राउंड बंद छोटा सिस्टम ट्रे बाहर निकलें discord tray background close minimize system tray quit',
   'minimize pip small window above on top floating corner player': 'छोटा करें पिक्चर इन पिक्चर pip छोटी विंडो ऊपर फ़्लोटिंग कोना प्लेयर minimize',

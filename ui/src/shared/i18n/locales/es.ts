@@ -926,7 +926,7 @@ const es: Record<string, string> = {
   'immersive blurry flou sharp': 'inmersivo desenfoque nítido',
   'immersive dark veil brightness': 'inmersivo oscuro velo brillo',
   'immersive animation drift': 'inmersivo animación desplazamiento',
-  'mixes artwork grid daily template image': 'mixes portadas cuadrícula diario plantilla imagen',
+  'mixes artwork grid daily template image varied tile': 'mixes portadas cuadrícula diario plantilla imagen variadas ficha',
   'launch boot login sign in windows task manager autostart start automatically': 'inicio arranque sesión windows administrador de tareas inicio automático',
   'tray background close minimize system tray quit discord': 'bandeja segundo plano cerrar minimizar área de notificación salir discord',
   'minimize pip small window above on top floating corner player': 'minimizar imagen en imagen pip ventana pequeña encima siempre visible flotante esquina reproductor',

@@ -214,7 +214,7 @@ export const SETTINGS: SettingDef[] = [
   { id: msg('Background motion'), in: 'Immersive player', keywords: msg('immersive animation drift') },
   { id: msg('Flowing background behind Home'), label: msg('Home background'), in: 'Immersive player', keywords: msg('home page liquid fluid warp shader cover colours') },
   { id: msg('Flowing background'), in: 'Immersive player', keywords: msg('immersive liquid fluid warp shader webgl') },
-  { id: msg('Mix covers'), in: 'Mixes', keywords: msg('mixes artwork grid daily template image') },
+  { id: msg('Mix covers'), in: 'Mixes', keywords: msg('mixes artwork grid daily template image varied tile') },
   { id: msg('Open at startup'), in: 'Starting and closing', keywords: msg('launch boot login sign in windows task manager autostart start automatically') },
   { id: msg('Keep running in the notification area'), label: msg('Close to tray'), in: 'Starting and closing', keywords: msg('tray background close minimize system tray quit discord') },
   { id: msg('Picture-in-picture on minimize'), in: 'Starting and closing', keywords: msg('minimize pip small window above on top floating corner player') },

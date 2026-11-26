@@ -926,7 +926,7 @@ const id: Record<string, string> = {
   'immersive blurry flou sharp': 'imersif buram tajam',
   'immersive dark veil brightness': 'imersif gelap selubung kecerahan',
   'immersive animation drift': 'imersif animasi bergeser',
-  'mixes artwork grid daily template image': 'mix sampul kisi harian templat gambar',
+  'mixes artwork grid daily template image varied tile': 'mix sampul kisi harian templat gambar beragam ubin',
   'launch boot login sign in windows task manager autostart start automatically': 'peluncuran booting masuk windows pengelola tugas startup mulai otomatis',
   'tray background close minimize system tray quit discord': 'tray latar belakang tutup perkecil area notifikasi keluar discord',
   'minimize pip small window above on top floating corner player': 'perkecil gambar dalam gambar pip jendela kecil di atas mengambang sudut pemutar',

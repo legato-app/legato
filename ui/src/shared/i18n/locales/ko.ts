@@ -926,7 +926,7 @@ const ko: Record<string, string> = {
   'immersive blurry flou sharp': '몰입형 흐림 선명 immersive blurry flou sharp',
   'immersive dark veil brightness': '몰입형 어둡게 베일 밝기 immersive dark veil brightness',
   'immersive animation drift': '몰입형 애니메이션 떠다님 immersive animation drift',
-  'mixes artwork grid daily template image': '믹스 아트워크 그리드 데일리 템플릿 이미지 mixes artwork grid daily template image',
+  'mixes artwork grid daily template image varied tile': '믹스 아트워크 그리드 데일리 템플릿 이미지 mixes artwork grid daily template image 다양하게 타일',
   'launch boot login sign in windows task manager autostart start automatically': '실행 부팅 로그인 windows 작업 관리자 자동 시작 launch boot login sign in task manager autostart start automatically',
   'tray background close minimize system tray quit discord': '트레이 백그라운드 닫기 최소화 시스템 트레이 종료 discord tray background close minimize system tray quit',
   'minimize pip small window above on top floating corner player': '최소화 PIP 작은 창 위 항상 위 플로팅 모서리 플레이어',

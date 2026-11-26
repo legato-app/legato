@@ -400,7 +400,7 @@ function Appearance() {
       </Group>
       <Group title={msg('Mixes')}>
         <div className="rounded-xl border border-line bg-raised">
-          <Row label={msg('Mix covers')} sub={tr("A different look from one mix to the next, four of its song covers like playlists, the first one, or the plain numbered tile")} preview={<MixCoverScene mixCovers={s.mixCovers} />}>
+          <Row setting="mixCovers" label={msg('Mix covers')} sub={tr("A different look from one mix to the next, four of its song covers like playlists, the first one, or the plain numbered tile")} preview={<MixCoverScene mixCovers={s.mixCovers} />}>
             <Segmented
               label={tr('Mix covers')}
               value={s.mixCovers}

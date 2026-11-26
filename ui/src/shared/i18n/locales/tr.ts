@@ -926,7 +926,7 @@ const tr: Record<string, string> = {
   'immersive blurry flou sharp': 'sürükleyici bulanık keskin',
   'immersive dark veil brightness': 'sürükleyici karanlık örtü parlaklık',
   'immersive animation drift': 'sürükleyici animasyon kayma',
-  'mixes artwork grid daily template image': 'mix’ler kapak ızgara günlük şablon görüntü',
+  'mixes artwork grid daily template image varied tile': 'mix’ler kapak ızgara günlük şablon görüntü çeşitli karo',
   'launch boot login sign in windows task manager autostart start automatically': 'başlangıç açılış oturum açma windows görev yöneticisi otomatik başlat',
   'tray background close minimize system tray quit discord': 'bildirim alanı sistem tepsisi arka plan kapat küçült çık tray discord',
   'minimize pip small window above on top floating corner player': 'küçült pencere içinde pencere pip küçük pencere üstte her zaman üstte yüzen köşe oynatıcı',

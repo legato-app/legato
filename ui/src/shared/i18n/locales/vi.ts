@@ -926,7 +926,7 @@ const vi: Record<string, string> = {
   'immersive blurry flou sharp': 'sống động mờ nét immersive blurry flou sharp',
   'immersive dark veil brightness': 'sống động tối lớp phủ độ sáng immersive dark veil brightness',
   'immersive animation drift': 'sống động hiệu ứng động trôi immersive animation drift',
-  'mixes artwork grid daily template image': 'bản phối ảnh bìa lưới hằng ngày mẫu hình ảnh mixes artwork grid daily template image',
+  'mixes artwork grid daily template image varied tile': 'bản phối ảnh bìa lưới hằng ngày mẫu hình ảnh mixes artwork grid daily template image đa dạng ô',
   'launch boot login sign in windows task manager autostart start automatically': 'khởi động đăng nhập windows trình quản lý tác vụ tự khởi động tự động launch boot login sign in task manager autostart start automatically',
   'tray background close minimize system tray quit discord': 'khay nền đóng thu nhỏ khay hệ thống thoát discord tray background close minimize system tray quit',
   'minimize pip small window above on top floating corner player': 'thu nhỏ hình trong hình pip cửa sổ nhỏ trên cùng nổi góc trình phát',

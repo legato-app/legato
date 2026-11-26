@@ -926,7 +926,7 @@ const zh: Record<string, string> = {
   'immersive blurry flou sharp': '沉浸式 模糊 清晰 immersive blurry flou sharp',
   'immersive dark veil brightness': '沉浸式 暗 遮罩 亮度 immersive dark veil brightness',
   'immersive animation drift': '沉浸式 动画 漂移 immersive animation drift',
-  'mixes artwork grid daily template image': '混音 封面图 网格 每日 模板 图片 mixes artwork grid daily template image',
+  'mixes artwork grid daily template image varied tile': '混音 封面图 网格 每日 模板 图片 mixes artwork grid daily template image 多样 方块',
   'launch boot login sign in windows task manager autostart start automatically': '启动 开机 登录 windows 任务管理器 自启动 自动启动 launch boot login sign in task manager autostart start automatically',
   'tray background close minimize system tray quit discord': '托盘 后台 关闭 最小化 系统托盘 退出 discord tray background close minimize system tray quit',
   'minimize pip small window above on top floating corner player': '最小化 画中画 pip 小窗口 置顶 悬浮 角落 播放器',

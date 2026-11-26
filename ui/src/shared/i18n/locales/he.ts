@@ -897,7 +897,7 @@ const he: Record<string, string> = {
   'immersive blurry flou sharp': 'immersive מטושטש טשטוש חד',
   'immersive dark veil brightness': 'immersive כהה צעיף בהירות',
   'immersive animation drift': 'immersive הנפשה סחיפה',
-  'mixes artwork grid daily template image': 'מיקסים עטיפות רשת יומי תבנית תמונה',
+  'mixes artwork grid daily template image varied tile': 'מיקסים עטיפות רשת יומי תבנית תמונה מגוון אריח',
   'launch boot login sign in windows task manager autostart start automatically': 'הפעלה אתחול התחברות windows מנהל משימות הפעלה אוטומטית התחלה אוטומטית',
   'tray background close minimize system tray quit discord': 'מגש מערכת רקע סגירה מזעור יציאה discord',
   'minimize pip small window above on top floating corner player': 'מזעור pip חלון קטן מעל תמיד צף פינה נגן',

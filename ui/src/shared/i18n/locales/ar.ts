@@ -897,7 +897,7 @@ const ar: Record<string, string> = {
   'immersive blurry flou sharp': 'غامر ضبابي ضبابية حاد',
   'immersive dark veil brightness': 'غامر داكن حجاب سطوع',
   'immersive animation drift': 'غامر حركة انجراف',
-  'mixes artwork grid daily template image': 'مزيجات أغلفة شبكة يومي قالب صورة',
+  'mixes artwork grid daily template image varied tile': 'مزيجات أغلفة شبكة يومي قالب صورة متنوع بطاقة',
   'launch boot login sign in windows task manager autostart start automatically': 'إطلاق إقلاع تسجيل دخول windows مدير المهام بدء تلقائي بدء تلقائيًا',
   'tray background close minimize system tray quit discord': 'علبة النظام خلفية إغلاق تصغير خروج discord',
   'minimize pip small window above on top floating corner player': 'تصغير pip نافذة صغيرة فوق دائمًا عائمة زاوية مشغّل',

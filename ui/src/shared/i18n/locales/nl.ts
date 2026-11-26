@@ -926,7 +926,7 @@ const nl: Record<string, string> = {
   'immersive blurry flou sharp': 'meeslepend vervaagd scherp blur immersive',
   'immersive dark veil brightness': 'meeslepend donker sluier helderheid dim immersive',
   'immersive animation drift': 'meeslepend animatie drijven drift',
-  'mixes artwork grid daily template image': 'mixen covers raster dagelijks sjabloon afbeelding mixes grid',
+  'mixes artwork grid daily template image varied tile': 'mixen covers raster dagelijks sjabloon afbeelding mixes grid gevarieerd tegel',
   'launch boot login sign in windows task manager autostart start automatically': 'opstarten start aanmelden windows taakbeheer automatisch starten launch startup autostart',
   'tray background close minimize system tray quit discord': 'systeemvak achtergrond sluiten minimaliseren afsluiten tray discord',
   'minimize pip small window above on top floating corner player': 'minimaliseren beeld in beeld pip klein venster bovenop zwevend hoek speler',

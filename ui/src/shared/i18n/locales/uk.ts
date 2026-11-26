@@ -926,7 +926,7 @@ const uk: Record<string, string> = {
   'immersive blurry flou sharp': 'занурювальний розмитий розмиття різкий',
   'immersive dark veil brightness': 'занурювальний темний вуаль яскравість',
   'immersive animation drift': 'занурювальний анімація рух',
-  'mixes artwork grid daily template image': 'мікси обкладинки сітка щоденні шаблон зображення',
+  'mixes artwork grid daily template image varied tile': 'мікси обкладинки сітка щоденні шаблон зображення різні плитка',
   'launch boot login sign in windows task manager autostart start automatically': 'запуск завантаження вхід windows диспетчер завдань автозавантаження автозапуск',
   'tray background close minimize system tray quit discord': 'трей фон закрити згорнути область сповіщень вихід tray discord',
   'minimize pip small window above on top floating corner player': 'згорнути картинка в картинці pip маленьке вікно поверх плаваюче кут плеєр',

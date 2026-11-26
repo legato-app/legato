@@ -926,7 +926,7 @@ const ja: Record<string, string> = {
   'immersive blurry flou sharp': '没入型 ぼかし くっきり immersive blurry flou sharp',
   'immersive dark veil brightness': '没入型 暗い ベール 明るさ immersive dark veil brightness',
   'immersive animation drift': '没入型 アニメーション 漂う immersive animation drift',
-  'mixes artwork grid daily template image': 'ミックス アートワーク グリッド デイリー テンプレート 画像 mixes artwork grid daily template image',
+  'mixes artwork grid daily template image varied tile': 'ミックス アートワーク グリッド デイリー テンプレート 画像 mixes artwork grid daily template image いろいろ タイル',
   'launch boot login sign in windows task manager autostart start automatically': '起動 スタートアップ ログイン サインイン windows タスクマネージャー 自動起動 launch boot login sign in task manager autostart start automatically',
   'tray background close minimize system tray quit discord': 'トレイ バックグラウンド 閉じる 最小化 システムトレイ 終了 discord tray background close minimize system tray quit',
   'minimize pip small window above on top floating corner player': '最小化 ピクチャー イン ピクチャー pip 小さいウィンドウ 最前面 フローティング 隅 プレーヤー',

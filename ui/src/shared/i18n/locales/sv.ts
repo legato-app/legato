@@ -926,7 +926,7 @@ const sv: Record<string, string> = {
   'immersive blurry flou sharp': 'uppslukande suddig oskärpa skarp',
   'immersive dark veil brightness': 'uppslukande mörk slöja ljusstyrka',
   'immersive animation drift': 'uppslukande animation glida',
-  'mixes artwork grid daily template image': 'mixar omslag rutnät daglig mall bild',
+  'mixes artwork grid daily template image varied tile': 'mixar omslag rutnät daglig mall bild varierade ruta',
   'launch boot login sign in windows task manager autostart start automatically': 'start uppstart inloggning logga in windows aktivitetshanteraren autostart starta automatiskt',
   'tray background close minimize system tray quit discord': 'meddelandefält bakgrund stäng minimera systemfält avsluta tray discord',
   'minimize pip small window above on top floating corner player': 'minimera bild i bild pip litet fönster överst flytande hörn spelare',
