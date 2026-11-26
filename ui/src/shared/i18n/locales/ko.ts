@@ -1196,6 +1196,7 @@ const ko: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Spotify에서 가져온 곡은 사용하지 않습니다',
   'Imported from Spotify': 'Spotify에서 가져옴',
   'Open Spotify': 'Spotify 열기',
+  'This PC is also signed out of Spotify’s page.': '이 PC는 Spotify 페이지에서도 로그아웃됩니다.',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

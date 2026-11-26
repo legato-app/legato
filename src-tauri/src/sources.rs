@@ -34,9 +34,13 @@ pub async fn connect(state: State<'_, AppState>, source: Source, credentials: Cr
 }
 
 #[tauri::command]
-pub async fn disconnect(state: State<'_, AppState>, source: Source) -> CmdResult<()> {
+pub async fn disconnect(app: tauri::AppHandle, state: State<'_, AppState>, source: Source) -> CmdResult<()> {
     state.cache.status.clear();
-    state.connector(source).map_or(Ok(()), |c| c.disconnect()).map_err(err)
+    state.connector(source).map_or(Ok(()), |c| c.disconnect()).map_err(err)?;
+    if source == Source::Spotify {
+        crate::spotify_web::sign_out(&app).map_err(err)?;
+    }
+    Ok(())
 }
 
 /// Asked after Spotify's disconnect: its imported playlists leave too.

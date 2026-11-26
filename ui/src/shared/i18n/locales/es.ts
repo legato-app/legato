@@ -1196,6 +1196,7 @@ const es: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Las canciones importadas de Spotify no se usan',
   'Imported from Spotify': 'Importada de Spotify',
   'Open Spotify': 'Abrir Spotify',
+  'This PC is also signed out of Spotify’s page.': 'Este PC también cierra sesión en la página de Spotify.',
   'See the play queue': 'Ver la cola de reproducción',
   'Read your listening history': 'Leer tu historial de escucha',
   'Sees what you listened to and when': 'Ve qué escuchaste y cuándo',

@@ -1196,6 +1196,7 @@ const nl: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Uit Spotify geïmporteerde nummers worden niet gebruikt',
   'Imported from Spotify': 'Geïmporteerd uit Spotify',
   'Open Spotify': 'Spotify openen',
+  'This PC is also signed out of Spotify’s page.': 'Deze pc wordt ook afgemeld op de pagina van Spotify.',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

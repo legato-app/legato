@@ -1196,6 +1196,7 @@ const ja: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Spotify から読み込んだ曲は使いません',
   'Imported from Spotify': 'Spotify から読み込み',
   'Open Spotify': 'Spotify を開く',
+  'This PC is also signed out of Spotify’s page.': 'この PC は Spotify のページからもサインアウトします。',
   'See the play queue': '再生キューを見る',
   'Read your listening history': '再生履歴を読む',
   'Sees what you listened to and when': '何をいつ聴いたかが分かります',

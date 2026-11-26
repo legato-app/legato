@@ -1196,6 +1196,7 @@ const hi: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Spotify से इंपोर्ट किए गए गाने इस्तेमाल नहीं होते',
   'Imported from Spotify': 'Spotify से इंपोर्ट की गई',
   'Open Spotify': 'Spotify खोलें',
+  'This PC is also signed out of Spotify’s page.': 'यह PC Spotify के पेज से भी साइन आउट हो गया है।',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

@@ -43,6 +43,24 @@ pub fn signed_in(app: &AppHandle) -> bool {
     main.cookies_for_url(url).is_ok_and(|c| c.iter().any(|c| c.name() == "sp_dc" && !c.value().is_empty()))
 }
 
+/// The sign-in on Spotify's page forgotten: its cookies on its two sites, nothing else of the shared profile.
+/// WebView2: call from async commands or threads only (`signed_in`).
+pub fn sign_out(app: &AppHandle) -> tauri::Result<()> {
+    if cfg!(mobile) {
+        return Ok(());
+    }
+    if let Some(window) = app.get_webview_window(LABEL) {
+        window.close()?;
+    }
+    let Some(main) = app.get_webview("main") else { return Ok(()) };
+    for site in [PLAYER, SIGN_IN] {
+        for cookie in main.cookies_for_url(Url::parse(site).expect("valid url"))? {
+            main.delete_cookie(cookie)?;
+        }
+    }
+    Ok(())
+}
+
 /// Opens (or focuses) Spotify's page, straight on its sign-in page when signed out.
 /// WebView2: call from async commands or threads only (`signed_in`).
 pub fn open(app: &AppHandle) -> tauri::Result<()> {

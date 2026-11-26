@@ -1161,6 +1161,7 @@ const ar: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'لا تُستخدم الأغاني المستوردة من Spotify',
   'Imported from Spotify': 'مستوردة من Spotify',
   'Open Spotify': 'فتح Spotify',
+  'This PC is also signed out of Spotify’s page.': 'تم أيضًا تسجيل خروج هذا الكمبيوتر من صفحة Spotify.',
   'See the play queue': 'رؤية قائمة التشغيل',
   'Read your listening history': 'قراءة سجل استماعك',
   'Sees what you listened to and when': 'يرى ما استمعت إليه ومتى',

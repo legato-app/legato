@@ -1196,6 +1196,7 @@ const id: Record<string, string> = {
   'Songs imported from Spotify aren’t used': 'Lagu yang diimpor dari Spotify tidak dipakai',
   'Imported from Spotify': 'Diimpor dari Spotify',
   'Open Spotify': 'Buka Spotify',
+  'This PC is also signed out of Spotify’s page.': 'PC ini juga keluar dari halaman Spotify.',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',
