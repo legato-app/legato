@@ -26,6 +26,7 @@ import { SeekBar, TimeText, usePosition } from './Progress'
 import { viaLabel, type Via } from './sources'
 import { useStill } from './still'
 import { ArtistLine } from './ArtistLine'
+import { FitTitle } from './FitTitle'
 import { ArtistLink } from './ArtistLink'
 import { isRemote, useNowTrack, usePlayer, useVideoSlot } from './store'
 import { volumeWheelRef } from './volume'
@@ -333,12 +334,12 @@ export function NowPlaying() {
         ) : panel === 'upNext' ? (
           <UpNext bare onHide={() => update({ upNext: false })} />
         ) : (
-          // Display XL (docs/design.md), smaller in a small window; long video titles wrap to two lines.
+          // Display XL (docs/design.md), smaller in a small window or for a long video title (`FitTitle`).
           phone ? (
             // The phone: title and artist on the left, the heart beside them; album, lyrics and Up next one tap away.
             <div className="flex min-w-0 items-center gap-3">
               <div className="min-w-0 flex-1">
-                <h2 className="line-clamp-2 text-2xl leading-tight font-black tracking-[-0.02em] break-words">{now.title}</h2>
+                <FitTitle title={now.title} floor={18} className="text-2xl leading-tight font-black tracking-[-0.02em]" />
                 <span className="flex min-w-0 items-center gap-1.5 text-base text-ink-2">
                   <ArtistLink now={now} className="min-w-0 truncate" />
                   {readout && <SourceIcon source={viaSource[now.via]} size={14} />}
@@ -353,7 +354,7 @@ export function NowPlaying() {
           ) : (
             <div className="flex min-w-0 flex-col justify-center gap-4 pb-8">
               {from && <FromTag />}
-              <h2 className="line-clamp-2 pb-1 text-[clamp(2.5rem,5.5vw,5.5rem)] leading-[1.05] font-black tracking-[-0.02em] break-words">{now.title}</h2>
+              <FitTitle title={now.title} floor={28} className="pb-1 text-[clamp(2.5rem,5.5vw,5.5rem)] leading-[1.05] font-black tracking-[-0.02em]" />
               <ArtistLine now={now} className="text-[1.375rem] leading-7 font-bold" />
               {track?.album && <p className="truncate text-sm">{track.album}</p>}
               {readout && source}
@@ -367,7 +368,7 @@ export function NowPlaying() {
       <div ref={volumeWheelRef} className="flex shrink-0 flex-col gap-3 pt-6">
         {panel && (
           <div className="min-w-0">
-            <h2 className="truncate text-[2rem] leading-tight font-black tracking-[-0.02em] phone:text-xl">{now.title}</h2>
+            <FitTitle title={now.title} floor={18} className="text-[2rem] leading-tight font-black tracking-[-0.02em] phone:text-xl" />
             <ArtistLink now={now} className="block w-fit max-w-full truncate text-base font-medium" />
           </div>
         )}
