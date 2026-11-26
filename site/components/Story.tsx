@@ -231,10 +231,10 @@ function useStage(box: RefObject<HTMLDivElement | null>, w0: number, h0: number)
   return [w, h] as const
 }
 
-type WindowProps = { at: MotionValue<number>; take: MotionValue<number>; ready: boolean; live: boolean; onReady: () => void; onLeave: () => void }
+type WindowProps = { at: MotionValue<number>; move: MotionValue<number>; take: MotionValue<number>; ready: boolean; live: boolean; onReady: () => void; onLeave: () => void }
 
 /** The window: one transform, from the scroll, the stage's size and the visitor's turn. No demo: each chapter's picture. */
-function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowProps & { device: Device }) {
+function AppWindow({ at, move, take, ready, live, onReady, onLeave, device }: WindowProps & { device: Device }) {
   const box = useRef<HTMLDivElement>(null)
   const [still, setStill] = useState('library')
   useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[stageOf(a)].scene))
@@ -244,12 +244,12 @@ function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowPr
   useMotionValueEvent(at, 'animationStart', () => willChange.set('transform'))
   useMotionValueEvent(at, 'animationComplete', () => willChange.set('auto'))
   // During the hero's 3D move it rides the scene's screen, corner on corner: the interface stays sharp all the way in.
-  const transformOrigin = useTransform(at, (a) => (a < 0 ? '0 0' : '50% 50%'))
+  const transformOrigin = useTransform(move, (m) => (m < 1 ? '0 0' : '50% 50%'))
   const transform = useTransform(() => {
-    if (at.get() < 0) {
+    if (move.get() < 1) {
       // Its place in the stage, before any transform (centred by its margins).
       const [left, top] = [w.get() / 2 - APP.w / 2, h.get() / 2 - APP.h / 2]
-      const corners = cornersAt(device, frameOf(device, moveOf(at.get())), w.get(), h.get())
+      const corners = cornersAt(device, frameOf(device, move.get()), w.get(), h.get())
       return homography(APP.w, APP.h, corners.map(([x, y]) => [x - left, y - top]))
     }
     const fitting = Math.min((w.get() * 0.66) / APP.w, (h.get() * 0.84) / APP.h)
@@ -274,7 +274,7 @@ function AppWindow({ at, take, ready, live, onReady, onLeave, device }: WindowPr
  * The phone: its screen a phone's size, so the interface takes its phone layout, under each chapter's text. Taken, it
  * fades through to the interface at the stage's own size, the phone's edge gone: a phone's real taps, a real phone's size.
  */
-function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, onFail }: WindowProps & { failed: boolean; tops: MotionValue<number[]>; onFail: () => void }) {
+function PhoneWindow({ at, move, take, ready, live, failed, tops, onReady, onLeave, onFail }: WindowProps & { failed: boolean; tops: MotionValue<number[]>; onFail: () => void }) {
   const box = useRef<HTMLDivElement>(null)
   const [still, setStill] = useState('library')
   useMotionValueEvent(at, 'change', (a) => ready || setStill(STAGES[stageOf(a)].scene))
@@ -283,10 +283,10 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
   useMotionValueEvent(take, 'change', (t) => setFlat(t >= 0.5))
   const opacity = useTransform(take, (t) => Math.abs(1 - 2 * t))
   // During the hero's 3D move its screen rides the scene's phone screen, corner on corner (the edge around it, outside).
-  const transformOrigin = useTransform(at, (a) => (a < 0 ? '0 0' : '50% 50%'))
+  const transformOrigin = useTransform(move, (m) => (m < 1 ? '0 0' : '50% 50%'))
   const transform = useTransform(() => {
     if (take.get() >= 0.5) return 'none'
-    if (at.get() < 0) return `${homography(PHONE.w, PHONE.h, cornersAt('phone', frameOf('phone', moveOf(at.get())), w.get(), h.get()))} translate(${-RIM}px, ${-RIM}px)`
+    if (move.get() < 1) return `${homography(PHONE.w, PHONE.h, cornersAt('phone', frameOf('phone', move.get()), w.get(), h.get()))} translate(${-RIM}px, ${-RIM}px)`
     const [i, t] = step(at.get())
     const [a, b] = [standAt(i, w.get(), h.get(), tops.get()), standAt(i + 1, w.get(), h.get(), tops.get())]
     const x = mix(a.x, b.x, t) - DEVICE.w / 2
@@ -441,13 +441,15 @@ export function Story() {
   const mode = useMode()
   const { scrollYProgress } = useScroll({ target: section, offset: ['start start', 'end end'] })
   // The stage glides after the scroll: a wheel's notches and a dragged scrollbar arrive as one movement. No overshoot.
-  const at = useSpring(useTransform(scrollYProgress, [0, 1], [-INTRO, LAST + TAIL]), { stiffness: 220, damping: 32, restDelta: 0.0005 })
-  const move = useTransform(at, moveOf)
+  const scrolled = useTransform(scrollYProgress, [0, 1], [-INTRO, LAST + TAIL])
+  const at = useSpring(scrolled, { stiffness: 220, damping: 32, restDelta: 0.0005 })
+  // The hero's 3D move follows the finger itself, frame for frame: a spring behind it reads as a slow zoom.
+  const move = useTransform(scrolled, moveOf)
   // The scene goes once the live window holds its screen, before the window leaves for the first chapter.
   const sceneOpacity = useTransform(at, (a) => 1 - clamp(a / 0.2))
   // No perspective of the stage's own while the window rides the film's screen: the corners carry the film's.
   const [riding, setRiding] = useState(true)
-  useMotionValueEvent(at, 'change', (a) => setRiding(a < 0))
+  useMotionValueEvent(move, 'change', (m) => setRiding(m < 1))
   const perspective = riding ? 'none' : mode === 'phone' ? 900 : 1800
   const visitor = useVisitor()
   // A phone's stage stands up: the phone's move. A PC's: its own device (device.ts), an Android tablet a laptop.
@@ -491,7 +493,7 @@ export function Story() {
     }
   }, [mode])
 
-  const windowProps = { at, take, ready, live: taken, onReady: () => setReady(true), onLeave: back }
+  const windowProps = { at, move, take, ready, live: taken, onReady: () => setReady(true), onLeave: back }
   return (
     <section ref={section} style={{ ['--stages' as string]: INTRO + LAST + TAIL }} className="story:relative story:-mt-[78px] story:h-[calc(100svh+var(--stages)*130svh)]">
       {mode && CHAPTER_SCENES.map(({ scene }, n) => <span key={scene} id={`chapter-${scene}`} style={{ top: `${(INTRO + n + 1) * 130}svh` }} className="absolute" />)}

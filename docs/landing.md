@@ -9,7 +9,8 @@ floating around them. Nothing is modelled by hand, so the renders can be made ag
 - **The website hero** (`site/components/DeviceScene.tsx`, Figma « Landing concept »): the page opens on the wide view
   of the three devices under the headline. Scrolling plays a camera move into the visitor's screen, square on; there
   the live demo takes the screen's place and the story goes on (`site/components/Story.tsx`).
-  - A phone-sized window (under 1000 px) gets the phone's move, framed upright. Wider ones get their device from
+  - A phone-sized window (under 1000 px) gets the phone's move, framed upright: it starts on the phone itself, large
+    between the text and the band (three devices in a row would be small there). Wider ones get their device from
     `site/components/device.ts`:
     - a battery that is running down or not full (Chromium) → the laptop (an Android tablet too);
     - anything else → the monitor.

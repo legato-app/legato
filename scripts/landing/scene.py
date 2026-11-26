@@ -376,9 +376,12 @@ SHOTS = {
     "laptop": ((0.4, -2.9, 1.05), (1.9, 0.0, -0.3)),
 }
 SCREENS = {"phone": "Phone screen", "monitor": "Monitor screen", "laptop": "Laptop screen"}
-# The site's hero (DeviceScene): the page's text sits over the top of the frame, so the move starts further back with the
-# view shifted up (the devices low, as in Figma's "Landing concept"). (camera, what it looks at, lens shift up).
-START = {"landscape": ((0, -9.2, 1.1), (0.05, 0, 0.0), 0.12), "portrait": ((0, -9.8, 1.0), (0.05, 0, 0.0), 0.14)}
+# The site's hero (DeviceScene): the page's text sits over the top of the frame, so a PC's move starts further back with
+# the view shifted up (the devices low, as in Figma's "Landing concept"). (camera, what it looks at, lens shift up).
+START = ((0, -9.2, 1.1), (0.05, 0, 0.0), 0.12)
+# A phone's frame stands up: the three devices in a row would be small in it. Its move starts on the phone itself, from
+# the side SHOTS sees it, filling the room between the page's text and its band (the lower half).
+PHONE_START = {"distance": 2.4, "shift": 0.27}
 # How tall the screen stands in the last frame: as the live demo's window (site Story.tsx, `full`: 82 % of the height).
 FILL = 0.82
 scene.camera = camob
@@ -398,8 +401,6 @@ if SHOT == "wide":
     camob.rotation_mode = "QUATERNION"
     camob.rotation_quaternion = looking(*WIDE)
 else:
-    portrait = HEIGHT > WIDTH
-    begin, begin_at, shift = START["portrait" if portrait else "landscape"]
     # Into the screen: square on, its own up kept up, as far as makes it FILL the frame's height.
     bpy.context.view_layer.update()
     face = scene.objects[SCREENS[SHOT]]
@@ -411,7 +412,13 @@ else:
     tall = max(c.dot(up) for c in corners) - min(c.dot(up) for c in corners)
     half_height = cam.sensor_width / 2 / cam.lens * HEIGHT / WIDTH  # tan of half the vertical view (sensor fit horizontal)
     into = centre + out * (tall / FILL / 2 / half_height)
-    keys = ((1, begin, looking(begin, begin_at), shift), (round(FRAMES * 0.55), SHOTS[SHOT][0], looking(*SHOTS[SHOT]), 0.0), (FRAMES, into, looking(into, centre, up), 0.0))
+    if HEIGHT > WIDTH:
+        phone_at = scene.objects["Phone"].location
+        begin = phone_at + (Vector(SHOTS["phone"][0]) - phone_at).normalized() * PHONE_START["distance"]
+        keys = ((1, begin, looking(begin, phone_at), PHONE_START["shift"]), (FRAMES, into, looking(into, centre, up), 0.0))
+    else:
+        begin, begin_at, shift = START
+        keys = ((1, begin, looking(begin, begin_at), shift), (round(FRAMES * 0.55), SHOTS[SHOT][0], looking(*SHOTS[SHOT]), 0.0), (FRAMES, into, looking(into, centre, up), 0.0))
     camob.rotation_mode = "QUATERNION"
     before = None
     for frame, where, turn, lift in keys:
@@ -437,9 +444,9 @@ else:
         for frame in range(1, FRAMES + 1):
             scene.frame_set(frame)
             # Projected by hand: world_to_camera_view reads a portrait frame's height wrong with the horizontal sensor
-            # fit. The lens shift moves the frame by its larger side.
+            # fit. The lens shift moves the frame by its width (the sensor's fitted side).
             view = camob.matrix_world.inverted()
-            lift = cam.shift_y * 2 * (half_width if WIDTH >= HEIGHT else half_height)
+            lift = cam.shift_y * 2 * half_width
             seen = [((p.x / -p.z) / half_width, (p.y / -p.z - lift) / half_height) for p in (view @ c for c in edges)]
             frames.append([round(value, 4) for x, y in seen for value in ((x + 1) / 2, (1 - y) / 2)])
         with open(RECT, "w") as file:
