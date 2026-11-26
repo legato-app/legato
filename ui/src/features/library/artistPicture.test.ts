@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import { api } from '../../shared/api'
-import { fetchPicture, photoOf, pictureKey, usePictures } from './artistPicture'
+import { asksPicture, fetchPicture, photoOf, pictureKey, usePictures } from './artistPicture'
 
 vi.mock('@tauri-apps/api/core', () => ({ convertFileSrc: (p: string, s: string) => `http://${s}.localhost/${encodeURIComponent(p)}`, invoke: vi.fn() }))
 vi.stubGlobal('window', { devicePixelRatio: 1 })
@@ -29,4 +29,14 @@ it('asks Rust once for an artist however many places ask in the same moment, the
   fetchPicture('Same Artist', true)
   expect(ask).toHaveBeenCalledTimes(2)
   expect(Object.keys(usePictures.getState())).toEqual(['same artist'])
+})
+
+it('asks for a picture 10 s into a song playing, by a real artist', () => {
+  const now = { title: 'jinx', artist: 'lexycat', via: 'youtube' as const }
+  expect(asksPicture(now, true, 10_000)).toBe(true)
+  // Skipped through, paused, stopped, untagged: nothing asked.
+  expect(asksPicture(now, true, 9_999)).toBe(false)
+  expect(asksPicture(now, false, 60_000)).toBe(false)
+  expect(asksPicture(undefined, true, 60_000)).toBe(false)
+  expect(asksPicture({ ...now, artist: 'Unknown artist' }, true, 60_000)).toBe(false)
 })

@@ -300,12 +300,7 @@ const ANSWERS: Record<string, (args: Record<string, unknown>) => unknown> = {
     plexRound++
     return null
   },
-  discord_status: () => ({ connected: false, error: null }),
   // An artist's picture (Now Playing's big title): their album's invented cover.
-  discord_artist_art: ({ name }) => {
-    const n = ALBUMS.findIndex((a) => a.artist === name)
-    return n < 0 ? null : `demo:${n}`
-  },
   artist_picture: ({ name }) => {
     const n = ALBUMS.findIndex((a) => a.artist === name)
     return n < 0 ? null : `demo:${n}`

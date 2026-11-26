@@ -14,8 +14,6 @@ import type { MenuEntry } from '../shared/ui/ContextMenu'
 import { shapeMenu, type MenuKind } from '../shared/ui/menuShape'
 import { CATEGORIES, labelOf } from './settings/catalog'
 import { SourceIcon } from '../shared/ui/SourceIcon'
-import type { Addon } from './addons/registry'
-import { isOn, setAddon } from './addons/state'
 import { takesEdits, useServers } from './sources/servers'
 import { holds, playingFrom } from './library/holding'
 import { navOf, withHidden } from './sidebar/navHidden'
@@ -1002,15 +1000,6 @@ export function editVersionMenu(v: Edit, rename: () => void): MenuEntry[] {
 /** A Live Editor preset: built in (no id) or saved. */
 export function editPresetMenu(name: string, apply: () => void, id?: number): MenuEntry[] {
   return [{ label: tr('Apply “{name}”', { name }), icon: <SlidersHorizontal size={16} />, onSelect: apply }, id !== undefined && '-', id !== undefined && { label: tr('Delete'), icon: <Trash size={16} />, danger: true, onSelect: () => deletePreset(id).catch(fail) }]
-}
-
-/** Add-on card. */
-export function addonMenu(a: Addon, open: () => void): MenuEntry[] {
-  const on = isOn(a.id)
-  return [
-    { label: on ? tr('Turn off') : tr('Turn on'), icon: <Power size={16} />, onSelect: () => setAddon(a.id, !on) },
-    { label: a.settings ? tr('Settings…') : tr('About…'), icon: a.settings ? <Gear size={16} /> : <Info size={16} />, onSelect: open },
-  ]
 }
 
 /** Anywhere without a menu of its own. */

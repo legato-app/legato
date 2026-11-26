@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { create } from 'zustand'
 import { api } from '../../shared/api'
 import { remoteArt, sizedArt } from '../../shared/art'
+import { UNKNOWN_ARTIST } from '../../shared/artistName'
+import type { NowPlaying } from '../player/store'
 
 // Artists' pictures found, by lowercased name (the art scheme's URL): ONE store for the big title's round picture and the
 // artist's page, so both always show the same image. The picture is the artist page's own, kept by Rust (`artist_picture`).
@@ -9,6 +11,9 @@ import { remoteArt, sizedArt } from '../../shared/art'
 export const usePictures = create<Record<string, string>>(() => ({}))
 
 export const pictureKey = (name: string) => name.toLowerCase()
+
+/** The artist's picture is asked for once a song has played 10 s (skips ask nothing), never for an untagged one. */
+export const asksPicture = (now: NowPlaying | undefined, playing: boolean, positionMs: number) => !!now && playing && positionMs >= 10_000 && now.artist !== UNKNOWN_ARTIST
 
 /** Asks in flight, by name and kind: the title, the page and the cards ask for the same artist within one frame, Rust is asked once. */
 const pending = new Set<string>()

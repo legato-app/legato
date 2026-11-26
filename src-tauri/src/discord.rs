@@ -1,7 +1,6 @@
-//! Discord Rich Presence add-on: one thread owns the Discord connection. Newest update wins, sends spaced out
+//! Discord Rich Presence (plugins' `discord.set`): one thread owns the Discord connection. Newest update wins, sends spaced out
 //! (Discord allows 5 per 20 s), retried while Discord is closed.
 use music_connectors::discord::{self, Ipc, Pipe, Presence};
-use music_core::searchpace::Sparse;
 use serde::Serialize;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::sync::{Arc, Mutex};
@@ -10,19 +9,15 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 const GAP: Duration = Duration::from_secs(4);
 const RETRY: Duration = Duration::from_secs(15);
 
-/// The artists' pictures asked of YouTube Music (`discord_artist_art`): nobody waits for them.
-pub static LOOKS: Mutex<Sparse> = Mutex::new(Sparse::new());
-
 pub enum Update {
     /// Show this track (None = connected, nothing shown).
     Set { client_id: String, presence: Option<Presence> },
-    /// Add-on off: connection closed, Discord drops the activity.
+    /// Plugin stopped: connection closed, Discord drops the activity.
     Off,
 }
 
-#[derive(Debug, Clone, Default, Serialize, ts_rs::TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename = "DiscordStatus")]
+/// What a plugin's `discord.status` answers.
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct Status {
     pub connected: bool,
     pub error: Option<String>,
