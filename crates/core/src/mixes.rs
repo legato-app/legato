@@ -461,8 +461,10 @@ pub fn artist_blocked(artist: &str, blocked: &[String]) -> bool {
     if blocked.is_empty() {
         return false;
     }
-    let blocked: Vec<String> = blocked.iter().map(|name| crate::matching::normalize(name)).collect();
-    crate::matching::credits(artist).iter().any(|name| blocked.contains(&crate::matching::normalize(name.trim_end_matches(" - Topic"))))
+    // A name of marks only ("!!!") has no comparable form: it stays itself.
+    let fold = |name: &str| Some(crate::matching::normalize(name)).filter(|folded| !folded.is_empty()).unwrap_or_else(|| name.trim().to_lowercase());
+    let blocked: Vec<String> = blocked.iter().map(|name| fold(name)).collect();
+    crate::matching::credits(artist).iter().any(|name| blocked.contains(&fold(name.trim_end_matches(" - Topic"))))
 }
 
 /// The radios' songs without the ones the user said never to see in mixes (`blocked`: `matching::match_key` of title and
@@ -1005,6 +1007,7 @@ mod tests {
             assert!(artist_blocked(credit, &blocked), "{credit}");
         }
         assert!(!artist_blocked("Bandits", &blocked) && !artist_blocked("Band", &[]));
+        assert!(!artist_blocked("???", &["!!!".into()]) && artist_blocked("!!!", &["!!!".into()]));
     }
 
     #[test]
