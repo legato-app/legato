@@ -3,18 +3,19 @@
 Blender 5.x, headless (scripts/landing/render.mjs runs every render the site and README use):
   blender -b -P scripts/landing/scene.py -- --variant dark --out render.png
       [--shot wide|phone|monitor|laptop] [--frames 48] [--size 2880x1200] [--only "Phone,Vinyl"]
-      [--samples 64] [--scale 100] [--blend scene.blend] [--tex site/public/shots]
+      [--samples 64] [--scale 100] [--blend scene.blend] [--tex site/public/shots] [--rect screen.json] [--frame 96]
 A device shot writes numbered frames (--out frame-####). Screens: the site's own shots (WebP).
 Background stays transparent (film_transparent): the page's colour shows through.
 """
 
+import json
 import math
 import os
 import sys
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 ARGS = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
 
@@ -36,6 +37,9 @@ FRAMES = int(arg("frames", "48"))
 # Only these groups render (README layers), comma separated; the rest is hidden.
 ONLY = [name for name in arg("only", "").split(",") if name]
 BLEND = arg("blend", "")
+# A move: where to write the screen's place in its last frame (JSON). --frame N renders that frame alone (a test still).
+RECT = arg("rect", "")
+STILL = arg("frame", "")
 DARK = VARIANT == "dark"
 R = math.radians
 
@@ -370,20 +374,65 @@ SHOTS = {
     "monitor": ((-0.31, -2.62, 0.45), (0.0, 0.35, 0.22)),
     "laptop": ((0.4, -2.9, 1.05), (1.9, 0.0, -0.3)),
 }
-look = bpy.data.objects.new("Camera target", None)
-coll.objects.link(look)
-aim = camob.constraints.new("TRACK_TO")
-aim.target, aim.track_axis, aim.up_axis = look, "TRACK_NEGATIVE_Z", "UP_Y"
-camob.location, look.location = WIDE
+SCREENS = {"phone": "Phone screen", "monitor": "Monitor screen", "laptop": "Laptop screen"}
+# The site's hero (DeviceScene): the page's text sits over the top of the frame, so the move starts further back with the
+# view shifted up (the devices low, as in Figma's "Landing concept"). (camera, what it looks at, lens shift up).
+START = {"landscape": ((0, -8.6, 1.1), (0.05, 0, 0.0), 0.12), "portrait": ((0, -7.8, 1.0), (0.05, 0, 0.0), 0.1)}
+# How tall the screen stands in the last frame: as the live demo's window (site Story.tsx, `full`: 82 % of the height).
+FILL = 0.82
 scene.camera = camob
 scene.frame_start, scene.frame_end = 1, 1
-if SHOT != "wide":
-    scene.frame_end = FRAMES
-    for frame, (where, at) in ((1, WIDE), (FRAMES, SHOTS[SHOT])):
-        camob.location, look.location = where, at
+cam.sensor_fit = "HORIZONTAL"
+
+
+def looking(where, at, up=Vector((0, 0, 1))):
+    """The camera's rotation from `where` towards `at`, `up` kept up."""
+    back = (Vector(where) - Vector(at)).normalized()
+    right = up.cross(back).normalized()
+    return Matrix((right, back.cross(right), back)).transposed().to_quaternion()
+
+
+if SHOT == "wide":
+    camob.location = WIDE[0]
+    camob.rotation_mode = "QUATERNION"
+    camob.rotation_quaternion = looking(*WIDE)
+else:
+    portrait = HEIGHT > WIDTH
+    begin, begin_at, shift = START["portrait" if portrait else "landscape"]
+    # Into the screen: square on, its own up kept up, as far as makes it FILL the frame's height.
+    bpy.context.view_layer.update()
+    face = scene.objects[SCREENS[SHOT]]
+    world = face.matrix_world
+    corners = [world @ v.co for v in face.data.vertices]
+    centre = sum(corners, Vector()) / len(corners)
+    out = (world.to_quaternion() @ Vector((0, -1, 0))).normalized()
+    up = (world.to_quaternion() @ Vector((0, 0, 1))).normalized()
+    tall = max(c.dot(up) for c in corners) - min(c.dot(up) for c in corners)
+    half_height = cam.sensor_width / 2 / cam.lens * HEIGHT / WIDTH  # tan of half the vertical view (sensor fit horizontal)
+    into = centre + out * (tall / FILL / 2 / half_height)
+    keys = ((1, begin, looking(begin, begin_at), shift), (round(FRAMES * 0.55), SHOTS[SHOT][0], looking(*SHOTS[SHOT]), 0.0), (FRAMES, into, looking(into, centre, up), 0.0))
+    camob.rotation_mode = "QUATERNION"
+    before = None
+    for frame, where, turn, lift in keys:
+        if before is not None and before.dot(turn) < 0:
+            turn.negate()  # the short way round
+        before = turn
+        camob.location, camob.rotation_quaternion, cam.shift_y = where, turn, lift
         camob.keyframe_insert("location", frame=frame)
-        look.keyframe_insert("location", frame=frame)
+        camob.keyframe_insert("rotation_quaternion", frame=frame)
+        cam.keyframe_insert("shift_y", frame=frame)
+    scene.frame_end = FRAMES
     scene.frame_set(FRAMES)
+    # Where the screen lands in the last frame, 0-1 from the top left: the site lays the live demo on it (DeviceScene).
+    if RECT:
+        # Projected by hand: world_to_camera_view reads a portrait frame's height wrong with the horizontal sensor fit.
+        view = camob.matrix_world.inverted()
+        half_width = cam.sensor_width / 2 / cam.lens
+        seen = [((p.x / -p.z) / half_width, (p.y / -p.z) / half_height) for p in (view @ c for c in corners)]
+        box = {"left": min(x for x, _ in seen), "right": max(x for x, _ in seen), "top": -max(y for _, y in seen), "bottom": -min(y for _, y in seen)}
+        with open(RECT, "w") as file:
+            json.dump({side: round((value + 1) / 2, 4) for side, value in box.items()}, file)
+    scene.frame_set(int(STILL or FRAMES))
 
 if ONLY:
     for ob in scene.objects:
@@ -413,6 +462,7 @@ if BLEND:
     bpy.ops.file.pack_all()
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(BLEND))
 if OUT:
-    # A move: numbered frames (OUT ends with ####); the wide view: one still.
+    # A move: numbered frames (OUT ends with ####); the wide view or --frame: one still.
     scene.render.filepath = os.path.abspath(OUT)
-    bpy.ops.render.render(animation=SHOT != "wide", write_still=SHOT == "wide")
+    moving = SHOT != "wide" and not STILL
+    bpy.ops.render.render(animation=moving, write_still=not moving)
