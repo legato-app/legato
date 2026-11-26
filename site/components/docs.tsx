@@ -109,8 +109,8 @@ src-tauri/              thin shell: commands, keychain, tray, media panel
     id: 'plugins',
     title: 'Plugins',
     parts: [
-      'A plugin is a folder with plugin.json and main.js, installed from Add-ons › Install a plugin…. Before anything runs, the user sees the author and every permission asked, and approves them. It runs in its own QuickJS engine: no DOM, no fetch, no files; 64 MB of memory and 1 second per run.',
-      { code: `{\n  "id": "com.example.my-plugin",\n  "name": "My plugin",\n  "version": "1.0.0",\n  "api": 1,\n  "main": "main.js",\n  "permissions": ["player:read", "ui"]\n}` },
+      'A plugin is a folder with legato.manifest (plugin.json, the older name, is still read) and main.js, installed from Add-ons › Install a plugin…. Before anything runs, the user sees the author and every permission asked, and approves them. It runs in its own QuickJS engine: no DOM, no fetch, no files; 64 MB of memory and 1 second per run.',
+      { code: `{\n  "id": "com.example.my-plugin",\n  "name": "My plugin",\n  "version": "1.0.0",\n  "api": 2,\n  "main": "main.js",\n  "permissions": ["player:read", "player:queue", "ui"]\n}` },
       {
         head: ['Permission', 'Lets the plugin'],
         table: [
@@ -120,9 +120,14 @@ src-tauri/              thin shell: commands, keychain, tray, media panel
           ['ui, ui:style', 'add menu items and panels / restyle the interface with CSS'],
           ['editor, visualizer', 'use the Live Editor’s settings / draw a visualizer look'],
           ['network:<host>', 'HTTPS requests to that host only'],
+          ['discord:presence (API 2)', 'show what plays on the Discord profile. Said at install: “Can show any text and links on your Discord profile, through the Discord app on this PC”'],
+          ['player:queue (API 2)', 'see the play queue and hear its changes'],
+          ['history:read (API 2)', 'read the listening history. Said at install: “Sees what you listened to and when”'],
         ],
       },
-      'Never available: passwords, tokens, files on the PC, other plugins’ data, the app’s own commands. API versions only grow: a later app keeps running API 1 plugins. The full reference, with every app.* call, is the plugin guide; a worked example is examples/plugins/sleep-timer.',
+      'The API 2 permissions need "api": 2 in the manifest: an API 1 manifest asking for one is refused.',
+      'During a blind test, plugins learn nothing of what plays: no track, playing, seek, ended or queue event; the player and its queue read as empty, the history as []. When the test closes, the player’s state is sent once.',
+      'Never available: passwords, tokens, files on the PC, other plugins’ data, the app’s own commands. API versions only grow: a later app keeps running API 1 plugins. The full reference, with every app.* call, is the plugin guide; worked examples are examples/plugins/sleep-timer and, for API 2, examples/plugins/discord-presence.',
     ],
   },
   {
