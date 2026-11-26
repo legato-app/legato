@@ -1296,6 +1296,7 @@ const nl: Record<string, string> = {
   'Keep the current look again': 'Huidige look opnieuw bewaren',
   'Keep the current look': 'Huidige look bewaren',
   'Colors only': 'Alleen kleuren',
+  'Parts of the bars moved or hidden': 'Onderdelen van de balken verplaatst of verborgen',
   'Default layout': 'Standaardindeling',
   'This theme’s layout didn’t work: the default layout is back': 'De indeling van dit thema werkte niet: de standaardindeling is terug',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Je eigen CSS bovenop het thema: elk deel van de interface. Links en @import worden verwijderd; de naam, het logo en de juridische vermeldingen van Legato blijven zoals ze zijn.',

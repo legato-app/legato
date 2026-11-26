@@ -1296,6 +1296,7 @@ const tr: Record<string, string> = {
   'Keep the current look again': 'Mevcut görünümü yeniden sakla',
   'Keep the current look': 'Mevcut görünümü sakla',
   'Colors only': 'Yalnızca renkler',
+  'Parts of the bars moved or hidden': 'Çubukların bazı parçaları taşındı veya gizlendi',
   'Default layout': 'Varsayılan düzen',
   'This theme’s layout didn’t work: the default layout is back': 'Bu temanın düzeni çalışmadı: varsayılan düzen geri geldi',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Temanın üzerine kendi CSS’in: arayüzün herhangi bir bölümü. Bağlantılar ve @import kaldırılır; Legato’in adı, logosu ve yasal bildirimleri olduğu gibi kalır.',

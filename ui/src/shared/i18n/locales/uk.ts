@@ -1296,6 +1296,7 @@ const uk: Record<string, string> = {
   'Keep the current look again': 'Знову зберегти поточний вигляд',
   'Keep the current look': 'Зберегти поточний вигляд',
   'Colors only': 'Лише кольори',
+  'Parts of the bars moved or hidden': 'Частини панелей переміщено або приховано',
   'Default layout': 'Типове розташування',
   'This theme’s layout didn’t work: the default layout is back': 'Розташування цієї теми не спрацювало: повернено типове',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Твій CSS поверх теми: будь-яка частина інтерфейсу. Посилання й @import видаляються; назва Legato, логотип і юридичні повідомлення залишаються як є.',

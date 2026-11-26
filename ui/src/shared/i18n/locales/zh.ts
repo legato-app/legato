@@ -1296,6 +1296,7 @@ const zh: Record<string, string> = {
   'Keep the current look again': '再次保留当前风格',
   'Keep the current look': '保留当前风格',
   'Colors only': '仅颜色',
+  'Parts of the bars moved or hidden': '栏中的部分内容被移动或隐藏',
   'Default layout': '默认布局',
   'This theme’s layout didn’t work: the default layout is back': '此主题的布局无法使用：已恢复默认布局',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': '在主题之上使用你自己的 CSS：可作用于界面的任何部分。链接和 @import 会被移除；Legato 的名称、标志和法律声明保持不变。',

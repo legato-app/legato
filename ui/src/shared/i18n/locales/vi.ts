@@ -1296,6 +1296,7 @@ const vi: Record<string, string> = {
   'Keep the current look again': 'Giữ lại phong cách hiện tại lần nữa',
   'Keep the current look': 'Giữ phong cách hiện tại',
   'Colors only': 'Chỉ màu sắc',
+  'Parts of the bars moved or hidden': 'Một số phần của các thanh được di chuyển hoặc ẩn',
   'Default layout': 'Bố cục mặc định',
   'This theme’s layout didn’t work: the default layout is back': 'Bố cục của chủ đề này không hoạt động: đã trở lại bố cục mặc định',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'CSS của riêng bạn trên chủ đề: áp dụng cho bất kỳ phần nào của giao diện. Liên kết và @import bị gỡ bỏ; tên, logo và thông báo pháp lý của Legato giữ nguyên.',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LAYOUT, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -48,6 +48,29 @@ describe('layoutRegions', () => {
     expect(draw({ v: 1, regions: { top: ['playerBar'] } }).order).toEqual({ topbar: 0, playerBar: 1, main: 2 })
     expect(draw({ v: 1, regions: { right: ['sidebar'] } }).order).toBeUndefined()
     expect(draw({ v: 1, regions: { top: ['playerBar'] }, hidden: ['playerBar'] }).order).toBeUndefined()
+  })
+})
+
+describe('a bar’s parts', () => {
+  const actions = PART_GROUPS.playerBar[2]
+
+  it('keeps known parts per bar, each once, and hides only what stays reachable', () => {
+    const got = sanitizeLayout({ v: 1, parts: { playerBar: { order: ['volume', 'volume', 'search', 'song'], hidden: ['sleep', 'more', 'song', 'progress'] }, topbar: { hidden: ['search', 'addons'] }, sidebar: { hidden: ['library'] }, sidePanel: { hidden: ['x'] } } })
+    expect(got?.parts).toEqual({ playerBar: { order: ['volume', 'song'], hidden: ['sleep'] }, topbar: { hidden: ['addons'] } })
+    expect(sanitizeLayout({ v: 1, parts: { topbar: { order: [], hidden: ['logo'] } } })).toBeNull()
+  })
+
+  it('draws the app’s order without a choice, the unnamed at their default place', () => {
+    for (const groups of Object.values(PART_GROUPS)) for (const group of groups) expect(arrangeParts<string>(undefined, group)).toEqual(group)
+    expect(arrangeParts({ order: ['volume', 'room'] }, actions)).toEqual(['volume', 'more', 'fullScreen', 'room', 'sleep', 'lyrics', 'upNext'])
+    expect(arrangeParts({ order: ['progress'], hidden: ['transport', 'sleep'] }, PART_GROUPS.playerBar[1])).toEqual(['progress'])
+    expect(arrangeParts({ order: ['library', 'nav'] }, PART_GROUPS.sidebar[0])).toEqual(['library', 'nav'])
+  })
+
+  it('is said in the warning, only when something moves', () => {
+    const summary = (parts: unknown) => layoutSummary(sanitizeLayout({ v: 1, parts }) ?? undefined)
+    expect(summary({ topbar: { hidden: ['addons'] } })).toEqual(['Parts of the bars moved or hidden'])
+    expect(summary({ topbar: { order: ['history', 'search'] } })).toEqual([])
   })
 })
 

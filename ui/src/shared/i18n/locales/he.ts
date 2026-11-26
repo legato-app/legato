@@ -1260,6 +1260,7 @@ const he: Record<string, string> = {
   'Keep the current look again': 'שמירת המראה הנוכחי שוב',
   'Keep the current look': 'שמירת המראה הנוכחי',
   'Colors only': 'צבעים בלבד',
+  'Parts of the bars moved or hidden': 'חלקים מהסרגלים הוזזו או הוסתרו',
   'Default layout': 'פריסת ברירת המחדל',
   'This theme’s layout didn’t work: the default layout is back': 'הפריסה של ערכת הנושא לא עבדה: פריסת ברירת המחדל חזרה',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'ה-CSS שלכם מעל ערכת הנושא: כל חלק בממשק. קישורים ו-@import מוסרים; השם של Legato, הלוגו וההודעות המשפטיות נשארים כמו שהם.',

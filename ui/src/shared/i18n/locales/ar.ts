@@ -1260,6 +1260,7 @@ const ar: Record<string, string> = {
   'Keep the current look again': 'احتفظ بالمظهر الحالي مجددًا',
   'Keep the current look': 'احتفظ بالمظهر الحالي',
   'Colors only': 'الألوان فقط',
+  'Parts of the bars moved or hidden': 'نُقلت أجزاء من الأشرطة أو أُخفيت',
   'Default layout': 'التخطيط الافتراضي',
   'This theme’s layout didn’t work: the default layout is back': 'تعذّر تطبيق تخطيط هذه السمة: عاد التخطيط الافتراضي',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'CSS خاص بك فوق السمة: أي جزء من الواجهة. تُزال الروابط و@import؛ ويبقى اسم Legato وشعاره والإشعارات القانونية كما هي.',

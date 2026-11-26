@@ -28,12 +28,29 @@ export type SizedSurface = keyof typeof SIZE_LIMITS
  *  list opens under it, so it stays on top. */
 const PLACES: Record<Surface, readonly Region[]> = { brand: REGIONS, topbar: ['top'], sidebar: ['left', 'right'], sidePanel: ['left', 'right'], playerBar: ['top', 'bottom'] }
 
+/** The parts a layout can reorder, per bar, one list per container in the app's order. */
+export const PART_GROUPS = {
+  playerBar: [['song', 'center', 'actions'], ['transport', 'progress'], ['room', 'sleep', 'lyrics', 'upNext', 'volume', 'more', 'fullScreen']],
+  topbar: [['history', 'search', 'offline', 'addons']],
+  sidebar: [['nav', 'library']],
+} as const
+export type PartedSurface = keyof typeof PART_GROUPS
+/** Those it can hide: each stays reachable from the bar's More. The others only move. */
+const HIDEABLE: Record<PartedSurface, readonly string[]> = { playerBar: ['transport', 'room', 'sleep', 'lyrics', 'upNext', 'volume', 'fullScreen'], topbar: ['history', 'addons'], sidebar: ['nav'] }
+
+export interface PartsChoice {
+  order?: string[]
+  hidden?: string[]
+}
+type Parts = Partial<Record<PartedSurface, PartsChoice>>
+
 /** The theme file's `layout` key. */
 export interface Layout {
   v: number
   regions?: Partial<Record<Region, Surface[]>>
   sizes?: Partial<Record<SizedSurface, number>>
   hidden?: Surface[]
+  parts?: Parts
 }
 
 /** What the shell draws: every surface in one region, in order. */
@@ -41,16 +58,28 @@ export interface Placement {
   regions: Record<Region, Surface[]>
   sizes: Partial<Record<SizedSurface, number>>
   hidden: Surface[]
+  parts: Parts
 }
 
 /** The app's own arrangement. */
-export const DEFAULT_LAYOUT: Placement = { regions: { top: ['brand', 'topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, sizes: {}, hidden: [] }
+export const DEFAULT_LAYOUT: Placement = { regions: { top: ['brand', 'topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, sizes: {}, hidden: [], parts: {} }
 
 const record = (value: unknown): Record<string, unknown> | null => (value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : null)
-const isSurface = (value: unknown): value is Surface => SURFACES.includes(value as Surface)
 
-/** Known surfaces, each once. */
-const surfaceList = (raw: unknown): Surface[] => [...new Set(Array.isArray(raw) ? raw.filter(isSurface) : [])]
+/** The known ids of a list, each once. */
+const knownList = <Id extends string>(raw: unknown, known: readonly Id[]): Id[] => [...new Set(Array.isArray(raw) ? raw.filter((id): id is Id => known.includes(id as Id)) : [])]
+const surfaceList = (raw: unknown) => knownList(raw, SURFACES)
+
+function sanitizeParts(raw: unknown): Layout['parts'] {
+  const given = record(raw)
+  const parts = Object.entries(PART_GROUPS).flatMap(([surface, groups]) => {
+    const choice = record(given?.[surface])
+    const order = knownList<string>(choice?.order, groups.flat())
+    const hidden = knownList<string>(choice?.hidden, HIDEABLE[surface as PartedSurface])
+    return order.length || hidden.length ? [[surface, { ...(order.length > 0 && { order }), ...(hidden.length > 0 && { hidden }) }]] : []
+  })
+  return parts.length ? Object.fromEntries(parts) : undefined
+}
 
 /** Each surface in the first region that names it and can hold it. */
 function sanitizeRegions(raw: unknown): Layout['regions'] {
@@ -84,21 +113,32 @@ export function sanitizeLayout(raw: unknown): Layout | null {
   const regions = sanitizeRegions(given.regions)
   const sizes = sanitizeSizes(given.sizes)
   const hidden = surfaceList(given.hidden)
-  if (!regions && !sizes && !hidden.length) return null
-  return { v: version, ...(regions && { regions }), ...(sizes && { sizes }), ...(hidden.length > 0 && { hidden }) }
+  const parts = sanitizeParts(given.parts)
+  if (!regions && !sizes && !hidden.length && !parts) return null
+  return { v: version, ...(regions && { regions }), ...(sizes && { sizes }), ...(hidden.length > 0 && { hidden }), ...(parts && { parts }) }
 }
 
-/** The named surfaces, then each one not named at its default place (after its default neighbor there). */
+/** `named`, then each of `defaults` not yet `placed`, at its default place (after its closest neighbor there). */
+function insertUnnamed<Id>(named: readonly Id[], defaults: readonly Id[], placed: (id: Id) => boolean = (id) => named.includes(id)): Id[] {
+  const list = [...named]
+  defaults.forEach((id, index) => {
+    if (placed(id)) return
+    const before = defaults.slice(0, index).findLast((other) => list.includes(other))
+    list.splice(before === undefined ? 0 : list.indexOf(before) + 1, 0, id)
+  })
+  return list
+}
+
+/** A bar's parts for one container (`group`, in the app's order), as the layout orders and hides them. */
+export function arrangeParts<Part extends string>(choice: PartsChoice | undefined, group: readonly Part[]): Part[] {
+  return insertUnnamed(knownList(choice?.order, group), group).filter((part) => !choice?.hidden?.includes(part))
+}
+
+/** The named surfaces, then each one not named at its default place. */
 function placeEverySurface(named: NonNullable<Layout['regions']>): Placement['regions'] {
   const regions = Object.fromEntries(REGIONS.map((region) => [region, [...(named[region] ?? [])]])) as Placement['regions']
   const placed = new Set(Object.values(regions).flat())
-  for (const region of REGIONS) {
-    DEFAULT_LAYOUT.regions[region].forEach((surface, index, defaults) => {
-      if (surface === 'brand' || placed.has(surface)) return
-      const before = defaults.slice(0, index).findLast((other) => regions[region].includes(other))
-      regions[region].splice(before ? regions[region].indexOf(before) + 1 : 0, 0, surface)
-    })
-  }
+  for (const region of REGIONS) regions[region] = insertUnnamed(regions[region], DEFAULT_LAYOUT.regions[region], (surface) => surface === 'brand' || placed.has(surface))
   // A logo not named goes with the top bar.
   if (!placed.has('brand')) regions.top.splice(regions.top.indexOf('topbar'), 0, 'brand')
   return regions
@@ -129,7 +169,7 @@ export interface ShellRegions {
 }
 
 /** `playerOpen`: Now Playing is up, the top bar carries its Close button. */
-export function layoutRegions({ regions, hidden }: Placement, playerOpen = false): ShellRegions {
+export function layoutRegions({ regions, hidden }: Pick<Placement, 'regions' | 'hidden'>, playerOpen = false): ShellRegions {
   const brandInTopbar = playerOpen || regions.top[regions.top.indexOf('topbar') - 1] === 'brand'
   const drawn = (surface: Surface) => (surface === 'brand' ? !brandInTopbar : !hidden.includes(surface) || surface === 'topbar' || surface === 'playerBar')
   const shown = Object.fromEntries(REGIONS.map((region) => [region, regions[region].filter(drawn)])) as ShellRegions['regions']
@@ -155,6 +195,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
   const hides = (surface: Surface) => hidden.includes(surface)
   const on = (region: Region, surface: Surface) => regions[region].includes(surface)
   const logoMoved = !layoutRegions(placement).brandInTopbar
+  const partsChanged = Object.entries(PART_GROUPS).some(([surface, groups]) => groups.some((group) => arrangeParts<string>(placement.parts[surface as PartedSurface], group).join() !== group.join()))
   const lines = [
     hides('topbar') && tr('A smaller top bar'),
     hides('sidebar') ? tr('No sidebar') : on('right', 'sidebar') && tr('The sidebar on the right'),
@@ -166,6 +207,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     logoMoved && on('right', 'brand') && tr('The logo on the right'),
     !!sizes.sidebar && !hides('sidebar') && tr('The sidebar {n} px wide', { n: sizes.sidebar }),
     !!sizes.sidePanel && !hides('sidePanel') && tr('The side panel {n} px wide', { n: sizes.sidePanel }),
+    partsChanged && tr('Parts of the bars moved or hidden'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
 }
@@ -183,5 +225,5 @@ export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
 /** The arrangement to draw for a checked layout; the app's own without one, from a newer app, or on a phone. */
 export function resolveLayout(layout: Layout | undefined, phone = false): Placement {
   if (!layout || phone || layout.v > LAYOUT_API) return DEFAULT_LAYOUT
-  return { regions: placeEverySurface(layout.regions ?? {}), sizes: layout.sizes ?? {}, hidden: allowedHidden(layout.hidden ?? []) }
+  return { regions: placeEverySurface(layout.regions ?? {}), sizes: layout.sizes ?? {}, hidden: allowedHidden(layout.hidden ?? []), parts: layout.parts ?? {} }
 }

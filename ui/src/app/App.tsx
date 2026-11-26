@@ -1,7 +1,7 @@
-import { ArrowsIn, ArrowsOut, CaretDown, CopySimple, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
+import { ArrowsIn, ArrowsOut, CaretDown, CopySimple, DotsThree, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
 import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AddonsView, AddView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
@@ -42,7 +42,7 @@ import { explain } from '../shared/errors'
 import { useOnline } from '../shared/online'
 import { usePhone } from '../shared/phone'
 import { region } from '../shared/format'
-import { ContextMenuHost, onMenu } from '../shared/ui/ContextMenu'
+import { ContextMenuHost, onMenu, openMenu, type MenuEntry } from '../shared/ui/ContextMenu'
 import { CastHost, CreditsHost, DuplicatesHost, EditInfoHost } from '../features/library/dialogs'
 import { linkKind, shouldWelcome } from '../features/welcome/firstRun'
 import { isRemixLink } from '../features/editor/remixLink'
@@ -52,7 +52,7 @@ import { searchShift } from './searchShift'
 import { useSettings } from './settings'
 import { dropLayout, useShellLayout } from './shellLayout'
 import { LayoutBoundary } from './LayoutBoundary'
-import { DEFAULT_LAYOUT, layoutRegions, type Surface } from '../shared/theme/layout'
+import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, type PartsChoice, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
@@ -109,8 +109,8 @@ function Brand({ className = '', order }: { className?: string; order?: number }
 }
 
 /** `bare`: a theme hides it. The logo, the search (nothing else searches), Settings, the window's buttons and the drag
- *  area stay: nothing else closes the window. */
-function TopBar({ brand, bare, order }: { brand: boolean; bare: boolean; order?: number }) {
+ *  area stay: nothing else closes the window. `choice`: the theme's order and hidden parts; what is hidden is in More. */
+function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean; order?: number; choice?: PartsChoice }) {
   const full = usePlayer((s) => s.full)
   const searchBox = useRef<HTMLDivElement>(null)
   // The phone's bar has no room to move the search: it stays put.
@@ -140,44 +140,66 @@ function TopBar({ brand, bare, order }: { brand: boolean; bare: boolean; order?:
     const off = win.onResized(check)
     return () => void off.then((f) => f())
   }, [])
-  return (
-    // Over Now Playing: a veil from the top keeps logo, Close player and window buttons readable on any cover.
-    <header data-tauri-drag-region style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
-      {/* The phone: the logo or Back, never both (Home is a tab there). */}
-      {brand && <Brand className={canBack && !full ? 'phone:hidden' : ''} />}
-      {full ? (
-        <button onClick={() => setFull(false)} title={tr('Close Now Playing (Esc)')} className="glass flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink transition hover:bg-raised">
-          <CaretDown size={12} weight="bold" /> {tr('Close player')}
+  const shown: string[] = bare ? ['search'] : arrangeParts(choice, PART_GROUPS.topbar[0])
+  const addons = !full && shown.includes('addons') && (
+    <button className={`${winBtn} rounded-full! phone:hidden ${page === 'addons' ? 'bg-raised' : ''}`} aria-label={tr('Add-ons')} title={tr('Add-ons')} onClick={() => go({ name: 'addons' })} onContextMenu={onMenu(() => navMenu({ name: 'addons' }))}>
+      <PuzzlePiece size={18} weight={page === 'addons' ? 'fill' : 'regular'} />
+    </button>
+  )
+  // Left last, Add-ons sits close to Settings, as in the app's own order.
+  const addonsBySettings = shown.at(-1) === 'addons'
+  const hidesSome = !shown.includes('history') || !shown.includes('addons')
+  const hiddenEntries = (): MenuEntry[] => [
+    !shown.includes('history') && { label: tr('Back'), icon: <CaretLeft size={16} />, disabled: !canBack, onSelect: goBack },
+    !shown.includes('history') && { label: tr('Forward'), icon: <CaretRight size={16} />, disabled: !canForward, onSelect: goForward },
+    !shown.includes('addons') && { label: tr('Add-ons'), icon: <PuzzlePiece size={16} />, onSelect: () => go({ name: 'addons' }) },
+  ]
+  const blocks: Record<string, ReactNode> = {
+    // ← → of the mockups (the mouse's back / forward buttons do the same). Nowhere to go: not drawn, its place kept
+    // (a calm bar, plan-v2 › U2; the search doesn't move). Now Playing has Close player instead.
+    history: !full && (
+      <span className="flex items-center gap-2">
+        <button className={`${navBtn} nudge-l ${canBack ? '' : 'invisible phone:hidden'}`} aria-label={tr('Back')} title={tr('Back')} disabled={!canBack} onClick={goBack}>
+          <CaretLeft size={16} />
         </button>
-      ) : (
-        // ← → of the mockups (the mouse's back / forward buttons do the same). Nowhere to go: not drawn, its place kept
-        // (a calm bar, plan-v2 › U2; the search doesn't move).
-        !bare && (
-          <span className="flex items-center gap-2">
-            <button className={`${navBtn} nudge-l ${canBack ? '' : 'invisible phone:hidden'}`} aria-label={tr('Back')} title={tr('Back')} disabled={!canBack} onClick={goBack}>
-              <CaretLeft size={16} />
-            </button>
-            <button className={`${navBtn} nudge-r phone:hidden ${canForward ? '' : 'invisible'}`} aria-label={tr('Forward')} title={tr('Forward')} disabled={!canForward} onClick={goForward}>
-              <CaretRight size={16} />
-            </button>
-          </span>
-        )
-      )}
+        <button className={`${navBtn} nudge-r phone:hidden ${canForward ? '' : 'invisible'}`} aria-label={tr('Forward')} title={tr('Forward')} disabled={!canForward} onClick={goForward}>
+          <CaretRight size={16} />
+        </button>
+      </span>
+    ),
+    search: (
       <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
         <SearchBar>
           <VoiceSearch />
         </SearchBar>
       </div>
-      {!online && !bare && (
-        <span role="status" title={tr('No internet connection: your own files still play. Searches and YouTube come back with the connection.')} className="swap-in flex shrink-0 items-center gap-1.5 rounded-full bg-raised px-3 py-1 text-xs font-medium text-ink-2">
-          <WifiSlash size={14} /> {tr('Offline')}
-        </span>
+    ),
+    offline: !online && (
+      <span role="status" title={tr('No internet connection: your own files still play. Searches and YouTube come back with the connection.')} className="swap-in flex shrink-0 items-center gap-1.5 rounded-full bg-raised px-3 py-1 text-xs font-medium text-ink-2">
+        <WifiSlash size={14} /> {tr('Offline')}
+      </span>
+    ),
+    addons: !addonsBySettings && addons,
+  }
+  return (
+    // Over Now Playing: a veil from the top keeps logo, Close player and window buttons readable on any cover.
+    <header data-tauri-drag-region style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
+      {/* The phone: the logo or Back, never both (Home is a tab there). */}
+      {brand && <Brand className={canBack && !full ? 'phone:hidden' : ''} />}
+      {full && (
+        <button onClick={() => setFull(false)} title={tr('Close Now Playing (Esc)')} className="glass flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink transition hover:bg-raised">
+          <CaretDown size={12} weight="bold" /> {tr('Close player')}
+        </button>
       )}
+      {shown.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
       {!full && (
         <span className="flex items-center gap-1 pe-2">
-          {!bare && (
-            <button className={`${winBtn} rounded-full! phone:hidden ${page === 'addons' ? 'bg-raised' : ''}`} aria-label={tr('Add-ons')} title={tr('Add-ons')} onClick={() => go({ name: 'addons' })} onContextMenu={onMenu(() => navMenu({ name: 'addons' }))}>
-              <PuzzlePiece size={18} weight={page === 'addons' ? 'fill' : 'regular'} />
+          {addonsBySettings && addons}
+          {hidesSome && (
+            <button className={`${winBtn} rounded-full! phone:hidden`} aria-label={tr('More')} title={tr('More')} onClick={(e) => openMenu(e, hiddenEntries(), { place: 'below' })}>
+              <DotsThree size={18} weight="bold" />
             </button>
           )}
           <button className={`${winBtn} turn rounded-full! ${page === 'settings' ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
@@ -367,13 +389,13 @@ export function App() {
   )
   // Above and under the middle row; the player bar is drawn apart.
   const bar = (surface: Surface) => {
-    if (surface === 'topbar') return part(surface, <TopBar brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} />)
+    if (surface === 'topbar') return part(surface, <TopBar brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} choice={placement.parts.topbar} />)
     return surface === 'brand' && part(surface, <Brand className="mx-4 my-1 shrink-0 self-start" order={shell.order?.brand} />)
   }
   // The columns keep off the window's edge when no bar is under them.
   const nothingUnder = !shell.regions.bottom.some((surface) => surface !== 'playerBar' || !shell.playerBarHidden)
   const column = (surface: Surface, side: 'left' | 'right') => {
-    if (surface === 'sidebar') return part(surface, <Sidebar side={side} fixedWidth={placement.sizes.sidebar} />)
+    if (surface === 'sidebar') return part(surface, <Sidebar side={side} fixedWidth={placement.sizes.sidebar} choice={placement.parts.sidebar} />)
     return part(surface, surface === 'brand' ? <Brand className="shrink-0 self-start" /> : <SidePanel width={placement.sizes.sidePanel} />)
   }
 

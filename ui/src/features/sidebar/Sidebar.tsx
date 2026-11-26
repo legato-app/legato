@@ -1,6 +1,6 @@
-import { ArrowDownLeft, ArrowUpRight, ChartBar, ClockCounterClockwise, Disc, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
+import { ArrowDownLeft, ArrowUpRight, ChartBar, ClockCounterClockwise, Disc, DotsThree, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
 import { artistName } from '../../shared/artistName'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
 import { useStore, type View } from '../../app/store'
@@ -13,7 +13,8 @@ import { usePhone } from '../../shared/phone'
 import { onMenu, openMenu, type MenuEntry } from '../../shared/ui/ContextMenu'
 import { VirtualGrid } from '../../shared/ui/VirtualGrid'
 import { VirtualList } from '../../shared/ui/VirtualList'
-import { DEFAULTS, SIDEBAR_MAX, SIDEBAR_MIN, type PlaylistOrder } from '../../shared/theme/theme'
+import { DEFAULTS, SIDEBAR_MAX, SIDEBAR_MIN, type PlaylistOrder, type Settings } from '../../shared/theme/theme'
+import { arrangeParts, PART_GROUPS, type PartsChoice } from '../../shared/theme/layout'
 import { byOpened, useOpenedLists } from '../home/recentLists'
 import { PlaylistCover } from '../library/PlaylistCover'
 import { canDropOn, dropOn, folderMenu, navMenu, playlistMenu, playlistsMenu } from '../menus'
@@ -126,7 +127,7 @@ const dot = (a: string, b: string) => (b ? `${a} · ${b}` : a)
  * album or artist (kind chips), with covers. The order picked stays (a list jumping back to Recent is what users
  * complain of first). Settings and Add-ons are in the top bar.
  */
-export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWidth?: number }) {
+export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; fixedWidth?: number; choice?: PartsChoice }) {
   const { view, go, tracks, playlists, editPlaylist } = useStore(useShallow((s) => ({ view: s.view, go: s.go, tracks: s.tracks, playlists: s.playlists, editPlaylist: s.editPlaylist })))
   const [kind, setKind] = useState<Kind | null>(null)
   const is = (name: View['name']) => view.name === name
@@ -210,9 +211,20 @@ export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWid
             ...(!kind && notFound ? [{ key: 'not-found', on: is('notFound'), art: tile(<MagnifyingGlass size={grid ? 64 : 22} weight="bold" />, 'bg-raised text-ink-2'), label: tr('Songs not found'), sub: dot(tr('YouTube'), songs(notFound)), to: { name: 'notFound' } as View, menu: () => navMenu({ name: 'notFound' }) }] : []),
           ]
 
-  return (
-    <aside className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
-      {/* The phone: Home and Mixes are tabs; Stats and Add music side by side. */}
+  const parts: string[] = arrangeParts(choice, PART_GROUPS.sidebar[0])
+  // A theme that hides the entries: they are in the library's More.
+  const navEntry = (item: Settings['hiddenNav'][number], label: string, icon: ReactNode): MenuEntry | false => !navOff.includes(item) && { label, icon, onSelect: () => go({ name: item }) }
+  const hiddenNavEntries = (): MenuEntry[] => [
+    navEntry('home', tr('Home'), <House size={16} />),
+    navEntry('mixes', tr('Mixes'), <Disc size={16} />),
+    navEntry('radio', tr('Radio'), <Radio size={16} />),
+    navEntry('stats', tr('Stats'), <ChartBar size={16} />),
+    navEntry('history', tr('History'), <ClockCounterClockwise size={16} />),
+    navEntry('add', tr('Add music'), <PlusCircle size={16} />),
+  ]
+  const blocks: Record<string, ReactNode> = {
+    // The phone: Home and Mixes are tabs; Stats and Add music side by side.
+    nav: (
       <nav className="flex shrink-0 flex-col rounded-lg bg-panel p-2 phone:grid phone:grid-cols-2 phone:gap-1">
         {!phone && !navOff.includes('home') && <NavItem on={is('home')} icon={House} label={tr('Home')} onClick={() => go({ name: 'home' })} onContextMenu={onMenu(() => navMenu({ name: 'home' }))} />}
         {!phone && !navOff.includes('mixes') && <NavItem on={is('mixes') || is('mix')} icon={Disc} label={tr('Mixes')} onClick={() => go({ name: 'mixes' })} onContextMenu={onMenu(() => navMenu({ name: 'mixes' }))} />}
@@ -221,8 +233,9 @@ export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWid
         {!navOff.includes('history') && <NavItem on={is('history')} icon={ClockCounterClockwise} label={tr('History')} onClick={() => go({ name: 'history' })} onContextMenu={onMenu(() => navMenu({ name: 'history' }))} />}
         {!navOff.includes('add') && <NavItem on={is('add')} icon={PlusCircle} label={tr('Add music')} onClick={() => go({ name: 'add' })} onContextMenu={onMenu(() => navMenu({ name: 'add' }))} />}
       </nav>
-
-      {/* The mini player stays put at the bottom; only the list scrolls. */}
+    ),
+    // The mini player stays put at the bottom; only the list scrolls.
+    library: (
       <section aria-label={tr('Library')} className="group/lib flex min-h-0 flex-1 flex-col rounded-lg bg-panel">
         <div onContextMenu={onMenu(playlistsMenu)} className="flex shrink-0 items-center gap-1 pt-3 pe-2 ps-4">
           <h2 className="flex-1 text-base font-medium">{tr('Library')}</h2>
@@ -233,6 +246,11 @@ export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWid
           <RoundButton label={tr('Sort playlists')} kind="plain" size="sm" className={wide ? '' : calm} onClick={(e) => openMenu(e, ORDERS.map((o) => ({ label: tr(o.label), checked: order === o.id, onSelect: () => useSettings.getState().update({ playlistOrder: o.id }) })))}>
             <SortAscending size={18} />
           </RoundButton>
+          {!parts.includes('nav') && (
+            <RoundButton label={tr('More')} kind="plain" size="sm" onClick={(e) => openMenu(e, hiddenNavEntries())}>
+              <DotsThree size={18} weight="bold" />
+            </RoundButton>
+          )}
           <RoundButton label={tr('New playlist')} kind="plain" size="sm" onClick={(e) => openMenu(e, [{ label: tr('New playlist'), icon: <Plus size={16} />, onSelect: () => void create() }, { label: tr('New smart playlist'), icon: <Lightning size={16} />, onSelect: createSmart }, { label: tr('Describe a playlist…'), icon: <MagnifyingGlass size={16} />, onSelect: () => void import('../smart/describeAction').then((m) => m.describeSmart()) }, { label: tr('New folder'), icon: <FolderSimplePlus size={16} />, onSelect: () => void newFolder() }])}>
             <Plus size={18} />
           </RoundButton>
@@ -253,6 +271,14 @@ export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWid
           </VirtualList>
         )}
       </section>
+    ),
+  }
+
+  return (
+    <aside className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
       {/* Edge: drag (or arrows) to resize, double-click for the default width. */}
       {!wide && fixedWidth === undefined && (
         <div

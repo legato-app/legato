@@ -1296,6 +1296,7 @@ const hi: Record<string, string> = {
   'Keep the current look again': 'मौजूदा लुक फिर से रखें',
   'Keep the current look': 'मौजूदा लुक रखें',
   'Colors only': 'सिर्फ़ रंग',
+  'Parts of the bars moved or hidden': 'पट्टियों के कुछ हिस्से खिसकाए या छिपाए गए',
   'Default layout': 'डिफ़ॉल्ट व्यवस्था',
   'This theme’s layout didn’t work: the default layout is back': 'इस थीम की व्यवस्था काम नहीं कर पाई: डिफ़ॉल्ट व्यवस्था लौट आई है',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'थीम के ऊपर आपकी अपनी CSS: इंटरफ़ेस का कोई भी हिस्सा। लिंक और @import हटा दिए जाते हैं; Legato का नाम, लोगो और कानूनी सूचनाएं जैसी हैं वैसी रहती हैं।',

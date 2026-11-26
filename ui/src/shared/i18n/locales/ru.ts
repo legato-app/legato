@@ -1296,6 +1296,7 @@ const ru: Record<string, string> = {
   'Keep the current look again': 'Снова сохранить текущий вид',
   'Keep the current look': 'Сохранить текущий вид',
   'Colors only': 'Только цвета',
+  'Parts of the bars moved or hidden': 'Части панелей перемещены или скрыты',
   'Default layout': 'Расположение по умолчанию',
   'This theme’s layout didn’t work: the default layout is back': 'Расположение этой темы не сработало: возвращено расположение по умолчанию',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Твой CSS поверх темы: любая часть интерфейса. Ссылки и @import удаляются; название Legato, логотип и юридические уведомления остаются как есть.',

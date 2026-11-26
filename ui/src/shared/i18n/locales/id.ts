@@ -1296,6 +1296,7 @@ const id: Record<string, string> = {
   'Keep the current look again': 'Simpan gaya saat ini lagi',
   'Keep the current look': 'Simpan gaya saat ini',
   'Colors only': 'Hanya warna',
+  'Parts of the bars moved or hidden': 'Bagian bilah dipindahkan atau disembunyikan',
   'Default layout': 'Tata letak bawaan',
   'This theme’s layout didn’t work: the default layout is back': 'Tata letak tema ini gagal: tata letak bawaan dipakai lagi',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'CSS milikmu sendiri di atas tema: bagian antarmuka mana pun. Link dan @import dihapus; nama, logo, dan pemberitahuan hukum Legato tetap seperti semula.',

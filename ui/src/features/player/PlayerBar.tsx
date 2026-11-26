@@ -1,6 +1,6 @@
 import { ArrowsOutSimple, DotsThree, Heart, Moon, Queue, Quotes, SpeakerHigh, SpeakerLow, SpeakerSlash } from '@phosphor-icons/react'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { api, type Source } from '../../shared/api'
@@ -9,10 +9,11 @@ import { Bar, Knob, RoundButton } from '../../shared/ui/controls'
 import { SourceIcon, sourceLabel } from '../../shared/ui/SourceIcon'
 import { ProgressLine, SeekBar, TimeText } from './Progress'
 import { usePhone } from '../../shared/phone'
-import { useSidePanelAway } from '../../app/shellLayout'
+import { useShellLayout, useSidePanelAway } from '../../app/shellLayout'
+import { arrangeParts, PART_GROUPS } from '../../shared/theme/layout'
 import { Transport } from './Transport'
 import { RoomFloats, RoomPill } from '../rooms/RoomPill'
-import { onMenu, openMenu } from '../../shared/ui/ContextMenu'
+import { onMenu, openMenu, type MenuEntry } from '../../shared/ui/ContextMenu'
 import { sleepLabel, sleepMenu, useSleep } from './sleep'
 import { playerMenu } from '../menus'
 import { trackArt } from '../../shared/art'
@@ -297,18 +298,34 @@ export function VolumeControl({ big }: { big?: boolean }) {
   )
 }
 
+/** Up next or the lyrics on screen: in the right panel, else (`away`) in Now Playing. */
+function showPanel(panel: 'upNext' | 'lyrics', away: boolean) {
+  const settings = useSettings.getState()
+  if (!away) return settings.update({ sidePanel: panel })
+  settings.update({ upNext: panel === 'upNext', lyrics: panel === 'lyrics', editor: false })
+  usePlayer.getState().setFull(true)
+}
+
+/** What a theme hid from the bar that the player's menu lacks: on top of the bar's More. */
+function hiddenPartEntries(shown: string[], away: boolean): MenuEntry[] {
+  const { volume, setVolume, toggleMute, setFull } = usePlayer.getState()
+  const levels = [100, 75, 50, 25].map((percent) => ({ label: `${percent}%`, onSelect: () => setVolume(percent / 100) }))
+  const entries: (MenuEntry | false)[] = [
+    !shown.includes('lyrics') && { label: tr('Lyrics'), icon: <Quotes size={16} />, onSelect: () => showPanel('lyrics', away) },
+    !shown.includes('upNext') && { label: tr('Up next'), icon: <Queue size={16} />, onSelect: () => showPanel('upNext', away) },
+    !shown.includes('volume') && { label: tr('Volume'), icon: <SpeakerHigh size={16} />, items: [{ label: volume > 0 ? tr('Mute') : tr('Unmute'), onSelect: toggleMute }, ...levels] },
+    !shown.includes('fullScreen') && { label: tr('Now playing, full screen'), icon: <ArrowsOutSimple size={16} />, onSelect: () => setFull(true) },
+  ]
+  return entries.filter(Boolean)
+}
+
 /** Right panel switch (Up next, lyrics): Fill when open, again closes it. Without one (a narrow window, the theme),
  *  Now Playing opens on it. */
 function PanelButton({ panel, label, icon: Icon }: { panel: 'upNext' | 'lyrics'; label: string; icon: typeof Queue }) {
   const away = useSidePanelAway()
   const on = useSettings((s) => s.settings.sidePanel === panel) && !away
   const now = usePlayer((s) => !!s.now)
-  const open = () => {
-    const settings = useSettings.getState()
-    if (!away) return settings.update({ sidePanel: on ? 'none' : panel })
-    settings.update({ upNext: panel === 'upNext', lyrics: panel === 'lyrics', editor: false })
-    usePlayer.getState().setFull(true)
-  }
+  const open = () => (on ? useSettings.getState().update({ sidePanel: 'none' }) : showPanel(panel, away))
   return (
     <RoundButton label={label} aria-pressed={on} kind="plain" size="sm" disabled={!now} className={on ? 'text-ink!' : ''} onClick={(e) => (open(), pop(e.currentTarget))}>
       <Icon size={19} weight={on ? 'fill' : 'regular'} />
@@ -340,6 +357,9 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
   const phone = usePhone()
   const track = useNowTrack()
   const offer = usePickup((s) => s.offer)
+  // The theme's order and hidden parts (the phone keeps its own bar).
+  const choice = useShellLayout().parts.playerBar
+  const away = useSidePanelAway()
   useLiveSync()
   // Engine plays local files, server songs and previews: poll it.
   const local = now && (now.via === 'local' || now.via === 'server' || now.via === 'preview')
@@ -393,20 +413,45 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
     return () => clearInterval(id)
   }, [local, onLocal])
 
-  return (
-    // On the window's background, under the panels (docs/design.md).
-    // Phone layout: a mini player (cover, song, like, previous / play / next, a progress line); Now Playing has the rest.
-    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(playerMenu)} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
-      {/* In key order: each iframe keeps its place as the two swap roles (a moved iframe reloads). */}
-      {now?.youtubeId &&
-        [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]
-          .sort((a, b) => a.key - b.key)
-          .map((f) => <YouTubeFrame key={f.key} videoId={f.videoId} tail={f === tail} idle={f === tail && !!tail?.done} cue={f === tail && !!tail?.cue} />)}
-      {!hidden && (
-        <>
-      {phone && now && <ProgressLine className="absolute inset-x-3 top-0" />}
-
-      {/* The phone: the whole song area opens Now Playing (a thumb's target, not two small ones). */}
+  const centerParts = arrangeParts(choice, PART_GROUPS.playerBar[1])
+  const actionParts = arrangeParts(choice, PART_GROUPS.playerBar[2])
+  // The bar's More: what the theme hid first, then the player's menu (with its play controls if the bar lost them).
+  const moreEntries = (): MenuEntry[] => {
+    const missing = hiddenPartEntries(actionParts, away)
+    return [...missing, ...(missing.length ? ['-' as const] : []), ...playerMenu({ controls: !centerParts.includes('transport') })]
+  }
+  const center: Record<string, ReactNode> = {
+    transport: <Transport />,
+    progress: (
+      <div className="flex w-full items-center gap-3 text-xs text-ink-2 tabular-nums">
+        <TimeText part="elapsed" />
+        <SeekBar className="flex-1" />
+        <TimeText part="total" />
+      </div>
+    ),
+  }
+  const actions: Record<string, ReactNode> = {
+    room: <RoomPill compact />,
+    sleep: <SleepButton always={sleepButton} />,
+    lyrics: <PanelButton panel="lyrics" label={tr('Lyrics')} icon={Quotes} />,
+    upNext: <PanelButton panel="upNext" label={tr('Up next')} icon={Queue} />,
+    volume: <VolumeControl />,
+    // The rare ones (picture in picture, sleep timer, Karaoke, Cover display, share…): the player's menu, as on a
+    // right-click (a calm bar, plan-v2 › U2).
+    more: (
+      <RoundButton label={tr('More')} kind="plain" size="sm" disabled={!now} onClick={(e) => openMenu(e, moreEntries(), { place: 'above' })}>
+        <DotsThree size={20} weight="bold" />
+      </RoundButton>
+    ),
+    fullScreen: (
+      <RoundButton label={tr('Now playing, full screen')} kind="plain" size="sm" disabled={!now} onClick={() => setFull(true)}>
+        <ArrowsOutSimple size={18} />
+      </RoundButton>
+    ),
+  }
+  const blocks: Record<string, ReactNode> = {
+    // The phone: the whole song area opens Now Playing (a thumb's target, not two small ones).
+    song: (
       <div onClick={phone && now ? () => setFull(true) : undefined} className="flex w-85 min-w-0 items-center gap-3 phone:w-auto phone:flex-1 phone:self-stretch">
         <button disabled={!now} onClick={() => setFull(true)} title={now ? tr('Open Now Playing') : undefined} className="relative shrink-0">
           {/* New song: its cover fades in. */}
@@ -441,36 +486,43 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
         </span>
         <LikeButton />
       </div>
+    ),
+    center: (
+      <div className="flex w-140 min-w-0 flex-col items-center gap-1">
+        {centerParts.map((part) => (
+          <Fragment key={part}>{center[part]}</Fragment>
+        ))}
+      </div>
+    ),
+    actions: (
+      <div className="flex w-85 items-center justify-end gap-2">
+        {actionParts.map((part) => (
+          <Fragment key={part}>{actions[part]}</Fragment>
+        ))}
+      </div>
+    ),
+  }
+
+  return (
+    // On the window's background, under the panels (docs/design.md).
+    // Phone layout: a mini player (cover, song, like, previous / play / next, a progress line); Now Playing has the rest.
+    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(playerMenu)} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
+      {/* In key order: each iframe keeps its place as the two swap roles (a moved iframe reloads). */}
+      {now?.youtubeId &&
+        [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]
+          .sort((a, b) => a.key - b.key)
+          .map((f) => <YouTubeFrame key={f.key} videoId={f.videoId} tail={f === tail} idle={f === tail && !!tail?.done} cue={f === tail && !!tail?.cue} />)}
+      {!hidden && (
+        <>
+      {phone && now && <ProgressLine className="absolute inset-x-3 top-0" />}
 
       {phone ? (
-        <Transport size="sm" mini />
-      ) : (
         <>
-          <div className="flex w-140 min-w-0 flex-col items-center gap-1">
-            <Transport />
-            <div className="flex w-full items-center gap-3 text-xs text-ink-2 tabular-nums">
-              <TimeText part="elapsed" />
-              <SeekBar className="flex-1" />
-              <TimeText part="total" />
-            </div>
-          </div>
-
-          <div className="flex w-85 items-center justify-end gap-2">
-            <RoomPill compact />
-            <SleepButton always={sleepButton} />
-            <PanelButton panel="lyrics" label={tr('Lyrics')} icon={Quotes} />
-            <PanelButton panel="upNext" label={tr('Up next')} icon={Queue} />
-            <VolumeControl />
-            {/* The rare ones (picture in picture, sleep timer, Karaoke, Cover display, share…): the player's menu, as on a
-                right-click (a calm bar, plan-v2 › U2). */}
-            <RoundButton label={tr('More')} kind="plain" size="sm" disabled={!now} onClick={(e) => openMenu(e, playerMenu({ controls: false }), { place: 'above' })}>
-              <DotsThree size={20} weight="bold" />
-            </RoundButton>
-            <RoundButton label={tr('Now playing, full screen')} kind="plain" size="sm" disabled={!now} onClick={() => setFull(true)}>
-              <ArrowsOutSimple size={18} />
-            </RoundButton>
-          </div>
+          {blocks.song}
+          <Transport size="sm" mini />
         </>
+      ) : (
+        arrangeParts(choice, PART_GROUPS.playerBar[0]).map((block) => <Fragment key={block}>{blocks[block]}</Fragment>)
       )}
         </>
       )}

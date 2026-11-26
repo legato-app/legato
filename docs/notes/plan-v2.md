@@ -731,8 +731,16 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-26): "Default layout" turns the setting off (the theme keeps its layout, one switch brings
       it back); the entry has no menu id, so the menu settings can't fold or hide it; a part that throws drops the
       layout until the app restarts; thrown under the app's own arrangement it goes to the root error screen as before.
-  - [ ] `M` 6. The bars' parts: player bar, top bar, sidebar (order, hidden, each hidden part still in More). Tests:
-    per-surface part sanitize.
+  - [x] `M` 6. The bars' parts: player bar, top bar, sidebar (order, hidden, each hidden part still in More). Tests:
+    per-surface part sanitize. 2026-11-26: done; moved parts, the three More menus and "Default layout" seen in the
+    browser demo (invented data), never in the app.
+    - Decided alone (2026-11-26): the file says `parts: { playerBar | topbar | sidebar: { order, hidden } }`; parts
+      move only inside their container (player bar: song, center, actions; transport, progress; room, sleep, lyrics,
+      Up next, volume, More, full screen. Top bar: Back/Forward, search, Offline, Add-ons. Sidebar: entries, library);
+      hideable only what stays reachable (transport, room, sleep, lyrics, Up next, volume, full screen; Back/Forward,
+      Add-ons; the sidebar's entries): the song, the progress bar, More, the search, Offline and the library only
+      move; the top bar gets a More beside Settings when it hides something (a hidden top bar too), the library's
+      header one for hidden entries; the warning says it in one line.
   - [ ] `M` 7. The shared page header (`pages.header` in `PageHeader`). Tests: a pure `headerLayout` (clamps, unknown
     values dropped, phone ignored).
   - [ ] `M` 8. `PAGE_PARTS`, `usePageParts`, the album, playlist and artist pages. Tests: per-page sanitize (fixed

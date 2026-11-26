@@ -1296,6 +1296,7 @@ const pt: Record<string, string> = {
   'Keep the current look again': 'Guardar o visual atual de novo',
   'Keep the current look': 'Guardar o visual atual',
   'Colors only': 'Só cores',
+  'Parts of the bars moved or hidden': 'Partes das barras movidas ou ocultas',
   'Default layout': 'Disposição padrão',
   'This theme’s layout didn’t work: the default layout is back': 'A disposição deste tema não funcionou: a padrão voltou',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Seu próprio CSS por cima do tema: qualquer parte da interface. Links e @import são removidos; o nome do Legato, o logo e os avisos legais ficam como estão.',

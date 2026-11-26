@@ -1296,6 +1296,7 @@ const sv: Record<string, string> = {
   'Keep the current look again': 'Behåll det nuvarande utseendet igen',
   'Keep the current look': 'Behåll det nuvarande utseendet',
   'Colors only': 'Bara färger',
+  'Parts of the bars moved or hidden': 'Delar av fälten flyttade eller dolda',
   'Default layout': 'Standardlayout',
   'This theme’s layout didn’t work: the default layout is back': 'Temats layout fungerade inte: standardlayouten är tillbaka',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'Din egen CSS ovanpå temat: vilken del av gränssnittet som helst. Länkar och @import tas bort; Legatos namn, logotyp och juridiska meddelanden förblir som de är.',

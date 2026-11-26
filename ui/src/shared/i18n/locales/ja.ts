@@ -1296,6 +1296,7 @@ const ja: Record<string, string> = {
   'Keep the current look again': '現在のルックで上書き',
   'Keep the current look': '現在のルックを保持',
   'Colors only': '色のみ',
+  'Parts of the bars moved or hidden': 'バーの一部を移動または非表示',
   'Default layout': '標準の配置',
   'This theme’s layout didn’t work: the default layout is back': 'このテーマの配置は使えませんでした。標準の配置に戻しました',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': 'テーマの上に独自のCSSを適用：インターフェースのどの部分にも使えます。リンクと@importは削除されます。Legatoの名前、ロゴ、法的表示はそのまま残ります。',

@@ -1296,6 +1296,7 @@ const ko: Record<string, string> = {
   'Keep the current look again': '현재 스타일 다시 유지',
   'Keep the current look': '현재 스타일 유지',
   'Colors only': '색만',
+  'Parts of the bars moved or hidden': '막대의 일부를 옮기거나 숨김',
   'Default layout': '기본 배치',
   'This theme’s layout didn’t work: the default layout is back': '이 테마의 배치가 작동하지 않아 기본 배치로 돌아왔습니다',
   'Your own CSS on top of the theme: any part of the interface. Links and @import are removed; Legato’s name, logo and legal notices stay as they are.': '테마 위에 내 CSS 적용: 인터페이스 어디에나 쓸 수 있습니다. 링크와 @import는 제거되며, Legato의 이름, 로고, 법적 고지는 그대로 유지됩니다.',
