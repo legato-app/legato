@@ -33,7 +33,7 @@ import { frameAround } from '../../shared/artbox'
 import { bindLiveFrame, sendLive } from './live'
 import { useLiveSync } from './liveSync'
 import { toggleLike, useLiked } from './like'
-import { tr } from '../../shared/i18n/i18n'
+import { locale, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { takeDrop } from './drop'
 import { discordText, takeLink } from '../library/discordDrop'
@@ -310,7 +310,8 @@ function showPanel(panel: 'upNext' | 'lyrics', away: boolean) {
  *  play controls, Full screen among them. */
 function hiddenPartEntries(shown: string[], away: boolean, controls: boolean): MenuEntry[] {
   const { volume, setVolume, toggleMute, setFull } = usePlayer.getState()
-  const levels = [100, 75, 50, 25].map((percent) => ({ label: `${percent}%`, onSelect: () => setVolume(percent / 100) }))
+  const percent = new Intl.NumberFormat(locale(), { style: 'percent' })
+  const levels = [1, 0.75, 0.5, 0.25].map((level) => ({ label: percent.format(level), onSelect: () => setVolume(level) }))
   const entries: (MenuEntry | false)[] = [
     !shown.includes('lyrics') && { label: tr('Lyrics'), icon: <Quotes size={16} />, onSelect: () => showPanel('lyrics', away) },
     !shown.includes('upNext') && { label: tr('Up next'), icon: <Queue size={16} />, onSelect: () => showPanel('upNext', away) },
