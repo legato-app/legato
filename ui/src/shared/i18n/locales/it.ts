@@ -1254,7 +1254,7 @@ const it: Record<string, string> = {
   'Allowed to:': 'Può:',
   'Log': 'Registro',
   'Nothing yet.': 'Ancora niente.',
-  'The plugin’s folder (with plugin.json)': 'La cartella del plugin (con plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'La cartella del plugin (con legato.manifest)',
   'Plugins': 'Plugin',
   'Install a plugin…': 'Installa un plugin…',
   'No plugin matches.': 'Nessun plugin corrisponde.',

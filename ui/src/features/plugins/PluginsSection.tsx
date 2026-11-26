@@ -165,7 +165,7 @@ export function PluginsSection({ query }: { query: string }) {
   const q = query.trim().toLowerCase()
   const shown = list.filter((p) => !q || `${p.manifest?.name} ${p.manifest?.description} ${p.manifest?.author}`.toLowerCase().includes(q))
   const pick = async () => {
-    const dir = await open({ directory: true, title: tr('The plugin’s folder (with plugin.json)') })
+    const dir = await open({ directory: true, title: tr('The plugin’s folder (with legato.manifest)') })
     if (typeof dir === 'string') setInstalling(dir)
   }
   return (

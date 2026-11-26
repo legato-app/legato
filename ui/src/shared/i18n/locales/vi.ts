@@ -1254,7 +1254,7 @@ const vi: Record<string, string> = {
   'Allowed to:': 'Được phép:',
   'Log': 'Nhật ký',
   'Nothing yet.': 'Chưa có gì.',
-  'The plugin’s folder (with plugin.json)': 'Thư mục của plugin (có plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Thư mục của plugin (có legato.manifest)',
   'Plugins': 'Plugin',
   'Install a plugin…': 'Cài đặt plugin…',
   'No plugin matches.': 'Không có plugin nào khớp.',

@@ -11,12 +11,12 @@ fade).
 
 ```
 my-plugin/
-  plugin.json   the manifest
+  legato.manifest   the manifest (plugin.json, the older name, still works)
   main.js       the code (one file: bundle if you use several)
   README.md     optional; .md .txt .png .css .json files are copied too (50 files, 5 MB at most)
 ```
 
-`plugin.json`:
+The manifest, JSON. `legato.manifest` is read first, else `plugin.json`:
 
 ```json
 {
@@ -28,15 +28,18 @@ my-plugin/
   "api": 1,
   "main": "main.js",
   "permissions": ["player:read", "ui"],
-  "homepage": "https://example.com/my-plugin"
+  "homepage": "https://example.com/my-plugin",
+  "repository": "https://example.com/my-plugin/code"
 }
 ```
 
 - `id`: 3-64 characters, `a-z 0-9 . -`. Installing a folder with the same id updates the plugin; new permissions
   are pointed out and approved again.
-- `api`: the plugin API version you wrote for. This app offers **1**; a plugin asking for more is refused with "needs
-  a newer version of Legato". Versions only grow: a later app keeps running API 1 plugins.
-- `main`: a `.js` file next to `plugin.json`, 2 MB at most.
+- `api`: the plugin API version you wrote for. This app offers **2**; a plugin asking for more is refused with "needs
+  a newer version of Legato". Versions only grow: a later app keeps running API 1 plugins. API 2 adds
+  `legato.manifest` and `repository`.
+- `main`: a `.js` file next to the manifest, 2 MB at most.
+- `homepage`, `repository`: https links, optional.
 
 ## Permissions
 

@@ -78,18 +78,14 @@ fn save_registry(state: &AppState, r: &HashMap<String, Entry>) -> CmdResult<()> 
     state.lib().set_setting(REGISTRY, &json!(r)).map_err(err)
 }
 
-fn read_manifest(folder: &Path) -> anyhow::Result<Manifest> {
-    let text = std::fs::read_to_string(folder.join("plugin.json")).map_err(|_| anyhow::anyhow!("No plugin.json in this folder"))?;
-    Manifest::parse(&text)
-}
-
 /// The files that would be copied: plain files of known kinds, flat, bounded.
 fn files(folder: &Path, m: &Manifest) -> anyhow::Result<Vec<(PathBuf, u64)>> {
     let mut out = Vec::new();
     for e in std::fs::read_dir(folder)? {
         let e = e?;
         let meta = std::fs::symlink_metadata(e.path())?;
-        let kind_ok = e.path().extension().and_then(|x| x.to_str()).is_some_and(|x| FILE_KINDS.contains(&x.to_lowercase().as_str()));
+        let kind_ok = e.path().extension().and_then(|x| x.to_str()).is_some_and(|x| FILE_KINDS.contains(&x.to_lowercase().as_str()))
+            || e.file_name().to_str().is_some_and(|name| music_plugins::manifest::FILES.contains(&name));
         if meta.is_file() && kind_ok {
             out.push((e.path(), meta.len()));
         }
@@ -221,7 +217,7 @@ fn track_json(t: &music_core::library::LibraryTrack) -> Value {
 
 fn start(app: &AppHandle, id: &str, granted: &[String]) -> CmdResult<()> {
     let folder = dir(app)?.join(id);
-    let m = read_manifest(&folder).map_err(err)?;
+    let m = Manifest::read(&folder).map_err(err)?;
     let code = std::fs::read_to_string(folder.join(&m.main)).map_err(err)?;
     // Only what was approved and is still asked for.
     let granted: Vec<Permission> = m.permissions().into_iter().filter(|p| granted.contains(&p.as_string())).collect();
@@ -264,7 +260,7 @@ pub async fn plugins_list(app: AppHandle, state: State<'_, AppState>, plugins: S
             continue;
         }
         let entry = reg.get(&id).cloned().unwrap_or_default();
-        let (manifest, broken) = match read_manifest(&e.path()) {
+        let (manifest, broken) = match Manifest::read(&e.path()) {
             Ok(m) => (Some(m), None),
             Err(e) => (None, Some(e.to_string())),
         };
@@ -285,9 +281,9 @@ pub async fn plugins_list(app: AppHandle, state: State<'_, AppState>, plugins: S
 #[tauri::command]
 pub async fn plugin_inspect(app: AppHandle, state: State<'_, AppState>, folder: String) -> CmdResult<Inspect> {
     let folder = PathBuf::from(folder);
-    let m = read_manifest(&folder).map_err(err)?;
+    let m = Manifest::read(&folder).map_err(err)?;
     let files = files(&folder, &m).map_err(err)?;
-    let installed = read_manifest(&dir(&app)?.join(&m.id)).ok().map(|x| x.version);
+    let installed = Manifest::read(&dir(&app)?.join(&m.id)).ok().map(|x| x.version);
     let granted = registry(&state).get(&m.id).map(|e| e.granted.clone()).unwrap_or_default();
     Ok(Inspect { new_permissions: m.permissions.iter().filter(|p| !granted.contains(p)).cloned().collect(), installed, files: files.len(), size: files.iter().map(|(_, s)| s).sum(), manifest: m })
 }
@@ -296,7 +292,7 @@ pub async fn plugin_inspect(app: AppHandle, state: State<'_, AppState>, folder: 
 #[tauri::command]
 pub async fn plugin_install(app: AppHandle, state: State<'_, AppState>, folder: String) -> CmdResult<String> {
     let folder = PathBuf::from(folder);
-    let m = read_manifest(&folder).map_err(err)?;
+    let m = Manifest::read(&folder).map_err(err)?;
     let files = files(&folder, &m).map_err(err)?;
     let target = dir(&app)?.join(&m.id);
     if folder.canonicalize().ok() == target.canonicalize().ok() {

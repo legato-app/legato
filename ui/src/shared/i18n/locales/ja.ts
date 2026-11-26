@@ -1254,7 +1254,7 @@ const ja: Record<string, string> = {
   'Allowed to:': '許可されていること：',
   'Log': 'ログ',
   'Nothing yet.': 'まだ何もありません。',
-  'The plugin’s folder (with plugin.json)': 'プラグインのフォルダー（plugin.jsonを含む）',
+  'The plugin’s folder (with legato.manifest)': 'プラグインのフォルダー（legato.manifestを含む）',
   'Plugins': 'プラグイン',
   'Install a plugin…': 'プラグインをインストール…',
   'No plugin matches.': '一致するプラグインはありません。',

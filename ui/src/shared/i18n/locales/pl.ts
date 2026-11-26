@@ -1254,7 +1254,7 @@ const pl: Record<string, string> = {
   'Allowed to:': 'Może:',
   'Log': 'Dziennik',
   'Nothing yet.': 'Jeszcze nic.',
-  'The plugin’s folder (with plugin.json)': 'Folder wtyczki (z plikiem plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Folder wtyczki (z plikiem legato.manifest)',
   'Plugins': 'Wtyczki',
   'Install a plugin…': 'Zainstaluj wtyczkę…',
   'No plugin matches.': 'Żadna wtyczka nie pasuje.',

@@ -1254,7 +1254,7 @@ const nl: Record<string, string> = {
   'Allowed to:': 'Mag:',
   'Log': 'Logboek',
   'Nothing yet.': 'Nog niets.',
-  'The plugin’s folder (with plugin.json)': 'De map van de plugin (met plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'De map van de plugin (met legato.manifest)',
   'Plugins': 'Plugins',
   'Install a plugin…': 'Een plugin installeren…',
   'No plugin matches.': 'Geen plugin gevonden.',

@@ -1254,7 +1254,7 @@ const ko: Record<string, string> = {
   'Allowed to:': '허용된 권한:',
   'Log': '로그',
   'Nothing yet.': '아직 없음.',
-  'The plugin’s folder (with plugin.json)': '플러그인 폴더 (plugin.json 포함)',
+  'The plugin’s folder (with legato.manifest)': '플러그인 폴더 (legato.manifest 포함)',
   'Plugins': '플러그인',
   'Install a plugin…': '플러그인 설치…',
   'No plugin matches.': '일치하는 플러그인이 없습니다.',

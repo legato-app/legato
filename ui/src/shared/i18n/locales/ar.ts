@@ -1219,7 +1219,7 @@ const ar: Record<string, string> = {
   'Allowed to:': 'مسموح له بـ:',
   'Log': 'السجل',
   'Nothing yet.': 'لا شيء بعد.',
-  'The plugin’s folder (with plugin.json)': 'مجلد الإضافة (مع plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'مجلد الإضافة (مع legato.manifest)',
   'Plugins': 'الإضافات',
   'Install a plugin…': 'تثبيت إضافة…',
   'No plugin matches.': 'لا توجد إضافة مطابقة.',

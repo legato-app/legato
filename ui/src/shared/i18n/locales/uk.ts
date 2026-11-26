@@ -1254,7 +1254,7 @@ const uk: Record<string, string> = {
   'Allowed to:': 'Дозволено:',
   'Log': 'Журнал',
   'Nothing yet.': 'Поки нічого.',
-  'The plugin’s folder (with plugin.json)': 'Папка плагіна (з plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Папка плагіна (з legato.manifest)',
   'Plugins': 'Плагіни',
   'Install a plugin…': 'Встановити плагін…',
   'No plugin matches.': 'Немає відповідних плагінів.',

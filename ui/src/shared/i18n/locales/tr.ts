@@ -1254,7 +1254,7 @@ const tr: Record<string, string> = {
   'Allowed to:': 'İzin verilenler:',
   'Log': 'Günlük',
   'Nothing yet.': 'Henüz bir şey yok.',
-  'The plugin’s folder (with plugin.json)': 'Eklentinin klasörü (plugin.json ile)',
+  'The plugin’s folder (with legato.manifest)': 'Eklentinin klasörü (legato.manifest ile)',
   'Plugins': 'Eklentiler',
   'Install a plugin…': 'Bir eklenti yükle…',
   'No plugin matches.': 'Eşleşen eklenti yok.',

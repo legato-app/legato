@@ -1263,7 +1263,7 @@ const fr: Record<string, string> = {
   'Allowed to:': 'Autorisé à :',
   'Log': 'Journal',
   'Nothing yet.': 'Rien pour l’instant.',
-  'The plugin’s folder (with plugin.json)': 'Le dossier du plugin (avec plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Le dossier du plugin (avec legato.manifest)',
   'Plugins': 'Plugins',
   'Install a plugin…': 'Installer un plugin…',
   'No plugin matches.': 'Aucun plugin ne correspond.',

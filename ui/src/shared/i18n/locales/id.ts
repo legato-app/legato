@@ -1254,7 +1254,7 @@ const id: Record<string, string> = {
   'Allowed to:': 'Diizinkan untuk:',
   'Log': 'Log',
   'Nothing yet.': 'Belum ada.',
-  'The plugin’s folder (with plugin.json)': 'Folder plugin (berisi plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Folder plugin (berisi legato.manifest)',
   'Plugins': 'Plugin',
   'Install a plugin…': 'Pasang plugin…',
   'No plugin matches.': 'Tidak ada plugin yang cocok.',

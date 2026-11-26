@@ -1254,7 +1254,7 @@ const zh: Record<string, string> = {
   'Allowed to:': '已允许：',
   'Log': '日志',
   'Nothing yet.': '暂无内容。',
-  'The plugin’s folder (with plugin.json)': '插件的文件夹（包含 plugin.json）',
+  'The plugin’s folder (with legato.manifest)': '插件的文件夹（包含 legato.manifest）',
   'Plugins': '插件',
   'Install a plugin…': '安装插件…',
   'No plugin matches.': '没有匹配的插件。',

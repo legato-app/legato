@@ -10,6 +10,10 @@ id: string, name: string, version: string, author: string, description: string,
  */
 api: number, 
 /**
- * Script file, next to plugin.json.
+ * Script file, next to the manifest.
  */
-main: string, permissions: Array<string>, homepage?: string | null, };
+main: string, permissions: Array<string>, homepage?: string | null, 
+/**
+ * Where the plugin's code lives.
+ */
+repository?: string | null, };

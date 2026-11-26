@@ -1219,7 +1219,7 @@ const he: Record<string, string> = {
   'Allowed to:': 'מורשה ל:',
   'Log': 'יומן',
   'Nothing yet.': 'עדיין כלום.',
-  'The plugin’s folder (with plugin.json)': 'תיקיית התוסף (עם plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'תיקיית התוסף (עם legato.manifest)',
   'Plugins': 'תוספים',
   'Install a plugin…': 'התקנת תוסף…',
   'No plugin matches.': 'אין תוסף תואם.',

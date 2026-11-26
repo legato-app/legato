@@ -1254,7 +1254,7 @@ const sv: Record<string, string> = {
   'Allowed to:': 'Får:',
   'Log': 'Logg',
   'Nothing yet.': 'Inget än.',
-  'The plugin’s folder (with plugin.json)': 'Pluginets mapp (med plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Pluginets mapp (med legato.manifest)',
   'Plugins': 'Plugins',
   'Install a plugin…': 'Installera ett plugin…',
   'No plugin matches.': 'Inget plugin matchar.',

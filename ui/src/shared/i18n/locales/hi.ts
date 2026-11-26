@@ -1254,7 +1254,7 @@ const hi: Record<string, string> = {
   'Allowed to:': 'अनुमति है:',
   'Log': 'लॉग',
   'Nothing yet.': 'अभी कुछ नहीं।',
-  'The plugin’s folder (with plugin.json)': 'प्लगइन का फ़ोल्डर (plugin.json के साथ)',
+  'The plugin’s folder (with legato.manifest)': 'प्लगइन का फ़ोल्डर (legato.manifest के साथ)',
   'Plugins': 'प्लगइन',
   'Install a plugin…': 'प्लगइन इंस्टॉल करें…',
   'No plugin matches.': 'कोई प्लगइन मेल नहीं खाता।',

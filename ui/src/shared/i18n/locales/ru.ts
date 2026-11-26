@@ -1254,7 +1254,7 @@ const ru: Record<string, string> = {
   'Allowed to:': 'Разрешено:',
   'Log': 'Журнал',
   'Nothing yet.': 'Пока ничего.',
-  'The plugin’s folder (with plugin.json)': 'Папка плагина (с plugin.json)',
+  'The plugin’s folder (with legato.manifest)': 'Папка плагина (с legato.manifest)',
   'Plugins': 'Плагины',
   'Install a plugin…': 'Установить плагин…',
   'No plugin matches.': 'Нет подходящих плагинов.',
