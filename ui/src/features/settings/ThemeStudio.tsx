@@ -9,6 +9,7 @@ import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
 import { LAYOUT_API } from '../../shared/theme/layout'
+import { askAboutLayout } from './themeLayoutImport'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 
@@ -324,8 +325,15 @@ export function ThemeStudio() {
   const [bad, setBad] = useState(false)
   const system: Theme = { ...current('system'), name: tr('System') }
   const add = (t: Theme) => {
-    update({ customThemes: [...settings.customThemes, t], theme: t.id })
+    // Read now: an import waits for the user, the list may have moved meanwhile.
+    update({ customThemes: [...useSettings.getState().settings.customThemes, t], theme: t.id })
     setEditing(t.id)
+  }
+  // A theme from outside: asked first when it rearranges the app. True: added.
+  const addImported = async (t: Theme) => {
+    const accepted = await askAboutLayout(t)
+    if (accepted) add(accepted)
+    return !!accepted
   }
   const fresh = (t: Partial<Theme>) => sanitizeTheme({ ...current(), ...t, id: undefined })
   const importFile = async () => {
@@ -334,7 +342,7 @@ export function ThemeStudio() {
     try {
       const t = sanitizeTheme({ ...((await api.importTheme(file)) as object), id: undefined })
       if (!t) throw new Error(tr('Invalid theme: all 13 colors are needed, as #RRGGBB.'))
-      add(t)
+      await addImported(t)
     } catch (e) {
       fail(e)
     }
@@ -447,9 +455,12 @@ export function ThemeStudio() {
                   theme = null
                 }
                 if (!theme) return setBad(true)
-                add(theme)
-                setPaste('')
-                setPasting(false)
+                // Canceled: the text stays.
+                void addImported(theme).then((added) => {
+                  if (!added) return
+                  setPaste('')
+                  setPasting(false)
+                })
               }}
             >
               {tr('Add')}

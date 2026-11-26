@@ -15,6 +15,8 @@ type Request = {
   ok: string
   /** The other button's words (default: Cancel). Given, it is also the default one: Enter keeps things as they are. */
   cancel?: string
+  /** A second way to say yes, between Cancel and OK. */
+  other?: string
   /** Text asked for (prompt); undefined = yes / no. */
   text?: string
   done: (answer: string | boolean | null) => void
@@ -35,6 +37,13 @@ function show(r: Omit<Request, 'done' | 'id'>): Promise<string | boolean | null>
 /** Yes / no; resolves false on Cancel, Escape or a click outside. */
 export async function ask(o: { title: string; body?: string; ok: string; cancel?: string }): Promise<boolean> {
   return (await show(o)) === true
+}
+
+/** Two ways to go on, or neither: null on Cancel, Escape or a click outside. */
+export async function askChoice(o: { title: string; body?: string; ok: string; other: string }): Promise<'ok' | 'other' | null> {
+  const answer = await show(o)
+  if (answer === true) return 'ok'
+  return answer === 'other' ? 'other' : null
 }
 
 /** One line of text; resolves null when canceled or left empty. */
@@ -75,6 +84,11 @@ function Question({ r }: { r: Request }) {
         <Button variant="ghost" data-default={r.cancel ? true : undefined} onClick={cancel}>
           {r.cancel ?? tr('Cancel')}
         </Button>
+        {r.other && (
+          <Button variant="ghost" onClick={() => end('other')}>
+            {r.other}
+          </Button>
+        )}
         <Button data-default={r.cancel ? undefined : true} onClick={ok} disabled={r.text !== undefined && !text.trim()}>
           {r.ok}
         </Button>

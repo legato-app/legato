@@ -2,6 +2,7 @@
  * A theme's arrangement of the app's shell. Data only, checked here: a layout grants nothing, it only moves the shell's
  * own parts. Pure: no window, no settings.
  */
+import { tr } from '../i18n/i18n'
 
 /** The layouts this app draws. Within a version only additions; a newer one is kept as it came and not applied. */
 export const LAYOUT_API = 1
@@ -142,6 +143,38 @@ export function layoutRegions({ regions, hidden }: Placement, playerOpen = false
     playerBarHidden,
     ...(!inPlace && { order: Object.fromEntries(column.map((block, index) => [block, index])) }),
   }
+}
+
+/** The warning's list is read at a glance. */
+const MAX_SUMMARY_LINES = 6
+
+/** What a layout changes in the app's own arrangement, one line each; none when it changes nothing here. */
+export function layoutSummary(layout: Layout | undefined): string[] {
+  const placement = resolveLayout(layout)
+  const { regions, sizes, hidden } = placement
+  const hides = (surface: Surface) => hidden.includes(surface)
+  const on = (region: Region, surface: Surface) => regions[region].includes(surface)
+  const logoMoved = !layoutRegions(placement).brandInTopbar
+  const lines = [
+    hides('topbar') && tr('No top bar: only Settings and the window’s buttons stay'),
+    hides('sidebar') ? tr('No sidebar') : on('right', 'sidebar') && tr('The sidebar on the right'),
+    hides('sidePanel') ? tr('No side panel') : on('left', 'sidePanel') && tr('The side panel on the left'),
+    hides('playerBar') ? tr('No player bar') : on('top', 'playerBar') && tr('The player bar at the top'),
+    logoMoved && on('top', 'brand') && tr('The logo elsewhere at the top'),
+    logoMoved && on('bottom', 'brand') && tr('The logo at the bottom'),
+    logoMoved && on('left', 'brand') && tr('The logo on the left'),
+    logoMoved && on('right', 'brand') && tr('The logo on the right'),
+    !!sizes.sidebar && !hides('sidebar') && tr('The sidebar {n} px wide', { n: sizes.sidebar }),
+    !!sizes.sidePanel && !hides('sidePanel') && tr('The side panel {n} px wide', { n: sizes.sidePanel }),
+  ].filter((line) => typeof line === 'string')
+  return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
+}
+
+/** The same theme, colors and CSS only. */
+export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
+  const copy = { ...theme }
+  delete copy.layout
+  return copy
 }
 
 /** The arrangement to draw for a checked layout; the app's own without one, from a newer app, or on a phone. */

@@ -716,9 +716,13 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     unchanged. 2026-11-26: done (`Brand` in `App.tsx`); never seen elsewhere than in the top bar.
     - Decided alone (2026-11-26): the logo leads the top bar when it stands just before it, and always while Now
       Playing is up (it covers the other places); elsewhere it is its own small block at its place in the region.
-  - [ ] `M` 4. The import warning: `layoutSummary`, `withoutLayout` (pure), the dialog in both import paths. Tests:
+  - [x] `M` 4. The import warning: `layoutSummary`, `withoutLayout` (pure), the dialog in both import paths. Tests:
     summary lines per difference, capped; Colours only drops `layout`; no question without a layout or with the
-    setting off. Skills: i18n.
+    setting off. Skills: i18n. 2026-11-26: done (`themeLayoutImport.ts`); the dialog and moved layouts seen in the
+    browser demo (invented data), no file imported in the app.
+    - Decided alone (2026-11-26): "Paste a theme" asks too; a dropped file keeps its first question ("Use the theme?")
+      before this one; asked on the phone too (the theme syncs to a PC); the dialog names Settings (Ctrl+,) only, not
+      right-click › Default layout, which slice 5 adds (its words to extend then); six changes listed, then "And more".
   - [ ] `S` 5. Ways back: "Default layout" in the fallback menu; a throwing region or part drops the layout + toast.
     Tests: the entry only while a layout is on; the boundary drops it. Skills: i18n.
   - [ ] `M` 6. The bars' parts: player bar, top bar, sidebar (order, hidden, each hidden part still in More). Tests:

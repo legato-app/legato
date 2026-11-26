@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LAYOUT, layoutRegions, resolveLayout, sanitizeLayout } from './layout'
+import { DEFAULT_LAYOUT, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -48,6 +48,36 @@ describe('layoutRegions', () => {
     expect(draw({ v: 1, regions: { top: ['playerBar'] } }).order).toEqual({ topbar: 0, playerBar: 1, main: 2 })
     expect(draw({ v: 1, regions: { right: ['sidebar'] } }).order).toBeUndefined()
     expect(draw({ v: 1, regions: { top: ['playerBar'] }, hidden: ['playerBar'] }).order).toBeUndefined()
+  })
+})
+
+describe('layoutSummary', () => {
+  const summary = (raw: unknown) => layoutSummary(sanitizeLayout(raw) ?? undefined)
+
+  it('says nothing for a layout that changes nothing here', () => {
+    expect(layoutSummary(undefined)).toEqual([])
+    expect(summary({ v: 1, regions: { top: ['brand', 'topbar'], left: ['sidebar'] }, hidden: ['brand'] })).toEqual([])
+    expect(summary({ v: 2, hidden: ['sidebar'] })).toEqual([])
+  })
+
+  it('says each difference on its own line', () => {
+    expect(summary({ v: 1, regions: { right: ['sidebar'] } })).toEqual(['The sidebar on the right'])
+    expect(summary({ v: 1, regions: { left: ['sidePanel'], top: ['playerBar'], bottom: ['brand'] } })).toEqual(['The side panel on the left', 'The player bar at the top', 'The logo at the bottom'])
+    expect(summary({ v: 1, hidden: ['topbar', 'sidePanel', 'playerBar'] })).toEqual(['No top bar: only Settings and the window’s buttons stay', 'No side panel', 'No player bar'])
+    expect(summary({ v: 1, sizes: { sidebar: 300, sidePanel: 360 } })).toEqual(['The sidebar 300 px wide', 'The side panel 360 px wide'])
+    expect(summary({ v: 1, regions: { top: ['topbar', 'brand'] } })).toEqual(['The logo elsewhere at the top'])
+  })
+
+  it('stops at six lines', () => {
+    const lines = summary({ v: 1, regions: { right: ['sidebar'], left: ['sidePanel', 'brand'], top: ['topbar', 'playerBar'] }, sizes: { sidebar: 300, sidePanel: 360 }, hidden: ['topbar'] })
+    expect(lines).toHaveLength(7)
+    expect(lines.at(-1)).toBe('And more')
+  })
+
+  it('takes a layout off a theme, nothing else', () => {
+    const theme: { name: string; layout?: Layout } = { name: 'Night', layout: { v: 1, hidden: ['sidebar'] } }
+    expect(withoutLayout(theme)).toEqual({ name: 'Night' })
+    expect(theme.layout).toBeDefined()
   })
 })
 
