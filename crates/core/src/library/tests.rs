@@ -1598,10 +1598,10 @@ fn spotify_covers_are_never_kept_and_old_ones_leave_once() {
     assert_eq!(arts()["New"], None);
     // Kept by an older version.
     lib.db.execute("UPDATE tracks SET art = 'https://image-cdn-ak.spotifycdn.com/image/b' WHERE title IN ('Video', 'Bare')", []).unwrap();
-    assert_eq!(lib.drop_spotify_art().unwrap(), 2);
+    assert_eq!(lib.drop_spotify_art().unwrap(), vec!["https://image-cdn-ak.spotifycdn.com/image/b"; 2]);
     assert_eq!(arts()["Video"].as_deref(), Some("https://i.ytimg.com/vi/Video/hqdefault.jpg"));
     assert_eq!((arts()["Bare"].clone(), arts()["Other"].as_deref()), (None, Some("https://a.mzstatic.com/x")));
-    assert_eq!(lib.drop_spotify_art().unwrap(), 0);
+    assert!(lib.drop_spotify_art().unwrap().is_empty());
 }
 
 #[test]

@@ -1197,6 +1197,7 @@ const tr: Record<string, string> = {
   'Imported from Spotify': 'Spotify’dan içe aktarıldı',
   'Open Spotify': 'Spotify’ı aç',
   'This PC is also signed out of Spotify’s page.': 'Bu bilgisayarda Spotify sayfasındaki oturum da kapatılır.',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Bu bilgisayarda kaldırılır; Spotify’a hâlâ bağlı bir bilgisayar onları geri getirir.',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

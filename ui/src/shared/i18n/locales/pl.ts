@@ -1197,6 +1197,7 @@ const pl: Record<string, string> = {
   'Imported from Spotify': 'Zaimportowana ze Spotify',
   'Open Spotify': 'Otwórz Spotify',
   'This PC is also signed out of Spotify’s page.': 'Ten komputer zostaje też wylogowany ze strony Spotify.',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Znikają na tym komputerze; komputer nadal połączony ze Spotify przywróci je.',
   'See the play queue': 'Podgląd kolejki odtwarzania',
   'Read your listening history': 'Odczyt historii słuchania',
   'Sees what you listened to and when': 'Widzi, czego i kiedy słuchasz',

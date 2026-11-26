@@ -1197,6 +1197,7 @@ const ko: Record<string, string> = {
   'Imported from Spotify': 'Spotify에서 가져옴',
   'Open Spotify': 'Spotify 열기',
   'This PC is also signed out of Spotify’s page.': '이 PC는 Spotify 페이지에서도 로그아웃됩니다.',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': '이 PC에서 삭제됩니다. Spotify에 아직 연결된 PC가 있으면 다시 가져옵니다.',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

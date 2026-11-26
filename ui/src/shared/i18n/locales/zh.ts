@@ -1197,6 +1197,7 @@ const zh: Record<string, string> = {
   'Imported from Spotify': '从 Spotify 导入',
   'Open Spotify': '打开 Spotify',
   'This PC is also signed out of Spotify’s page.': '此电脑也会退出 Spotify 网页的登录。',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': '它们会从此电脑移除；仍连接着 Spotify 的电脑会把它们带回来。',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

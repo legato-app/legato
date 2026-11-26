@@ -109,7 +109,7 @@ function ServiceRow({ service }: { service: 'spotify' }) {
     // The PC's only: a phone has no Spotify page signed in.
     const signedOut = phoneApp ? '' : tr('This PC is also signed out of Spotify’s page.')
     if (!raw.playlists.some((playlist) => playlist.source === service)) return void (signedOut && useStore.getState().notify(signedOut, { kind: 'info' }))
-    if (!(await ask({ title: tr('Also remove the playlists imported from Spotify?'), body: [tr('The songs stay in your library.'), signedOut].join('\n'), ok: tr('Remove'), cancel: tr('Keep') }))) return
+    if (!(await ask({ title: tr('Also remove the playlists imported from Spotify?'), body: [tr('The songs stay in your library.'), tr('They’re removed on this PC; a PC still connected to Spotify brings them back.'), signedOut].join('\n'), ok: tr('Remove'), cancel: tr('Keep') }))) return
     await api.removeSpotifyPlaylists().then(refresh, (e: unknown) => useStore.setState({ error: String(e) }))
   }
   return (

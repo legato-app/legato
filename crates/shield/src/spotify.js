@@ -11,16 +11,11 @@
   const pause = () => sleep(350 + Math.random() * 350)
   const ROW = '[data-testid="tracklist-row"]'
   const TRACK = /\/track\/([A-Za-z0-9]{22})/
-  const COVER = /^https:\/\/(i\.scdn\.co|mosaic\.scdn\.co|[a-z0-9-]+\.spotifycdn\.com)\//
   const MAX_SONGS = 3000
   const MAX_LISTS = 500
   const BATCH = 40
 
   const text = (el) => (el?.textContent ?? '').trim()
-  const cover = (root) => {
-    const src = root?.querySelector('img')?.src ?? ''
-    return COVER.test(src) ? src : undefined
-  }
 
   // Nearest ancestor that really scrolls.
   const scrollerOf = (el) => {
@@ -51,7 +46,7 @@
     const id = link?.getAttribute('href')?.match(TRACK)?.[1]
     if (!id) return null
     const artists = [...new Set([...row.querySelectorAll('a[href*="/artist/"]')].map(text).filter(Boolean))]
-    return { id, title: text(link), artists, album: text(row.querySelector('a[href*="/album/"]')) || undefined, ms: duration(row), art: cover(row) }
+    return { id, title: text(link), artists, album: text(row.querySelector('a[href*="/album/"]')) || undefined, ms: duration(row) }
   }
 
   // The list's own grid: a playlist's page has others under it (Recommended).
@@ -104,7 +99,7 @@
       const before = seen.size
       for (const title of document.querySelectorAll(TITLE)) {
         const id = title.id.split(':').pop()
-        if (!seen.has(id)) seen.set(id, { id, name: text(title), cover: cover(title.closest('[role="row"]')) })
+        if (!seen.has(id)) seen.set(id, { id, name: text(title) })
       }
       const end = box.scrollTop + box.clientHeight >= box.scrollHeight - 4
       still = seen.size > before || !end ? 0 : still + 1

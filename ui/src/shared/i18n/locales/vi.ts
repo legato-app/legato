@@ -1197,6 +1197,7 @@ const vi: Record<string, string> = {
   'Imported from Spotify': 'Nhập từ Spotify',
   'Open Spotify': 'Mở Spotify',
   'This PC is also signed out of Spotify’s page.': 'PC này cũng được đăng xuất khỏi trang của Spotify.',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Chúng bị xóa trên PC này; một PC vẫn kết nối với Spotify sẽ mang chúng trở lại.',
   'See the play queue': 'Xem hàng chờ phát',
   'Read your listening history': 'Đọc lịch sử nghe của bạn',
   'Sees what you listened to and when': 'Thấy bạn đã nghe gì và khi nào',

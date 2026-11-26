@@ -38,7 +38,10 @@ pub async fn disconnect(app: tauri::AppHandle, state: State<'_, AppState>, sourc
     state.cache.status.clear();
     state.connector(source).map_or(Ok(()), |c| c.disconnect()).map_err(err)?;
     if source == Source::Spotify {
-        crate::spotify_web::sign_out(&app).map_err(err)?;
+        // The account is disconnected whatever happens to the page's cookies.
+        if let Err(e) = crate::spotify_web::sign_out(&app) {
+            diag::warn("spotify", "the sign-out of Spotify's page failed", &e.to_string());
+        }
     }
     Ok(())
 }

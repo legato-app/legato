@@ -1162,6 +1162,7 @@ const he: Record<string, string> = {
   'Imported from Spotify': 'יובא מ-Spotify',
   'Open Spotify': 'פתיחת Spotify',
   'This PC is also signed out of Spotify’s page.': 'המחשב הזה גם מנותק מדף Spotify.',
+  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'הם יוסרו במחשב הזה; מחשב שעדיין מחובר ל-Spotify יחזיר אותם.',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

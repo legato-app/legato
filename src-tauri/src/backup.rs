@@ -27,8 +27,12 @@ pub fn drop_spotify_art(app: &AppHandle) {
     let Some(state) = app.try_state::<AppState>() else { return };
     let changed = state.lib().drop_spotify_art();
     match changed {
-        Ok(0) => {}
-        Ok(_) => {
+        Ok(dropped) if dropped.is_empty() => {}
+        Ok(dropped) => {
+            // Their pictures leave the cover cache too.
+            for url in &dropped {
+                state.art.forget(url);
+            }
             let _ = app.emit_to("main", "local-changed", 0);
         }
         Err(e) => crate::diag::warn("library", "old Spotify covers not removed", &format!("{e:#}")),

@@ -233,6 +233,15 @@ impl ArtCache {
         self.prune_later();
     }
 
+    /// One address's picture and its thumbnails leave the folder.
+    pub fn forget(&self, url: &str) {
+        let name = key(url);
+        let thumbnails = music_core::artcache::SIZES.iter().map(|size| music_core::artcache::file_name(&name, Some(*size)));
+        for file in thumbnails.chain([name.clone()]) {
+            let _ = std::fs::remove_file(self.dir.join(file));
+        }
+    }
+
     /// Empties the folder (everything here downloads again). Bytes freed.
     pub fn clear(&self) -> u64 {
         let freed = music_core::artcache::clear(&self.dir);
@@ -652,5 +661,18 @@ mod tests {
     async fn futures_join(cache: &ArtCache, url: &str) -> Vec<Option<Arc<Image>>> {
         let (a, b, c) = tokio::join!(cache.shared(url, None), cache.shared(url, None), cache.shared(url, None));
         vec![a, b, c]
+    }
+
+    #[test]
+    fn a_forgotten_address_leaves_the_folder_with_its_thumbnails() {
+        let dir = tempfile::tempdir().unwrap();
+        let cache = ArtCache::new(dir.path().to_path_buf(), 1 << 20);
+        let (gone, kept) = ("https://i.scdn.co/image/a", "https://i.ytimg.com/vi/b/hqdefault.jpg");
+        let files = |url: &str| [None, Some(music_core::artcache::SIZES[0])].map(|size| dir.path().join(music_core::artcache::file_name(&key(url), size)));
+        for file in files(gone).iter().chain(&files(kept)) {
+            std::fs::write(file, b"picture").unwrap();
+        }
+        cache.forget(gone);
+        assert!(files(gone).iter().all(|file| !file.exists()) && files(kept).iter().all(|file| file.exists()));
     }
 }

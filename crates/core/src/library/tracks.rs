@@ -126,11 +126,11 @@ impl Library {
     }
 
     /// Once: the Spotify covers older versions kept leave. A song with a YouTube link takes its video's frame, the
-    /// others none until a source gives one. Returns the songs changed.
-    pub fn drop_spotify_art(&self) -> Result<usize> {
+    /// others none until a source gives one. Returns the addresses dropped, one per song changed.
+    pub fn drop_spotify_art(&self) -> Result<Vec<String>> {
         const DONE: &str = "spotifyArt1";
         if self.setting(DONE)?.is_some() {
-            return Ok(0);
+            return Ok(Vec::new());
         }
         self.tx(|| {
             let mut stmt = self.db.prepare(
@@ -138,14 +138,15 @@ impl Library {
                  FROM tracks t WHERE t.art LIKE '%scdn.co/%' OR t.art LIKE '%.spotifycdn.com/%'",
             )?;
             let rows: Vec<(i64, String, Option<String>)> = stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?.collect::<rusqlite::Result<_>>()?;
-            let mut changed = 0;
+            let mut dropped = Vec::new();
             for (id, art, video) in rows {
                 if crate::model::spotify_art(&art) {
-                    changed += self.db.execute("UPDATE tracks SET art = ?1 WHERE id = ?2", params![video.as_deref().map(crate::model::youtube_art), id])?;
+                    self.db.execute("UPDATE tracks SET art = ?1 WHERE id = ?2", params![video.as_deref().map(crate::model::youtube_art), id])?;
+                    dropped.push(art);
                 }
             }
             self.set_setting(DONE, &serde_json::json!(true))?;
-            Ok(changed)
+            Ok(dropped)
         })
     }
 
