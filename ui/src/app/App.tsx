@@ -365,6 +365,8 @@ export function App() {
     if (surface === 'topbar') return <TopBar key={surface} brand={shell.brandInTopbar} bare={shell.topbarBare} order={shell.order?.topbar} />
     return surface === 'brand' && <Brand key={surface} className="mx-4 my-1 shrink-0 self-start" order={shell.order?.brand} />
   }
+  // The columns keep off the window's edge when no bar is under them.
+  const nothingUnder = !shell.regions.bottom.some((surface) => surface !== 'playerBar' || !shell.playerBarHidden)
   const column = (surface: Surface, side: 'left' | 'right') => {
     if (surface === 'sidebar') return <Sidebar key={surface} side={side} fixedWidth={placement.sizes.sidebar} />
     return surface === 'brand' ? <Brand key={surface} className="shrink-0 self-start" /> : <SidePanel key={surface} width={placement.sizes.sidePanel} />
@@ -375,7 +377,7 @@ export function App() {
     // Layered panels on the window's background (docs/design.md): sidebar, page, right panel; the player bar below.
     <div className="flex h-full flex-col bg-recess transition-colors duration-700" style={appTint}>
       {shell.regions.top.map(bar)}
-      <div className="flex min-h-0 flex-1 gap-2 px-2 phone:px-0" style={{ order: shell.order?.main }}>
+      <div className={`flex min-h-0 flex-1 gap-2 px-2 phone:px-0 ${nothingUnder ? 'pb-2' : ''}`} style={{ order: shell.order?.main }}>
         {shell.regions.left.map((surface) => column(surface, 'left'))}
         {/* Your library open wide takes the page's place (kept, hidden: it comes back as it was). */}
         <main className={`flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-bg phone:rounded-none ${libraryWide && sidebarShown ? 'hidden' : ''}`}>
