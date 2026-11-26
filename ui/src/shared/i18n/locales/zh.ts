@@ -1194,6 +1194,8 @@ const zh: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': '同时移除从 Spotify 导入的歌单？',
   'Keep': '保留',
   'Songs imported from Spotify aren’t used': '不使用从 Spotify 导入的歌曲',
+  'Imported from Spotify': '从 Spotify 导入',
+  'Open Spotify': '打开 Spotify',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

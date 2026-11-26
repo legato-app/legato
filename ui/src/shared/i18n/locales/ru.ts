@@ -1194,6 +1194,8 @@ const ru: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Удалить и плейлисты, импортированные из Spotify?',
   'Keep': 'Оставить',
   'Songs imported from Spotify aren’t used': 'Треки, импортированные из Spotify, не используются',
+  'Imported from Spotify': 'Импортировано из Spotify',
+  'Open Spotify': 'Открыть Spotify',
   'See the play queue': 'Видеть очередь воспроизведения',
   'Read your listening history': 'Читать историю прослушивания',
   'Sees what you listened to and when': 'Видит, что и когда вы слушали',

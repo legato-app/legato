@@ -1194,6 +1194,8 @@ const pl: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Usunąć też playlisty zaimportowane ze Spotify?',
   'Keep': 'Zachowaj',
   'Songs imported from Spotify aren’t used': 'Utwory zaimportowane ze Spotify nie są używane',
+  'Imported from Spotify': 'Zaimportowana ze Spotify',
+  'Open Spotify': 'Otwórz Spotify',
   'See the play queue': 'Podgląd kolejki odtwarzania',
   'Read your listening history': 'Odczyt historii słuchania',
   'Sees what you listened to and when': 'Widzi, czego i kiedy słuchasz',

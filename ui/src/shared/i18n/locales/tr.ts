@@ -1194,6 +1194,8 @@ const tr: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Spotify’dan içe aktarılan çalma listeleri de kaldırılsın mı?',
   'Keep': 'Koru',
   'Songs imported from Spotify aren’t used': 'Spotify’dan içe aktarılan şarkılar kullanılmaz',
+  'Imported from Spotify': 'Spotify’dan içe aktarıldı',
+  'Open Spotify': 'Spotify’ı aç',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

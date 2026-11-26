@@ -1194,6 +1194,8 @@ const hi: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'क्या Spotify से इंपोर्ट की गई प्लेलिस्ट भी हटाएँ?',
   'Keep': 'रखें',
   'Songs imported from Spotify aren’t used': 'Spotify से इंपोर्ट किए गए गाने इस्तेमाल नहीं होते',
+  'Imported from Spotify': 'Spotify से इंपोर्ट की गई',
+  'Open Spotify': 'Spotify खोलें',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

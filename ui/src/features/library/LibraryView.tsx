@@ -17,6 +17,7 @@ import { holdLayer } from '../../shared/ui/layers'
 import { Cover } from '../../shared/ui/Cover'
 import { playlistMenu, shufflePlay, tracksMenu } from '../menus'
 import { PageHeader } from '../../shared/ui/PageHeader'
+import { SpotifyAttribution } from './SpotifyAttribution'
 import { sourceLabel } from '../../shared/ui/SourceIcon'
 import { startAutoDj } from '../player/autoDj'
 import { isFull, vias } from '../player/sources'
@@ -389,7 +390,12 @@ export function PlaylistView({ id }: { id: number }) {
         }
         kicker={playlist.custom ? tr('Your playlist') : tr('Playlist · {source} · imported', { source: tr(sourceLabel[playlist.source]) })}
         title={playlist.custom ? <EditableTitle key={playlist.name} id={id} name={playlist.name} /> : playlist.name}
-        sub={`${trn(playlist.trackCount, '{n} song', '{n} songs')} · ${totalTime(playlistTracks)}`}
+        sub={
+          <>
+            {`${trn(playlist.trackCount, '{n} song', '{n} songs')} · ${totalTime(playlistTracks)}`}
+            {playlist.source === 'spotify' && !playlist.custom && <SpotifyAttribution sourceId={playlist.sourceId} />}
+          </>
+        }
         actions={
           <>
             <PlayAll tracks={shown} />

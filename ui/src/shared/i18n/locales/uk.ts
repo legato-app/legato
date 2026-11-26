@@ -1194,6 +1194,8 @@ const uk: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Видалити також плейлисти, імпортовані зі Spotify?',
   'Keep': 'Залишити',
   'Songs imported from Spotify aren’t used': 'Треки, імпортовані зі Spotify, не використовуються',
+  'Imported from Spotify': 'Імпортовано зі Spotify',
+  'Open Spotify': 'Відкрити Spotify',
   'See the play queue': 'Бачити чергу відтворення',
   'Read your listening history': 'Читати історію прослуховування',
   'Sees what you listened to and when': 'Бачить, що й коли ви слухали',

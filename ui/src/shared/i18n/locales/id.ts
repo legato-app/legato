@@ -1194,6 +1194,8 @@ const id: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Hapus juga playlist yang diimpor dari Spotify?',
   'Keep': 'Simpan',
   'Songs imported from Spotify aren’t used': 'Lagu yang diimpor dari Spotify tidak dipakai',
+  'Imported from Spotify': 'Diimpor dari Spotify',
+  'Open Spotify': 'Buka Spotify',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',

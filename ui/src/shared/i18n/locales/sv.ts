@@ -1194,6 +1194,8 @@ const sv: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Ta också bort spellistorna som importerats från Spotify?',
   'Keep': 'Behåll',
   'Songs imported from Spotify aren’t used': 'Låtar som importerats från Spotify används inte',
+  'Imported from Spotify': 'Importerad från Spotify',
+  'Open Spotify': 'Öppna Spotify',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

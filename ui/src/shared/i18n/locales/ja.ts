@@ -1194,6 +1194,8 @@ const ja: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'Spotify から読み込んだプレイリストも削除しますか？',
   'Keep': '残す',
   'Songs imported from Spotify aren’t used': 'Spotify から読み込んだ曲は使いません',
+  'Imported from Spotify': 'Spotify から読み込み',
+  'Open Spotify': 'Spotify を開く',
   'See the play queue': '再生キューを見る',
   'Read your listening history': '再生履歴を読む',
   'Sees what you listened to and when': '何をいつ聴いたかが分かります',

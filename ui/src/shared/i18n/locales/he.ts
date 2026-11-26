@@ -1159,6 +1159,8 @@ const he: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'להסיר גם את הפלייליסטים שיובאו מ-Spotify?',
   'Keep': 'להשאיר',
   'Songs imported from Spotify aren’t used': 'שירים שיובאו מ-Spotify לא נכללים',
+  'Imported from Spotify': 'יובא מ-Spotify',
+  'Open Spotify': 'פתיחת Spotify',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

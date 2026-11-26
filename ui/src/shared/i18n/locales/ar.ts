@@ -1159,6 +1159,8 @@ const ar: Record<string, string> = {
   'Also remove the playlists imported from Spotify?': 'هل تريد أيضًا إزالة قوائم التشغيل المستوردة من Spotify؟',
   'Keep': 'إبقاء',
   'Songs imported from Spotify aren’t used': 'لا تُستخدم الأغاني المستوردة من Spotify',
+  'Imported from Spotify': 'مستوردة من Spotify',
+  'Open Spotify': 'فتح Spotify',
   'See the play queue': 'رؤية قائمة التشغيل',
   'Read your listening history': 'قراءة سجل استماعك',
   'Sees what you listened to and when': 'يرى ما استمعت إليه ومتى',
