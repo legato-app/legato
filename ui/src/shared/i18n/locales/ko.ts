@@ -1952,6 +1952,7 @@ const ko: Record<string, string> = {
   'Google sign-in': 'Google 로그인',
   'Scrobbling': '스크로블링',
   'Ad and tracker lists': '광고 및 추적기 목록',
+  'Listening rooms': '감상 방',
   'Other': '기타',
   'The app': '앱',
   'App windows': '앱 창',

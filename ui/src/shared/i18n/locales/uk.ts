@@ -1952,6 +1952,7 @@ const uk: Record<string, string> = {
   'Google sign-in': 'Вхід у Google',
   'Scrobbling': 'Скроблінг',
   'Ad and tracker lists': 'Списки реклами й трекерів',
+  'Listening rooms': 'Кімнати прослуховування',
   'Other': 'Інше',
   'The app': 'Застосунок',
   'App windows': 'Вікна застосунку',

@@ -1952,6 +1952,7 @@ const ru: Record<string, string> = {
   'Google sign-in': 'Вход в Google',
   'Scrobbling': 'Скробблинг',
   'Ad and tracker lists': 'Списки рекламы и трекеров',
+  'Listening rooms': 'Комнаты прослушивания',
   'Other': 'Другое',
   'The app': 'Приложение',
   'App windows': 'Окна приложения',

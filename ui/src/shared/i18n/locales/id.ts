@@ -1952,6 +1952,7 @@ const id: Record<string, string> = {
   'Google sign-in': 'Masuk dengan Google',
   'Scrobbling': 'Scrobbling',
   'Ad and tracker lists': 'Daftar iklan dan pelacak',
+  'Listening rooms': 'Ruang dengar',
   'Other': 'Lainnya',
   'The app': 'Aplikasi',
   'App windows': 'Jendela aplikasi',

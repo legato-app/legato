@@ -1952,6 +1952,7 @@ const sv: Record<string, string> = {
   'Google sign-in': 'Google-inloggning',
   'Scrobbling': 'Scrobbling',
   'Ad and tracker lists': 'Listor över annonser och spårare',
+  'Listening rooms': 'Lyssningsrum',
   'Other': 'Övrigt',
   'The app': 'Appen',
   'App windows': 'Appens fönster',

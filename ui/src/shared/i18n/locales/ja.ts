@@ -1952,6 +1952,7 @@ const ja: Record<string, string> = {
   'Google sign-in': 'Google ログイン',
   'Scrobbling': 'Scrobble',
   'Ad and tracker lists': '広告・トラッカーのリスト',
+  'Listening rooms': 'リスニングルーム',
   'Other': 'その他',
   'The app': 'アプリ',
   'App windows': 'アプリのウィンドウ',

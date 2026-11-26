@@ -1952,6 +1952,7 @@ const vi: Record<string, string> = {
   'Google sign-in': 'Đăng nhập Google',
   'Scrobbling': 'Scrobble',
   'Ad and tracker lists': 'Danh sách quảng cáo và trình theo dõi',
+  'Listening rooms': 'Phòng nghe nhạc',
   'Other': 'Khác',
   'The app': 'Ứng dụng',
   'App windows': 'Cửa sổ ứng dụng',

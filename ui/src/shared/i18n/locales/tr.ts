@@ -1952,6 +1952,7 @@ const tr: Record<string, string> = {
   'Google sign-in': 'Google ile oturum açma',
   'Scrobbling': 'Scrobbling',
   'Ad and tracker lists': 'Reklam ve izleyici listeleri',
+  'Listening rooms': 'Dinleme odaları',
   'Other': 'Diğer',
   'The app': 'Uygulama',
   'App windows': 'Uygulama pencereleri',

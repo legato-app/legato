@@ -70,9 +70,10 @@ Reactions are a fixed set of six (heart, fire, laugh, clap, party, wow); no free
   queue and play-now say "You follow the room: the host picks the songs", with Leave. A song that ends waits for the
   host instead of playing the listener's own Up next.
 
-## Over the internet (being built, plan-v2 line 17)
+## Over the internet (plan-v2 line 17; never tried across two networks)
 
-Not in the interface yet. The listener and the host meet once through public Nostr relays (relay.damus.io, nos.lol), then
+Desktop only: the host presses Invite over the internet and sends the link (`legato://room?c=…&r=…`, no address), the
+guest pastes or opens it, then Join. The listener and the host meet once through public Nostr relays (relay.damus.io, nos.lol), then
 talk directly over a WebRTC data channel (`str0m`, in Rust: never the WebView's), each side's public address learned from
 Cloudflare's STUN; no TURN, so two strict NATs can't meet. Inside the channel the room's own wire runs unchanged (the
 version, SPAKE2 on the code, sealed frames, tries counted).
@@ -96,7 +97,8 @@ version, SPAKE2 on the code, sealed frames, tries counted).
 What leaves the host, to the devices in the room only, sealed: the song (title, artist, album, length, ISRC, YouTube
 and Spotify ids, an https cover address), its position, Up next's first 3, the device names in the room, reactions.
 On mDNS, in clear, to the network: the room's id, the host device's name, how many listen, full or not. Never a file
-path, an account, a token or sound. The website's privacy row "Listening rooms" says the same; change both together.
+path, an account, a token or sound. Over the internet, the relays and Cloudflare see what is listed above, and the two
+sides see each other's IP address. The website's privacy row "Listening rooms" says the same; change both together.
 
 ## Tests
 

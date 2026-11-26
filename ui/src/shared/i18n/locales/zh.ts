@@ -1952,6 +1952,7 @@ const zh: Record<string, string> = {
   'Google sign-in': 'Google 登录',
   'Scrobbling': '听歌记录同步',
   'Ad and tracker lists': '广告与跟踪器列表',
+  'Listening rooms': '一起听房间',
   'Other': '其他',
   'The app': '应用本身',
   'App windows': '应用窗口',

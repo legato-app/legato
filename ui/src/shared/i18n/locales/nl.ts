@@ -1952,6 +1952,7 @@ const nl: Record<string, string> = {
   'Google sign-in': 'Inloggen bij Google',
   'Scrobbling': 'Scrobbelen',
   'Ad and tracker lists': 'Advertentie- en trackerlijsten',
+  'Listening rooms': 'Luisterkamers',
   'Other': 'Overig',
   'The app': 'De app',
   'App windows': 'App-vensters',

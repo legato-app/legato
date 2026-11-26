@@ -41,6 +41,7 @@ pub enum Why {
     Discord,
     Updates,
     AdLists,
+    ListeningRooms,
     Plugin,
     Other,
 }
@@ -99,6 +100,10 @@ const WHY: &[(&str, Why)] = &[
     ("github.com", Why::Updates),
     ("githubusercontent.com", Why::Updates),
     ("easylist.to", Why::AdLists),
+    // Rooms over the internet: the two relays and Cloudflare's STUN, no other host of theirs.
+    ("relay.damus.io", Why::ListeningRooms),
+    ("nos.lol", Why::ListeningRooms),
+    ("stun.cloudflare.com", Why::ListeningRooms),
 ];
 
 /// Most hosts kept a day: past it, new ones aren't (a page can't fill memory).
@@ -211,6 +216,9 @@ mod tests {
     #[test]
     fn hosts_say_why() {
         assert_eq!(why("music.youtube.com", Via::App), Why::YouTube);
+        for host in ["relay.damus.io", "nos.lol", "stun.cloudflare.com"] {
+            assert_eq!(why(host, Via::App), Why::ListeningRooms, "{host}");
+        }
         assert_eq!(why("accounts.google.com", Via::Window), Why::GoogleSignIn);
         assert_eq!(why("i.ytimg.com", Via::App), Why::Covers);
         assert_eq!(why("rr3---sn-4g5e.googlevideo.com", Via::Window), Why::YouTube);

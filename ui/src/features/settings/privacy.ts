@@ -18,6 +18,7 @@ export const WHY_LABELS: Record<Why, string> = {
   discord: 'Discord',
   updates: msg('Updates'),
   adLists: msg('Ad and tracker lists'),
+  listeningRooms: msg('Listening rooms'),
   plugin: msg('Plugins'),
   other: msg('Other'),
 }

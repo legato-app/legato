@@ -1892,6 +1892,7 @@ const ar: Record<string, string> = {
   'Google sign-in': 'تسجيل الدخول إلى Google',
   'Scrobbling': 'Scrobbling',
   'Ad and tracker lists': 'قوائم الإعلانات والمتتبعات',
+  'Listening rooms': 'غرف الاستماع',
   'Other': 'أخرى',
   'The app': 'التطبيق',
   'App windows': 'نوافذ التطبيق',
