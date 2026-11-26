@@ -206,6 +206,28 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
             Ok(Value::Null)
         }
         "discord.status" => Ok(json!(state.discord.status())),
+        "library.search" => {
+            let query = a["query"].as_str().unwrap_or_default().trim().to_lowercase();
+            if query.is_empty() {
+                return Ok(json!([]));
+            }
+            let limit = a["limit"].as_u64().unwrap_or(100).min(100) as usize;
+            let tracks = state.lib().tracks().map_err(err)?;
+            let matches = |t: &&music_core::library::LibraryTrack| [Some(&t.track.title), Some(&t.track.artist), t.track.album.as_ref()].into_iter().flatten().any(|text| text.to_lowercase().contains(&query));
+            Ok(json!(tracks.iter().filter(matches).take(limit).map(track_json).collect::<Vec<_>>()))
+        }
+        "history.recent" => {
+            let limit = a["limit"].as_u64().unwrap_or(100).clamp(1, 500) as u32;
+            let lib = state.lib();
+            let plays = lib.plays_before(a["before"].as_i64(), limit).map_err(err)?;
+            let songs: HashMap<i64, music_core::library::LibraryTrack> = lib.tracks().map_err(err)?.into_iter().map(|t| (t.id, t)).collect();
+            // Plays of songs gone from the library are left out.
+            let listened = plays.iter().filter_map(|play| {
+                let song = &songs.get(&play.track_id)?.track;
+                Some(json!({ "trackId": play.track_id, "title": song.title, "artist": song.artist, "startedAt": play.started_at, "listenedMs": play.listened_ms, "completed": play.completed }))
+            });
+            Ok(json!(listened.collect::<Vec<_>>()))
+        }
         "net.fetch" => {
             let req: Request = serde_json::from_value(a.clone()).map_err(|_| "net.fetch: bad request".to_string())?;
             let r = app.state::<Plugins>().gateway.fetch(&req).await.map(|r| json!(r)).map_err(|e| e.to_string());
@@ -222,7 +244,7 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
 /// A song as plugins see it: no local file path.
 fn track_json(t: &music_core::library::LibraryTrack) -> Value {
     let sources: Vec<&str> = t.track.ids.keys().map(|s| s.as_str()).collect();
-    json!({ "id": t.id, "title": t.track.title, "artist": t.track.artist, "album": t.track.album, "durationMs": t.track.duration_ms, "sources": sources })
+    json!({ "id": t.id, "title": t.track.title, "artist": t.track.artist, "album": t.track.album, "durationMs": t.track.duration_ms, "sources": sources, "art": music_core::model::web_art(t.track.art.as_deref()) })
 }
 
 fn start(app: &AppHandle, id: &str, granted: &[String]) -> CmdResult<()> {

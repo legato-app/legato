@@ -128,6 +128,8 @@ pub const METHODS: &[(&str, Option<&str>, Route)] = &[
     ("library.tracks", Some("library:read"), Route::Shell),
     ("library.playlists", Some("library:read"), Route::Shell),
     ("library.playlist", Some("library:read"), Route::Shell),
+    ("library.search", Some("library:read"), Route::Shell),
+    ("history.recent", Some("history:read"), Route::Shell),
     ("playlists.create", Some("library:write"), Route::Ui),
     ("playlists.add", Some("library:write"), Route::Ui),
     ("ui.notify", Some("ui"), Route::Ui),

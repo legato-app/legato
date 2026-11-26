@@ -68,6 +68,22 @@ pub fn pick_art(a: Option<String>, b: Option<String>) -> Option<String> {
     }
 }
 
+/// A cover others may be handed (plugins): a web address only, never a file path or the app's own `art:` links.
+pub fn web_art(art: Option<&str>) -> Option<&str> {
+    art.filter(|art| art.starts_with("https://") && art.len() <= 1000)
+}
+
+#[cfg(test)]
+mod web_art_tests {
+    #[test]
+    fn only_https_covers_go_out() {
+        assert_eq!(super::web_art(Some("https://example.com/a.jpg")), Some("https://example.com/a.jpg"));
+        for kept in [Some("C:/Music/cover.jpg"), Some("art://local/1"), Some("http://example.com/a.jpg"), None] {
+            assert_eq!(super::web_art(kept), None);
+        }
+    }
+}
+
 /// Art for a bare YouTube video (no network).
 pub fn youtube_art(video_id: &str) -> String {
     format!("https://i.ytimg.com/vi/{video_id}/hqdefault.jpg")

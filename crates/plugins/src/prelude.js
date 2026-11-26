@@ -106,6 +106,7 @@
       tracks: () => call('library.tracks'),
       playlists: () => call('library.playlists'),
       playlist: (id) => call('library.playlist', { id }),
+      search: (query, limit) => call('library.search', { query, limit }),
     },
     playlists: {
       create: (name) => call('playlists.create', { name }),
@@ -141,6 +142,9 @@
       remove: (key) => call('storage.remove', { key }),
       keys: () => call('storage.keys'),
     },
+    history: Object.freeze({
+      recent: (options = {}) => call('history.recent', { before: options.before, limit: options.limit }),
+    }),
     discord: Object.freeze({
       set: (presence) => call('discord.set', presence),
       clear: () => call('discord.clear'),

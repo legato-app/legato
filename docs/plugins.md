@@ -69,6 +69,11 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 shows: 'name' | 'artist' | 'song' | 'both' }`. Updates are spaced 4 s apart and retried while Discord is closed;
 `set` answers the state known so far.
 
+`app.library.search(query, limit)` (`library:read`, title, artist or album, 100 at most) gives songs as
+`library.tracks()` does. Songs now carry `art`: an https cover, else null. `app.history.recent({ before?, limit })`
+(`history:read`, 500 at most, newest first, `before` in unix seconds) →
+`[{ trackId, title, artist, startedAt, listenedMs, completed }]`.
+
 Without any permission a plugin still has its own storage, timers and log.
 
 Never available, whatever the permissions: the user's passwords, tokens and sign-ins, files on the PC, other
