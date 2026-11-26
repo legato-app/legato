@@ -70,7 +70,7 @@ From API 2 (a manifest asking for them with `"api": 1` is refused):
 shows: 'name' | 'artist' | 'song' | 'both' }`. Updates are spaced 4 s apart and retried while Discord is closed;
 `set` answers the state known so far.
 
-`app.library.search(query, limit)` (`library:read`, title, artist or album, 100 at most) gives songs as
+`app.library.search(query, limit)` (`library:read`, title, artist or album, 100 at most; a query of 200 characters at most, one search at a time) gives songs as
 `library.tracks()` does. Songs now carry `art`: an https cover, else null. `app.history.recent({ before?, limit })`
 (`history:read`, 500 at most, newest first, `before` in unix seconds) →
 `[{ trackId, title, artist, startedAt, listenedMs, completed }]`.

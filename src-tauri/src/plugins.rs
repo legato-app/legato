@@ -9,7 +9,7 @@ use music_plugins::net::{Gateway, Request};
 use music_plugins::{Call, Manifest, Outbox, Permission, Route, Running};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -64,6 +64,27 @@ pub struct Plugins {
     errors: Mutex<HashMap<String, String>>,
     logs: Mutex<HashMap<String, VecDeque<String>>>,
     gateway: Gateway,
+    /// Plugins with a library search running: one at a time each (a search reads the whole library).
+    searching: Mutex<HashSet<String>>,
+}
+
+/// A plugin's search slot, given back when the search ends however it ends.
+struct Searching<'a> {
+    plugins: &'a Plugins,
+    plugin: &'a str,
+}
+
+impl<'a> Searching<'a> {
+    fn start(plugins: &'a Plugins, plugin: &'a str) -> Result<Self, String> {
+        let free = plugins.searching.lock().unwrap().insert(plugin.to_string());
+        free.then(|| Self { plugins, plugin }).ok_or_else(|| "library.search: one search at a time".to_string())
+    }
+}
+
+impl Drop for Searching<'_> {
+    fn drop(&mut self) {
+        self.plugins.searching.lock().unwrap().remove(self.plugin);
+    }
 }
 
 fn dir(app: &AppHandle) -> CmdResult<PathBuf> {
@@ -207,6 +228,11 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
         }
         "discord.status" => Ok(json!(state.discord.status())),
         "library.search" => {
+            let plugins = app.state::<Plugins>();
+            let _slot = Searching::start(&plugins, &call.plugin)?;
+            if a["query"].as_str().is_some_and(|query| query.chars().count() > 200) {
+                return Err("library.search: 200 characters at most".into());
+            }
             let query = a["query"].as_str().unwrap_or_default().trim().to_lowercase();
             if query.is_empty() {
                 return Ok(json!([]));
