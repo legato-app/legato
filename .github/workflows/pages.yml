@@ -7,7 +7,8 @@ name: pages
 on:
   push:
     branches: [master]
-    paths: [site/**, ui/**, .github/workflows/pages.yml]
+    # docs/ and CONTRIBUTING.md: the docs' developer pages take them in (site/content/docs).
+    paths: [site/**, ui/**, docs/**, CONTRIBUTING.md, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:

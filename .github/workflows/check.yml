@@ -183,6 +183,31 @@ jobs:
         shell: bash
         run: echo '::error title=e2e failed::The smoke test failed. The e2e-failure artifact and this job log say why.'
 
+  # The website as pages.yml builds it: a broken MDX page, an include gone or a type error shows here, not at the deploy.
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            site/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
+        working-directory: site
+      - run: pnpm build
+        working-directory: site
+
   # Third-party licenses (docs/licenses.md): interface packages, then every Rust crate on every platform.
   licenses:
     runs-on: ubuntu-latest

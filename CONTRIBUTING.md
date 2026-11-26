@@ -47,6 +47,11 @@ root and in `site/`, then, in `site/`, `pnpm dev` (http://localhost:3000) or `pn
 `site/components/content.tsx`; its privacy rows replace the old `docs/privacy.md`, so change them when the app starts
 sending something new.
 
+The docs (`/docs/`, English only) are Fumadocs: pages in `site/content/docs`, listed by each folder's `meta.json`,
+searched in the browser. The developers' architecture, plugin and contribution pages include `docs/architecture.md`,
+`docs/plugins.md` and this file (`site/components/repoDocs.ts` turns their links into GitHub's): change those, not a
+copy. Their style sheet (`app/(docs)/docs.css`) stays off every other page.
+
 The site speaks the app's 18 languages: English at the root, every other one at `/<code>/` from its own
 `site/components/i18n/<code>.ts` (a `Copy`, listed in `copies.ts`). The root sends a visitor to their browser's
 language before the first paint, unless they picked one in the header (`site/components/pick.ts`, kept in that browser);
