@@ -855,7 +855,7 @@ const id: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Selain warnanya, tema ini memindahkan atau menyembunyikan bagian aplikasi:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Anda bisa kembali kapan saja: Pengaturan (Ctrl+,) › Tampilan › Izinkan tema menata aplikasi.',
   'Use its layout': 'Pakai tata letaknya',
-  'No top bar: only Settings and the window’s buttons stay': 'Tanpa bilah atas: hanya Pengaturan dan tombol jendela yang tersisa',
+  'A smaller top bar': 'Bilah atas yang lebih ringkas',
   'No sidebar': 'Tanpa bilah samping',
   'The sidebar on the right': 'Bilah samping di kanan',
   'No side panel': 'Tanpa panel samping',

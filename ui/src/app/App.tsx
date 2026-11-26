@@ -107,13 +107,14 @@ function Brand({ className = '', order }: { className?: string; order?: number }
   )
 }
 
-/** `bare`: a theme hides it. The logo, Settings, the window's buttons and the drag area stay: nothing else closes the window. */
+/** `bare`: a theme hides it. The logo, the search (nothing else searches), Settings, the window's buttons and the drag
+ *  area stay: nothing else closes the window. */
 function TopBar({ brand, bare, order }: { brand: boolean; bare: boolean; order?: number }) {
   const full = usePlayer((s) => s.full)
   const searchBox = useRef<HTMLDivElement>(null)
   // The phone's bar has no room to move the search: it stays put.
   const phone = usePhone()
-  const shift = useSearchCentered(searchBox, !phone && !bare)
+  const shift = useSearchCentered(searchBox, !phone)
   // Now Playing opening or closing swaps what sits left of the search (Back / Forward, Close player): its recentring jumps then, it
   // does not slide (2026-11-13). Focus and the window's own resizes still glide.
   const [snap, setSnap] = useState(false)
@@ -161,15 +162,11 @@ function TopBar({ brand, bare, order }: { brand: boolean; bare: boolean; order?:
           </span>
         )
       )}
-      {bare ? (
-        <div data-tauri-drag-region className="h-full flex-1" />
-      ) : (
-        <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
-          <SearchBar>
-            <VoiceSearch />
-          </SearchBar>
-        </div>
-      )}
+      <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
+        <SearchBar>
+          <VoiceSearch />
+        </SearchBar>
+      </div>
       {!online && !bare && (
         <span role="status" title={tr('No internet connection: your own files still play. Searches and YouTube come back with the connection.')} className="swap-in flex shrink-0 items-center gap-1.5 rounded-full bg-raised px-3 py-1 text-xs font-medium text-ink-2">
           <WifiSlash size={14} /> {tr('Offline')}

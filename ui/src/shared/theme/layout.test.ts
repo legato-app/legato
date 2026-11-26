@@ -63,7 +63,7 @@ describe('layoutSummary', () => {
   it('says each difference on its own line', () => {
     expect(summary({ v: 1, regions: { right: ['sidebar'] } })).toEqual(['The sidebar on the right'])
     expect(summary({ v: 1, regions: { left: ['sidePanel'], top: ['playerBar'], bottom: ['brand'] } })).toEqual(['The side panel on the left', 'The player bar at the top', 'The logo at the bottom'])
-    expect(summary({ v: 1, hidden: ['topbar', 'sidePanel', 'playerBar'] })).toEqual(['No top bar: only Settings and the window’s buttons stay', 'No side panel', 'No player bar'])
+    expect(summary({ v: 1, hidden: ['topbar', 'sidePanel', 'playerBar'] })).toEqual(['A smaller top bar', 'No side panel', 'No player bar'])
     expect(summary({ v: 1, sizes: { sidebar: 300, sidePanel: 360 } })).toEqual(['The sidebar 300 px wide', 'The side panel 360 px wide'])
     expect(summary({ v: 1, regions: { top: ['topbar', 'brand'] } })).toEqual(['The logo elsewhere at the top'])
   })

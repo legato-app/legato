@@ -708,8 +708,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     never seen with a layout in the app.
     - Decided alone (2026-11-26): the player bar never moves in the page (a moved video frame reloads), a flex order
       shows it above, so the keyboard still reaches it last; hidden, it stays mounted at no height (YouTube's player and
-      the engine's polling live there); a hidden top bar keeps the logo, Settings, the window's buttons and the drag area
-      (nothing else closes the window) and shows whole over Now Playing; a layout's size fixes the width (no resize
+      the engine's polling live there); a hidden top bar keeps the logo, the search (review: nothing else searches),
+      Settings, the window's buttons and the drag area (nothing else closes the window) and shows whole over Now Playing; a layout's size fixes the width (no resize
       handle); with no side panel the mini player floats and its buttons open Now Playing; the row is PC only and part of
       Reset appearance; a newer layout's theme card says it needs a newer Legato.
   - [x] `S` 3. The brand as its own surface, never hidden. Tests: a table of hostile layouts keeps it; `css.test.ts`

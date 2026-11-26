@@ -855,7 +855,7 @@ const uk: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Окрім кольорів, вона переміщує або приховує частини застосунку:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Повернутися можна будь-коли: Налаштування (Ctrl+,) › Вигляд › Дозволити темам змінювати розташування елементів.',
   'Use its layout': 'Використати її розташування',
-  'No top bar: only Settings and the window’s buttons stay': 'Без верхньої панелі: залишаться лише налаштування та кнопки вікна',
+  'A smaller top bar': 'Менша верхня панель',
   'No sidebar': 'Без бічної панелі',
   'The sidebar on the right': 'Бічна панель праворуч',
   'No side panel': 'Без правої панелі',

@@ -119,7 +119,7 @@ export interface ShellRegions {
   regions: Record<Region, Surface[]>
   /** The logo leads the top bar: just before it there, and whenever Now Playing covers the rest. */
   brandInTopbar: boolean
-  /** A hidden top bar keeps what no layout can take: the window's buttons, Settings, the drag area. */
+  /** A hidden top bar keeps what no layout can take: the search, Settings, the window's buttons, the drag area. */
   topbarBare: boolean
   /** Not drawn, still mounted: it holds YouTube's player. */
   playerBarHidden: boolean
@@ -156,7 +156,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
   const on = (region: Region, surface: Surface) => regions[region].includes(surface)
   const logoMoved = !layoutRegions(placement).brandInTopbar
   const lines = [
-    hides('topbar') && tr('No top bar: only Settings and the window’s buttons stay'),
+    hides('topbar') && tr('A smaller top bar'),
     hides('sidebar') ? tr('No sidebar') : on('right', 'sidebar') && tr('The sidebar on the right'),
     hides('sidePanel') ? tr('No side panel') : on('left', 'sidePanel') && tr('The side panel on the left'),
     hides('playerBar') ? tr('No player bar') : on('top', 'playerBar') && tr('The player bar at the top'),

@@ -855,7 +855,7 @@ const zh: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': '除了颜色之外，它还会移动或隐藏应用的某些部分：',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': '你可以随时改回：设置 (Ctrl+,) › 外观 › 允许主题调整应用布局。',
   'Use its layout': '使用它的布局',
-  'No top bar: only Settings and the window’s buttons stay': '没有顶部栏：只保留设置和窗口按钮',
+  'A smaller top bar': '精简的顶部栏',
   'No sidebar': '没有侧边栏',
   'The sidebar on the right': '侧边栏在右侧',
   'No side panel': '没有侧面板',

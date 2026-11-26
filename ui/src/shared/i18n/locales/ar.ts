@@ -826,7 +826,7 @@ const ar: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'إضافة إلى ألوانها، تنقل أجزاء من التطبيق أو تخفيها:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'يمكنك العودة في أي وقت: الإعدادات (Ctrl+,) › المظهر › السماح للسمات بترتيب التطبيق.',
   'Use its layout': 'استخدام تخطيطها',
-  'No top bar: only Settings and the window’s buttons stay': 'من دون شريط علوي: تبقى الإعدادات وأزرار النافذة فقط',
+  'A smaller top bar': 'شريط علوي أصغر',
   'No sidebar': 'من دون شريط جانبي',
   'The sidebar on the right': 'الشريط الجانبي على اليمين',
   'No side panel': 'من دون لوحة جانبية',

@@ -855,7 +855,7 @@ const tr: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Renklerinin yanı sıra uygulamanın bazı bölümlerini taşıyor veya gizliyor:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'İstediğiniz zaman geri dönebilirsiniz: Ayarlar (Ctrl+,) › Görünüm › Temalar uygulamayı düzenleyebilsin.',
   'Use its layout': 'Düzenini kullan',
-  'No top bar: only Settings and the window’s buttons stay': 'Üst çubuk yok: yalnızca Ayarlar ve pencere düğmeleri kalır',
+  'A smaller top bar': 'Daha küçük bir üst çubuk',
   'No sidebar': 'Kenar çubuğu yok',
   'The sidebar on the right': 'Kenar çubuğu sağda',
   'No side panel': 'Yan panel yok',

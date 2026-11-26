@@ -855,7 +855,7 @@ const nl: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Naast de kleuren verplaatst of verbergt het delen van de app:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Je kunt altijd terug: Instellingen (Ctrl+,) › Uiterlijk › Thema’s de app laten indelen.',
   'Use its layout': 'Indeling gebruiken',
-  'No top bar: only Settings and the window’s buttons stay': 'Geen bovenbalk: alleen Instellingen en de vensterknoppen blijven',
+  'A smaller top bar': 'Een kleinere bovenbalk',
   'No sidebar': 'Geen zijbalk',
   'The sidebar on the right': 'De zijbalk rechts',
   'No side panel': 'Geen zijpaneel',

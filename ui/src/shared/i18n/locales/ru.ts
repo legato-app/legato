@@ -855,7 +855,7 @@ const ru: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Помимо цветов, она перемещает или скрывает части приложения:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Вернуться можно в любой момент: Настройки (Ctrl+,) › Оформление › Разрешить темам менять расположение элементов.',
   'Use its layout': 'Использовать расположение',
-  'No top bar: only Settings and the window’s buttons stay': 'Без верхней панели: останутся только настройки и кнопки окна',
+  'A smaller top bar': 'Уменьшенная верхняя панель',
   'No sidebar': 'Без боковой панели',
   'The sidebar on the right': 'Боковая панель справа',
   'No side panel': 'Без правой панели',

@@ -855,7 +855,7 @@ const hi: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'रंगों के अलावा, यह ऐप के हिस्सों को खिसकाती या छिपाती है:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'आप कभी भी वापस लौट सकते हैं: सेटिंग (Ctrl+,) › रूप-रंग › थीम को ऐप की व्यवस्था बदलने दें।',
   'Use its layout': 'इसकी व्यवस्था अपनाएँ',
-  'No top bar: only Settings and the window’s buttons stay': 'ऊपरी पट्टी नहीं: सिर्फ़ सेटिंग और विंडो के बटन रहेंगे',
+  'A smaller top bar': 'छोटी ऊपरी पट्टी',
   'No sidebar': 'साइडबार नहीं',
   'The sidebar on the right': 'साइडबार दाईं ओर',
   'No side panel': 'साइड पैनल नहीं',

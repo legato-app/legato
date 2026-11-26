@@ -855,7 +855,7 @@ const ja: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': '色のほかに、アプリの一部を移動したり隠したりします：',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'いつでも元に戻せます：設定 (Ctrl+,) › 外観 › テーマにアプリの配置を任せる。',
   'Use its layout': 'この配置を使う',
-  'No top bar: only Settings and the window’s buttons stay': '上部バーなし：設定とウィンドウのボタンだけが残ります',
+  'A smaller top bar': '小さくした上部バー',
   'No sidebar': 'サイドバーなし',
   'The sidebar on the right': 'サイドバーを右に',
   'No side panel': 'サイドパネルなし',

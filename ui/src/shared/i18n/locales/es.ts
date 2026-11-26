@@ -855,7 +855,7 @@ const es: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Además de sus colores, mueve u oculta partes de la app:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Puedes volver atrás cuando quieras: Ajustes (Ctrl+,) › Apariencia › Dejar que los temas organicen la app.',
   'Use its layout': 'Usar su disposición',
-  'No top bar: only Settings and the window’s buttons stay': 'Sin barra superior: solo quedan Ajustes y los botones de la ventana',
+  'A smaller top bar': 'Una barra superior más pequeña',
   'No sidebar': 'Sin barra lateral',
   'The sidebar on the right': 'La barra lateral a la derecha',
   'No side panel': 'Sin panel lateral',

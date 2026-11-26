@@ -826,7 +826,7 @@ const he: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'מלבד הצבעים שלה, היא מזיזה או מסתירה חלקים באפליקציה:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'אפשר לחזור בכל עת: הגדרות (Ctrl+,) › מראה › לאפשר לערכות נושא לסדר את האפליקציה.',
   'Use its layout': 'להשתמש בפריסה שלה',
-  'No top bar: only Settings and the window’s buttons stay': 'בלי סרגל עליון: נשארים רק ההגדרות ולחצני החלון',
+  'A smaller top bar': 'סרגל עליון קטן יותר',
   'No sidebar': 'בלי סרגל צד',
   'The sidebar on the right': 'סרגל הצד מימין',
   'No side panel': 'בלי חלונית צד',

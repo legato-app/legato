@@ -855,7 +855,7 @@ const vi: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Ngoài màu sắc, chủ đề còn di chuyển hoặc ẩn các phần của ứng dụng:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Bạn có thể quay lại bất cứ lúc nào: Cài đặt (Ctrl+,) › Giao diện › Cho phép chủ đề sắp xếp ứng dụng.',
   'Use its layout': 'Dùng bố cục này',
-  'No top bar: only Settings and the window’s buttons stay': 'Không có thanh trên: chỉ còn Cài đặt và các nút cửa sổ',
+  'A smaller top bar': 'Thanh trên gọn hơn',
   'No sidebar': 'Không có thanh bên',
   'The sidebar on the right': 'Thanh bên ở bên phải',
   'No side panel': 'Không có bảng bên',

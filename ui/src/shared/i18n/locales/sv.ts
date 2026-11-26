@@ -855,7 +855,7 @@ const sv: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': 'Förutom färgerna flyttar eller döljer det delar av appen:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': 'Du kan gå tillbaka när som helst: Inställningar (Ctrl+,) › Utseende › Låt teman ordna om appen.',
   'Use its layout': 'Använd layouten',
-  'No top bar: only Settings and the window’s buttons stay': 'Ingen toppanel: bara Inställningar och fönsterknapparna finns kvar',
+  'A smaller top bar': 'En mindre toppanel',
   'No sidebar': 'Inget sidofält',
   'The sidebar on the right': 'Sidofältet till höger',
   'No side panel': 'Ingen sidopanel',

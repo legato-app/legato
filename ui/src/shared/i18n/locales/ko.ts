@@ -855,7 +855,7 @@ const ko: Record<string, string> = {
   'Besides its colors, it moves or hides parts of the app:': '색상 외에도 앱의 일부를 옮기거나 숨깁니다:',
   'You can go back at any time: Settings (Ctrl+,) › Appearance › Let themes arrange the app.': '언제든 되돌릴 수 있습니다: 설정(Ctrl+,) › 모양 › 테마가 앱 배치를 바꾸도록 허용.',
   'Use its layout': '이 배치 사용',
-  'No top bar: only Settings and the window’s buttons stay': '상단 막대 없음: 설정과 창 버튼만 남습니다',
+  'A smaller top bar': '더 작은 상단 막대',
   'No sidebar': '사이드바 없음',
   'The sidebar on the right': '사이드바를 오른쪽에',
   'No side panel': '사이드 패널 없음',
