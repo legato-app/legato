@@ -1232,6 +1232,7 @@ const nl: Record<string, string> = {
   'See what plays and when it changes': 'Zien wat er speelt en wanneer het verandert',
   'Show what you play on Discord': 'Op Discord tonen wat je afspeelt',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Kan elke tekst en links op je Discord-profiel tonen, via de Discord-app op deze pc',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord-status is nu een plug-in, met je instellingen: zie Add-ons',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

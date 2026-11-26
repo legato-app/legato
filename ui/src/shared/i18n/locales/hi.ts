@@ -1232,6 +1232,7 @@ const hi: Record<string, string> = {
   'See what plays and when it changes': 'देखें क्या चल रहा है और कब बदलता है',
   'Show what you play on Discord': 'आप जो सुनते हैं उसे Discord पर दिखाना',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'इस PC के Discord ऐप से, आपकी Discord प्रोफ़ाइल पर कोई भी टेक्स्ट और लिंक दिखा सकता है',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord प्रेज़ेंस अब आपकी सेटिंग्स के साथ एक प्लगइन है: ऐड-ऑन देखें',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

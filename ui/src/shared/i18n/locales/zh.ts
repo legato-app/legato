@@ -1232,6 +1232,7 @@ const zh: Record<string, string> = {
   'See what plays and when it changes': '查看正在播放的内容及其变化',
   'Show what you play on Discord': '在 Discord 上显示你在听什么',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': '可通过此电脑上的 Discord 应用，在你的 Discord 个人资料上显示任意文字和链接',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord 状态现在是一个插件，并沿用你的设置：请查看附加组件',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

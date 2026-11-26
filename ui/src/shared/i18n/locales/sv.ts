@@ -1232,6 +1232,7 @@ const sv: Record<string, string> = {
   'See what plays and when it changes': 'Se vad som spelas och när det ändras',
   'Show what you play on Discord': 'Visa på Discord vad du spelar',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Kan visa valfri text och länkar på din Discord-profil, via Discord-appen på den här datorn',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord-närvaron är nu ett tillägg, med dina inställningar: se Tillägg',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

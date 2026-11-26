@@ -1197,6 +1197,7 @@ const he: Record<string, string> = {
   'See what plays and when it changes': 'לראות מה מתנגן ומתי זה משתנה',
   'Show what you play on Discord': 'להציג ב-Discord את מה שמתנגן',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'יכול להציג כל טקסט וקישורים בפרופיל ה-Discord שלכם, דרך אפליקציית Discord במחשב הזה',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'הנוכחות ב-Discord היא עכשיו תוסף, עם ההגדרות שלכם: ראו תוספים',
   'See the play queue': 'לראות את תור הניגון',
   'Read your listening history': 'לקרוא את היסטוריית ההאזנה',
   'Sees what you listened to and when': 'רואה למה האזנתם ומתי',

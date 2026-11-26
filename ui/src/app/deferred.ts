@@ -21,6 +21,8 @@ export function startDeferred(): () => void {
     ['Music server', () => import('../features/sources/servers').then((m) => m.startServers())],
     ['Sync Mode', () => import('../features/syncmode/syncmode').then((m) => m.startSyncMode())],
     ['Plugins', () => import('../features/plugins/host').then((m) => m.startPlugins())],
+    // After Plugins: the moved plugin's first calls find the interface listening.
+    ['Discord plugin', () => import('../features/addons/discordMove').then((m) => m.startDiscordMove())],
     ['Auto sync', () => import('../features/sources/autosync').then((m) => m.startAutoSync())],
     ['Phone remote', () => import('../features/remote/remote').then((m) => m.startRemote())],
     ['Streaming overlay', () => import('../features/remote/remote').then((m) => m.startOverlay())],

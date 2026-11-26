@@ -354,6 +354,8 @@ export const api = {
   /** App events for plugins allowed to hear them: 'track', 'playing'. */
   /** What the player tells running plugins (`perms::EVENTS` checks each one's permission). */
   pluginEvent: (name: 'track' | 'playing' | 'ended' | 'seek' | 'volume' | 'queue', payload: unknown) => invoke<void>('plugin_event', { name, payload }),
+  /** The built-in Discord presence's user moved to the bundled plugin, once. True: done now. */
+  pluginAdoptDiscord: (settings: unknown) => invoke<boolean>('plugin_adopt_discord', { settings }),
   /** A plugin's menu item ('command') or panel control ('panel') was used. */
   pluginInput: (plugin: string, name: 'command' | 'panel', payload: unknown) => invoke<void>('plugin_input', { plugin, name, payload }),
   /** The visualizer's frame for the plugin whose look shows: the latest only, never queued. */

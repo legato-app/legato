@@ -5,6 +5,7 @@
 //! `plugin_reply`). Logic: `crates/plugins`.
 
 use crate::{AppState, CmdResult, err};
+use music_plugins::discord_move;
 use music_plugins::net::{Gateway, Request};
 use music_plugins::{Call, Manifest, Outbox, Permission, Route, Running};
 use serde::{Deserialize, Serialize};
@@ -368,6 +369,35 @@ pub async fn plugin_install(app: AppHandle, state: State<'_, AppState>, folder: 
     save_registry(&state, &reg)?;
     start(&app, &m.id, &m.permissions)?;
     Ok(m.id)
+}
+
+/// Done once per library: the settings row.
+const DISCORD_MOVED: &str = "discordPluginMoved1";
+
+/// For who had the built-in Discord presence on (`settings`: its settings): the bundled plugin installed, its
+/// permissions granted, the settings moved into its storage. True: done now, so the interface switches the old one off.
+#[tauri::command]
+pub async fn plugin_adopt_discord(app: AppHandle, state: State<'_, AppState>, settings: Value) -> CmdResult<bool> {
+    if state.lib().setting(DISCORD_MOVED).map_err(err)?.is_some() {
+        return Ok(false);
+    }
+    let manifest = Manifest::parse(discord_move::FILES[0].1).map_err(err)?;
+    let mut reg = registry(&state);
+    // Installed by hand already: left as the user set it.
+    if !reg.contains_key(&manifest.id) {
+        let target = dir(&app)?.join(&manifest.id);
+        std::fs::create_dir_all(&target).map_err(err)?;
+        for (name, content) in discord_move::FILES {
+            std::fs::write(target.join(name), content).map_err(err)?;
+        }
+        state.lib().set_setting(&storage_key(&manifest.id), &discord_move::storage(&settings)).map_err(err)?;
+        reg.insert(manifest.id.clone(), Entry { on: true, granted: manifest.permissions.clone() });
+        save_registry(&state, &reg)?;
+        start(&app, &manifest.id, &manifest.permissions)?;
+        let _ = app.emit_to("main", "plugin-state", &manifest.id);
+    }
+    state.lib().set_setting(DISCORD_MOVED, &json!(true)).map_err(err)?;
+    Ok(true)
 }
 
 #[tauri::command]

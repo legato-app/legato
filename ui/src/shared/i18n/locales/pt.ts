@@ -1232,6 +1232,7 @@ const pt: Record<string, string> = {
   'See what plays and when it changes': 'Ver o que está tocando e quando muda',
   'Show what you play on Discord': 'Mostrar no Discord o que você ouve',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Pode mostrar qualquer texto e links no seu perfil do Discord, pelo app do Discord neste PC',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'A presença no Discord agora é um plugin, com suas configurações: veja em Complementos',
   'See the play queue': 'Ver a fila de reprodução',
   'Read your listening history': 'Ler seu histórico de reprodução',
   'Sees what you listened to and when': 'Vê o que você ouviu e quando',

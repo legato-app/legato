@@ -1232,6 +1232,7 @@ const tr: Record<string, string> = {
   'See what plays and when it changes': 'Neyin çaldığını ve ne zaman değiştiğini görmek',
   'Show what you play on Discord': 'Dinlediğini Discord’da göstermek',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Bu bilgisayardaki Discord uygulaması üzerinden Discord profilinde her türlü metni ve bağlantıyı gösterebilir',
+  'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord durumu artık ayarlarınla birlikte bir eklenti: Eklentiler’e bak',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

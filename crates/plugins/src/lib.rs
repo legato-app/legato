@@ -2,6 +2,7 @@
 //! runtime (no DOM, no network, no files), reaching the app only through `app` calls that the user's approved
 //! permissions allow. Network goes through a gateway that keeps to approved hosts. Docs: docs/plugins.md.
 
+pub mod discord_move;
 pub mod manifest;
 pub mod net;
 pub mod perms;
