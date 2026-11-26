@@ -122,9 +122,9 @@ const coll = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true }
 const dot = (a: string, b: string) => (b ? `${a} · ${b}` : a)
 
 /**
- * Two panels (docs/design.md): Home, Mixes, Stats, Add music; then Your library, Spotify-like: Songs and your playlists,
- * or every album or artist (kind chips), with covers. The order picked stays (Spotify's sidebar kept going back to
- * Recent: users' first complaint). Settings and Add-ons are in the top bar.
+ * Two panels (docs/design.md): Home, Mixes, Stats, Add music; then the library: Songs and your playlists, or every
+ * album or artist (kind chips), with covers. The order picked stays (a list jumping back to Recent is what users
+ * complain of first). Settings and Add-ons are in the top bar.
  */
 export function Sidebar() {
   const { view, go, tracks, playlists, editPlaylist } = useStore(useShallow((s) => ({ view: s.view, go: s.go, tracks: s.tracks, playlists: s.playlists, editPlaylist: s.editPlaylist })))
@@ -221,11 +221,11 @@ export function Sidebar() {
       </nav>
 
       {/* The mini player stays put at the bottom; only the list scrolls. */}
-      <section aria-label={tr('Your library')} className="group/lib flex min-h-0 flex-1 flex-col rounded-lg bg-panel">
+      <section aria-label={tr('Library')} className="group/lib flex min-h-0 flex-1 flex-col rounded-lg bg-panel">
         <div onContextMenu={onMenu(playlistsMenu)} className="flex shrink-0 items-center gap-1 pt-3 pe-2 ps-4">
-          <h2 className="flex-1 text-base font-medium">{tr('Your library')}</h2>
+          <h2 className="flex-1 text-base font-medium">{tr('Library')}</h2>
           {/* Expand and Sort under the pointer or the keyboard (a calm sidebar, plan-v2 › U2); open wide and the phone: shown. */}
-          <RoundButton label={wide ? tr('Collapse Your library') : tr('Expand Your library')} aria-pressed={wide} kind="plain" size="sm" className={`${wide ? 'nudge-l' : 'nudge-r'} ${wide ? '' : calm} phone:hidden`} onClick={() => update({ libraryWide: !wide })}>
+          <RoundButton label={wide ? tr('Collapse library') : tr('Expand library')} aria-pressed={wide} kind="plain" size="sm" className={`${wide ? 'nudge-l' : 'nudge-r'} ${wide ? '' : calm} phone:hidden`} onClick={() => update({ libraryWide: !wide })}>
             {wide ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
           </RoundButton>
           <RoundButton label={tr('Sort playlists')} kind="plain" size="sm" className={wide ? '' : calm} onClick={(e) => openMenu(e, ORDERS.map((o) => ({ label: tr(o.label), checked: order === o.id, onSelect: () => useSettings.getState().update({ playlistOrder: o.id }) })))}>

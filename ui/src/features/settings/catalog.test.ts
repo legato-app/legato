@@ -12,7 +12,7 @@ const BEFORE = [
   'Volume per source', 'Volume per output device', 'Focus and workout sessions', 'Last.fm suggestions', 'Blind test', 'Podcasts', 'Fade between songs', 'Sweet fades', 'Early endings',
   'Skip silence', 'Skip non-music parts', 'Tuner scale', 'Glow', 'Immersive player', 'Cover tint', 'Mini player', 'Mini player place', 'Progress bar', 'Covers in lists',
   'Clock on the cover display', 'Column browser', 'Covers for new releases', 'Hide explicit songs', 'Whole app in the cover’s color', 'Play with', 'Sidebar entries',
-  'Counts in the sidebar', 'Open on', 'Update channel', 'Cover cache size', 'Back up your library', 'Restore a backup', 'Clear covers', 'Your library', 'Lyrics and song analyses',
+  'Counts in the sidebar', 'Open on', 'Update channel', 'Cover cache size', 'Back up your library', 'Restore a backup', 'Clear covers', 'Library', 'Lyrics and song analyses',
   'Diagnostics log', 'Animations', 'List columns', 'YouTube Music', 'Update every 15 minutes', 'Sync direction', 'Spotify', 'OneDrive', 'Your devices', 'Connect Spotify',
   'Apple Music', 'Local files', 'Your music server', 'Block ads and trackers', 'The app', 'App windows', 'Automatic updates', 'App status', 'About', 'Third-party licenses',
   'Copy diagnostics', 'Smart shuffle', 'Variety', 'Songs heard lately', 'Your ratings count', 'Alarm', 'Same artist again', 'Pause during calls', 'Keep the screen on', 'Phone remote',

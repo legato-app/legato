@@ -507,7 +507,7 @@ export function SearchView() {
       <div className="flex shrink-0 items-center justify-between gap-4 pb-4.5 phone:gap-1 phone:pb-3">
         <div role="tablist" aria-label={tr('Search in')} className="no-scrollbar flex flex-wrap items-center gap-2 phone:min-w-0 phone:flex-1 phone:flex-nowrap phone:overflow-x-auto">
           <LedChip on={from === 'all'} label={tr('All')} onClick={() => pickFrom('all')} />
-          <LedChip on={from === 'library'} label={tr('Your library')} count={formatCount(lib.songs.length)} onClick={() => pickFrom('library')} />
+          <LedChip on={from === 'library'} label={tr('Library')} count={formatCount(lib.songs.length)} onClick={() => pickFrom('library')} />
           {/* Signed out too: YouTube Music's public catalog (search_catalogs). */}
           {chip('ytmusic', 'YouTube Music')}
           {chip('youtube', 'YouTube')}

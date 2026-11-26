@@ -606,7 +606,7 @@ export function HomeView() {
         {/* The phone: one row scrolled sideways. */}
         <div role="tablist" aria-label={tr('Show on Home')} className="no-scrollbar flex min-w-0 flex-1 flex-wrap items-center gap-2 phone:flex-nowrap phone:overflow-x-auto">
           <LedChip on={!mood && filter === 'all'} label={tr('All')} onClick={() => pick('all')} />
-          <LedChip on={!mood && filter === 'library'} label={tr('Your library')} onClick={() => pick('library')} />
+          <LedChip on={!mood && filter === 'library'} label={tr('Library')} onClick={() => pick('library')} />
           {ytOn && ytSection && <LedChip on={!mood && filter === 'youtube'} label="YouTube Music" onClick={() => pick('youtube')} />}
           {moods.length > 0 && <span aria-hidden className="mx-1 h-5 w-px bg-line" />}
           {moods.map((m) => (

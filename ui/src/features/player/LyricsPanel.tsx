@@ -239,7 +239,7 @@ function LyricsEditor({ text: first, onSave, onClose }: { text: string; onSave: 
 }
 
 /**
- * Now Playing › Lyrics, beside the cover (Spotify-like). LRCLIB first (synced when it can be, stretched for slowed /
+ * Now Playing › Lyrics, beside the cover. LRCLIB first (synced when it can be, stretched for slowed /
  * sped up versions), YouTube Music's own when signed in (src-tauri lyrics), cached on disk. heading = what heads the
  * panel instead of "Lyrics" (the main window's tabs, which also reach Up next).
  */

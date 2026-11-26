@@ -149,7 +149,7 @@ export const SETTINGS: SettingDef[] = [
   { id: msg('Back up your library'), in: 'Library backup', keywords: msg('backup save copy export file library playlists likes history move new pc computer') },
   { id: msg('Restore a backup'), in: 'Library backup', keywords: msg('restore backup import file library replace') },
   { id: msg('Clear covers'), in: 'Cover cache', keywords: msg('covers pictures images artwork cache disk space storage size limit clear delete empty free') },
-  { id: msg('Your library'), in: 'Storage', keywords: msg('library database disk space storage size') },
+  { id: msg('Library'), in: 'Storage', keywords: msg('library database disk space storage size') },
   { id: msg('Lyrics and song analyses'), label: msg('Lyrics and analyses'), in: 'Storage', keywords: msg('lyrics sponsorblock waveform loudness silence cache clear storage disk space') },
   { id: msg('Diagnostics log'), in: 'Storage', keywords: msg('log logs diagnostics report clear storage') },
   { id: msg('Animations'), in: 'Lists and navigation', keywords: msg('motion transitions reduce') },

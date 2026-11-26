@@ -18,7 +18,7 @@ export function PhoneTabs() {
   const tabs = [
     { id: 'home' as const, label: tr('Home'), icon: House, on: lit === 'home', onClick: page({ name: 'home' }) },
     { id: 'search' as const, label: tr('Search'), icon: MagnifyingGlass, on: lit === 'search', onClick: () => (leave(), view.name !== 'search' && go({ name: 'search' }), document.querySelector<HTMLInputElement>('[data-search]')?.focus()) },
-    { id: 'library' as const, label: tr('Your library'), icon: Books, on: lit === 'library', onClick: () => update({ libraryWide: !wide }) },
+    { id: 'library' as const, label: tr('Library'), icon: Books, on: lit === 'library', onClick: () => update({ libraryWide: !wide }) },
     { id: 'mixes' as const, label: tr('Mixes'), icon: Disc, on: lit === 'mixes', onClick: page({ name: 'mixes' }) },
     { id: 'radio' as const, label: tr('Radio'), icon: Radio, on: lit === 'radio', onClick: page({ name: 'radio' }) },
   ]

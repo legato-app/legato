@@ -5,8 +5,8 @@ version 1.0: System (Modern / Modern Dark) carries it. Earlier proposals are in 
 v0.1", "Proposal 2 (poster)"). Where the app differs from the mockups: the search stays in the top bar (the window
 needs a drag area and its buttons there), with Add-ons and Settings.
 
-Reading this as: desktop music player and library for people whose music lives in several services. Familiar like
-Spotify and YouTube Music, denser and calmer than both.
+Reading this as: desktop music player and library for people whose music lives in several services. Familiar to anyone
+who has used a music app, dense and calm.
 
 Dial (app): ENERGY 2 / RHYTHM 2 / MOTION 2 (more motion, user's request 2026-10-29). Dial (website, user's choice
 2026-10-31): ENERGY 2 / RHYTHM 2 / MOTION 3, for the scroll story only ([Website](#website)).
@@ -29,7 +29,7 @@ Each rule below answers one of these.
 ## Layout
 
 - Layered panels on a window background (8 px gaps, 8 px corners): sidebar, main pane, Up next, player bar.
-- Sidebar: Home, Mixes, Stats; then Your library with kind chips (Playlists, Albums, Artists) and items with cover,
+- Sidebar: Home, Mixes, Stats; then the library with kind chips (Playlists, Albums, Artists) and items with cover,
   kind and count. Resizable, with a button to open the library full width.
 - Song lists default to Compact: 40 px rows with a small cover, Title, Artist, Album, Source, heart, Time as columns.
   Comfortable (56 px, bigger covers) is one click away. Columns are chosen from the list header. The mockups' compact
@@ -56,7 +56,7 @@ room; nothing removed, every feature one menu away (no fake buttons). The phone'
   the box it opens.
 - **Top bar:** Back and Forward are drawn only when they can go somewhere (their place kept, the search doesn't move);
   the search's shortcut keys show under the pointer only (Settings › Shortcuts lists them).
-- **Sidebar:** Your library's Expand and Sort buttons show under the pointer or on keyboard focus (always when open
+- **Sidebar:** the library's Expand and Sort buttons show under the pointer or on keyboard focus (always when open
   wide, on a touch screen and on the phone); New playlist (+) stays.
 
 ## Phone
@@ -68,7 +68,7 @@ arranged for a thumb). Liner's calm is the spirit, never its look. The rules:
 - **Less in sight, nothing lost.** Every feature stays reachable; what a screen doesn't need often moves into a sheet,
   a menu or a More (⋯), never away. Desktop-only rows stay hidden on the phone app (`settings/desktopOnly.ts`).
 - **One main action per screen**, in the accent where it plays (the round play), the rest plain icons.
-- **Thumb's reach.** The bottom tabs (Home, Search, Your library, Mixes), the mini player above them, Now Playing's
+- **Thumb's reach.** The bottom tabs (Home, Search, Library, Mixes), the mini player above them, Now Playing's
   controls at the foot of the screen. Every tap target is 44 px at least: `RoundButton` adds an invisible 8 px ring on
   the phone (its drawn size stays), the top bar's buttons are 40 to 44 px, menu rows 48 px. That ring reaches past a
   row's edge, so a box that scrolls down never scrolls sideways there (`styles.css`: `overflow-y-auto` clips x on the
@@ -88,7 +88,7 @@ arranged for a thumb). Liner's calm is the spirit, never its look. The rules:
   play, next, repeat), then Lyrics, Up next and Sound spread under the thumb. An open panel takes the cover's place.
   More holds the rest: Show (Auto, Video, Cover), Less like this, Karaoke, Cover display, share, the Live Editor,
   sleep timer, playlists, rating, bookmarks, go to album or artist.
-- **Your library tab:** Stats and Add music side by side (Home and Mixes are tabs), then the library list.
+- **Library tab:** Stats and Add music side by side (Home and Mixes are tabs), then the library list.
 - **Settings:** the sections as one row of chips under the settings search; in each section the common groups first,
   the rare ones folded under "Advanced" at the foot (`settings/phoneFold.ts`), a search result opening its fold.
 - **List rows:** 56 px at least, two lines (title; artist or one detail), the menu's ⋯ at the end, a tap plays.
@@ -197,8 +197,8 @@ light ink3 is still #6B6B6B; the app uses #606060 (AA on cover tints, `ambient.t
 
 ## Shape, icons, motion
 
-- Radius: 4 covers, 6 rows and tiles, 8 panels and cards, pill for buttons, chips and search (the shapes of YouTube
-  and Spotify, which these listeners use daily), round for the play button and artist photos.
+- Radius: 4 covers, 6 rows and tiles, 8 panels and cards, pill for buttons, chips and search, round for the play
+  button and artist photos.
 - Flat. One shadow, for menus and dialogs over content; the glow above is light, not depth.
 - Icons: Phosphor (already in the app). Regular at rest, Fill when active.
 - Motion: hover and pressed 120 to 150 ms, panels 200 ms, opening Now Playing 240 ms. Icons answer: arrows lean the

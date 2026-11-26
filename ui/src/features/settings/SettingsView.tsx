@@ -737,7 +737,7 @@ function StorageRows() {
   )
   return (
     <div className="rounded-xl border border-line bg-raised">
-      <Row label={msg('Your library')} sub={tr('Songs, playlists, history and settings, with the copies kept before each update and each day. Never cleared here')}>
+      <Row label={msg('Library')} sub={tr('Songs, playlists, history and settings, with the copies kept before each update and each day. Never cleared here')}>
         {size(s?.library)}
       </Row>
       <Row label={msg('Lyrics and song analyses')} sub={tr('Lyrics found, SponsorBlock’s parts, your files’ silences, loudness and waveforms: found or measured again as songs play')}>
