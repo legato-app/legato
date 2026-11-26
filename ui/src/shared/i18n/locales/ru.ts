@@ -1191,6 +1191,8 @@ const ru: Record<string, string> = {
   'Show what you play on Discord': 'Показывать в Discord, что вы слушаете',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Может показывать любой текст и ссылки в вашем профиле Discord через приложение Discord на этом ПК',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Статус в Discord теперь плагин с вашими настройками: см. Дополнения',
+  'Also remove the playlists imported from Spotify?': 'Удалить и плейлисты, импортированные из Spotify?',
+  'Keep': 'Оставить',
   'See the play queue': 'Видеть очередь воспроизведения',
   'Read your listening history': 'Читать историю прослушивания',
   'Sees what you listened to and when': 'Видит, что и когда вы слушали',

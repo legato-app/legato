@@ -1191,6 +1191,8 @@ const uk: Record<string, string> = {
   'Show what you play on Discord': 'Показувати в Discord, що ви слухаєте',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Може показувати будь-який текст і посилання у вашому профілі Discord через застосунок Discord на цьому ПК',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Статус у Discord тепер плагін із вашими налаштуваннями: див. Доповнення',
+  'Also remove the playlists imported from Spotify?': 'Видалити також плейлисти, імпортовані зі Spotify?',
+  'Keep': 'Залишити',
   'See the play queue': 'Бачити чергу відтворення',
   'Read your listening history': 'Читати історію прослуховування',
   'Sees what you listened to and when': 'Бачить, що й коли ви слухали',

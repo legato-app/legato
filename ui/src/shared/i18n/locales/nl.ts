@@ -1191,6 +1191,8 @@ const nl: Record<string, string> = {
   'Show what you play on Discord': 'Op Discord tonen wat je afspeelt',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Kan elke tekst en links op je Discord-profiel tonen, via de Discord-app op deze pc',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord-status is nu een plug-in, met je instellingen: zie Add-ons',
+  'Also remove the playlists imported from Spotify?': 'Ook de uit Spotify geïmporteerde playlists verwijderen?',
+  'Keep': 'Behouden',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

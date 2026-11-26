@@ -102,11 +102,18 @@ function ServiceRow({ service }: { service: 'spotify' }) {
   const { connected } = status[service]
   const selected = view.name === 'settings' && view.wizard === service
   const [dirs, setDir] = useDirections()
+  const leave = async () => {
+    await disconnect(service)
+    const { status, raw, refresh } = useStore.getState()
+    if (status[service].connected || !raw.playlists.some((playlist) => playlist.source === service)) return
+    if (!(await ask({ title: tr('Also remove the playlists imported from Spotify?'), body: tr('The songs stay in your library.'), ok: tr('Remove'), cancel: tr('Keep') }))) return
+    await api.removeSpotifyPlaylists().then(refresh, (e: unknown) => useStore.setState({ error: String(e) }))
+  }
   return (
     <div data-setting={sourceLabel[service]} className={`flex flex-col gap-3 border-b border-line-soft px-4 py-3.5 ${selected ? 'bg-bg' : ''}`}>
       <AccountLine on={connected} icon={<SourceIcon source={service} size={16} />} title={sourceLabel[service]} pitch={phoneApp && !connected ? tr('Connect it in Legato on your PC: your playlists come here when your devices sync.') : tr(guides[service].pitch)} state={connected ? tr('Connected') : tr('Not connected')}>
         {connected ? (
-          <Button variant="ghost" disabled={busy} onClick={() => disconnect(service)}>
+          <Button variant="ghost" disabled={busy} onClick={() => void leave()}>
             {tr('Disconnect')}
           </Button>
         ) : (

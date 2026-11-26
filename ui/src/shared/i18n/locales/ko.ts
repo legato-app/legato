@@ -1191,6 +1191,8 @@ const ko: Record<string, string> = {
   'Show what you play on Discord': '듣는 곡을 Discord에 표시',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': '이 PC의 Discord 앱을 통해 Discord 프로필에 어떤 글과 링크든 표시할 수 있습니다',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord 상태 표시가 설정을 그대로 가진 플러그인이 되었습니다. 애드온에서 확인하세요',
+  'Also remove the playlists imported from Spotify?': 'Spotify에서 가져온 재생목록도 삭제할까요?',
+  'Keep': '유지',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

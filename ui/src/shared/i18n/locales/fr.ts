@@ -1200,6 +1200,8 @@ const fr: Record<string, string> = {
   'Show what you play on Discord': 'Afficher sur Discord ce que vous écoutez',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Peut afficher n’importe quel texte et des liens sur votre profil Discord, par l’appli Discord de ce PC',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'La présence Discord est maintenant un plugin, avec vos réglages : voir les modules',
+  'Also remove the playlists imported from Spotify?': 'Retirer aussi les playlists importées de Spotify ?',
+  'Keep': 'Garder',
   'See the play queue': 'Voir la file d’attente',
   'Read your listening history': 'Lire votre historique d’écoute',
   'Sees what you listened to and when': 'Voit ce que vous avez écouté et quand',

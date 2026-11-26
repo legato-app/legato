@@ -1191,6 +1191,8 @@ const vi: Record<string, string> = {
   'Show what you play on Discord': 'Hiển thị trên Discord bài bạn đang nghe',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Có thể hiển thị văn bản và liên kết bất kỳ trên hồ sơ Discord của bạn, qua ứng dụng Discord trên máy này',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Trạng thái Discord giờ là một plugin, giữ cài đặt của bạn: xem Tiện ích',
+  'Also remove the playlists imported from Spotify?': 'Xóa luôn các danh sách phát đã nhập từ Spotify?',
+  'Keep': 'Giữ lại',
   'See the play queue': 'Xem hàng chờ phát',
   'Read your listening history': 'Đọc lịch sử nghe của bạn',
   'Sees what you listened to and when': 'Thấy bạn đã nghe gì và khi nào',

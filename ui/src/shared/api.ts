@@ -24,6 +24,7 @@ export const api = {
     Object.fromEntries(await invoke<[Service, SourceStatus][]>('sources_status')) as Record<Service, SourceStatus>,
   connect: (source: Service, credentials: Credentials) => invoke<void>('connect', { source, credentials }),
   disconnect: (source: Service) => invoke<void>('disconnect', { source }),
+  removeSpotifyPlaylists: () => invoke<number>('remove_spotify_playlists'),
   sync: () => invoke<SyncReport>('sync_all'),
   library: () => invoke<LibraryData>('library'),
   /** null = too much changed: read the library whole. */

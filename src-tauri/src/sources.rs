@@ -39,6 +39,12 @@ pub async fn disconnect(state: State<'_, AppState>, source: Source) -> CmdResult
     state.connector(source).map_or(Ok(()), |c| c.disconnect()).map_err(err)
 }
 
+/// Asked after Spotify's disconnect: its imported playlists leave too.
+#[tauri::command]
+pub async fn remove_spotify_playlists(state: State<'_, AppState>) -> CmdResult<usize> {
+    state.lib().remove_spotify_playlists().map_err(err)
+}
+
 #[tauri::command]
 pub async fn sync_all(state: State<'_, AppState>) -> CmdResult<SyncReport> {
     // Songs YouTube Music refused earlier, before its playlists are read again.

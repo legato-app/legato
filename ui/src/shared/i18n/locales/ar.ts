@@ -1156,6 +1156,8 @@ const ar: Record<string, string> = {
   'Show what you play on Discord': 'إظهار ما تشغّله على Discord',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'يمكنه عرض أي نص وروابط على ملفك في Discord، عبر تطبيق Discord على هذا الحاسوب',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'أصبح حضور Discord إضافة الآن، مع إعداداتك: انظر الإضافات',
+  'Also remove the playlists imported from Spotify?': 'هل تريد أيضًا إزالة قوائم التشغيل المستوردة من Spotify؟',
+  'Keep': 'إبقاء',
   'See the play queue': 'رؤية قائمة التشغيل',
   'Read your listening history': 'قراءة سجل استماعك',
   'Sees what you listened to and when': 'يرى ما استمعت إليه ومتى',

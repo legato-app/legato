@@ -1603,3 +1603,14 @@ fn spotify_covers_are_never_kept_and_old_ones_leave_once() {
     assert_eq!((arts()["Bare"].clone(), arts()["Other"].as_deref()), (None, Some("https://a.mzstatic.com/x")));
     assert_eq!(lib.drop_spotify_art().unwrap(), 0);
 }
+
+#[test]
+fn spotify_playlists_can_leave_with_the_account() {
+    let lib = Library::in_memory().unwrap();
+    lib.save_playlist(Source::Spotify, "a", "From Spotify", &[spotify()]).unwrap();
+    lib.save_playlist(Source::Youtube, "b", "From YouTube", &[youtube()]).unwrap();
+    assert_eq!(lib.remove_spotify_playlists().unwrap(), 1);
+    assert_eq!(lib.playlists().unwrap().iter().map(|p| p.name.as_str()).collect::<Vec<_>>(), ["From YouTube"]);
+    assert!(!lib.tracks().unwrap().is_empty(), "the songs stay");
+    assert_eq!(lib.remove_spotify_playlists().unwrap(), 0);
+}

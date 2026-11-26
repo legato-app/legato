@@ -129,6 +129,22 @@ impl Library {
         })
     }
 
+    /// The playlists imported from Spotify go, on the user's word (the account disconnected). Their songs stay.
+    /// Recorded as gone, so Sync Mode removes them from the other PCs too. Returns how many.
+    pub fn remove_spotify_playlists(&self) -> Result<usize> {
+        self.tx(|| {
+            let theirs: Vec<(i64, String)> = {
+                let mut stmt = self.db.prepare("SELECT id, source_id FROM playlists WHERE source = 'spotify' AND custom = 0")?;
+                stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+            };
+            for (id, source_id) in &theirs {
+                self.db.execute("DELETE FROM playlists WHERE id = ?1", [id])?;
+                self.gone("playlist", &format!("spotify:{source_id}"))?;
+            }
+            Ok(theirs.len())
+        })
+    }
+
     /// Apply edit; returns new playlist id for Create / Duplicate.
     pub fn edit_playlist(&self, edit: PlaylistEdit) -> Result<Option<i64>> {
         self.tx(|| {

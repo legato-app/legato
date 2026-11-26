@@ -13,6 +13,8 @@ type Request = {
   title: string
   body?: string
   ok: string
+  /** The other button's words (default: Cancel). Given, it is also the default one: Enter keeps things as they are. */
+  cancel?: string
   /** Text asked for (prompt); undefined = yes / no. */
   text?: string
   done: (answer: string | boolean | null) => void
@@ -31,7 +33,7 @@ function show(r: Omit<Request, 'done' | 'id'>): Promise<string | boolean | null>
 }
 
 /** Yes / no; resolves false on Cancel, Escape or a click outside. */
-export async function ask(o: { title: string; body?: string; ok: string }): Promise<boolean> {
+export async function ask(o: { title: string; body?: string; ok: string; cancel?: string }): Promise<boolean> {
   return (await show(o)) === true
 }
 
@@ -70,10 +72,10 @@ function Question({ r }: { r: Request }) {
         />
       )}
       <div className="flex justify-end gap-2">
-        <Button variant="ghost" onClick={cancel}>
-          {tr('Cancel')}
+        <Button variant="ghost" data-default={r.cancel ? true : undefined} onClick={cancel}>
+          {r.cancel ?? tr('Cancel')}
         </Button>
-        <Button data-default onClick={ok} disabled={r.text !== undefined && !text.trim()}>
+        <Button data-default={r.cancel ? undefined : true} onClick={ok} disabled={r.text !== undefined && !text.trim()}>
           {r.ok}
         </Button>
       </div>

@@ -1191,6 +1191,8 @@ const id: Record<string, string> = {
   'Show what you play on Discord': 'Menampilkan yang kamu putar di Discord',
   'Can show any text and links on your Discord profile, through the Discord app on this PC': 'Bisa menampilkan teks dan tautan apa pun di profil Discord-mu, lewat aplikasi Discord di PC ini',
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Kehadiran Discord kini berupa plugin, dengan pengaturanmu: lihat Add-on',
+  'Also remove the playlists imported from Spotify?': 'Hapus juga playlist yang diimpor dari Spotify?',
+  'Keep': 'Simpan',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',
