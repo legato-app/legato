@@ -1460,6 +1460,7 @@ const fr: Record<string, string> = {
   '{h} h {m} min': '{h} h {m} min',
   '{n} h': '{n} h',
   'Your stats': 'Vos statistiques',
+  'From what you played in Legato': 'D’après ce que vous avez écouté dans Legato',
   'From what you played in Legato on this PC': 'D’après ce que vous avez écouté dans Legato sur ce PC',
   'Period': 'Période',
   '4 weeks': '4 semaines',

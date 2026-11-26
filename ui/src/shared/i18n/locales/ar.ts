@@ -1407,6 +1407,7 @@ const ar: Record<string, string> = {
   '{h} h {m} min': '{h} س {m} د',
   '{n} h': '{n} س',
   'Your stats': 'إحصاءاتك',
+  'From what you played in Legato': 'مما شغّلته في Legato',
   'From what you played in Legato on this PC': 'مما شغّلته في Legato على هذا الحاسوب',
   'Period': 'الفترة',
   '4 weeks': '4 أسابيع',

@@ -7,7 +7,6 @@ import { trackArt } from '../../shared/art'
 import { artistName } from '../../shared/artistName'
 import { tr } from '../../shared/i18n/i18n'
 import { usePhone } from '../../shared/phone'
-import { phoneApp } from '../../shared/platform'
 import { onMenu } from '../../shared/ui/ContextMenu'
 import { Cover } from '../../shared/ui/Cover'
 import { PageHeader } from '../../shared/ui/PageHeader'
@@ -15,6 +14,7 @@ import { navMenu, trackMenu } from '../menus'
 import { PlayingMark } from '../player/PlayingMark'
 import { usePlayer } from '../player/store'
 import { historyRows, type HistoryRow } from './days'
+import { latestOnly, withNewest } from './loading'
 import { ResetHistory } from './ResetHistory'
 
 /** Plays asked for at a time. */
@@ -31,26 +31,52 @@ export function HistoryView() {
   const single = useSettings((s) => s.settings.clickToPlay === 'single') || phone
   const [plays, setPlays] = useState<Play[] | null>(null)
   const [more, setMore] = useState(true)
-  const asking = useRef(false)
+  const [ask] = useState(latestOnly)
+  const paging = useRef(false)
+  // Counts answers: a page dropped for a later request is asked for again if the end still shows.
+  const [answers, setAnswers] = useState(0)
 
-  const load = useCallback((before: number | null) => {
-    if (asking.current) return
-    asking.current = true
-    api
-      .historyPage(before, PAGE)
-      .then(
-        (page) => {
-          setMore(page.length >= PAGE)
-          setPlays((shown) => (before === null ? page : [...(shown ?? []), ...page]))
-        },
-        (e: unknown) => {
-          setMore(false)
-          useStore.setState({ error: String(e) })
-        },
-      )
-      .finally(() => (asking.current = false))
-  }, [])
-  useEffect(() => load(null), [load])
+  const load = useCallback(
+    (before: number | null) => {
+      // One older page at a time; the newest page is asked again whenever something may have changed.
+      if (before !== null && paging.current) return
+      if (before !== null) paging.current = true
+      const wanted = ask()
+      api
+        .historyPage(before, PAGE)
+        .then(
+          (page) => {
+            if (!wanted()) return
+            const full = page.length >= PAGE
+            if (before !== null) {
+              setMore(full)
+              setPlays((shown) => [...(shown ?? []), ...page])
+            } else {
+              setMore((was) => full && was)
+              setPlays((shown) => withNewest(shown ?? [], page, PAGE))
+            }
+          },
+          (e: unknown) => {
+            if (!wanted()) return
+            setMore(false)
+            useStore.setState({ error: String(e) })
+          },
+        )
+        .finally(() => {
+          if (before !== null) paging.current = false
+          setAnswers((n) => n + 1)
+        })
+    },
+    [ask],
+  )
+  // A new play (the library read its stats again), or the window back: today may be another day by now.
+  const stats = useStore((s) => s.stats)
+  useEffect(() => load(null), [load, stats])
+  useEffect(() => {
+    const again = () => load(null)
+    window.addEventListener('focus', again)
+    return () => window.removeEventListener('focus', again)
+  }, [load])
 
   // The plays of songs still in the library, and their songs: the list playing from a row goes through.
   const { shown, songs } = useMemo(() => {
@@ -58,6 +84,7 @@ export function HistoryView() {
     const shown = (plays ?? []).filter((p) => byId.has(p.trackId))
     return { shown, songs: shown.map((p) => byId.get(p.trackId) as LibraryTrack) }
   }, [plays, tracks])
+  // `plays` is a new list at every answer: the day names are worked out again with it.
   const rows = useMemo(() => historyRows(shown, Date.now()), [shown])
 
   const scroller = useRef<HTMLDivElement>(null)
@@ -67,7 +94,7 @@ export function HistoryView() {
   const oldest = plays?.at(-1)?.startedAt ?? null
   useEffect(() => {
     if (atEnd) load(oldest)
-  }, [atEnd, oldest, load])
+  }, [atEnd, oldest, answers, load])
 
   const language = navigator.language
   const dayName = (row: Extract<HistoryRow, { kind: 'day' }>) => {
@@ -80,7 +107,7 @@ export function HistoryView() {
     <>
       <PageHeader
         title={tr('History')}
-        sub={phoneApp ? tr('From what you played in Legato on this phone') : tr('From what you played in Legato on this PC')}
+        sub={tr('From what you played in Legato')}
         actions={!!plays?.length && <ResetHistory onDone={() => load(null)} />}
         onContextMenu={onMenu(() => navMenu({ name: 'history' }))}
       />

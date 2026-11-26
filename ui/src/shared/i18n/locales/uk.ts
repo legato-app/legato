@@ -1451,6 +1451,7 @@ const uk: Record<string, string> = {
   '{h} h {m} min': '{h} год {m} хв',
   '{n} h': '{n} год',
   'Your stats': 'Твоя статистика',
+  'From what you played in Legato': 'За тим, що ви слухали в Legato',
   'From what you played in Legato on this PC': 'За прослуховуваннями в Legato на цьому ПК',
   'Period': 'Період',
   '4 weeks': '4 тижні',

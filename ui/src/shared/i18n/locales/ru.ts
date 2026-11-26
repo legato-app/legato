@@ -1451,6 +1451,7 @@ const ru: Record<string, string> = {
   '{h} h {m} min': '{h} ч {m} мин',
   '{n} h': '{n} ч',
   'Your stats': 'Твоя статистика',
+  'From what you played in Legato': 'По тому, что вы слушали в Legato',
   'From what you played in Legato on this PC': 'По прослушиваниям в Legato на этом ПК',
   'Period': 'Период',
   '4 weeks': '4 недели',

@@ -1451,6 +1451,7 @@ const hi: Record<string, string> = {
   '{h} h {m} min': '{h} घंटे {m} मिनट',
   '{n} h': '{n} घंटे',
   'Your stats': 'आपके आंकड़े',
+  'From what you played in Legato': 'Legato में आपने जो चलाया उससे',
   'From what you played in Legato on this PC': 'इस PC पर Legato में आपने जो चलाया उससे',
   'Period': 'अवधि',
   '4 weeks': '4 हफ़्ते',

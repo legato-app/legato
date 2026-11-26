@@ -1451,6 +1451,7 @@ const vi: Record<string, string> = {
   '{h} h {m} min': '{h} giờ {m} phút',
   '{n} h': '{n} giờ',
   'Your stats': 'Thống kê của bạn',
+  'From what you played in Legato': 'Từ những gì bạn đã phát trong Legato',
   'From what you played in Legato on this PC': 'Từ những gì bạn đã phát trong Legato trên PC này',
   'Period': 'Khoảng thời gian',
   '4 weeks': '4 tuần',

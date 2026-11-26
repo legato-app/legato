@@ -1451,6 +1451,7 @@ const zh: Record<string, string> = {
   '{h} h {m} min': '{h} 小时 {m} 分钟',
   '{n} h': '{n} 小时',
   'Your stats': '你的统计',
+  'From what you played in Legato': '来自你在 Legato 中播放的内容',
   'From what you played in Legato on this PC': '根据你在此电脑上用 Legato 播放的内容',
   'Period': '时段',
   '4 weeks': '4 周',

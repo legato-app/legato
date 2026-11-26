@@ -1451,6 +1451,7 @@ const ja: Record<string, string> = {
   '{h} h {m} min': '{h}時間{m}分',
   '{n} h': '{n}時間',
   'Your stats': 'あなたの統計',
+  'From what you played in Legato': 'Legato で再生した内容から',
   'From what you played in Legato on this PC': 'このPCのLegatoで再生した内容から',
   'Period': '期間',
   '4 weeks': '4週間',

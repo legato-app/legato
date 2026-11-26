@@ -1451,6 +1451,7 @@ const nl: Record<string, string> = {
   '{h} h {m} min': '{h} u {m} min',
   '{n} h': '{n} u',
   'Your stats': 'Jouw statistieken',
+  'From what you played in Legato': 'Uit wat je in Legato hebt afgespeeld',
   'From what you played in Legato on this PC': 'Op basis van wat je in Legato op deze pc hebt afgespeeld',
   'Period': 'Periode',
   '4 weeks': '4 weken',

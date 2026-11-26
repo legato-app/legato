@@ -1451,6 +1451,7 @@ const id: Record<string, string> = {
   '{h} h {m} min': '{h} j {m} mnt',
   '{n} h': '{n} j',
   'Your stats': 'Statistikmu',
+  'From what you played in Legato': 'Dari yang kamu putar di Legato',
   'From what you played in Legato on this PC': 'Dari yang kamu putar di Legato di PC ini',
   'Period': 'Periode',
   '4 weeks': '4 minggu',

@@ -1451,6 +1451,7 @@ const sv: Record<string, string> = {
   '{h} h {m} min': '{h} h {m} min',
   '{n} h': '{n} h',
   'Your stats': 'Din statistik',
+  'From what you played in Legato': 'Från det du spelat i Legato',
   'From what you played in Legato on this PC': 'Utifrån det du har spelat i Legato på den här datorn',
   'Period': 'Period',
   '4 weeks': '4 veckor',

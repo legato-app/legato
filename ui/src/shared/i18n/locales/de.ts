@@ -1451,6 +1451,7 @@ const de: Record<string, string> = {
   '{h} h {m} min': '{h} Std. {m} Min.',
   '{n} h': '{n} Std.',
   'Your stats': 'Deine Statistiken',
+  'From what you played in Legato': 'Aus dem, was du in Legato abgespielt hast',
   'From what you played in Legato on this PC': 'Aus dem, was du in Legato auf diesem PC gehört hast',
   'Period': 'Zeitraum',
   '4 weeks': '4 Wochen',

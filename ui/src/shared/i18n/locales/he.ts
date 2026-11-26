@@ -1407,6 +1407,7 @@ const he: Record<string, string> = {
   '{h} h {m} min': '{h} שע׳ {m} דק׳',
   '{n} h': '{n} שע׳',
   'Your stats': 'הסטטיסטיקות שלכם',
+  'From what you played in Legato': 'ממה שניגנתם ב-Legato',
   'From what you played in Legato on this PC': 'ממה שניגנתם ב-Legato במחשב הזה',
   'Period': 'תקופה',
   '4 weeks': '4 שבועות',

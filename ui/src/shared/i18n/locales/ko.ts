@@ -1451,6 +1451,7 @@ const ko: Record<string, string> = {
   '{h} h {m} min': '{h}시간 {m}분',
   '{n} h': '{n}시간',
   'Your stats': '나의 통계',
+  'From what you played in Legato': 'Legato에서 재생한 기록',
   'From what you played in Legato on this PC': '이 PC의 Legato에서 재생한 기록 기준',
   'Period': '기간',
   '4 weeks': '4주',

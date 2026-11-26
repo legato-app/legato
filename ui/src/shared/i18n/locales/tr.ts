@@ -1451,6 +1451,7 @@ const tr: Record<string, string> = {
   '{h} h {m} min': '{h} sa {m} dk',
   '{n} h': '{n} sa',
   'Your stats': 'İstatistiklerin',
+  'From what you played in Legato': 'Legato’da çaldıklarına göre',
   'From what you played in Legato on this PC': 'Bu bilgisayarda Legato’te çaldıklarından',
   'Period': 'Dönem',
   '4 weeks': '4 hafta',
