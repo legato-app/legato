@@ -1,9 +1,10 @@
 """The landing's 3D scene: phone, monitor and laptop showing Legato, floating with glossy objects around.
 
-Blender 5.x, headless:
-  blender -b -P scripts/landing/scene.py -- --variant dark --tex <dir of PNG shots> --out render.png
-      [--samples 64] [--scale 100] [--blend scene.blend]
-Textures: library-phone-, library-, player-{dark,light}.png (site/public/shots converted to PNG).
+Blender 5.x, headless (scripts/landing/render.mjs runs every render the site and README use):
+  blender -b -P scripts/landing/scene.py -- --variant dark --out render.png
+      [--shot wide|phone|monitor|laptop] [--frames 48] [--size 2880x1200] [--only "Phone,Vinyl"]
+      [--samples 64] [--scale 100] [--blend scene.blend] [--tex site/public/shots]
+A device shot writes numbered frames (--out frame-####). Screens: the site's own shots (WebP).
 Background stays transparent (film_transparent): the page's colour shows through.
 """
 
@@ -24,10 +25,16 @@ def arg(name, default):
 
 
 VARIANT = arg("variant", "dark")
-TEX = arg("tex", ".")
+TEX = arg("tex", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "site", "public", "shots"))
 OUT = arg("out", "")
 SAMPLES = int(arg("samples", "32"))
 SCALE = int(arg("scale", "50"))
+WIDTH, HEIGHT = (int(n) for n in arg("size", "2880x1200").split("x"))
+# A camera move from the wide view to one device (site hero), or the wide still.
+SHOT = arg("shot", "wide")
+FRAMES = int(arg("frames", "48"))
+# Only these groups render (README layers), comma separated; the rest is hidden.
+ONLY = [name for name in arg("only", "").split(",") if name]
 BLEND = arg("blend", "")
 DARK = VARIANT == "dark"
 R = math.radians
@@ -79,7 +86,7 @@ M = {
 }
 # Screens: the shot as emission under a glossy black glass.
 for key, shot in (("phone", "library-phone"), ("monitor", "library"), ("laptop", "player")):
-    M[key] = material(f"Screen {key}", (0, 0, 0), rough=0.04, coat=0.0, image=f"{shot}-{VARIANT}.png")
+    M[key] = material(f"Screen {key}", (0, 0, 0), rough=0.04, coat=0.0, image=f"{shot}-{VARIANT}.webp")
 
 # Vinyl grooves: rings bump on the record's top.
 _v = M["vinyl"].node_tree
@@ -356,9 +363,35 @@ cam = bpy.data.cameras.new("Camera")
 cam.lens = 50
 camob = bpy.data.objects.new("Camera", cam)
 coll.objects.link(camob)
-camob.location = (0, -8.1, 1.0)
-camob.rotation_euler = (Vector((0.05, 0, 0.0)) - camob.location).to_track_quat("-Z", "Y").to_euler()
+# Wide framing, then where each device shot ends: (camera, what it looks at). The camera faces each screen.
+WIDE = ((0, -8.1, 1.0), (0.05, 0, 0.0))
+SHOTS = {
+    "phone": ((-0.54, -2.98, 0.9), (-1.85, -0.2, 0.0)),
+    "monitor": ((-0.31, -2.62, 0.45), (0.0, 0.35, 0.22)),
+    "laptop": ((0.4, -2.9, 1.05), (1.9, 0.0, -0.3)),
+}
+look = bpy.data.objects.new("Camera target", None)
+coll.objects.link(look)
+aim = camob.constraints.new("TRACK_TO")
+aim.target, aim.track_axis, aim.up_axis = look, "TRACK_NEGATIVE_Z", "UP_Y"
+camob.location, look.location = WIDE
 scene.camera = camob
+scene.frame_start, scene.frame_end = 1, 1
+if SHOT != "wide":
+    scene.frame_end = FRAMES
+    for frame, (where, at) in ((1, WIDE), (FRAMES, SHOTS[SHOT])):
+        camob.location, look.location = where, at
+        camob.keyframe_insert("location", frame=frame)
+        look.keyframe_insert("location", frame=frame)
+    scene.frame_set(FRAMES)
+
+if ONLY:
+    for ob in scene.objects:
+        root = ob
+        while root.parent:
+            root = root.parent
+        if ob.type not in ("LIGHT", "CAMERA") and root.name not in ONLY:
+            ob.hide_render = True
 
 for engine in ("BLENDER_EEVEE", "BLENDER_EEVEE_NEXT"):
     try:
@@ -370,7 +403,7 @@ scene.eevee.taa_render_samples = SAMPLES
 scene.eevee.use_raytracing = True
 scene.eevee.use_shadows = True
 scene.render.film_transparent = True
-scene.render.resolution_x, scene.render.resolution_y = 2880, 1200
+scene.render.resolution_x, scene.render.resolution_y = WIDTH, HEIGHT
 scene.render.resolution_percentage = SCALE
 scene.render.image_settings.file_format = "PNG"
 scene.render.image_settings.color_mode = "RGBA"
@@ -380,5 +413,6 @@ if BLEND:
     bpy.ops.file.pack_all()
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(BLEND))
 if OUT:
+    # A move: numbered frames (OUT ends with ####); the wide view: one still.
     scene.render.filepath = os.path.abspath(OUT)
-    bpy.ops.render.render(write_still=True)
+    bpy.ops.render.render(animation=SHOT != "wide", write_still=SHOT == "wide")
