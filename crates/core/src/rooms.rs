@@ -307,7 +307,8 @@ fn room_id(id: &str) -> bool {
     id.len() == 16 && id.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
-/// What a room's QR code holds: the code, where the host listens, the room's id. Private IPv4 addresses only.
+/// What a room's QR code holds: the code, where the host listens, the room's id. Private IPv4 addresses only. No
+/// address: an invite over the internet, met through the relays (`connectors::roommeet`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoomLink {
     pub code: String,
@@ -317,8 +318,11 @@ pub struct RoomLink {
 
 impl RoomLink {
     pub fn text(&self) -> String {
-        let hosts: Vec<String> = self.hosts.iter().map(ToString::to_string).collect();
-        format!("{ROOM_LINK}c={}&h={}&r={}", self.code, hosts.join(","), self.id)
+        let mut hosts: Vec<String> = self.hosts.iter().map(ToString::to_string).collect();
+        if !hosts.is_empty() {
+            hosts = vec![format!("&h={}", hosts.join(","))];
+        }
+        format!("{ROOM_LINK}c={}{}&r={}", self.code, hosts.concat(), self.id)
     }
 
     pub fn parse(text: &str) -> Option<RoomLink> {
@@ -326,7 +330,8 @@ impl RoomLink {
         let get = |k: &str| query.split('&').find_map(|kv| kv.strip_prefix(k)?.strip_prefix('='));
         let code = get("c").filter(|c| is_code(c))?.to_string();
         let id = get("r").filter(|i| room_id(i))?.to_string();
-        let hosts: Option<Vec<SocketAddrV4>> = get("h")?.split(',').map(|h| h.parse().ok().filter(|a: &SocketAddrV4| private(IpAddr::V4(*a.ip())))).collect();
+        let Some(listed) = get("h") else { return Some(RoomLink { code, hosts: Vec::new(), id }) };
+        let hosts: Option<Vec<SocketAddrV4>> = listed.split(',').map(|h| h.parse().ok().filter(|a: &SocketAddrV4| private(IpAddr::V4(*a.ip())))).collect();
         let hosts = hosts.filter(|h| !h.is_empty() && h.len() <= ADDRS_MAX)?;
         Some(RoomLink { code, hosts, id })
     }
@@ -489,6 +494,11 @@ mod tests {
         assert_eq!(RoomLink::parse(&l.text().replace("192.168.1.20", "8.8.8.8")), None);
         assert_eq!(RoomLink::parse(&l.text().replace("042917", "42917")), None);
         assert_eq!(RoomLink::parse("legato://pair?c=042917&h=192.168.1.20:47822&i=x"), None);
+        // An invite over the internet names no address: the code and the room's id only.
+        let invite = RoomLink { hosts: Vec::new(), ..l };
+        assert_eq!(invite.text(), "legato://room?c=042917&r=0123456789abcdef");
+        assert_eq!(RoomLink::parse(&invite.text()), Some(invite.clone()));
+        assert_eq!(RoomLink::parse(&format!("{}&h=", invite.text())), None);
         assert!(is_code(&new_code()) && room_id(&new_id()));
     }
 

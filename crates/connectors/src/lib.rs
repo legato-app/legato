@@ -26,6 +26,8 @@ pub mod radio_browser;
 pub mod rooms;
 #[cfg(not(target_os = "android"))]
 pub mod roomlink;
+#[cfg(not(target_os = "android"))]
+pub mod roommeet;
 pub mod roomsignal;
 pub mod stun;
 pub mod servers;

@@ -211,14 +211,14 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Listening<S> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use k256::schnorr::{Signature, VerifyingKey};
     use tokio::net::{TcpListener, TcpStream};
 
     /// A relay on this machine: forwards each event to the subscriptions whose `#t` or `#e` it carries, says OK, or
     /// refuses every event when `refuse`.
-    async fn mock_relay(refuse: bool) -> std::net::SocketAddr {
+    pub(crate) async fn mock_relay(refuse: bool) -> std::net::SocketAddr {
         let l = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let addr = l.local_addr().unwrap();
         let (tx, _) = tokio::sync::broadcast::channel::<Value>(16);
@@ -260,7 +260,7 @@ mod tests {
         addr
     }
 
-    async fn relay(addr: std::net::SocketAddr) -> Relay<TcpStream> {
+    pub(crate) async fn relay(addr: std::net::SocketAddr) -> Relay<TcpStream> {
         Relay::over(TcpStream::connect(addr).await.unwrap(), "relay.test").await.unwrap()
     }
 
