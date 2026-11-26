@@ -5,10 +5,9 @@ Where the work stands, for a session with no history here. Read this first, then
 versions are in git. Updated 2026-11-26.
 
 ## Where things stand
-- **Repository**: `legato-app/legato`. **master** = `29f3bcfe`; `platforms` is the same commit. Work goes to master by
+- **Repository**: `legato-app/legato`. **master** = `a4412ea1` (Beta content: the Discord artist picture is back; plugin authors verified by signature, the trusted list empty); `platforms` is the same commit. Work goes to master by
   push only, on the owner's word.
-- **Last Beta**: `69fb248c` (the Now Playing title fits and settles). Its release run started 18:10Z; the newest Beta
-  `gh` lists so far is v1.2.262. Stable **1.2.10** (2026-11-14).
+- **Last Beta**: v1.2.288 = `69fb248c` (the Now Playing title settles). Stable **1.2.10** (2026-11-14).
 - **Discord presence** is a plugin, in `legato-app/discord-presence` (MIT), on API 2.
 - **Docs site**: Fumadocs (`fumadocs-core` / `fumadocs-ui` 16.19, `fumadocs-mdx` 15.6), its own `(docs)` root layout,
   static search at `/legato/api/search`. Pushed as `[skip release]` (`c382ba3d..0e7acc6b`). A `site` job in `check.yml`
@@ -21,12 +20,13 @@ versions are in git. Updated 2026-11-26.
 ## Next, in order
 1. **Theme file as a whole layout**: plan-v2's `L` line "A theme file alone can change the app's whole layout". Design
    only, first; the script question is in its sub-point.
-2. **Lite build**: plan-v2's `L` line "A Lite build next to the full one", with its design and slices under it.
-3. **Profiles on one PC**: plan-v2's `M-L` line, with its design under it.
-4. **Open plan lines**, by title (numbers move): "Now Playing panel: the album line", "Phone: the artist names bold",
+2. **Plugin fixes and pictures**, after the 2 Dec reset: (a) the bundled Discord Presence copy refreshed when its version is newer (`plugin_adopt_discord`); (b) optional plugin pictures, verified authors only; (c) Legato's signing key, Discord Presence signed, `discord_move::FILES` carrying the signature files. Plan-v2's three `plugin` lines near the theme ones.
+3. **Lite build**: plan-v2's `L` line "A Lite build next to the full one", with its design and slices under it.
+4. **Profiles on one PC**: plan-v2's `M-L` line, with its design under it.
+5. **Open plan lines**, by title (numbers move): "Now Playing panel: the album line", "Phone: the artist names bold",
    "Right-click › Hide", "Mix covers in several styles", "Normal videos counted as music", "Much fuller diagnostics",
    "Playlist edits sent back to the server", "Server songs levelled", "The remaining JSX moved into one component".
-5. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
+6. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
 
 ## Waiting on the owner
 Waiting on the owner's answer: the Spotify legal questions, removing Spotify-only songs on disconnect, and keeping the
