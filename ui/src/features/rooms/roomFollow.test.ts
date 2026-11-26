@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { RoomNow, RoomSong } from '../../shared/api'
 import { catchUp, DRIFT_MS, follow, positionAt, SETTLE_MS, shouldSeek, songKey, START, type Follow } from './roomFollow'
 
-const song = (title: string, youtube: string | null = 'dQw4w9WgXcQ'): RoomSong => ({ title, artist: 'Band', album: null, durationMs: 200_000, isrc: null, youtube, spotify: null, art: null })
+const song = (title: string, youtube: string | null = 'dQw4w9WgXcQ'): RoomSong => ({ title, artist: 'Band', album: null, durationMs: 200_000, isrc: null, youtube, art: null })
 const room = (over: Partial<RoomNow> = {}): RoomNow => ({ song: song('A'), positionMs: 10_000, playing: true, at: 0, seq: 1, ...over })
 
 /** Loaded and playing at the room's place: a settled follower at `t`. */
@@ -14,7 +14,6 @@ function settled(r: RoomNow, t: number): Follow {
 describe('roomFollow', () => {
   it('keys songs by their best id', () => {
     expect(songKey(song('A'))).toBe('yt:dQw4w9WgXcQ')
-    expect(songKey({ ...song('A', null), spotify: '4uLU6hMCjMI75M1A2tKUQC' })).toBe('sp:4uLU6hMCjMI75M1A2tKUQC')
     expect(songKey({ ...song('A', null), isrc: 'USRC17607839' })).toBe('isrc:USRC17607839')
     expect(songKey(song('Song', null))).toBe(songKey({ ...song('SONG', null), artist: 'BAND' }))
     expect(songKey(null)).toBeNull()

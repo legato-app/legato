@@ -8,11 +8,10 @@ export const DRIFT_MS = 1500
 /** After a load or a seek: left alone this long (ms), no seek loops while a player catches up. `SETTLE_MS`. */
 export const SETTLE_MS = 4000
 
-/** One key per song: its YouTube id, else Spotify's, ISRC, title and artist. */
+/** One key per song: its YouTube id, else ISRC, else title and artist. */
 export function songKey(s: RoomSong | null | undefined): string | null {
   if (!s) return null
   if (s.youtube) return `yt:${s.youtube}`
-  if (s.spotify) return `sp:${s.spotify}`
   if (s.isrc) return `isrc:${s.isrc}`
   return `t:${s.title.toLowerCase()}\u0000${s.artist.toLowerCase()}`
 }

@@ -131,7 +131,7 @@ export function roomSong(t: Pick<LibraryTrack, 'title' | 'artist' | 'album' | 'd
   const title = now?.title ?? t?.title
   if (!title) return null
   const art = t?.art?.startsWith('https://') ? t.art : null
-  return { title, artist: now?.artist ?? t?.artist ?? '', album: t?.album ?? null, durationMs: t?.durationMs ?? null, isrc: t?.isrc ?? null, youtube: now?.youtubeId ?? t?.ids.youtube ?? null, spotify: t?.ids.spotify ?? null, art }
+  return { title, artist: now?.artist ?? t?.artist ?? '', album: t?.album ?? null, durationMs: t?.durationMs ?? null, isrc: t?.isrc ?? null, youtube: now?.youtubeId ?? t?.ids.youtube ?? null, art }
 }
 
 /** Up next's first songs, in play order. */

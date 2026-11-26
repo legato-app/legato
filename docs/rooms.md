@@ -94,8 +94,8 @@ version, SPAKE2 on the code, sealed frames, tries counted).
 
 ## Privacy
 
-What leaves the host, to the devices in the room only, sealed: the song (title, artist, album, length, ISRC, YouTube
-and Spotify ids, an https cover address), its position, Up next's first 3, the device names in the room, reactions.
+What leaves the host, to the devices in the room only, sealed: the song (title, artist, album, length, ISRC, YouTube id, an
+https cover address), its position, Up next's first 3, the device names in the room, reactions.
 On mDNS, in clear, to the network: the room's id, the host device's name, how many listen, full or not. Never a file
 path, an account, a token or sound. Over the internet, the relays and Cloudflare see what is listed above, and the two
 sides see each other's IP address. The website's privacy row "Listening rooms" says the same; change both together.

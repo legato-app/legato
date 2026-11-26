@@ -9,10 +9,6 @@ export type RoomSong = { title: string, artist: string, album: string | null, du
  */
 youtube: string | null, 
 /**
- * Spotify track id.
- */
-spotify: string | null, 
-/**
  * A web cover the art scheme allows; none else.
  */
 art: string | null, };

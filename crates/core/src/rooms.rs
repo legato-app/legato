@@ -64,8 +64,6 @@ pub struct RoomSong {
     pub isrc: Option<String>,
     /// YouTube video id.
     pub youtube: Option<String>,
-    /// Spotify track id.
-    pub spotify: Option<String>,
     /// A web cover the art scheme allows; none else.
     pub art: Option<String>,
 }
@@ -86,10 +84,6 @@ fn youtube_id(id: &str) -> bool {
     id.len() == 11 && id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
 }
 
-fn spotify_id(id: &str) -> bool {
-    id.len() == 22 && id.bytes().all(|b| b.is_ascii_alphanumeric())
-}
-
 fn isrc(code: &str) -> bool {
     code.len() == 12 && code.bytes().all(|b| b.is_ascii_alphanumeric())
 }
@@ -104,7 +98,6 @@ impl RoomSong {
             duration_ms: t.duration_ms,
             isrc: t.isrc.clone(),
             youtube: t.ids.get(&Source::Youtube).cloned(),
-            spotify: t.ids.get(&Source::Spotify).cloned(),
             art: t.art.clone(),
         };
         song.checked(art_ok)
@@ -123,7 +116,6 @@ impl RoomSong {
             duration_ms: self.duration_ms.filter(|&d| d > 0 && d <= 24 * 3_600_000),
             isrc: self.isrc.map(|i| i.to_ascii_uppercase()).filter(|i| isrc(i)),
             youtube: self.youtube.filter(|v| youtube_id(v)),
-            spotify: self.spotify.filter(|s| spotify_id(s)),
             art: self.art.filter(|a| a.len() <= ART_MAX && a.starts_with("https://") && art_ok(a)),
         })
     }
@@ -133,9 +125,6 @@ impl RoomSong {
         let mut t = Track { title: self.title.clone(), artist: self.artist.clone(), album: self.album.clone(), duration_ms: self.duration_ms, isrc: self.isrc.clone(), art: self.art.clone(), ..Track::default() };
         if let Some(v) = &self.youtube {
             t.ids.insert(Source::Youtube, v.clone());
-        }
-        if let Some(s) = &self.spotify {
-            t.ids.insert(Source::Spotify, s.clone());
         }
         t
     }
@@ -375,14 +364,13 @@ mod tests {
     use std::collections::HashMap;
 
     const VIDEO: &str = "dQw4w9WgXcQ";
-    const SPOT: &str = "4uLU6hMCjMI75M1A2tKUQC";
 
     fn art_ok(url: &str) -> bool {
         url.starts_with("https://i.ytimg.com/")
     }
 
     fn song() -> RoomSong {
-        RoomSong { title: "Song".into(), artist: "Band".into(), album: Some("Album".into()), duration_ms: Some(200_000), isrc: Some("usrc17607839".into()), youtube: Some(VIDEO.into()), spotify: Some(SPOT.into()), art: Some(format!("https://i.ytimg.com/vi/{VIDEO}/hqdefault.jpg")) }
+        RoomSong { title: "Song".into(), artist: "Band".into(), album: Some("Album".into()), duration_ms: Some(200_000), isrc: Some("usrc17607839".into()), youtube: Some(VIDEO.into()), art: Some(format!("https://i.ytimg.com/vi/{VIDEO}/hqdefault.jpg")) }
     }
 
     #[test]
@@ -391,13 +379,14 @@ mod tests {
         assert_eq!(s.isrc.as_deref(), Some("USRC17607839"));
         let t = s.track();
         assert_eq!(t.ids.get(&Source::Youtube).map(String::as_str), Some(VIDEO));
-        assert_eq!(t.ids.get(&Source::Spotify).map(String::as_str), Some(SPOT));
         let mut local = song().track();
+        local.ids.insert(Source::Spotify, "4uLU6hMCjMI75M1A2tKUQC".into());
         local.ids.insert(Source::Local, r"C:\Users\Clovis\Music\a.mp3".into());
         local.art = Some("file:///C:/Users/Clovis/cover.jpg".into());
         let out = RoomSong::of(&local, art_ok).unwrap();
         let json = String::from_utf8(encode(&out).unwrap()).unwrap();
         assert!(!json.contains("Users") && !json.contains("mp3"), "{json}");
+        assert!(!json.contains("4uLU6hMCjMI75M1A2tKUQC"), "no Spotify id leaves: {json}");
         assert_eq!(out.art, None, "a local cover stays home");
         for path in [r"C:\Music\x.mp3", "/home/me/x.flac", "file:///x", "D:/x.ogg", r"\\nas\x"] {
             assert_eq!(RoomSong { title: path.into(), ..song() }.checked(art_ok), None, "{path}");
@@ -407,9 +396,9 @@ mod tests {
 
     #[test]
     fn bad_words_are_dropped() {
-        let s = RoomSong { title: format!("\u{7}{}", "x".repeat(500)), youtube: Some("nope".into()), spotify: Some("bad!".into()), isrc: Some("x".into()), art: Some("http://i.ytimg.com/a.jpg".into()), duration_ms: Some(0), ..song() }.checked(art_ok).unwrap();
+        let s = RoomSong { title: format!("\u{7}{}", "x".repeat(500)), youtube: Some("nope".into()), isrc: Some("x".into()), art: Some("http://i.ytimg.com/a.jpg".into()), duration_ms: Some(0), ..song() }.checked(art_ok).unwrap();
         assert_eq!(s.title.chars().count(), TEXT_MAX);
-        assert_eq!((s.youtube, s.spotify, s.isrc, s.art, s.duration_ms), (None, None, None, None, None));
+        assert_eq!((s.youtube, s.isrc, s.art, s.duration_ms), (None, None, None, None));
         assert_eq!(RoomSong { art: Some("https://evil.example/a.jpg".into()), ..song() }.checked(art_ok).unwrap().art, None);
         assert_eq!(RoomSong { title: "  ".into(), ..song() }.checked(art_ok), None);
     }
