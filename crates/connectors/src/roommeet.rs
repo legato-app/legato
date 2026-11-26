@@ -2,7 +2,7 @@
 //! addresses (`stun`), the offer and answer through a relay (`roomsignal`), the data channel as a stream (`roomlink`)
 //! the room's own wire then runs on.
 
-use crate::roomsignal::{Invite, Listening, RELAYS, Relay, connect};
+use crate::roomsignal::{Invite, Listening, Offer, RELAYS, Relay, connect};
 use crate::{roomlink, roomsignal, stun};
 use anyhow::{Result, anyhow};
 use std::net::{IpAddr, SocketAddr};
@@ -11,7 +11,7 @@ use std::time::Duration;
 use str0m::Candidate;
 use tokio::io::{AsyncRead, AsyncWrite, DuplexStream};
 use tokio::net::{TcpStream, UdpSocket};
-use tokio::sync::Semaphore;
+use tokio::sync::{Semaphore, mpsc};
 use tokio::time::Instant;
 use tokio_rustls::client::TlsStream;
 
@@ -57,27 +57,36 @@ pub async fn join<S: AsyncRead + AsyncWrite + Unpin>(mut relay: Relay<S>, invite
 }
 
 /// The host's side: answers every offer heard, each stream opened handed to `opened`, until the relay refuses or goes
-/// (the error says which).
-pub async fn host<S: AsyncRead + AsyncWrite + Unpin>(mut listening: Listening<S>, local: IpAddr, stun_server: Option<(&str, u16)>, opened: impl Fn(DuplexStream) + Clone + Send + 'static) -> anyhow::Error {
+/// (the error says which). Each offer's address is asked for beside the others (STUN takes seconds).
+pub async fn host<S: AsyncRead + AsyncWrite + Unpin>(mut listening: Listening<S>, local: IpAddr, stun_server: Option<(&'static str, u16)>, opened: impl Fn(DuplexStream) + Clone + Send + 'static) -> anyhow::Error {
     let slots = Arc::new(Semaphore::new(AT_ONCE));
+    // The answers come back here: the relay connection is this loop's alone.
+    let (answered, mut answers) = mpsc::unbounded_channel::<(Offer, String)>();
     loop {
-        let offer = match listening.next(Instant::now() + FOREVER).await {
-            Ok(offer) => offer,
-            Err(e) => return e,
-        };
-        let Ok(slot) = slots.clone().try_acquire_owned() else { continue };
-        // An offer that can't be answered is that listener's trouble, not the room's.
-        let Ok((socket, candidates)) = socket(local, stun_server).await else { continue };
-        let Ok((answer, opening)) = roomlink::accept(socket, candidates, &offer.sdp) else { continue };
-        let opened = opened.clone();
-        tokio::spawn(async move {
-            if let Ok(stream) = opening.await {
-                opened(stream);
+        tokio::select! {
+            heard = listening.next(Instant::now() + FOREVER) => {
+                let offer = match heard {
+                    Ok(offer) => offer,
+                    Err(e) => return e,
+                };
+                let Ok(slot) = slots.clone().try_acquire_owned() else { continue };
+                let (answered, opened) = (answered.clone(), opened.clone());
+                tokio::spawn(async move {
+                    // An offer that can't be answered is that listener's trouble, not the room's.
+                    let Ok((socket, candidates)) = socket(local, stun_server).await else { return };
+                    let Ok((answer, opening)) = roomlink::accept(socket, candidates, &offer.sdp) else { return };
+                    let _ = answered.send((offer, answer));
+                    if let Ok(stream) = opening.await {
+                        opened(stream);
+                    }
+                    drop(slot);
+                });
             }
-            drop(slot);
-        });
-        if let Err(e) = listening.answer(&offer, &answer).await {
-            return e;
+            Some((offer, answer)) = answers.recv() => {
+                if let Err(e) = listening.answer(&offer, &answer).await {
+                    return e;
+                }
+            }
         }
     }
 }
@@ -88,7 +97,6 @@ mod tests {
     use crate::rooms::{Host, SILENT, join_over};
     use crate::roomsignal::tests::{mock_relay, relay};
     use tokio::net::TcpListener;
-    use tokio::sync::mpsc;
 
     #[tokio::test]
     async fn an_invite_leads_into_the_room_through_the_relay() {
@@ -104,5 +112,24 @@ mod tests {
         let stream = join(relay(relay_address).await, invite, local, None).await.unwrap();
         let joined = join_over(stream, "042917", "Far", SILENT).await.unwrap();
         assert_eq!(joined.welcome.people, vec!["Far".to_string()]);
+    }
+
+    #[tokio::test]
+    async fn a_second_guest_does_not_wait_for_the_first_ones_address() {
+        let relay_address = mock_relay(false).await;
+        let invite = Invite { id: "0123456789abcdef".into(), code: "042917".into() };
+        let local: IpAddr = "127.0.0.1".parse().unwrap();
+        // A STUN server that never answers: the host spends 3 s on each offer's public address.
+        let silent = UdpSocket::bind("127.0.0.1:0").await.unwrap();
+        let port = silent.local_addr().unwrap().port();
+        let listening = Listening::start(relay(relay_address).await, invite.clone()).await.unwrap();
+        tokio::spawn(async move { host(listening, local, Some(("127.0.0.1", port)), drop).await });
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        let guest = || async { join(relay(relay_address).await, invite.clone(), local, None).await };
+        let started = Instant::now();
+        let (first, second) = tokio::join!(guest(), guest());
+        assert!(first.is_ok() && second.is_ok());
+        assert!(started.elapsed() < Duration::from_secs(5), "{:?}", started.elapsed());
+        drop(silent);
     }
 }
