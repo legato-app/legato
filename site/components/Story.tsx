@@ -9,6 +9,8 @@ import { rootOf } from './langs'
 import { Hero } from './Hero'
 import { useAndroid, useLatest } from './latest'
 import { EASE } from './motion'
+import { DeviceScene } from './DeviceScene'
+import { sceneProgress } from './scene'
 
 // The app's first window (tauri.conf.json); the stage scales it.
 const APP = { w: 1360, h: 860 }
@@ -60,9 +62,10 @@ function standAt(i: number, w: number, h: number, tops: number[]): Stand {
   const pose = PHONE_POSES[i]
   const top = (k: number) => (tops[k] ?? h * 0.3) + GAP
   const fit = (k: number) => Math.max(0.2, Math.min((h - BAR - GAP - top(k)) / DEVICE.h, (w * 0.8) / DEVICE.w))
-  // The hero's text is tall: the first chapter's size, its top under the headline, the rest below the fold.
+  // The hero's text is tall: the first chapter's size. At the hero it stands mid-screen, where the 3D scene's move ends
+  // (DeviceScene), and comes in as that scene fades.
   const s = fit(Math.max(i, 1)) * pose.zoom
-  const y = i ? top(i) + (h - BAR - GAP - top(i)) / 2 : top(0) + (DEVICE.h * s) / 2
+  const y = i ? top(i) + (h - BAR - GAP - top(i)) / 2 : h / 2
   return { x: w / 2 + pose.x * w, y, s, rx: pose.rx, ry: pose.ry }
 }
 
@@ -256,7 +259,8 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
   const [w, h] = useStage(box, 390, 760)
   const [flat, setFlat] = useState(false)
   useMotionValueEvent(take, 'change', (t) => setFlat(t >= 0.5))
-  const opacity = useTransform(take, (t) => Math.abs(1 - 2 * t))
+  // It comes in as the hero's 3D scene plays out and fades (DeviceScene): the scene's phone becomes this one.
+  const opacity = useTransform(() => Math.abs(1 - 2 * take.get()) * clamp((sceneProgress(at.get()) - 0.75) / 0.25))
   const transform = useTransform(() => {
     if (take.get() >= 0.5) return 'none'
     const [i, t] = step(at.get())
@@ -280,11 +284,23 @@ function PhoneWindow({ at, take, ready, live, failed, tops, onReady, onLeave, on
   )
 }
 
+/** The phone's hero: the 3D scene under the text, the scroll playing it (DeviceScene), before the phone with the demo. */
+function PhoneScene({ at, tops }: { at: MotionValue<number>; tops: MotionValue<number[]> }) {
+  const top = useTransform(tops, (all) => all[0] ?? 0)
+  return (
+    <motion.div style={{ top }} className="pointer-events-none absolute inset-x-0 px-(--pad)">
+      <DeviceScene scroll={at} />
+    </motion.div>
+  )
+}
+
 /** One stage's text: there while the window holds, gone while it travels. Hidden once out, so Tab skips it. */
 function Panel({ i, at, take, mode, right, tops, children }: { i: number; at: MotionValue<number>; take: MotionValue<number>; mode: 'pc' | 'phone' | null; right?: boolean; tops: MotionValue<number[]>; children: ReactNode }) {
   const own = useRef<HTMLElement>(null)
   const here = (a: number) => (i === LAST ? Math.min(a, i) : a)
-  const opacity = useTransform(() => (1 - clamp((Math.abs(here(at.get()) - i) - 0.22) / 0.14)) * (1 - take.get()))
+  // The phone's hero text leaves early: the 3D scene rises over it (PhoneScene).
+  const leaving = (a: number) => (i === 0 && mode === 'phone' ? 1 - clamp((a - 0.06) / 0.12) : 1 - clamp((Math.abs(here(a) - i) - 0.22) / 0.14))
+  const opacity = useTransform(() => leaving(at.get()) * (1 - take.get()))
   const y = useTransform(at, (a) => (i - here(a)) * (mode === 'phone' ? 24 : 56))
   const visibility = useTransform(opacity, (o) => (o < 0.01 ? 'hidden' : 'visible'))
   // The phone stands under the text: where it ends.
@@ -475,6 +491,7 @@ export function Story() {
           <Hero />
           <Stacked name="library" alt={c.chapters[0].alt} />
         </Panel>
+        {mode === 'phone' && <PhoneScene at={at} tops={tops} />}
         {CHAPTER_SCENES.map(({ scene, pose }, n) => ({ scene, pose, ...c.chapters[n] })).map(({ scene, title, text, alt, pose }, n) => (
           <Panel key={scene} i={n + 1} at={at} take={take} mode={mode} tops={tops} right={pose.x < 0}>
             <div className="px-(--pad) py-10 pinned:p-0 pocket:pt-5 pocket:pb-0">

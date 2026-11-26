@@ -79,7 +79,8 @@ export function Hero() {
           </li>
         ))}
       </motion.ul>
-      <motion.div variants={rise} className="w-full">
+      {/* The phone's story shows it on its own stage, the scroll driving it (Story.tsx). */}
+      <motion.div variants={rise} className="w-full pocket:hidden">
         <DeviceScene />
       </motion.div>
     </motion.div>
