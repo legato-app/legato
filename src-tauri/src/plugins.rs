@@ -285,7 +285,7 @@ pub async fn plugin_inspect(app: AppHandle, state: State<'_, AppState>, folder: 
     let files = files(&folder, &m).map_err(err)?;
     let installed = Manifest::read(&dir(&app)?.join(&m.id)).ok().map(|x| x.version);
     let granted = registry(&state).get(&m.id).map(|e| e.granted.clone()).unwrap_or_default();
-    Ok(Inspect { new_permissions: m.permissions.iter().filter(|p| !granted.contains(p)).cloned().collect(), installed, files: files.len(), size: files.iter().map(|(_, s)| s).sum(), manifest: m })
+    Ok(Inspect { new_permissions: music_plugins::perms::added(&granted, &m.permissions), installed, files: files.len(), size: files.iter().map(|(_, s)| s).sum(), manifest: m })
 }
 
 /// Installs (or updates) the plugin in `folder`, its permissions approved by the user, and turns it on.

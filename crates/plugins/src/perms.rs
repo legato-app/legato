@@ -74,6 +74,12 @@ impl Permission {
     }
 }
 
+/// The permissions in `wanted` the user hasn't approved yet (`granted`), as the manifest writes them: what an install
+/// or an update points out. Another network host is another permission; dropped ones don't count.
+pub fn added(granted: &[String], wanted: &[String]) -> Vec<String> {
+    wanted.iter().filter(|permission| !granted.contains(permission)).cloned().collect()
+}
+
 /// Who handles a call: the plugin's own thread, the app's Rust side, or the interface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Route {
@@ -150,6 +156,16 @@ pub fn may_receive(granted: &[Permission], event: &str) -> bool {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn only_new_permissions_count_as_added() {
+        let list = |names: &[&str]| names.iter().map(|name| name.to_string()).collect::<Vec<_>>();
+        let granted = list(&["ui", "network:api.example.com", "player:read"]);
+        assert_eq!(added(&granted, &list(&["ui", "network:other.example.com", "editor"])), list(&["network:other.example.com", "editor"]));
+        // Fewer than approved: nothing to ask about.
+        assert!(added(&granted, &list(&["ui"])).is_empty());
+        assert_eq!(added(&[], &list(&["ui"])), list(&["ui"]));
+    }
 
     #[test]
     fn permissions_and_hosts() {
