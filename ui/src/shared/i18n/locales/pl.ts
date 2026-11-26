@@ -1193,6 +1193,7 @@ const pl: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Status na Discordzie to teraz wtyczka, z twoimi ustawieniami: zobacz Dodatki',
   'Also remove the playlists imported from Spotify?': 'Usunąć też playlisty zaimportowane ze Spotify?',
   'Keep': 'Zachowaj',
+  'Songs imported from Spotify aren’t used': 'Utwory zaimportowane ze Spotify nie są używane',
   'See the play queue': 'Podgląd kolejki odtwarzania',
   'Read your listening history': 'Odczyt historii słuchania',
   'Sees what you listened to and when': 'Widzi, czego i kiedy słuchasz',

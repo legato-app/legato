@@ -1193,6 +1193,7 @@ const hi: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord प्रेज़ेंस अब आपकी सेटिंग्स के साथ एक प्लगइन है: ऐड-ऑन देखें',
   'Also remove the playlists imported from Spotify?': 'क्या Spotify से इंपोर्ट की गई प्लेलिस्ट भी हटाएँ?',
   'Keep': 'रखें',
+  'Songs imported from Spotify aren’t used': 'Spotify से इंपोर्ट किए गए गाने इस्तेमाल नहीं होते',
   'See the play queue': 'प्ले क्यू देखना',
   'Read your listening history': 'आपका सुनने का इतिहास पढ़ना',
   'Sees what you listened to and when': 'देखता है कि आपने क्या और कब सुना',

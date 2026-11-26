@@ -1193,6 +1193,7 @@ const sv: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord-närvaron är nu ett tillägg, med dina inställningar: se Tillägg',
   'Also remove the playlists imported from Spotify?': 'Ta också bort spellistorna som importerats från Spotify?',
   'Keep': 'Behåll',
+  'Songs imported from Spotify aren’t used': 'Låtar som importerats från Spotify används inte',
   'See the play queue': 'Se uppspelningskön',
   'Read your listening history': 'Läsa din lyssningshistorik',
   'Sees what you listened to and when': 'Ser vad du har lyssnat på och när',

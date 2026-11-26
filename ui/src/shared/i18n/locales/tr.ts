@@ -1193,6 +1193,7 @@ const tr: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord durumu artık ayarlarınla birlikte bir eklenti: Eklentiler’e bak',
   'Also remove the playlists imported from Spotify?': 'Spotify’dan içe aktarılan çalma listeleri de kaldırılsın mı?',
   'Keep': 'Koru',
+  'Songs imported from Spotify aren’t used': 'Spotify’dan içe aktarılan şarkılar kullanılmaz',
   'See the play queue': 'Çalma sırasını görmek',
   'Read your listening history': 'Dinleme geçmişini okumak',
   'Sees what you listened to and when': 'Neyi ne zaman dinlediğini görür',

@@ -182,6 +182,7 @@ export function BlindTest() {
           </div>
         </>
       )}
+      <p className="text-xs text-ink-3">{tr('Songs imported from Spotify aren’t used')}</p>
     </div>
   )
 }

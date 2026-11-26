@@ -20,6 +20,14 @@ it('picks ten songs, each with the right answer among four different ones', () =
   }
 })
 
+it('never asks a song imported from Spotify, even with a version to play', () => {
+  const tracks = Array.from({ length: 9 }, (_, i) => song(i + 1))
+  tracks[0] = song(1, { ids: { youtube: 'v1', spotify: 's1' } })
+  const game = pickRounds(tracks, 10, seq())
+  expect(game).toHaveLength(8)
+  expect(game.flatMap((r) => r.choices).some((c) => c.id === 1)).toBe(false)
+})
+
 it('leaves out what cannot be asked, one version of a song, and no game under eight songs', () => {
   const tracks = [
     ...Array.from({ length: 8 }, (_, i) => song(i + 1)),

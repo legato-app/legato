@@ -1193,6 +1193,7 @@ const id: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Kehadiran Discord kini berupa plugin, dengan pengaturanmu: lihat Add-on',
   'Also remove the playlists imported from Spotify?': 'Hapus juga playlist yang diimpor dari Spotify?',
   'Keep': 'Simpan',
+  'Songs imported from Spotify aren’t used': 'Lagu yang diimpor dari Spotify tidak dipakai',
   'See the play queue': 'Melihat antrean putar',
   'Read your listening history': 'Membaca riwayat dengarmu',
   'Sees what you listened to and when': 'Melihat apa yang kamu dengarkan dan kapan',

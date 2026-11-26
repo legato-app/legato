@@ -1193,6 +1193,7 @@ const zh: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord 状态现在是一个插件，并沿用你的设置：请查看附加组件',
   'Also remove the playlists imported from Spotify?': '同时移除从 Spotify 导入的歌单？',
   'Keep': '保留',
+  'Songs imported from Spotify aren’t used': '不使用从 Spotify 导入的歌曲',
   'See the play queue': '查看播放队列',
   'Read your listening history': '读取你的收听历史',
   'Sees what you listened to and when': '能看到你听过什么以及何时',

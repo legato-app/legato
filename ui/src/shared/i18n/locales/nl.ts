@@ -1193,6 +1193,7 @@ const nl: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord-status is nu een plug-in, met je instellingen: zie Add-ons',
   'Also remove the playlists imported from Spotify?': 'Ook de uit Spotify geïmporteerde playlists verwijderen?',
   'Keep': 'Behouden',
+  'Songs imported from Spotify aren’t used': 'Uit Spotify geïmporteerde nummers worden niet gebruikt',
   'See the play queue': 'De wachtrij zien',
   'Read your listening history': 'Je luistergeschiedenis lezen',
   'Sees what you listened to and when': 'Ziet wat je hebt geluisterd en wanneer',

@@ -1158,6 +1158,7 @@ const ar: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'أصبح حضور Discord إضافة الآن، مع إعداداتك: انظر الإضافات',
   'Also remove the playlists imported from Spotify?': 'هل تريد أيضًا إزالة قوائم التشغيل المستوردة من Spotify؟',
   'Keep': 'إبقاء',
+  'Songs imported from Spotify aren’t used': 'لا تُستخدم الأغاني المستوردة من Spotify',
   'See the play queue': 'رؤية قائمة التشغيل',
   'Read your listening history': 'قراءة سجل استماعك',
   'Sees what you listened to and when': 'يرى ما استمعت إليه ومتى',

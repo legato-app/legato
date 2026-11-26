@@ -18,12 +18,12 @@ const key = (t: LibraryTrack) => `${t.title.trim().toLowerCase()}|${t.artist.tri
 
 /**
  * A game: `rounds` songs of the library that can play and last a minute at least, one version each, each with the right answer
- * among four. Fewer than MIN_POOL songs: no game (the answers would repeat).
+ * among four. Never a song imported from Spotify (its policy: no games with its content). Fewer than MIN_POOL songs: no game (the answers would repeat).
  */
 export function pickRounds(tracks: LibraryTrack[], rounds = ROUNDS, random: () => number = Math.random, by: 'song' | 'artist' = 'song'): Round[] {
   const seen = new Set<string>()
   const pool = shuffled(
-    tracks.filter((t) => t.musicness !== 'notMusic' && (t.durationMs ?? 0) >= 60_000 && (t.ids.youtube || t.ids.local || t.ids.server || t.ids.apple) && !seen.has(key(t)) && seen.add(key(t))),
+    tracks.filter((t) => t.musicness !== 'notMusic' && (t.durationMs ?? 0) >= 60_000 && (t.ids.youtube || t.ids.local || t.ids.server || t.ids.apple) && !t.ids.spotify && !seen.has(key(t)) && seen.add(key(t))),
     random,
   )
   if (pool.length < MIN_POOL) return []

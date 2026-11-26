@@ -1193,6 +1193,7 @@ const vi: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Trạng thái Discord giờ là một plugin, giữ cài đặt của bạn: xem Tiện ích',
   'Also remove the playlists imported from Spotify?': 'Xóa luôn các danh sách phát đã nhập từ Spotify?',
   'Keep': 'Giữ lại',
+  'Songs imported from Spotify aren’t used': 'Bài hát nhập từ Spotify không được dùng',
   'See the play queue': 'Xem hàng chờ phát',
   'Read your listening history': 'Đọc lịch sử nghe của bạn',
   'Sees what you listened to and when': 'Thấy bạn đã nghe gì và khi nào',

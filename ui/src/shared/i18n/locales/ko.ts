@@ -1193,6 +1193,7 @@ const ko: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Discord 상태 표시가 설정을 그대로 가진 플러그인이 되었습니다. 애드온에서 확인하세요',
   'Also remove the playlists imported from Spotify?': 'Spotify에서 가져온 재생목록도 삭제할까요?',
   'Keep': '유지',
+  'Songs imported from Spotify aren’t used': 'Spotify에서 가져온 곡은 사용하지 않습니다',
   'See the play queue': '재생 대기열 보기',
   'Read your listening history': '감상 기록 읽기',
   'Sees what you listened to and when': '무엇을 언제 들었는지 봅니다',

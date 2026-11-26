@@ -1193,6 +1193,7 @@ const uk: Record<string, string> = {
   'Discord presence is now a plugin, with your settings: see Add-ons': 'Статус у Discord тепер плагін із вашими налаштуваннями: див. Доповнення',
   'Also remove the playlists imported from Spotify?': 'Видалити також плейлисти, імпортовані зі Spotify?',
   'Keep': 'Залишити',
+  'Songs imported from Spotify aren’t used': 'Треки, імпортовані зі Spotify, не використовуються',
   'See the play queue': 'Бачити чергу відтворення',
   'Read your listening history': 'Читати історію прослуховування',
   'Sees what you listened to and when': 'Бачить, що й коли ви слухали',
