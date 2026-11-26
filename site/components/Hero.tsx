@@ -4,6 +4,7 @@ import { ArrowRight, FolderSimple, WindowsLogo } from '@phosphor-icons/react'
 import { motion, type Variants } from 'motion/react'
 import { siApplemusic, siSpotify, siYoutubemusic } from 'simple-icons'
 import { useCopy } from './copy'
+import { DeviceScene } from './DeviceScene'
 import { useAndroid, useLatest } from './latest'
 import { EASE } from './motion'
 
@@ -78,6 +79,9 @@ export function Hero() {
           </li>
         ))}
       </motion.ul>
+      <motion.div variants={rise} className="w-full">
+        <DeviceScene />
+      </motion.div>
     </motion.div>
   )
 }
