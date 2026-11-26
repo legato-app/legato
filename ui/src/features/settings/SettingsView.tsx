@@ -190,7 +190,7 @@ function Appearance() {
   const playing = usePlayer((p) => !!p.now)
   const col = (c: Column) => (s.columns.includes(c) ? s.columns.filter((x) => x !== c) : COLUMNS.filter((x) => x === c || s.columns.includes(x)))
   const labels: Record<Column, string> = { album: msg('Album'), year: msg('Year'), genre: msg('Genre'), bpm: msg('BPM'), key: msg('Key'), sources: msg('Sources'), plays: msg('Plays'), rating: msg('Rating'), added: msg('Date added'), duration: msg('Duration') }
-  const reset: Partial<Settings> = { accent: DEFAULTS.accent, covers: DEFAULTS.covers, density: DEFAULTS.density, zoom: DEFAULTS.zoom, readout: DEFAULTS.readout, sleepButton: DEFAULTS.sleepButton, glow: DEFAULTS.glow, volume: DEFAULTS.volume, tuner: DEFAULTS.tuner, columns: DEFAULTS.columns, tint: DEFAULTS.tint, immersive: DEFAULTS.immersive, miniPlayer: DEFAULTS.miniPlayer, font: DEFAULTS.font, motion: DEFAULTS.motion, sidebarCounts: DEFAULTS.sidebarCounts, listCovers: DEFAULTS.listCovers, columnBrowser: DEFAULTS.columnBrowser, stage: DEFAULTS.stage, miniSpot: DEFAULTS.miniSpot, miniPlace: DEFAULTS.miniPlace, textSize: DEFAULTS.textSize }
+  const reset: Partial<Settings> = { accent: DEFAULTS.accent, covers: DEFAULTS.covers, density: DEFAULTS.density, zoom: DEFAULTS.zoom, readout: DEFAULTS.readout, sleepButton: DEFAULTS.sleepButton, glow: DEFAULTS.glow, volume: DEFAULTS.volume, tuner: DEFAULTS.tuner, columns: DEFAULTS.columns, tint: DEFAULTS.tint, immersive: DEFAULTS.immersive, miniPlayer: DEFAULTS.miniPlayer, font: DEFAULTS.font, motion: DEFAULTS.motion, sidebarCounts: DEFAULTS.sidebarCounts, listCovers: DEFAULTS.listCovers, columnBrowser: DEFAULTS.columnBrowser, stage: DEFAULTS.stage, miniSpot: DEFAULTS.miniSpot, miniPlace: DEFAULTS.miniPlace, textSize: DEFAULTS.textSize, themeLayouts: DEFAULTS.themeLayouts }
   return (
     <div className="contents">
       <Group title={msg('Theme')} bare>
@@ -200,6 +200,14 @@ function Appearance() {
         </Button>
       </div>
       <ThemeStudio />
+      {/* The phone keeps its own arrangement (its row is desktop only): no empty box. */}
+      {!phoneApp && (
+        <div className="rounded-xl border border-line bg-raised">
+          <Row setting="themeLayouts" label={msg('Let themes arrange the app')} sub={tr('A theme may move or hide the sidebar, the side panel and the player bar. Off, only its colors and CSS apply')}>
+            <Toggle label={tr('Let themes arrange the app')} checked={s.themeLayouts} onChange={(themeLayouts) => update({ themeLayouts })} />
+          </Row>
+        </div>
+      )}
       </Group>
       {/* Only Windows gives an accent to read: no Windows chip on the phone, and one synced from a PC shows the theme's. */}
       <Group title={msg('Accent color')} hint={s.accent === 'system' && !phoneApp ? tr('from Windows') : s.accent === 'cover' ? tr('from the cover') : s.accent && s.accent !== 'system' ? s.accent : tr('from theme')}>

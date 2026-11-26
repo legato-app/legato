@@ -21,7 +21,7 @@ const LOOK = 'rounded-lg bg-panel p-3'
  * only). YouTube: its video, 200 px tall (YouTube's minimum, sides cut), shown even with the panel hidden. Other sources:
  * the cover, when the mini player is on. Click: play / pause.
  */
-function Stage() {
+function Stage({ width }: { width: number }) {
   const now = usePlayer((s) => s.now)!
   const playing = usePlayer((s) => s.playing)
   const toggle = usePlayer((s) => s.toggle)
@@ -32,7 +32,8 @@ function Stage() {
         <VideoSlot fill onClick={toggle} className="h-50 w-full" />
       ) : (
         <button onClick={toggle} title={playing ? tr('Pause') : tr('Play')} className="block">
-          <Cover title={now.title} art={track ? trackArt(track) : undefined} size={276} />
+          {/* The panel less its padding. */}
+          <Cover title={now.title} art={track ? trackArt(track) : undefined} size={width - 24} />
         </button>
       )}
       <MiniViz className="mt-2" />
@@ -44,7 +45,7 @@ function Stage() {
  * Right panel of the main window (docs/design.md): Up next or the lyrics of what plays, beside every page (setting
  * sidePanel; Now Playing keeps its own panels). Tabs on top switch between them, as in the mockups.
  */
-export function SidePanel() {
+export function SidePanel({ width = 300 }: { width?: number }) {
   const now = usePlayer((s) => s.now)
   const playing = usePlayer((s) => s.playing)
   const full = usePlayer((s) => s.full)
@@ -73,8 +74,8 @@ export function SidePanel() {
   const look = `slide-in min-h-0 flex-1 ${LOOK}`
   return (
     // Phone layout: none (Now Playing has Up next and the lyrics).
-    <div className="flex w-75 shrink-0 flex-col gap-2 phone:hidden">
-      {stage && <Stage />}
+    <div className="flex shrink-0 flex-col gap-2 phone:hidden" style={{ width }}>
+      {stage && <Stage width={width} />}
       {parked}
       {panel === 'lyrics' && (
         <PageBoundary fallback={null}>

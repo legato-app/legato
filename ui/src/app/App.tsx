@@ -50,6 +50,8 @@ import { isShareCode } from '../features/share/shareCode'
 import { Logo } from '../shared/ui/Logo'
 import { searchShift } from './searchShift'
 import { useSettings } from './settings'
+import { useShellLayout } from './shellLayout'
+import { layoutRegions, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
@@ -94,12 +96,13 @@ function useSearchCentered(box: React.RefObject<HTMLDivElement | null>, on: bool
   return shift
 }
 
-function TopBar() {
+/** `bare`: a theme hides it. The logo, Settings, the window's buttons and the drag area stay: nothing else closes the window. */
+function TopBar({ bare, order }: { bare: boolean; order?: number }) {
   const full = usePlayer((s) => s.full)
   const searchBox = useRef<HTMLDivElement>(null)
   // The phone's bar has no room to move the search: it stays put.
   const phone = usePhone()
-  const shift = useSearchCentered(searchBox, !phone)
+  const shift = useSearchCentered(searchBox, !phone && !bare)
   // Now Playing opening or closing swaps what sits left of the search (Back / Forward, Close player): its recentring jumps then, it
   // does not slide (2026-11-13). Focus and the window's own resizes still glide.
   const [snap, setSnap] = useState(false)
@@ -126,7 +129,7 @@ function TopBar() {
   }, [])
   return (
     // Over Now Playing: a veil from the top keeps logo, Close player and window buttons readable on any cover.
-    <header data-tauri-drag-region className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
+    <header data-tauri-drag-region style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
       {/* The phone: the logo or Back, never both (Home is a tab there). */}
       <button data-brand onClick={() => go({ name: 'home' })} title={tr('Home')} className={`flex items-center gap-2.5 rounded-md px-2 py-1 ${canBack && !full ? 'phone:hidden' : ''}`}>
         <Logo />
@@ -139,30 +142,38 @@ function TopBar() {
       ) : (
         // ← → of the mockups (the mouse's back / forward buttons do the same). Nowhere to go: not drawn, its place kept
         // (a calm bar, plan-v2 › U2; the search doesn't move).
-        <span className="flex items-center gap-2">
-          <button className={`${navBtn} nudge-l ${canBack ? '' : 'invisible phone:hidden'}`} aria-label={tr('Back')} title={tr('Back')} disabled={!canBack} onClick={goBack}>
-            <CaretLeft size={16} />
-          </button>
-          <button className={`${navBtn} nudge-r phone:hidden ${canForward ? '' : 'invisible'}`} aria-label={tr('Forward')} title={tr('Forward')} disabled={!canForward} onClick={goForward}>
-            <CaretRight size={16} />
-          </button>
-        </span>
+        !bare && (
+          <span className="flex items-center gap-2">
+            <button className={`${navBtn} nudge-l ${canBack ? '' : 'invisible phone:hidden'}`} aria-label={tr('Back')} title={tr('Back')} disabled={!canBack} onClick={goBack}>
+              <CaretLeft size={16} />
+            </button>
+            <button className={`${navBtn} nudge-r phone:hidden ${canForward ? '' : 'invisible'}`} aria-label={tr('Forward')} title={tr('Forward')} disabled={!canForward} onClick={goForward}>
+              <CaretRight size={16} />
+            </button>
+          </span>
+        )
       )}
-      <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
-        <SearchBar>
-          <VoiceSearch />
-        </SearchBar>
-      </div>
-      {!online && (
+      {bare ? (
+        <div data-tauri-drag-region className="h-full flex-1" />
+      ) : (
+        <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
+          <SearchBar>
+            <VoiceSearch />
+          </SearchBar>
+        </div>
+      )}
+      {!online && !bare && (
         <span role="status" title={tr('No internet connection: your own files still play. Searches and YouTube come back with the connection.')} className="swap-in flex shrink-0 items-center gap-1.5 rounded-full bg-raised px-3 py-1 text-xs font-medium text-ink-2">
           <WifiSlash size={14} /> {tr('Offline')}
         </span>
       )}
       {!full && (
         <span className="flex items-center gap-1 pe-2">
-          <button className={`${winBtn} rounded-full! phone:hidden ${page === 'addons' ? 'bg-raised' : ''}`} aria-label={tr('Add-ons')} title={tr('Add-ons')} onClick={() => go({ name: 'addons' })} onContextMenu={onMenu(() => navMenu({ name: 'addons' }))}>
-            <PuzzlePiece size={18} weight={page === 'addons' ? 'fill' : 'regular'} />
-          </button>
+          {!bare && (
+            <button className={`${winBtn} rounded-full! phone:hidden ${page === 'addons' ? 'bg-raised' : ''}`} aria-label={tr('Add-ons')} title={tr('Add-ons')} onClick={() => go({ name: 'addons' })} onContextMenu={onMenu(() => navMenu({ name: 'addons' }))}>
+              <PuzzlePiece size={18} weight={page === 'addons' ? 'fill' : 'regular'} />
+            </button>
+          )}
           <button className={`${winBtn} turn rounded-full! ${page === 'settings' ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
             <Gear size={18} weight={page === 'settings' ? 'fill' : 'regular'} />
           </button>
@@ -336,15 +347,24 @@ export function App() {
     return () => document.removeEventListener('paste', onPaste)
   }, [])
 
+  // Where the theme puts the shell's parts (its own arrangement without a layout).
+  const placement = useShellLayout()
+  const shell = layoutRegions(placement, full)
+  // Open wide, the library stands in for the page: only with a sidebar to hold it.
+  const sidebarShown = shell.regions.left.includes('sidebar') || shell.regions.right.includes('sidebar')
+  const bar = (surface: Surface) => surface === 'topbar' && <TopBar key={surface} bare={shell.topbarBare} order={shell.order?.topbar} />
+  const column = (surface: Surface, side: 'left' | 'right') =>
+    surface === 'sidebar' ? <Sidebar key={surface} side={side} fixedWidth={placement.sizes.sidebar} /> : <SidePanel key={surface} width={placement.sizes.sidePanel} />
+
   return (
     // Setting appTint: every surface takes the playing cover's color (text keeps AA, ambient.ts).
     // Layered panels on the window's background (docs/design.md): sidebar, page, right panel; the player bar below.
     <div className="flex h-full flex-col bg-recess transition-colors duration-700" style={appTint}>
-      <TopBar />
-      <div className="flex min-h-0 flex-1 gap-2 px-2 phone:px-0">
-        <Sidebar />
+      {shell.regions.top.map(bar)}
+      <div className="flex min-h-0 flex-1 gap-2 px-2 phone:px-0" style={{ order: shell.order?.main }}>
+        {shell.regions.left.map((surface) => column(surface, 'left'))}
         {/* Your library open wide takes the page's place (kept, hidden: it comes back as it was). */}
-        <main className={`flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-bg phone:rounded-none ${libraryWide ? 'hidden' : ''}`}>
+        <main className={`flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg bg-bg phone:rounded-none ${libraryWide && sidebarShown ? 'hidden' : ''}`}>
           <Alerts />
           {/* New page: a short rise (styles.css .page-in), not when only its details change. Its padding is what a
               page band undoes to reach the pane's edges (PageHeader). */}
@@ -375,14 +395,16 @@ export function App() {
             </PageBoundary>
           </div>
         </main>
-        <SidePanel />
+        {shell.regions.right.map((surface) => column(surface, 'right'))}
         {view.name === 'settings' && view.wizard && (
           <PageBoundary fallback={null}>
             <ConnectWizard key={view.wizard} service={view.wizard} onClose={() => go({ name: 'settings', section: 'sources' })} />
           </PageBoundary>
         )}
       </div>
-      <PlayerBar />
+      {shell.regions.bottom.map(bar)}
+      {/* Here whatever the layout (a moved video frame reloads): shown above by its flex order. */}
+      <PlayerBar hidden={shell.playerBarHidden} order={shell.order?.playerBar} />
       <PhoneTabs />
       <MiniPlayer />
       <VolumeHud />

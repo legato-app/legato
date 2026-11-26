@@ -8,6 +8,7 @@ import { coverImage } from '../../shared/art'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
+import { LAYOUT_API } from '../../shared/theme/layout'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 
@@ -55,6 +56,7 @@ function ThemeCard({ t, on, onClick, badge, peek }: { t: Theme; on: boolean; onC
         {on && <Led on />} <span className="flex-1 truncate">{t.name}</span>
         <span className="font-mono text-[0.625rem] text-ink-3">{badge ?? t.accent}</span>
       </span>
+      {t.layout && t.layout.v > LAYOUT_API && <span className="text-xs text-ink-3">{tr('Its layout needs a newer Legato')}</span>}
     </button>
   )
 }

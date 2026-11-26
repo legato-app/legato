@@ -109,6 +109,37 @@ function allowedHidden(hidden: Surface[]): Surface[] {
   return shown.includes('sidebar') ? shown.filter((surface) => surface !== 'topbar') : shown
 }
 
+/** A block of the window's own column: the bars above and under the middle row (`main`: the page and its columns). */
+export type RootBlock = Surface | 'main'
+
+/** A placement as the shell draws it. */
+export interface ShellRegions {
+  /** Surfaces drawn on each side, in order. The logo is the top bar's to draw. */
+  regions: Record<Region, Surface[]>
+  /** A hidden top bar keeps what no layout can take: the window's buttons, Settings, the drag area. */
+  topbarBare: boolean
+  /** Not drawn, still mounted: it holds YouTube's player. */
+  playerBarHidden: boolean
+  /** The blocks' flex order, when the player bar shows elsewhere than last: it never moves in the page, a moved
+   *  video frame reloads. */
+  order?: Partial<Record<RootBlock, number>>
+}
+
+/** `playerOpen`: Now Playing is up, the top bar carries its Close button. */
+export function layoutRegions({ regions, hidden }: Placement, playerOpen = false): ShellRegions {
+  const drawn = (surface: Surface) => surface !== 'brand' && (!hidden.includes(surface) || surface === 'topbar' || surface === 'playerBar')
+  const shown = Object.fromEntries(REGIONS.map((region) => [region, regions[region].filter(drawn)])) as ShellRegions['regions']
+  const playerBarHidden = hidden.includes('playerBar')
+  const column: RootBlock[] = [...shown.top, 'main', ...shown.bottom]
+  const inPlace = playerBarHidden || column.at(-1) === 'playerBar'
+  return {
+    regions: shown,
+    topbarBare: hidden.includes('topbar') && !playerOpen,
+    playerBarHidden,
+    ...(!inPlace && { order: Object.fromEntries(column.map((block, index) => [block, index])) }),
+  }
+}
+
 /** The arrangement to draw for a checked layout; the app's own without one, from a newer app, or on a phone. */
 export function resolveLayout(layout: Layout | undefined, phone = false): Placement {
   if (!layout || phone || layout.v > LAYOUT_API) return DEFAULT_LAYOUT

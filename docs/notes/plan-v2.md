@@ -702,9 +702,16 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       panel is 260 to 420 px (the sidebar limits moved to `layout.ts`); a newer version's layout is kept as it came up
       to 8 000 characters (above, its version only), so a save or a sync from an older app doesn't lose it; an unnamed
       logo goes with the top bar.
-  - [ ] `M` 2. The shell drawn from the resolved layout, and the setting (on). Tests: a pure `layoutRegions`, the
+  - [x] `M` 2. The shell drawn from the resolved layout, and the setting (on). Tests: a pure `layoutRegions`, the
     default in today's order, the setting's sanitize and search entry. Skills: `add-setting` (new key, default true,
-    no `DEFAULTS_VERSION` bump, synced), i18n.
+    no `DEFAULTS_VERSION` bump, synced), i18n. 2026-11-26: done (`themeLayouts`, Appearance › Theme); tests only,
+    never seen with a layout in the app.
+    - Decided alone (2026-11-26): the player bar never moves in the page (a moved video frame reloads), a flex order
+      shows it above, so the keyboard still reaches it last; hidden, it stays mounted at no height (YouTube's player and
+      the engine's polling live there); a hidden top bar keeps the logo, Settings, the window's buttons and the drag area
+      (nothing else closes the window) and shows whole over Now Playing; a layout's size fixes the width (no resize
+      handle); with no side panel the mini player floats and its buttons open Now Playing; the row is PC only and part of
+      Reset appearance; a newer layout's theme card says it needs a newer Legato.
   - [ ] `S` 3. The brand as its own surface, never hidden. Tests: a table of hostile layouts keeps it; `css.test.ts`
     unchanged.
   - [ ] `M` 4. The import warning: `layoutSummary`, `withoutLayout` (pure), the dialog in both import paths. Tests:

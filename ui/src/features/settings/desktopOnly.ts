@@ -1,6 +1,7 @@
 /** Settings that mean nothing on a phone (a window, a tray, a keyboard, a PC's sound, a list's columns, a window's sign-in): hidden there, in the page and in the search. Ids are the rows' and groups' English labels (`data-setting`). */
 export const DESKTOP_ONLY: ReadonlySet<string> = new Set([
   'Interface size',
+  'Let themes arrange the app',
   'List columns',
   'Mini player',
   'Mini player place',

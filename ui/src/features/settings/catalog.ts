@@ -99,6 +99,7 @@ export interface SettingDef {
 export const SETTINGS: SettingDef[] = [
   { id: msg('Language'), in: 'Language', keywords: msg('language translation translate english french interface') },
   { id: msg('Theme'), in: 'Theme', keywords: msg('dark light mode windows color themes editor custom colors import export palette contrast picture background image wallpaper corners css') },
+  { id: msg('Let themes arrange the app'), in: 'Theme', keywords: msg('theme layout arrange move hide sidebar side panel player bar top') },
   { id: msg('Accent color'), in: 'Accent color', keywords: msg('colour highlight windows') },
   { id: msg('Font'), in: 'Font', keywords: msg('typeface roboto text') },
   { id: msg('Covers'), in: 'Covers', keywords: msg('cover shape round vinyl sharp artwork') },

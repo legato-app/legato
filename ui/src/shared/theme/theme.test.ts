@@ -143,6 +143,12 @@ describe('resolveTheme', () => {
     expect(sanitizeTheme({ ...base, layout: 'right' })).not.toHaveProperty('layout')
   })
 
+  it('lets themes arrange the app unless turned off', () => {
+    expect(sanitize({}).themeLayouts).toBe(true)
+    expect(sanitize({ themeLayouts: false }).themeLayouts).toBe(false)
+    expect(sanitize({ themeLayouts: 'no' }).themeLayouts).toBe(true)
+  })
+
   it('mix covers are varied by default; the old default grid moves once (v12), a pick of one’s own stays', () => {
     expect(sanitize({}).mixCovers).toBe('varied')
     expect(sanitize({ mixCovers: 'grid', defaultsVersion: 11 }).mixCovers).toBe('varied')

@@ -358,6 +358,8 @@ export interface Settings {
   tint: boolean
   /** The whole app takes that tint while a song plays. */
   appTint: boolean
+  /** A theme may move or hide the app's parts (its layout, PC only). On: asked at import before one is taken. */
+  themeLayouts: boolean
   /** Now Playing over the song's cover, big and blurred (tint used when off). */
   immersive: boolean
   /** Immersive background: blur in screen px (0–80), veil strength % (0–80), slow drift. */
@@ -621,6 +623,7 @@ export const DEFAULTS: Settings = {
   miniPlayer: false,
   tint: true,
   appTint: false,
+  themeLayouts: true,
   immersive: false,
   backdropBlur: 24,
   backdropDim: 40,
@@ -897,6 +900,7 @@ export function sanitize(raw: unknown): Settings {
     miniPlayer: typeof r.miniPlayer === 'boolean' ? r.miniPlayer : DEFAULTS.miniPlayer,
     tint: typeof r.tint === 'boolean' ? r.tint : DEFAULTS.tint,
     appTint: r.appTint === true,
+    themeLayouts: typeof r.themeLayouts === 'boolean' ? r.themeLayouts : DEFAULTS.themeLayouts,
     immersive: typeof r.immersive === 'boolean' ? r.immersive : DEFAULTS.immersive,
     backdropBlur: num(r.backdropBlur, 0, 80, DEFAULTS.backdropBlur),
     backdropDim: num(r.backdropDim, 0, 80, DEFAULTS.backdropDim),

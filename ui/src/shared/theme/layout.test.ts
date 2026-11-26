@@ -1,7 +1,29 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LAYOUT, resolveLayout, sanitizeLayout } from './layout'
+import { DEFAULT_LAYOUT, layoutRegions, resolveLayout, sanitizeLayout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
+const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
+
+describe('layoutRegions', () => {
+  it('draws the app’s own arrangement in today’s order, with no reordering', () => {
+    expect(layoutRegions(DEFAULT_LAYOUT)).toEqual({ regions: { top: ['topbar'], left: ['sidebar'], right: ['sidePanel'], bottom: ['playerBar'] }, topbarBare: false, playerBarHidden: false })
+  })
+
+  it('leaves out hidden columns, keeps the player bar mounted and a bare top bar', () => {
+    const got = draw({ v: 1, hidden: ['sidePanel', 'playerBar', 'topbar'] })
+    expect(got.regions).toEqual({ top: ['topbar'], left: ['sidebar'], right: [], bottom: ['playerBar'] })
+    expect(got).toMatchObject({ topbarBare: true, playerBarHidden: true })
+    expect(draw({ v: 1, hidden: ['sidebar'] }).regions.left).toEqual([])
+    expect(draw({ v: 1, hidden: ['topbar'] }, true).topbarBare).toBe(false)
+  })
+
+  it('orders the blocks only when the player bar shows elsewhere than last', () => {
+    expect(draw({ v: 1, regions: { top: ['topbar', 'playerBar'] } }).order).toEqual({ topbar: 0, playerBar: 1, main: 2 })
+    expect(draw({ v: 1, regions: { top: ['playerBar'] } }).order).toEqual({ topbar: 0, playerBar: 1, main: 2 })
+    expect(draw({ v: 1, regions: { right: ['sidebar'] } }).order).toBeUndefined()
+    expect(draw({ v: 1, regions: { top: ['playerBar'] }, hidden: ['playerBar'] }).order).toBeUndefined()
+  })
+})
 
 describe('sanitizeLayout', () => {
   it('keeps what is valid, drops unknown keys and ids', () => {

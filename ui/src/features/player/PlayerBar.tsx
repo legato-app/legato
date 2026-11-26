@@ -8,7 +8,8 @@ import { formatDuration } from '../../shared/format'
 import { Bar, Knob, RoundButton } from '../../shared/ui/controls'
 import { SourceIcon, sourceLabel } from '../../shared/ui/SourceIcon'
 import { ProgressLine, SeekBar, TimeText } from './Progress'
-import { useNarrow, usePhone } from '../../shared/phone'
+import { usePhone } from '../../shared/phone'
+import { useSidePanelAway } from '../../app/shellLayout'
 import { Transport } from './Transport'
 import { RoomFloats, RoomPill } from '../rooms/RoomPill'
 import { onMenu, openMenu } from '../../shared/ui/ContextMenu'
@@ -296,14 +297,15 @@ export function VolumeControl({ big }: { big?: boolean }) {
   )
 }
 
-/** Right panel switch (Up next, lyrics): Fill when open, again closes it. A narrow window has none: Now Playing opens on it. */
+/** Right panel switch (Up next, lyrics): Fill when open, again closes it. Without one (a narrow window, the theme),
+ *  Now Playing opens on it. */
 function PanelButton({ panel, label, icon: Icon }: { panel: 'upNext' | 'lyrics'; label: string; icon: typeof Queue }) {
-  const narrow = useNarrow()
-  const on = useSettings((s) => s.settings.sidePanel === panel) && !narrow
+  const away = useSidePanelAway()
+  const on = useSettings((s) => s.settings.sidePanel === panel) && !away
   const now = usePlayer((s) => !!s.now)
   const open = () => {
     const settings = useSettings.getState()
-    if (!narrow) return settings.update({ sidePanel: on ? 'none' : panel })
+    if (!away) return settings.update({ sidePanel: on ? 'none' : panel })
     settings.update({ upNext: panel === 'upNext', lyrics: panel === 'lyrics', editor: false })
     usePlayer.getState().setFull(true)
   }
@@ -326,7 +328,8 @@ function LikeButton() {
   )
 }
 
-export function PlayerBar() {
+/** `hidden`: a theme leaves it out; mounted all the same, YouTube's player and the engine's polling live here. */
+export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }) {
   const now = usePlayer((s) => s.now)
   const tail = usePlayer((s) => s.tail)
   const frameKey = usePlayer((s) => s.frameKey)
@@ -393,12 +396,14 @@ export function PlayerBar() {
   return (
     // On the window's background, under the panels (docs/design.md).
     // Phone layout: a mini player (cover, song, like, previous / play / next, a progress line); Now Playing has the rest.
-    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(playerMenu)} className="relative flex h-22 shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3">
+    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(playerMenu)} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
       {/* In key order: each iframe keeps its place as the two swap roles (a moved iframe reloads). */}
       {now?.youtubeId &&
         [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]
           .sort((a, b) => a.key - b.key)
           .map((f) => <YouTubeFrame key={f.key} videoId={f.videoId} tail={f === tail} idle={f === tail && !!tail?.done} cue={f === tail && !!tail?.cue} />)}
+      {!hidden && (
+        <>
       {phone && now && <ProgressLine className="absolute inset-x-3 top-0" />}
 
       {/* The phone: the whole song area opens Now Playing (a thumb's target, not two small ones). */}
@@ -465,6 +470,8 @@ export function PlayerBar() {
               <ArrowsOutSimple size={18} />
             </RoundButton>
           </div>
+        </>
+      )}
         </>
       )}
     </footer>

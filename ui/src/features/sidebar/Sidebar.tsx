@@ -126,7 +126,7 @@ const dot = (a: string, b: string) => (b ? `${a} · ${b}` : a)
  * album or artist (kind chips), with covers. The order picked stays (a list jumping back to Recent is what users
  * complain of first). Settings and Add-ons are in the top bar.
  */
-export function Sidebar() {
+export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWidth?: number }) {
   const { view, go, tracks, playlists, editPlaylist } = useStore(useShallow((s) => ({ view: s.view, go: s.go, tracks: s.tracks, playlists: s.playlists, editPlaylist: s.editPlaylist })))
   const [kind, setKind] = useState<Kind | null>(null)
   const is = (name: View['name']) => view.name === name
@@ -170,8 +170,10 @@ export function Sidebar() {
   const saved = useSettings((s) => s.settings.sidebarWidth)
   const [drag, setDrag] = useState<number | null>(null)
   const start = useRef<{ x: number; w: number } | null>(null)
-  const width = drag ?? saved
+  const width = fixedWidth ?? drag ?? saved
   const fit = (w: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)))
+  // The handle sits on the page's side: dragging towards the page widens.
+  const towardsPage = side === 'left' ? 1 : -1
   const art = grid ? 176 : 48
   // Open wide, it stands in for the page: whatever opens a page closes it.
   const seen = useRef(view)
@@ -252,7 +254,7 @@ export function Sidebar() {
         )}
       </section>
       {/* Edge: drag (or arrows) to resize, double-click for the default width. */}
-      {!wide && (
+      {!wide && fixedWidth === undefined && (
         <div
           role="separator"
           aria-orientation="vertical"
@@ -265,10 +267,10 @@ export function Sidebar() {
             e.currentTarget.setPointerCapture(e.pointerId)
             start.current = { x: e.clientX, w: width }
           }}
-          onPointerMove={(e) => start.current && setDrag(fit(start.current.w + e.clientX - start.current.x))}
+          onPointerMove={(e) => start.current && setDrag(fit(start.current.w + towardsPage * (e.clientX - start.current.x)))}
           onPointerUp={(e) => {
             // From the event: `drag` here can be a move behind.
-            if (drag !== null && start.current) update({ sidebarWidth: fit(start.current.w + e.clientX - start.current.x) })
+            if (drag !== null && start.current) update({ sidebarWidth: fit(start.current.w + towardsPage * (e.clientX - start.current.x)) })
             start.current = null
             setDrag(null)
           }}
@@ -277,9 +279,9 @@ export function Sidebar() {
             const step = e.key === 'ArrowLeft' ? -16 : e.key === 'ArrowRight' ? 16 : 0
             if (!step) return
             e.preventDefault()
-            update({ sidebarWidth: fit(width + step) })
+            update({ sidebarWidth: fit(width + towardsPage * step) })
           }}
-          className="absolute inset-y-2 -end-1.5 z-10 w-2 cursor-col-resize rounded-full transition-colors hover:bg-line focus-visible:bg-line"
+          className={`absolute inset-y-2 z-10 w-2 cursor-col-resize rounded-full transition-colors hover:bg-line focus-visible:bg-line ${side === 'left' ? '-end-1.5' : '-start-1.5'}`}
         />
       )}
     </aside>
