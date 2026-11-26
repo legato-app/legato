@@ -233,25 +233,19 @@ async fn shell_call(app: &AppHandle, call: &Call) -> Result<Value, String> {
             if a["query"].as_str().is_some_and(|query| query.chars().count() > 200) {
                 return Err("library.search: 200 characters at most".into());
             }
-            let query = a["query"].as_str().unwrap_or_default().trim().to_lowercase();
-            if query.is_empty() {
-                return Ok(json!([]));
-            }
             let limit = a["limit"].as_u64().unwrap_or(100).min(100) as usize;
             let tracks = state.lib().tracks().map_err(err)?;
-            let matches = |t: &&music_core::library::LibraryTrack| [Some(&t.track.title), Some(&t.track.artist), t.track.album.as_ref()].into_iter().flatten().any(|text| text.to_lowercase().contains(&query));
-            Ok(json!(tracks.iter().filter(matches).take(limit).map(track_json).collect::<Vec<_>>()))
+            let found = music_core::plugin_view::search_tracks(&tracks, a["query"].as_str().unwrap_or_default(), limit);
+            Ok(json!(found.into_iter().map(track_json).collect::<Vec<_>>()))
         }
         "history.recent" => {
             let limit = a["limit"].as_u64().unwrap_or(100).clamp(1, 500) as u32;
             let lib = state.lib();
             let plays = lib.plays_before(a["before"].as_i64(), limit).map_err(err)?;
-            let songs: HashMap<i64, music_core::library::LibraryTrack> = lib.tracks().map_err(err)?.into_iter().map(|t| (t.id, t)).collect();
-            // Plays of songs gone from the library are left out.
-            let listened = plays.iter().filter_map(|play| {
-                let song = &songs.get(&play.track_id)?.track;
-                Some(json!({ "trackId": play.track_id, "title": song.title, "artist": song.artist, "startedAt": play.started_at, "listenedMs": play.listened_ms, "completed": play.completed }))
-            });
+            let songs = lib.tracks().map_err(err)?;
+            let listened = music_core::plugin_view::recent_plays(&plays, &songs)
+                .into_iter()
+                .map(|(play, song)| json!({ "trackId": play.track_id, "title": song.track.title, "artist": song.track.artist, "startedAt": play.started_at, "listenedMs": play.listened_ms, "completed": play.completed }));
             Ok(json!(listened.collect::<Vec<_>>()))
         }
         "net.fetch" => {
