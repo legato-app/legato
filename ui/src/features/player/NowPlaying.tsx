@@ -5,6 +5,8 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
+import { useStore } from '../../app/store'
+import { primaryArtist } from '../library/filter'
 import type { LibraryTrack, Source } from '../../shared/api'
 import { bigTrackArt, trackArt } from '../../shared/art'
 import { clampRatio } from '../../shared/artbox'
@@ -210,6 +212,20 @@ function NextLine() {
   )
 }
 
+/** The album, as the artists are drawn (`ArtistLine`): bold, its cover on the right; a click opens its page. */
+function AlbumLine({ track, album }: { track: LibraryTrack; album: string }) {
+  const open = () => {
+    usePlayer.getState().setFull(false)
+    useStore.getState().go({ name: 'album', album, artist: primaryArtist(track.artist) })
+  }
+  return (
+    <button type="button" title={tr('Go to album')} onClick={open} className="group flex w-fit max-w-full items-center gap-2.5 text-left text-base font-bold hover:text-ink">
+      <span className="min-w-0 truncate group-hover:underline">{album}</span>
+      <Cover title={album} art={trackArt(track)} size={32} className="shadow-[0_2px_10px_var(--shadow)]" />
+    </button>
+  )
+}
+
 /**
  * Whole window (docs/design.md): the cover's flat tint, cover or video on the left, the title big on the right (or a
  * panel there: Up next, lyrics, the Live Editor, the title then over the controls), controls across the bottom.
@@ -356,7 +372,7 @@ export function NowPlaying() {
               {from && <FromTag />}
               <FitTitle title={now.title} floor={28} className="pb-1 text-[clamp(2.5rem,5.5vw,5.5rem)] leading-[1.05] font-black tracking-[-0.02em]" />
               <ArtistLine now={now} className="text-[1.375rem] leading-7 font-bold" />
-              {track?.album && <p className="truncate text-sm">{track.album}</p>}
+              {track?.album && <AlbumLine track={track} album={track.album} />}
               {readout && source}
               <LyricsPeek />
               <NextLine />

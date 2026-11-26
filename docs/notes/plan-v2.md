@@ -185,8 +185,8 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `M` Screen off on the phone: our extras rest (the visualizer's analysis, our own animation and polling loops), YouTube's player untouched (the owner, 2026-11-19). Sonnet: `9dce33b9`, `306de9a3`, `cbec7f0c`. Not seen on a phone yet.
 - [x] `M` The update between two songs does not seem to happen: find why (the owner, 2026-11-19: "le fameux truc de update entre deux song a pas l'air de marcher"). Opus, `f164d866`. The PC already worked; the phone now waits for the song's end; INFO lines in the log. Not tried on the phone.
 - [x] `S` One « More… » per right-click menu, never two (`5ae44406`).
-- [ ] `S` Now Playing panel: the album line like the artist's, bold, clickable, with its cover.
-  - Brief: `NowPlaying.tsx` album line as `ArtistLine.tsx` does it (small square cover, bold name, a click opens the album; no album, nothing). Album info from `ytm_browse::album_info`.
+- [x] `S` Now Playing panel: the album line like the artist's, bold, clickable, with its cover. 2026-11-26: PC panel; typecheck and lint only, not seen in the app.
+  - Decided alone (2026-11-26): no `album_info` call (it gives the year and track list, no cover: the cover is the playing song's own, nothing new asked of the network); smaller than the artists' (16 px bold) so the title and artists lead; the page opened is the one "Go to album" opens.
 - [ ] `S` Phone: the artist names bold with their picture, and the From line with the playlist's icon and bold name, as on the PC.
   - Brief: the phone block uses `ArtistLine`; the phone's From tag gets the playlist's small icon and bold name, as on the PC (`PlaylistCover.tsx`).
 - [x] `S` Playlist icons default to a grid of 4 covers (`39122055`).
