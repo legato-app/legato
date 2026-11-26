@@ -1,13 +1,15 @@
 import { create } from 'zustand'
 import { useStore } from '../../app/store'
-import { api, type PluginCall, type PluginInfo } from '../../shared/api'
+import { api, type PluginCall, type PluginEventName, type PluginInfo } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
 import { setEffects, useEditor } from '../editor/editor'
 import { cleanEffects } from '../player/effects'
-import { usePlayer } from '../player/store'
+import { onListenEnd } from '../player/listens'
+import { seekListeners, usePlayer } from '../player/store'
 import { cleanLookName, cleanOps } from './drawList'
 import { cleanCommand, cleanCss, cleanTree, type PanelNode, type PluginCommand } from './panel'
 import { usePluginViz } from './pluginViz'
+import { pluginQueue, pluginTrack } from './shapes'
 
 /**
  * Plugins in the interface: installed list, what each running one added (menu items, panel, style), and the calls
@@ -44,9 +46,19 @@ export function pluginCommands(where: PluginCommand['where'][number]): { plugin:
 export const runCommand = (plugin: string, id: string, context: unknown) => void api.pluginInput(plugin, 'command', { id, context }).catch(() => {})
 
 const nowTrack = () => {
-  const n = usePlayer.getState().now
-  return n ? { title: n.title, artist: n.artist, trackId: n.trackId !== undefined && n.trackId > 0 ? n.trackId : null, via: n.via } : null
+  const { now, durationMs } = usePlayer.getState()
+  return now ? pluginTrack(now, useStore.getState().tracks.find((t) => t.id === now.trackId), durationMs) : null
 }
+
+/** Library songs for the ids a plugin sent, in its order; unknown ones left out. */
+function librarySongs(ids: unknown) {
+  const wanted = Array.isArray(ids) ? ids.filter((x): x is number => Number.isInteger(x)).slice(0, 500) : []
+  const byId = new Map(useStore.getState().tracks.map((t) => [t.id, t]))
+  return wanted.map((id) => byId.get(id)).filter((t) => !!t)
+}
+
+/** The queue as plugins hear of it: at most once in this long. */
+const QUEUE_EVERY_MS = 500
 
 async function answer(c: PluginCall): Promise<unknown> {
   const p = usePlayer.getState()
@@ -55,6 +67,13 @@ async function answer(c: PluginCall): Promise<unknown> {
   switch (c.method) {
     case 'player.state':
       return { track: nowTrack(), playing: p.playing, positionMs: Math.round(p.positionMs), durationMs: p.durationMs, volume: p.volume }
+    case 'player.queue':
+      return pluginQueue(p.list, p.order, p.index)
+    case 'player.enqueue': {
+      const songs = librarySongs(a.ids)
+      if (!songs.length) throw new Error('No such songs in the library')
+      return p.enqueue(songs, a.next === true)
+    }
     case 'player.play':
       if (!p.playing) p.toggle()
       return null
@@ -155,8 +174,22 @@ export function startPlugins(): () => void {
   })
   const states = api.onPluginState(() => void loadPlugins())
   const offStyles = usePlugins.subscribe((s, prev) => s.styles !== prev.styles && syncStyles(s.styles))
+  const listening = () => usePlugins.getState().list.some((p) => p.running)
+  const tell = (name: PluginEventName, payload: unknown) => void (listening() && api.pluginEvent(name, payload).catch(() => {}))
+  const offEnded = onListenEnd((play) => tell('ended', { trackId: play.trackId, listenedMs: play.listenedMs, completed: play.completed }))
+  const seeked = (ms: number) => tell('seek', { positionMs: Math.max(0, Math.round(ms)) })
+  seekListeners.add(seeked)
+  let queueTimer: ReturnType<typeof setTimeout> | undefined
   const offPlayer = usePlayer.subscribe((s, prev) => {
-    if (!usePlugins.getState().list.some((p) => p.running)) return
+    if (!listening()) return
+    if (s.volume !== prev.volume) tell('volume', { volume: s.volume })
+    // Several changes in a row: one event, with the queue as it is then.
+    if ((s.list !== prev.list || s.order !== prev.order || s.index !== prev.index) && queueTimer === undefined)
+      queueTimer = setTimeout(() => {
+        queueTimer = undefined
+        const { list, order, index } = usePlayer.getState()
+        tell('queue', pluginQueue(list, order, index))
+      }, QUEUE_EVERY_MS)
     if (s.now !== prev.now && (s.now?.title !== prev.now?.title || s.now?.trackId !== prev.now?.trackId)) void api.pluginEvent('track', nowTrack()).catch(() => {})
     if (s.playing !== prev.playing) void api.pluginEvent('playing', s.playing).catch(() => {})
   })
@@ -165,6 +198,9 @@ export function startPlugins(): () => void {
     void states.then((f) => f())
     offStyles()
     offPlayer()
+    offEnded()
+    seekListeners.delete(seeked)
+    clearTimeout(queueTimer)
     syncStyles({})
   }
 }

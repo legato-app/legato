@@ -93,6 +93,8 @@
     },
     player: {
       state: () => call('player.state'),
+      queue: () => call('player.queue'),
+      enqueue: (ids, options = {}) => call('player.enqueue', { ids, next: !!options.next }),
       play: () => call('player.play'),
       pause: () => call('player.pause'),
       toggle: () => call('player.toggle'),

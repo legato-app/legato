@@ -117,6 +117,8 @@ pub const METHODS: &[(&str, Option<&str>, Route)] = &[
     ("storage.remove", None, Route::Shell),
     ("storage.keys", None, Route::Shell),
     ("player.state", Some("player:read"), Route::Ui),
+    ("player.queue", Some("player:queue"), Route::Ui),
+    ("player.enqueue", Some("player:control"), Route::Ui),
     ("player.play", Some("player:control"), Route::Ui),
     ("player.pause", Some("player:control"), Route::Ui),
     ("player.toggle", Some("player:control"), Route::Ui),
@@ -148,7 +150,7 @@ pub const METHODS: &[(&str, Option<&str>, Route)] = &[
 ];
 
 /// Events a plugin may receive, and the permission each needs.
-pub const EVENTS: &[(&str, &str)] = &[("track", "player:read"), ("playing", "player:read"), ("command", "ui"), ("panel", "ui"), ("visualizer", "visualizer")];
+pub const EVENTS: &[(&str, &str)] = &[("track", "player:read"), ("playing", "player:read"), ("ended", "player:read"), ("seek", "player:read"), ("volume", "player:read"), ("queue", "player:queue"), ("command", "ui"), ("panel", "ui"), ("visualizer", "visualizer")];
 
 /// May a plugin with `granted` call `method` with `args`? Where does the call go?
 pub fn check(granted: &[Permission], method: &str, args: &serde_json::Value) -> Result<Route, String> {

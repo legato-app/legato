@@ -219,6 +219,8 @@ export function roomMove<T>(f: () => T): T {
 let frame: HTMLIFrameElement | null = null
 export const bindFrame = (el: HTMLIFrameElement | null) => void (frame = el)
 // Other embed stopped, kept for the next overlap.
+/** Told each seek asked of the player (plugins' `seek` event). */
+export const seekListeners = new Set<(ms: number) => void>()
 const stopTail = (t: PlayerState['tail']) => t && { ...t, done: true }
 // Songs not found are left alone; lookups stop a while once YouTube refuses one (never around it).
 let nfOf: number[] | undefined
@@ -908,6 +910,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
 
   seek(ms) {
     if (held) return held()
+    for (const heard of seekListeners) heard(ms)
     const via = get().now?.via
     if (via === 'youtube') yt('seekTo', ms / 1000, true)
     else send({ type: 'seek', ms })

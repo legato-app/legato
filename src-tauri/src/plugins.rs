@@ -393,7 +393,7 @@ pub fn plugin_reply(plugins: State<Plugins>, plugin: String, id: u64, ok: bool, 
 /// An app event for every plugin allowed to hear it (track, playing).
 #[tauri::command]
 pub fn plugin_event(plugins: State<Plugins>, name: String, payload: Value) {
-    if !["track", "playing"].contains(&name.as_str()) {
+    if !["track", "playing", "ended", "seek", "volume", "queue"].contains(&name.as_str()) {
         return;
     }
     for p in plugins.running.lock().unwrap().values() {

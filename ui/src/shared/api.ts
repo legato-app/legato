@@ -3,6 +3,9 @@ import { listen } from '@tauri-apps/api/event'
 import type { Box } from './artbox'
 import type { PlexPin, PlexServer, ServerExposure, ServerKind, ServerStatus, ServerSync, AddReport, AlbumInfo, ArtistPath, Bookmark, CastDevice, SongEnds, Chapter, DeviceOffer, DeviceOfferEvent, DevicesStatus, CacheStats, Contact, Credentials, DetectInput, DetectLayers, Detection, Direction, DiscordCard, DiscordStatus, Dropped, Edit, EditDraft, Effects, ExportReport, FileList, FileTags, FindReport, Heard, ImportDoubt, JumpPlaylist, LastfmStatus, LibraryChanges, LibraryData, LibraryHealth, LibraryPlaylist, LibraryTrack, ListImport, LinkImport, Listen, ListenbrainzStatus, ListRef, LiveReport, LiveSettings, LyricHit, Lyrics, LyricsAsk, LyricsChoice, MediaNow, Merged, Mix, NearbyState, Lmix, ArtistLink, Bio, SongCredit, NewRelease, OutputDevices, Pickup, PodcastFeed, RadioStation, Play, PlayerCommand, PlayerLevels, PlayerStatus, PlaylistEdit, PluginCall, PluginInfo, PluginInspect, Pref, Presence, PushFailed, RemoteLink, RemoteSong, RoomEvent, RoomFind, RoomHeard, RoomNow, RoomReaction, RoomSong, RoomStatus, Scrobble, SearchResults, ShareCode, SharePreview, SharedSong, ShieldStatus, ShortcutEntry, SongRelease, SongTags, Source, SourceStatus, SpotifyExport, SpotifyImport, SpotifyLibraryImport, SpotifyList, SpotifyPick, SpotifyProgress, SponsorSegment, Storage, SyncProbe, SyncReport, SyncStatus, SystemAccent, TagsSaved, Taken, TasteSignal, Track, UpdateStatus, WatchCmd, WatchRect, WatchReport, YtmAccount, YtmAccounts, YtmArtist, YtmHome } from './generated'
 
+/** What the player tells running plugins (`crates/plugins` `perms::EVENTS` checks each one's permission). */
+export type PluginEventName = 'track' | 'playing' | 'ended' | 'seek' | 'volume' | 'queue'
+
 // Every type the commands and events carry is a Rust type: `pnpm types` (ts-rs) writes it into ./generated, never by hand.
 // Re-exported here, so features import them from the api.
 export * from './generated'
@@ -352,7 +355,7 @@ export const api = {
   pluginUninstall: (id: string) => invoke<void>('plugin_uninstall', { id }),
   pluginReply: (plugin: string, id: number, ok: boolean, value?: unknown, error?: string) => invoke<void>('plugin_reply', { plugin, id, ok, value: value ?? null, error: error ?? null }),
   /** App events for plugins allowed to hear them: 'track', 'playing'. */
-  pluginEvent: (name: 'track' | 'playing', payload: unknown) => invoke<void>('plugin_event', { name, payload }),
+  pluginEvent: (name: PluginEventName, payload: unknown) => invoke<void>('plugin_event', { name, payload }),
   /** A plugin's menu item ('command') or panel control ('panel') was used. */
   pluginInput: (plugin: string, name: 'command' | 'panel', payload: unknown) => invoke<void>('plugin_input', { plugin, name, payload }),
   /** The visualizer's frame for the plugin whose look shows: the latest only, never queued. */

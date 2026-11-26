@@ -74,6 +74,13 @@ shows: 'name' | 'artist' | 'song' | 'both' }`. Updates are spaced 4 s apart and 
 (`history:read`, 500 at most, newest first, `before` in unix seconds) →
 `[{ trackId, title, artist, startedAt, listenedMs, completed }]`.
 
+`app.player.queue()` (`player:queue`) → `{ index, tracks: [{ trackId, title, artist, durationMs }] }`, in play order,
+500 around the current song. `app.player.enqueue(trackIds, { next })` (`player:control`, library songs, 500 at most).
+The `track` event and `player.state().track` also carry `album`, `durationMs`, `art` (https, else null), `youtubeId`
+and `page` (the song's https page, else null). Events: `ended` `{ trackId, listenedMs, completed }` (library songs),
+`seek` `{ positionMs }`, `volume` `{ volume }` (all `player:read`), and `queue` (`player:queue`, the same shape as
+`queue()`, once every 500 ms at most).
+
 Without any permission a plugin still has its own storage, timers and log.
 
 Never available, whatever the permissions: the user's passwords, tokens and sign-ins, files on the PC, other
