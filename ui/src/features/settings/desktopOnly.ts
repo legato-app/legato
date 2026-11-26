@@ -25,5 +25,8 @@ export const DESKTOP_ONLY: ReadonlySet<string> = new Set([
   'Connect Spotify',
 ])
 
+/** Pages with no phone use (plugins run on a PC): left out of the search's pages there. */
+export const DESKTOP_ONLY_PAGES: ReadonlySet<string> = new Set(['addons'])
+
 /** Whole sections with no phone use. */
 export const DESKTOP_ONLY_SECTIONS: ReadonlySet<string> = new Set(['shortcuts'])

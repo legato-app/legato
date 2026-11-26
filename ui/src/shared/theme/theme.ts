@@ -258,6 +258,7 @@ export const TEXT_SCALES = { compact: 1, normal: 1.08, large: 1.17 } as const
 export type TextSize = keyof typeof TEXT_SCALES
 export type Spot = (typeof SPOTS)[number]
 
+// DISCORD_APP, DiscordSettings, sanitizeDiscord: read only by discordMove; drop with it.
 /** The app's own Discord application (public id, not a secret): its name shows after "Listening to". */
 export const DISCORD_APP = '1560758371064221839'
 
