@@ -8,7 +8,8 @@ import type { ReactNode } from 'react'
 export const GITHUB = 'https://github.com/legato-app/legato'
 /** The public Discord invitation: a link out, the visitor clicks and nothing is sent from this site. */
 export const DISCORD = 'https://discord.gg/WsqAuCSxQU'
-export const PLUGINS_GUIDE = `${GITHUB}/blob/master/docs/plugins.md`
+// Absolute: the same from every language's page.
+export const PLUGINS_GUIDE = 'https://legato-app.github.io/legato/docs/developers/plugins/'
 
 export type IconName = 'Playlist' | 'Sparkle' | 'FolderSimple' | 'Devices' | 'PuzzlePiece' | 'Translate'
 
@@ -258,7 +259,7 @@ export const en: Copy = {
       { q: 'Is there an Android version?', a: "A beta, yes: an APK on the download link under the Windows button (Android 8 or later, 64-bit). Open the file on your phone and allow installs from your browser when Android asks; there is no store listing: the app offers each new version itself (tap Update, then confirm in Android's installer; the first time, Android asks you to allow Legato to install apps). It talks to the same places as the Windows app, keeps its data on the phone, and syncs with your PCs over Wi-Fi from Settings › Sync Mode. iPhone: not yet." },
       { q: 'How do I move to a new PC?', a: 'Sync Mode keeps several PCs alike. For a one-time move: Settings › General › Back up your library, then Restore a backup on the new PC, and sign in to your accounts again.' },
       { q: 'How do updates work?', a: 'The app checks GitHub at launch and installs a new version between two songs, or while nothing plays. You get the versions that were tried first (Stable); Settings › General has a Beta channel that brings every change first, and may break. On Android, the app follows Beta and downloads a new version only when you tap Update.' },
-      { q: 'Can I write a plugin?', a: 'Yes: a folder with a manifest and a script, which asks for its permissions when someone installs it. The guide: [docs/plugins.md].', href: PLUGINS_GUIDE },
+      { q: 'Can I write a plugin?', a: 'Yes: a folder with a manifest and a script, which asks for its permissions when someone installs it. The guide: [Docs › Plugins].', href: PLUGINS_GUIDE },
       { q: 'Windows warns me about the installer: is it safe?', a: 'The installer isn’t signed with a Windows code-signing certificate, so SmartScreen may warn the first time: More info › Run anyway. Updates are signed, and the app checks them before it installs them.' },
       { q: 'Which file do I download?', a: 'Legato_…_x64-setup.exe: run it. The .msi is the same app, for managed PCs. New versions install themselves between two songs; Settings › General › Updates picks Stable (tried) or Beta (every green change, sooner and rougher).' },
     ],

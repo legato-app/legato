@@ -2,6 +2,7 @@ import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layo
 import defaultComponents from 'fumadocs-ui/mdx'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { OldAnchors } from '@/components/OldAnchors'
 import { source } from '@/lib/source'
 
 type Props = { params: Promise<{ slug?: string[] }> }
@@ -12,6 +13,7 @@ export default async function Page({ params }: Props) {
   const Content = page.data.body
   return (
     <DocsPage toc={page.data.toc}>
+      {!page.slugs.length && <OldAnchors />}
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
