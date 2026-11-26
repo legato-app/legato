@@ -3,7 +3,7 @@
 Desktop music player (Tauri 2 + Rust + React/TS, an Android build too) that unifies Spotify, YouTube, Apple Music,
 personal servers and local files.
 
-Read first: `docs/notes/handoff.md` (where the work stands), then only the sections of `docs/notes/plan-v2.md` you need
+Read first: `docs/notes/handoff.md` (where the work stands), `docs/notes/workflow.md` (how the work is run), then only the sections of `docs/notes/plan-v2.md` you need
 (open work; history in git). Overview `docs/architecture.md`, design `docs/design.md` (Figma file "Untitled", to be
 renamed "Legato · Design", every page light and dark), playback `docs/playback.md`, dev traps `docs/development.md`.
 What users read is the website, `site/` (Next.js static export on GitHub Pages, copy in `site/components/content.tsx`);
