@@ -306,15 +306,16 @@ function showPanel(panel: 'upNext' | 'lyrics', away: boolean) {
   usePlayer.getState().setFull(true)
 }
 
-/** What a theme hid from the bar that the player's menu lacks: on top of the bar's More. */
-function hiddenPartEntries(shown: string[], away: boolean): MenuEntry[] {
+/** What a theme hid from the bar that the player's menu lacks: on top of the bar's menu. `controls`: that menu has its
+ *  play controls, Full screen among them. */
+function hiddenPartEntries(shown: string[], away: boolean, controls: boolean): MenuEntry[] {
   const { volume, setVolume, toggleMute, setFull } = usePlayer.getState()
   const levels = [100, 75, 50, 25].map((percent) => ({ label: `${percent}%`, onSelect: () => setVolume(percent / 100) }))
   const entries: (MenuEntry | false)[] = [
     !shown.includes('lyrics') && { label: tr('Lyrics'), icon: <Quotes size={16} />, onSelect: () => showPanel('lyrics', away) },
     !shown.includes('upNext') && { label: tr('Up next'), icon: <Queue size={16} />, onSelect: () => showPanel('upNext', away) },
     !shown.includes('volume') && { label: tr('Volume'), icon: <SpeakerHigh size={16} />, items: [{ label: volume > 0 ? tr('Mute') : tr('Unmute'), onSelect: toggleMute }, ...levels] },
-    !shown.includes('fullScreen') && { label: tr('Now playing, full screen'), icon: <ArrowsOutSimple size={16} />, onSelect: () => setFull(true) },
+    !controls && !shown.includes('fullScreen') && { label: tr('Now playing, full screen'), icon: <ArrowsOutSimple size={16} />, onSelect: () => setFull(true) },
   ]
   return entries.filter(Boolean)
 }
@@ -415,10 +416,11 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
 
   const centerParts = arrangeParts(choice, PART_GROUPS.playerBar[1])
   const actionParts = arrangeParts(choice, PART_GROUPS.playerBar[2])
-  // The bar's More: what the theme hid first, then the player's menu (with its play controls if the bar lost them).
-  const moreEntries = (): MenuEntry[] => {
-    const missing = hiddenPartEntries(actionParts, away)
-    return [...missing, ...(missing.length ? ['-' as const] : []), ...playerMenu({ controls: !centerParts.includes('transport') })]
+  // The bar's menu: what the theme hid first, then the player's own. Right-click keeps the play controls; More, beside
+  // them, has them only if the bar lost them. Nothing playing: the app's menu alone.
+  const barEntries = (controls: boolean): MenuEntry[] => {
+    const missing = now ? hiddenPartEntries(actionParts, away, controls) : []
+    return [...missing, ...(missing.length ? ['-' as const] : []), ...playerMenu({ controls })]
   }
   const center: Record<string, ReactNode> = {
     transport: <Transport />,
@@ -439,7 +441,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
     // The rare ones (picture in picture, sleep timer, Karaoke, Cover display, share…): the player's menu, as on a
     // right-click (a calm bar, plan-v2 › U2).
     more: (
-      <RoundButton label={tr('More')} kind="plain" size="sm" disabled={!now} onClick={(e) => openMenu(e, moreEntries(), { place: 'above' })}>
+      <RoundButton label={tr('More')} kind="plain" size="sm" disabled={!now} onClick={(e) => openMenu(e, barEntries(!centerParts.includes('transport')), { place: 'above' })}>
         <DotsThree size={20} weight="bold" />
       </RoundButton>
     ),
@@ -506,7 +508,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
   return (
     // On the window's background, under the panels (docs/design.md).
     // Phone layout: a mini player (cover, song, like, previous / play / next, a progress line); Now Playing has the rest.
-    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(playerMenu)} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
+    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(() => barEntries(true))} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
       {/* In key order: each iframe keeps its place as the two swap roles (a moved iframe reloads). */}
       {now?.youtubeId &&
         [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]
