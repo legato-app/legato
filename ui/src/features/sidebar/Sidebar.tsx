@@ -172,8 +172,8 @@ export function Sidebar({ side, fixedWidth }: { side: 'left' | 'right'; fixedWid
   const start = useRef<{ x: number; w: number } | null>(null)
   const width = fixedWidth ?? drag ?? saved
   const fit = (w: number) => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)))
-  // The handle sits on the page's side: dragging towards the page widens.
-  const towardsPage = side === 'left' ? 1 : -1
+  // The handle sits on the page's side: dragging towards the page widens. Right to left, the sides swap on screen.
+  const towardsPage = (side === 'left') === (document.documentElement.dir !== 'rtl') ? 1 : -1
   const art = grid ? 176 : 48
   // Open wide, it stands in for the page: whatever opens a page closes it.
   const seen = useRef(view)
