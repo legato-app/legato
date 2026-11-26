@@ -170,9 +170,15 @@ export function startPlugins(): () => void {
 }
 
 /** Permission → what it lets a plugin do, for the approval dialog. */
-export function permissionText(p: string): { text: string; risky: boolean } {
+export function permissionText(p: string): { text: string; risky: boolean; warning?: string } {
   if (p.startsWith('network:')) return { text: tr('Send and receive data from {host} (it can send there what it can read)', { host: p.slice(8) }), risky: true }
   switch (p) {
+    case 'discord:presence':
+      return { text: tr('Show what you play on Discord'), risky: true, warning: tr('Shows what you play on your Discord profile, through the Discord app on this PC') }
+    case 'player:queue':
+      return { text: tr('See the play queue'), risky: false }
+    case 'history:read':
+      return { text: tr('Read your listening history'), risky: true, warning: tr('Sees what you listened to and when') }
     case 'player:read':
       return { text: tr('See what plays and when it changes'), risky: false }
     case 'player:control':

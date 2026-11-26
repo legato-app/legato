@@ -24,6 +24,12 @@ pub enum Permission {
     Editor,
     /// A look for the visualizer: the music's levels in, a drawing out.
     Visualizer,
+    /// Show what plays on the user's Discord profile (API 2).
+    DiscordPresence,
+    /// See the play queue (API 2).
+    PlayerQueue,
+    /// See what was listened to and when (API 2).
+    HistoryRead,
     /// HTTPS requests to this host only, through the app.
     Network(String),
 }
@@ -49,6 +55,9 @@ impl Permission {
             "ui:style" => Self::UiStyle,
             "editor" => Self::Editor,
             "visualizer" => Self::Visualizer,
+            "discord:presence" => Self::DiscordPresence,
+            "player:queue" => Self::PlayerQueue,
+            "history:read" => Self::HistoryRead,
             _ => match s.strip_prefix("network:") {
                 Some(h) => {
                     ensure!(host_ok(h), "Not a host name a plugin can ask for: {h}");
@@ -57,6 +66,14 @@ impl Permission {
                 None => bail!("Unknown permission: {s}"),
             },
         })
+    }
+
+    /// The first plugin API that has it: an older manifest can't ask for it.
+    pub fn since_api(&self) -> u32 {
+        match self {
+            Self::DiscordPresence | Self::PlayerQueue | Self::HistoryRead => 2,
+            _ => 1,
+        }
     }
 
     pub fn as_string(&self) -> String {
@@ -69,6 +86,9 @@ impl Permission {
             Self::UiStyle => "ui:style".into(),
             Self::Editor => "editor".into(),
             Self::Visualizer => "visualizer".into(),
+            Self::DiscordPresence => "discord:presence".into(),
+            Self::PlayerQueue => "player:queue".into(),
+            Self::HistoryRead => "history:read".into(),
             Self::Network(h) => format!("network:{h}"),
         }
     }

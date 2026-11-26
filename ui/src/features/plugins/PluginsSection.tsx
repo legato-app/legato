@@ -21,13 +21,14 @@ function Permissions({ list, fresh }: { list: string[]; fresh?: string[] }) {
   return (
     <ul className="flex flex-col gap-1.5">
       {list.map((p) => {
-        const { text, risky } = permissionText(p)
+        const { text, risky, warning } = permissionText(p)
         return (
           <li key={p} className="flex items-start gap-2 text-[0.8125rem]">
             {risky ? <Warning size={15} className="mt-0.5 shrink-0 text-[#F0B232]" /> : <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-ink-3" />}
             <span>
               {text}
               {fresh?.includes(p) && <span className="ms-1.5 rounded-full border border-line px-1.5 text-[0.625rem] text-ink-2">{tr('New')}</span>}
+              {warning && <span className="block text-xs text-ink-2">{warning}</span>}
             </span>
           </li>
         )

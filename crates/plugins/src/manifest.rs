@@ -68,7 +68,8 @@ impl Manifest {
         ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to the manifest");
         ensure!(m.permissions.len() <= 32, "manifest: too many permissions");
         for p in &m.permissions {
-            Permission::parse(p)?;
+            let since = Permission::parse(p)?.since_api();
+            ensure!(since <= m.api, "manifest: {p} needs plugin API {since}");
         }
         for (field, link) in [("homepage", &m.homepage), ("repository", &m.repository)] {
             if let Some(link) = link {
@@ -114,6 +115,13 @@ mod tests {
         std::fs::remove_dir_all(&folder).unwrap();
         assert!(Manifest::parse(&json(r#","repository":"http://x""#)).is_err());
         assert!(Manifest::parse(&json("").replace("\"api\":1", "\"api\":3")).unwrap_err().to_string().contains("newer version of Legato"));
+    }
+
+    #[test]
+    fn the_newer_permissions_need_a_newer_api() {
+        let asking = json(r#","permissions":["discord:presence","player:queue","history:read"]"#);
+        assert!(Manifest::parse(&asking).unwrap_err().to_string().contains("needs plugin API 2"));
+        assert_eq!(Manifest::parse(&asking.replace("\"api\":1", "\"api\":2")).unwrap().permissions().len(), 3);
     }
 
     #[test]

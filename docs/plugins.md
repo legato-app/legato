@@ -55,6 +55,14 @@ The manifest, JSON. `legato.manifest` is read first, else `plugin.json`:
 | `visualizer` | offer a look for the visualizer, hear the music's levels while it shows, draw it |
 | `network:<host>` | HTTPS requests to that host only, e.g. `network:api.example.com` |
 
+From API 2 (a manifest asking for them with `"api": 1` is refused):
+
+| Permission | Lets the plugin | Said under it at install |
+|---|---|---|
+| `discord:presence` | show what plays on your Discord profile | Shows what you play on your Discord profile, through the Discord app on this PC |
+| `player:queue` | see the play queue | |
+| `history:read` | read your listening history | Sees what you listened to and when |
+
 Without any permission a plugin still has its own storage, timers and log.
 
 Never available, whatever the permissions: the user's passwords, tokens and sign-ins, files on the PC, other
