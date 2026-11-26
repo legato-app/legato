@@ -375,6 +375,53 @@ mod tests {
     }
 
     #[test]
+    fn the_discord_example_shows_a_youtube_song_and_a_pause() {
+        let manifest = Manifest::parse(include_str!("../../../examples/plugins/discord-presence/legato.manifest")).unwrap();
+        let granted = manifest.permissions();
+        let spy = Arc::new(Spy::default());
+        let plugin = Running::start(manifest, granted, include_str!("../../../examples/plugins/discord-presence/main.js").into(), "1.0.0", spy.clone());
+        // The app, faked: kept settings, a YouTube song first playing, then paused.
+        let state = |playing: bool| json!({ "track": { "title": "Song", "artist": "Band", "album": null, "art": null, "youtubeId": "abc", "page": "https://www.youtube.com/watch?v=abc" }, "playing": playing, "positionMs": 1000.4, "durationMs": 200000 });
+        let mut playing = true;
+        let mut answered = 0;
+        let mut sent: Vec<Value> = Vec::new();
+        let end = Instant::now() + Duration::from_secs(5);
+        while sent.len() < 2 && Instant::now() < end {
+            let call = spy.calls.lock().unwrap().get(answered).cloned();
+            let Some(call) = call else {
+                std::thread::sleep(Duration::from_millis(10));
+                continue;
+            };
+            answered += 1;
+            let answer = match call.method.as_str() {
+                "storage.get" => match call.args["key"].as_str().unwrap() {
+                    "clientId" => json!("123456"),
+                    "paused" => json!(true),
+                    _ => Value::Null,
+                },
+                "player.state" => state(playing),
+                "discord.set" => json!({ "connected": true, "error": null }),
+                _ => Value::Null,
+            };
+            plugin.reply(call.id, Ok(answer));
+            if call.method == "discord.set" {
+                sent.push(call.args);
+                if playing {
+                    playing = false;
+                    plugin.event("playing", json!(false));
+                }
+            }
+        }
+        assert_eq!(sent.len(), 2, "{:?}", spy.logs.lock().unwrap());
+        assert_eq!(sent[0]["clientId"], "123456");
+        assert_eq!(sent[0]["positionMs"], 1000);
+        assert_eq!(sent[0]["art"], "https://i.ytimg.com/vi/abc/hqdefault.jpg");
+        assert_eq!(sent[0]["buttons"][0], json!({ "label": "Listen on YouTube", "url": "https://www.youtube.com/watch?v=abc" }));
+        assert_eq!(sent[0]["buttons"][1]["label"], "Get App On GitHub");
+        assert_eq!((sent[0]["playing"].clone(), sent[1]["playing"].clone()), (json!(true), json!(false)));
+    }
+
+    #[test]
     fn timers_fire_and_clear() {
         let (_r, spy) = start("let n = 0; const id = setInterval(() => { n++; if (n === 3) { clearInterval(id); console.log('three') } }, 10); setTimeout(() => console.log('once'), 5)", vec![]);
         wait_for(|| spy.logs.lock().unwrap().iter().any(|l| l == "info: three"));

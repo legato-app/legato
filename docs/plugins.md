@@ -5,7 +5,8 @@ service. It is a folder with two files, installed by the user from **Add-ons ›
 runs, the user sees who made it and every permission it asks for, and approves them.
 
 Example: [`examples/plugins/sleep-timer`](../examples/plugins/sleep-timer) (pauses the music after a while, with a
-fade).
+fade). API 2: [`examples/plugins/discord-presence`](../examples/plugins/discord-presence) (what plays, on your
+Discord profile).
 
 ## The folder
 
