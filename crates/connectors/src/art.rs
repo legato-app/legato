@@ -21,10 +21,11 @@ pub fn allowed(url: &str) -> bool {
 }
 
 /// A cover others may be handed (plugins, and Discord through them): a public service's https address only. Never a
-/// personal server's (its address is the user's own), a radio's favicon or a file. The interface's twin:
+/// personal server's (its address is the user's own), the user's Discord picture or banner, a radio's favicon or a
+/// file. The interface's twin:
 /// `publicCover` in `plugins/shapes.ts`.
 pub fn public_cover(url: &str) -> bool {
-    url.starts_with("https://") && url.len() <= 1000 && service(url)
+    url.starts_with("https://") && url.len() <= 1000 && !Url::parse(url).is_ok_and(|parsed| parsed.host_str() == Some("cdn.discordapp.com")) && service(url)
 }
 
 /// Radio stations' favicons (a station's page chooses its host, so any host): only addresses the Rust side handed out
@@ -350,7 +351,7 @@ mod tests {
         for public in ["https://i.ytimg.com/vi/abc/hqdefault.jpg", "https://is1-ssl.mzstatic.com/image/thumb/a/600x600bb.jpg"] {
             assert!(public_cover(public), "{public}");
         }
-        for kept in ["https://music.example.net/rest/getCoverArt.view?id=al-1", "http://i.ytimg.com/vi/abc/hqdefault.jpg", "art://local/1", "C:/Music/cover.jpg"] {
+        for kept in ["https://music.example.net/rest/getCoverArt.view?id=al-1", "http://i.ytimg.com/vi/abc/hqdefault.jpg", "art://local/1", "C:/Music/cover.jpg", "https://cdn.discordapp.com/avatars/1/a.png?size=256", "https://CDN.discordapp.com/banners/1/b.png"] {
             assert!(!public_cover(kept), "{kept}");
         }
     }
