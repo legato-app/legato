@@ -671,6 +671,30 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Sync Mode's per-PC files, and a wrong first step could mix two people's data. Needs the owner's choices (what is shared, e.g. local
       folders) before the data model.
       Owner's choices (2026-11-25): shared between profiles: local folders, personal servers (Subsonic, Jellyfin, Plex), look and sound (theme, EQ, playback settings); each profile's own: library, likes, history, Last.fm, YouTube cookies (WebView2 profile), keychain entries. A profile picker at launch when there are several; a switch restarts the app. An optional 4-digit code per profile, said in the UI as a lock against mistakes, not real protection.
+  - Design (Opus, 2026-11-26):
+    - No migration: today's data is the profile "Main", where it already is. `profiles.json` in `app_data_dir`:
+      `[{id, uid, name, color, code?}]` plus `last`. `code` is a salted sha256 of the 4 digits, checked in Rust.
+    - Another profile `<id>`: `app_data_dir/profiles/<id>/library.db`; WebView2 at
+      `app_local_data_dir/profiles/<id>/EBWebView` (`data_directory` on the main window builder, `lib.rs:835`); keychain
+      service `app.legato.desktop.p.<id>`. Last.fm, ListenBrainz, Discord, the Google session, plugins and the Sync device
+      id follow from those three.
+    - Shared: `SHARED_KEYS` (theme, EQ and playback, `localFolders`, servers) in `app_data_dir/shared.json`, laid over the
+      profile's settings; server secrets stay under the Main keychain service; the art cache stays shared.
+    - Switching restarts the app: `profile_switch(id)` writes `last`, then `app.restart()`. WebView2's folder is fixed at
+      start, and rebuilding `AppState` live risks mixing two people's data. `--profile <id>` at start. A profile with a
+      code asks for it before anything shows.
+    - UI: an avatar (initial + colour) at the end of the TopBar (`App.tsx:97`). Its menu: the current profile + Manage,
+      the others (switch), Add a profile, Remove (asks; the library is backed up first, then the folder and keychain
+      service are deleted).
+    - Sync Mode: the snapshot carries the profile `uid` and the merge refuses another `uid`; setup and pairing bind the
+      current profile. Android: one profile; the switcher is desktop only.
+    - Decided during the 2026-11-26 run: avatar menu first. The launch picker (the owner's 2026-11-25 choice) is NOT built
+      until the owner reconfirms it, because the 2026-11-26 note said the menu may replace it. Remove deletes after a
+      confirm and a backup.
+    - Slices: 1 `profiles.json` + pure `profile_paths` (Main = today's paths) with tests; 2 launch uses the paths,
+      `--profile`, the restart switch; 3 `SHARED_KEYS` + `shared.json` with a test; 4 Sync `uid` (field, refusal, pairing)
+      with tests; 5 the avatar menu + optional code; 6 the launch picker if reconfirmed, docs (`architecture.md`,
+      `sync-mode.md`, `PRIVACY`: nothing new leaves the PC).
 - [ ] `L` Exclusive WASAPI output / bit-perfect for local files (foobar's audiophiles).
 - [ ] `L` Podcasts by RSS (open feeds only: no platform audio taken), resume per episode, speed.
       2026-11-13, the first slice: Settings › Playback › Podcasts (off) adds Podcasts to the app menu: type an open feed's address, keep
