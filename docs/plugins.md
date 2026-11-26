@@ -8,7 +8,7 @@ Example: [`examples/plugins/sleep-timer`](../examples/plugins/sleep-timer) (paus
 fade). API 2: the Discord presence (what plays, on your Discord profile), which lives in
 [legato-app/discord-presence](https://github.com/legato-app/discord-presence) (MIT); the copy in
 [`examples/plugins/discord-presence`](../examples/plugins/discord-presence) is the one the app installs for who had
-the built-in presence.
+the built-in presence. Legato's bundled plugin follows the app's copy when the app's is newer.
 
 ## The folder
 

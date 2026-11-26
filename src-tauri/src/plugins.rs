@@ -319,9 +319,12 @@ pub fn start_all(app: &AppHandle) {
     let reg = registry(&state);
     if let (Ok(root), Ok(bundled)) = (dir(app), Manifest::parse(discord_move::FILES[0].1))
         && reg.contains_key(&bundled.id)
-        && let Err(error) = discord_move::refresh(&root.join(&bundled.id))
     {
-        crate::diag::warn("plugins", "bundled plugin not refreshed", &format!("{error:#}"));
+        match discord_move::refresh(&root.join(&bundled.id)) {
+            Ok(true) => crate::diag::info("plugins", "bundled plugin refreshed", ""),
+            Ok(false) => {}
+            Err(error) => crate::diag::warn("plugins", "bundled plugin not refreshed", &format!("{error:#}")),
+        }
     }
     for (id, e) in reg {
         if !e.on {
@@ -408,7 +411,8 @@ const DISCORD_MOVED: &str = "discordPluginMoved1";
 
 /// For who had the built-in Discord presence on (`settings`: its settings): the bundled plugin installed, its
 /// permissions granted, the settings moved into its storage. Done now: "moved", or "kept" for a plugin installed by
-/// hand already (left as the user set it); the interface switches the old one off. None: done before.
+/// hand already (its settings and grants left alone here; `start_all` still replaces the files of a copy older than the
+/// app's); the interface switches the old one off. None: done before.
 #[tauri::command]
 pub async fn plugin_adopt_discord(app: AppHandle, state: State<'_, AppState>, settings: Value) -> CmdResult<Option<&'static str>> {
     if state.lib().setting(DISCORD_MOVED).map_err(err)?.is_some() {
