@@ -11,8 +11,8 @@ Windows 10 and 11 · free · no account of ours
 [![License: source-available](https://img.shields.io/badge/license-source--available-7CB8FF?labelColor=0F0F0F)](LICENSE)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="site/public/shots/library-dark.webp">
-  <img alt="Legato's Songs page: the library on the left, songs from every service in one list, Up next on the right" src="site/public/shots/library-light.webp">
+  <source media="(prefers-color-scheme: dark)" srcset="site/public/landing/float-dark.svg">
+  <img alt="Legato on a phone, a desktop monitor and a laptop, with a music note, a record, headphones and a sync wave floating around them" src="site/public/landing/float-light.svg">
 </picture>
 
 </div>
