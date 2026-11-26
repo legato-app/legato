@@ -187,8 +187,8 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `S` One « More… » per right-click menu, never two (`5ae44406`).
 - [x] `S` Now Playing panel: the album line like the artist's, bold, clickable, with its cover. 2026-11-26: PC panel; typecheck and lint only, not seen in the app.
   - Decided alone (2026-11-26): no `album_info` call (it gives the year and track list, no cover: the cover is the playing song's own, nothing new asked of the network); smaller than the artists' (16 px bold) so the title and artists lead; the page opened is the one "Go to album" opens.
-- [ ] `S` Phone: the artist names bold with their picture, and the From line with the playlist's icon and bold name, as on the PC.
-  - Brief: the phone block uses `ArtistLine`; the phone's From tag gets the playlist's small icon and bold name, as on the PC (`PlaylistCover.tsx`).
+- [x] `S` Phone: the artist names bold with their picture, and the From line with the playlist's icon and bold name, as on the PC. 2026-11-26: the phone's Now Playing draws `ArtistLine`; the From line was already there (the phone's top bar uses the same `FromTag` since `8cb3e92e`). Not tried on a phone.
+  - Decided alone (2026-11-26): the names in ink as on the PC (they were grey), the source icon stays grey; several artists wrap onto more lines; the PC's picture size (32 px); the mini player and the title above an open panel keep one plain name.
 - [x] `S` Playlist icons default to a grid of 4 covers (`39122055`).
 - [x] `S` « Made from songs you love » mixes take their seed song's cover (`c449f71d`).
 - [ ] `M` Right-click › Hide for parts of the interface (first the Now Playing panel's cards), shown again from Settings › Appearance. A live interface editor for themes comes later.

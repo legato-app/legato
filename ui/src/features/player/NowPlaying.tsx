@@ -356,10 +356,14 @@ export function NowPlaying() {
             <div className="flex min-w-0 items-center gap-3">
               <div className="min-w-0 flex-1">
                 <FitTitle title={now.title} floor={18} className="text-2xl leading-tight font-black tracking-[-0.02em]" />
-                <span className="flex min-w-0 items-center gap-1.5 text-base text-ink-2">
-                  <ArtistLink now={now} className="min-w-0 truncate" />
-                  {readout && <SourceIcon source={viaSource[now.via]} size={14} />}
-                </span>
+                <div className="flex min-w-0 items-center gap-2 pt-1 text-base font-bold">
+                  <ArtistLine now={now} className="min-w-0" />
+                  {readout && (
+                    <span className="flex text-ink-2">
+                      <SourceIcon source={viaSource[now.via]} size={14} />
+                    </span>
+                  )}
+                </div>
               </div>
               {track && (
                 <RoundButton label={liked ? tr('Remove from Liked Music') : tr('Add to Liked Music')} aria-pressed={liked} kind="plain" size="md" onClick={(e) => (void toggleLike(track), pop(e.currentTarget))} className={liked ? 'text-ink!' : ''}>
