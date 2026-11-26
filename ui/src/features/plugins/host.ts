@@ -184,6 +184,8 @@ export function startPlugins(): () => void {
   void api.pluginQuiz(useBlind.getState().open).catch(() => {})
   const offQuiz = useBlind.subscribe((quiz, before) => {
     if (quiz.open === before.open) return
+    // Said before the gate closes: what showed the song playing (a Discord presence) stops.
+    if (quiz.open) tell('playing', false)
     void api.pluginQuiz(quiz.open).catch(() => {})
     if (quiz.open) return
     const { playing, list, order, index } = usePlayer.getState()

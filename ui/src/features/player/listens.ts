@@ -1,4 +1,5 @@
 import { api, type Play } from '../../shared/api'
+import { useBlind } from '../blind/blindOpen'
 import { usePickWhy } from './pickWhyStore'
 
 /** Current listen, reported once when it ends (feeds mixes). */
@@ -12,6 +13,8 @@ interface Listen {
   durationMs: number | null
   /** A catalog song (a radio's, a search's): its verdict counts for this session only, it has no stored play. */
   remote?: boolean
+  /** A blind test's snippet: no play, no verdict, wherever it ends. */
+  quiz?: boolean
 }
 
 let cur: Listen | null = null
@@ -49,8 +52,9 @@ export function endListen(ended: boolean) {
   const play = cur && toPlay(cur, ended)
   const durationMs = cur?.durationMs ?? null
   const remote = cur?.remote
+  const quiz = cur?.quiz
   cur = null
-  if (!play) return
+  if (!play || quiz) return
   if (play.completed) session.last.set(play.trackId, 1)
   else if (play.listenedMs < SKIP_MS) {
     session.skips.set(play.trackId, (session.skips.get(play.trackId) ?? 0) + 1)
@@ -73,7 +77,7 @@ export function endListen(ended: boolean) {
 /** Ends the previous listen (not completed), starts one for `trackId` (none = dropped file, untracked; `remote`: a catalog song). */
 export function startListen(trackId: number | undefined, durationMs: number | null, remote = false) {
   endListen(false)
-  if (trackId !== undefined) cur = { trackId, startedAt: Math.floor(Date.now() / 1000), heardMs: 0, lastMs: 0, durationMs, remote }
+  if (trackId !== undefined) cur = { trackId, startedAt: Math.floor(Date.now() / 1000), heardMs: 0, lastMs: 0, durationMs, remote, quiz: useBlind.getState().open }
 }
 
 export function progress(positionMs: number, durationMs?: number | null) {
