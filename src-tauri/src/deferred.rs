@@ -55,7 +55,10 @@ fn start(app: &AppHandle, cause: Cause) {
     }
     {
         let app = app.clone();
-        tauri::async_runtime::spawn_blocking(move || crate::backup::remove_old_mixes(&app));
+        tauri::async_runtime::spawn_blocking(move || {
+            crate::backup::remove_old_mixes(&app);
+            crate::backup::drop_spotify_art(&app);
+        });
     }
     // Each plugin opens a QuickJS runtime and a thread: off the async workers' way.
     #[cfg(desktop)]

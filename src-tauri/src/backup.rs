@@ -22,6 +22,19 @@ pub fn remove_old_mixes(app: &AppHandle) {
     }
 }
 
+/// Once, after the first screen: Spotify's covers kept by older versions leave the library.
+pub fn drop_spotify_art(app: &AppHandle) {
+    let Some(state) = app.try_state::<AppState>() else { return };
+    let changed = state.lib().drop_spotify_art();
+    match changed {
+        Ok(0) => {}
+        Ok(_) => {
+            let _ = app.emit_to("main", "local-changed", 0);
+        }
+        Err(e) => crate::diag::warn("library", "old Spotify covers not removed", &format!("{e:#}")),
+    }
+}
+
 /// A consistent copy of the library at `path`, the user's pick.
 #[tauri::command]
 pub async fn library_backup(app: AppHandle, path: String) -> CmdResult<()> {

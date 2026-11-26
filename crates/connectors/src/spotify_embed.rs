@@ -50,8 +50,6 @@ fn parse_page(html: &str, kind: &str, id: &str) -> Result<SpotifyList> {
     let data: Value = serde_json::from_str(&json[1])?;
     let e = entity(&data).context("No tracks in this Spotify page")?;
     let name = e.get("name").and_then(Value::as_str).unwrap_or("Spotify playlist").to_string();
-    // Album page: its cover is every track's cover. Playlist covers aren't.
-    let album_art = (kind == "album").then(|| e.pointer("/coverArt/sources/0/url").and_then(Value::as_str).map(String::from)).flatten();
     let tracks = e["trackList"]
         .as_array()
         .into_iter()
@@ -68,7 +66,8 @@ fn parse_page(html: &str, kind: &str, id: &str) -> Result<SpotifyList> {
                 duration_ms: t.get("duration").and_then(Value::as_u64).map(|d| d as u32),
                 isrc: None,
                 ids: BTreeMap::from([(Source::Spotify, id)]),
-                art: album_art.clone(),
+                // Never Spotify's cover (`model::spotify_art`).
+                art: None,
                 musicness: Some(music_core::musicness::Musicness::Music),
                 explicit: false,
             })
@@ -83,7 +82,7 @@ pub fn track_ids(text: &str, max: usize) -> Vec<String> {
     TRACK_LINK.captures_iter(text).map(|c| c[1].to_string()).filter(|id| seen.insert(id.clone())).take(max).collect()
 }
 
-/// One track's embed page: names, length, cover (no album or ISRC there). Its cover moved to i.scdn.co, same picture.
+/// One track's embed page: names and length (no album or ISRC there; its cover is never taken).
 fn parse_track(html: &str, id: &str) -> Result<Track> {
     let json = NEXT_DATA.captures(html).context("Spotify page without track data")?;
     let data: Value = serde_json::from_str(&json[1])?;
@@ -91,14 +90,11 @@ fn parse_track(html: &str, id: &str) -> Result<Track> {
     let title = e["name"].as_str().or_else(|| e["title"].as_str()).map(str::trim).filter(|t| !t.is_empty()).context("Spotify track without a title")?;
     let artists: Vec<&str> = e["artists"].as_array().into_iter().flatten().filter_map(|a| a["name"].as_str()).map(str::trim).filter(|a| !a.is_empty()).collect();
     anyhow::ensure!(!artists.is_empty(), "Spotify track without an artist");
-    let biggest = e.pointer("/visualIdentity/image").and_then(Value::as_array).and_then(|images| images.iter().max_by_key(|i| i["maxWidth"].as_u64()));
-    let picture = biggest.and_then(|i| i["url"].as_str()).and_then(|u| u.rsplit('/').next()).filter(|h| !h.is_empty() && h.bytes().all(|b| b.is_ascii_hexdigit()));
     Ok(Track {
         title: title.to_string(),
         artist: artists.join(", "),
         duration_ms: e["duration"].as_u64().and_then(|d| u32::try_from(d).ok()).filter(|d| *d > 0),
         ids: BTreeMap::from([(Source::Spotify, id.to_string())]),
-        art: picture.map(|h| format!("https://i.scdn.co/image/{h}")),
         musicness: Some(music_core::musicness::Musicness::Music),
         ..Default::default()
     })
@@ -151,7 +147,7 @@ mod tests {
         s.mock("GET", "/track/3XmwAZpIMNpTJy8faw3ajD").with_status(404).create_async().await;
         let t = track(&s.url(), "0DiWol3AO6WpXZgp0goxAV").await.unwrap();
         assert_eq!((t.title.as_str(), t.artist.as_str(), t.duration_ms), ("One More Time", "Daft Punk, Romanthony", Some(320_357)));
-        assert_eq!(t.art.as_deref(), Some("https://i.scdn.co/image/ab67616d00001e021e81bff9807a9e629fce5aa5"));
+        assert_eq!(t.art, None);
         assert_eq!(t.ids[&Source::Spotify], "0DiWol3AO6WpXZgp0goxAV");
         assert!(track(&s.url(), "3XmwAZpIMNpTJy8faw3ajD").await.unwrap_err().to_string().contains("doesn't exist"));
         // Spotify's page for a missing one: no entity.
@@ -185,10 +181,10 @@ mod tests {
     }
 
     #[test]
-    fn albums_give_tracks_their_album_and_cover() {
+    fn albums_give_tracks_their_album_without_its_cover() {
         let entity = json!({ "name": "Discovery", "coverArt": { "sources": [{ "url": "https://i.scdn.co/image/disc" }] }, "trackList": [{ "uri": "spotify:track:0DiWol3AO6WpXZgp0goxAV", "title": "One More Time", "subtitle": "Daft Punk", "duration": 320357 }] });
         let list = parse_page(&page(entity), "album", "2noRn2Aes5aoNVsU6iWThc").unwrap();
-        assert_eq!((list.tracks[0].album.as_deref(), list.tracks[0].art.as_deref()), (Some("Discovery"), Some("https://i.scdn.co/image/disc")));
+        assert_eq!((list.tracks[0].album.as_deref(), list.tracks[0].art.as_deref()), (Some("Discovery"), None));
         assert!(parse_page("<html>nothing</html>", "album", "x").is_err());
     }
 }

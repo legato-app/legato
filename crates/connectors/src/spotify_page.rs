@@ -42,7 +42,6 @@ pub enum Message {
 struct RawList {
     id: String,
     name: String,
-    cover: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -52,7 +51,6 @@ struct RawSong {
     artists: Vec<String>,
     album: Option<String>,
     ms: Option<u32>,
-    art: Option<String>,
 }
 
 #[derive(Default, Deserialize)]
@@ -82,7 +80,7 @@ pub(crate) fn clean_art(url: Option<String>) -> Option<String> {
 
 fn list(r: RawList) -> Option<PageList> {
     valid_id(&r.id).then_some(())?;
-    Some(PageList { id: r.id, name: clean(&r.name)?, cover: clean_art(r.cover) })
+    Some(PageList { id: r.id, name: clean(&r.name)?, cover: None })
 }
 
 fn song(r: RawSong) -> Option<Track> {
@@ -95,7 +93,8 @@ fn song(r: RawSong) -> Option<Track> {
         duration_ms: r.ms.filter(|ms| (1..=MAX_DURATION_MS).contains(ms)),
         isrc: None,
         ids: BTreeMap::from([(Source::Spotify, r.id)]),
-        art: clean_art(r.art),
+        // Never Spotify's cover (`model::spotify_art`).
+        art: None,
         musicness: Some(Musicness::Music),
         explicit: false,
     })
@@ -149,7 +148,7 @@ mod tests {
         assert_eq!(total, 50);
         let t = &songs[0];
         assert_eq!((t.title.as_str(), t.artist.as_str(), t.album.as_deref()), ("Loser", "Tame Impala, Tame Impala 2", Some("Deadbeat")));
-        assert_eq!((t.duration_ms, t.ids[&Source::Spotify].as_str(), t.art.as_deref()), (Some(223_000), ID, Some("https://i.scdn.co/image/ab67")));
+        assert_eq!((t.duration_ms, t.ids[&Source::Spotify].as_str(), t.art.as_deref()), (Some(223_000), ID, None));
     }
 
     #[test]
@@ -178,7 +177,7 @@ mod tests {
     #[test]
     fn reads_lists_and_steps() {
         let m = format!(r#"legato-spotify:{{"lists":[{{"id":"{ID}","name":"Road trip","cover":"https://mosaic.scdn.co/60/ab"}},{{"id":"nope","name":"Bad"}}]}}"#);
-        assert_eq!(parse(PAGE, &m), Some(Message::Lists(vec![PageList { id: ID.into(), name: "Road trip".into(), cover: Some("https://mosaic.scdn.co/60/ab".into()) }])));
+        assert_eq!(parse(PAGE, &m), Some(Message::Lists(vec![PageList { id: ID.into(), name: "Road trip".into(), cover: None }])));
         assert_eq!(parse(PAGE, r#"legato-spotify:{"lists":[]}"#), Some(Message::Lists(vec![])));
         assert_eq!(parse(PAGE, r#"legato-spotify:{"started":true}"#), Some(Message::Started));
         assert_eq!(parse(PAGE, r#"legato-spotify:{"done":true}"#), Some(Message::Done));

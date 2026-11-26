@@ -8,7 +8,7 @@ fn spotify() -> Track {
         duration_ms: Some(248_000),
         isrc: Some("USQX91300108".into()),
         ids: BTreeMap::from([(Source::Spotify, "2Foc5Q5nqNiosCNqttzHof".into())]),
-        art: Some("https://i.scdn.co/image/ram".into()),
+        art: Some("https://cdn.example/ram".into()),
         musicness: None,
         explicit: false,
     }
@@ -1583,4 +1583,23 @@ fn a_count_stored_as_artist_is_repaired_by_the_next_upsert() -> Result<()> {
     lib.upsert_track(&Track { artist: "Someone Else".into(), ..youtube() })?;
     assert_eq!(stored(id)?.0, "Daft Punk");
     Ok(())
+}
+
+#[test]
+fn spotify_covers_are_never_kept_and_old_ones_leave_once() {
+    let lib = Library::in_memory().unwrap();
+    let song = |title: &str, source: Source, art: Option<&str>| Track { title: title.into(), artist: "Band".into(), art: art.map(String::from), ids: [(source, title.to_string())].into(), ..Default::default() };
+    // Whatever brings one.
+    lib.upsert_track(&song("New", Source::Spotify, Some("https://i.scdn.co/image/a"))).unwrap();
+    lib.upsert_track(&song("Video", Source::Youtube, None)).unwrap();
+    lib.upsert_track(&song("Bare", Source::Spotify, None)).unwrap();
+    lib.upsert_track(&song("Other", Source::Apple, Some("https://a.mzstatic.com/x"))).unwrap();
+    let arts = || lib.tracks().unwrap().into_iter().map(|t| (t.track.title, t.track.art)).collect::<std::collections::BTreeMap<_, _>>();
+    assert_eq!(arts()["New"], None);
+    // Kept by an older version.
+    lib.db.execute("UPDATE tracks SET art = 'https://image-cdn-ak.spotifycdn.com/image/b' WHERE title IN ('Video', 'Bare')", []).unwrap();
+    assert_eq!(lib.drop_spotify_art().unwrap(), 2);
+    assert_eq!(arts()["Video"].as_deref(), Some("https://i.ytimg.com/vi/Video/hqdefault.jpg"));
+    assert_eq!((arts()["Bare"].clone(), arts()["Other"].as_deref()), (None, Some("https://a.mzstatic.com/x")));
+    assert_eq!(lib.drop_spotify_art().unwrap(), 0);
 }

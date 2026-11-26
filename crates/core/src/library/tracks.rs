@@ -125,17 +125,43 @@ impl Library {
         })
     }
 
+    /// Once: the Spotify covers older versions kept leave. A song with a YouTube link takes its video's frame, the
+    /// others none until a source gives one. Returns the songs changed.
+    pub fn drop_spotify_art(&self) -> Result<usize> {
+        const DONE: &str = "spotifyArt1";
+        if self.setting(DONE)?.is_some() {
+            return Ok(0);
+        }
+        self.tx(|| {
+            let mut stmt = self.db.prepare(
+                "SELECT t.id, t.art, (SELECT source_id FROM track_ids WHERE track_id = t.id AND source = 'youtube' LIMIT 1)
+                 FROM tracks t WHERE t.art LIKE '%scdn.co/%' OR t.art LIKE '%.spotifycdn.com/%'",
+            )?;
+            let rows: Vec<(i64, String, Option<String>)> = stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?.collect::<rusqlite::Result<_>>()?;
+            let mut changed = 0;
+            for (id, art, video) in rows {
+                if crate::model::spotify_art(&art) {
+                    changed += self.db.execute("UPDATE tracks SET art = ?1 WHERE id = ?2", params![video.as_deref().map(crate::model::youtube_art), id])?;
+                }
+            }
+            self.set_setting(DONE, &serde_json::json!(true))?;
+            Ok(changed)
+        })
+    }
+
     pub fn upsert_track(&self, t: &Track) -> Result<i64> {
         self.tx(|| {
             let mut found = self.lookup(t)?;
             let isrc = t.isrc.as_ref().map(|s| s.to_uppercase());
+            // Whoever sends it (an older PC's sync, a shared list), Spotify's cover isn't kept.
+            let art = t.art.clone().filter(|url| !crate::model::spotify_art(url));
             let id = match found.pop_first() {
                 None => {
                     self.db.prepare_cached(
                         "INSERT INTO tracks (title, artist, album, duration_ms, isrc, match_key, art, musicness, explicit, added, added_at)
                          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, (SELECT coalesce(max(added), 0) + 1 FROM tracks), CAST(strftime('%s', 'now') AS INTEGER))",
                     )?
-                    .execute(params![t.title, t.artist, t.album, t.duration_ms, isrc, match_key(&t.title, &t.artist), t.art, t.musicness.map(Musicness::as_str), t.explicit])?;
+                    .execute(params![t.title, t.artist, t.album, t.duration_ms, isrc, match_key(&t.title, &t.artist), art, t.musicness.map(Musicness::as_str), t.explicit])?;
                     self.db.last_insert_rowid()
                 }
                 // Only an id in common, and another song by its names: a wrong link somewhere. The row stays as it is and
@@ -146,7 +172,7 @@ impl Library {
                     for dupe in found {
                         self.absorb(keep, dupe)?;
                     }
-                    self.fill(keep, t.album.clone(), t.duration_ms, isrc, t.art.clone(), t.musicness)?;
+                    self.fill(keep, t.album.clone(), t.duration_ms, isrc, art, t.musicness)?;
                     self.repair_artist(keep, &t.artist)?;
                     if t.explicit {
                         self.mark_explicit(keep)?;

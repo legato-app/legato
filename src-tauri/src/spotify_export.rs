@@ -85,7 +85,7 @@ async fn watch(app: AppHandle, mut signals: UnboundedReceiver<Signal>) {
 fn hold(path: &Path, labels: &[String]) -> anyhow::Result<Vec<SpotifyList>> {
     let mut lists = spotify_export::read(path)?;
     spotify_export::name_lists(&mut lists, labels);
-    let shown = lists.iter().map(|l| SpotifyList { id: l.id.clone(), name: l.name.clone(), cover: l.cover().map(str::to_string), songs: Some(l.tracks.len() as u32) }).collect();
+    let shown = lists.iter().map(|l| SpotifyList { id: l.id.clone(), name: l.name.clone(), cover: None, songs: Some(l.tracks.len() as u32) }).collect();
     *HELD.lock().unwrap() = lists;
     Ok(shown)
 }

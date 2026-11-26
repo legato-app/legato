@@ -54,6 +54,12 @@ pub struct Track {
     pub explicit: bool,
 }
 
+/// A cover from Spotify's image hosts. Never kept: its policy allows none next to another service's stream.
+pub fn spotify_art(url: &str) -> bool {
+    let host = url.strip_prefix("https://").and_then(|rest| rest.split(['/', '?', '#']).next()).unwrap_or_default();
+    host == "i.scdn.co" || host == "mosaic.scdn.co" || host.ends_with(".spotifycdn.com")
+}
+
 /// YouTube video frame: last resort art, any real cover wins over it.
 pub fn video_frame(url: &str) -> bool {
     url.starts_with("https://i.ytimg.com/")

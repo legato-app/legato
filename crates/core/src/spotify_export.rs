@@ -142,13 +142,6 @@ pub struct ExportedList {
     pub tracks: Vec<Track>,
 }
 
-impl ExportedList {
-    /// The first song's cover.
-    pub fn cover(&self) -> Option<&str> {
-        self.tracks.iter().find_map(|t| t.art.as_deref())
-    }
-}
-
 fn clean(cell: &str) -> Option<String> {
     let s = cell.trim();
     (!s.is_empty() && s.chars().count() <= MAX_TEXT && !s.chars().any(char::is_control)).then(|| s.to_string())
@@ -200,7 +193,8 @@ fn track(line: &str) -> Option<Track> {
         duration_ms: cell(12).and_then(|d| d.parse().ok()).filter(|ms| *ms > 0),
         isrc: cell(16).filter(|i| i.len() == 12 && i.bytes().all(|b| b.is_ascii_alphanumeric())),
         ids: [(Source::Spotify, id.to_string())].into(),
-        art: cell(9).filter(|u| u.starts_with("https://i.scdn.co/image/")),
+        // Never Spotify's cover (`model::spotify_art`).
+        art: None,
         musicness: None,
         explicit: cell(14).is_some_and(|e| e.eq_ignore_ascii_case("true")),
     })
@@ -554,7 +548,7 @@ mod tests {
         let t = &l.tracks[0];
         assert_eq!((t.title.as_str(), t.artist.as_str(), t.album.as_deref()), ("Get Lucky (feat. A, B)", "Daft Punk, Pharrell Williams", Some("Random Access Memories")));
         assert_eq!((t.duration_ms, t.isrc.as_deref(), t.ids[&Source::Spotify].as_str()), (Some(248_000), Some("USQX91300808"), ID));
-        assert_eq!(l.cover(), Some("https://i.scdn.co/image/ab67"));
+        assert_eq!(t.art, None);
         assert!(!t.explicit);
         let marked = list("a.csv", &format!("{HEAD}
 {}
@@ -581,8 +575,6 @@ mod tests {
         let odd = [row("short", "A"), row(ID, ""), row(ID, "A\u{7}"), row(ID, &"x".repeat(301)), episode.to_string()].join("\n");
         assert_eq!(list("a.csv", &format!("{HEAD}\n{odd}\n{}\n", row(ID, "Good"))).unwrap().tracks.len(), 1);
         assert_eq!(list("a.csv", &format!("{HEAD}\n{odd}\n")), None);
-        let bad_art = row(ID, "A").replace("https://i.scdn.co/image/ab67", "https://evil.example/a.jpg");
-        assert_eq!(list("a.csv", &format!("{HEAD}\n{bad_art}\n")).unwrap().cover(), None);
         assert_eq!(list("a.txt", &format!("{HEAD}\n{}\n", row(ID, "A"))), None);
     }
 
