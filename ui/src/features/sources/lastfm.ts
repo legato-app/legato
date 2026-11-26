@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { useStore } from '../../app/store'
 import { api, type LastfmStatus } from '../../shared/api'
 import { scrobbles, toScrobble } from './lastfmRules'
+import { useBlind } from '../blind/blindOpen'
 import { onListenEnd } from '../player/listens'
 import { usePlayer } from '../player/store'
 
@@ -32,7 +33,8 @@ export function startLastfm() {
     if (!s.playing || id === undefined || id === last) return
     last = id
     const t = trackOf(id)
-    if (on() && t) void api.lastfmNowPlaying(toScrobble(t, Math.floor(Date.now() / 1000))).catch(() => {})
+    // Not a blind test’s song: the profile would name it.
+    if (on() && t && !useBlind.getState().open) void api.lastfmNowPlaying(toScrobble(t, Math.floor(Date.now() / 1000))).catch(() => {})
   })
   return () => {
     off()

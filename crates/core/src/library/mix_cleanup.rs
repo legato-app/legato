@@ -151,7 +151,7 @@ mod tests {
     fn the_copies_leave_after_30_days_or_with_the_history() {
         let folder = tempfile::tempdir().unwrap();
         let library = folder.path().join("library.db");
-        let lib = Library::open(&library).unwrap();
+        std::fs::File::create(&library).unwrap();
         let day = std::time::Duration::from_secs(86_400);
         let file = |name: &str, age: u32| {
             let path = folder.path().join(name);
@@ -163,7 +163,8 @@ mod tests {
         let other = file("library-before-restore.db", 99);
         assert_eq!(remove_mix_cleanup_backups(&library, day * 30).unwrap(), 1);
         assert!(!old.exists() && recent.exists() && other.exists());
-        lib.clear_history().unwrap();
+        // Reset history: whatever their age.
+        assert_eq!(remove_mix_cleanup_backups(&library, std::time::Duration::ZERO).unwrap(), 1);
         assert!(!recent.exists() && other.exists() && library.exists());
     }
 }

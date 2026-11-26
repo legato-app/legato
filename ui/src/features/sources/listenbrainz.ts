@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { useStore } from '../../app/store'
 import { api, type ListenbrainzStatus } from '../../shared/api'
 import { counts, toListen, type PlayedFrom } from './listenbrainzRules'
+import { useBlind } from '../blind/blindOpen'
 import { onListenEnd } from '../player/listens'
 import { usePlayer } from '../player/store'
 
@@ -37,7 +38,8 @@ export function startListenbrainz() {
     from.set(id, { via: s.now.via, youtubeId: s.now.youtubeId })
     if (from.size > 8) from.delete(from.keys().next().value!)
     const t = trackOf(id)
-    if (on() && t) void api.listenbrainzNowPlaying(toListen(t, Math.floor(Date.now() / 1000), from.get(id))).catch(() => {})
+    // Not a blind test’s song: the profile would name it.
+    if (on() && t && !useBlind.getState().open) void api.listenbrainzNowPlaying(toListen(t, Math.floor(Date.now() / 1000), from.get(id))).catch(() => {})
   })
   return () => {
     off()
