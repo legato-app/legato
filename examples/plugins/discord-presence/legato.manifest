@@ -7,5 +7,5 @@
   "api": 2,
   "main": "main.js",
   "permissions": ["player:read", "discord:presence", "ui"],
-  "repository": "https://github.com/legato-app/legato"
+  "repository": "https://github.com/legato-app/discord-presence"
 }

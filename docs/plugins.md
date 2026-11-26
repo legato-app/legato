@@ -5,8 +5,10 @@ service. It is a folder with two files, installed by the user from **Add-ons ›
 runs, the user sees who made it and every permission it asks for, and approves them.
 
 Example: [`examples/plugins/sleep-timer`](../examples/plugins/sleep-timer) (pauses the music after a while, with a
-fade). API 2: [`examples/plugins/discord-presence`](../examples/plugins/discord-presence) (what plays, on your
-Discord profile).
+fade). API 2: the Discord presence (what plays, on your Discord profile), which lives in
+[legato-app/discord-presence](https://github.com/legato-app/discord-presence) (MIT); the copy in
+[`examples/plugins/discord-presence`](../examples/plugins/discord-presence) is the one the app installs for who had
+the built-in presence.
 
 ## The folder
 

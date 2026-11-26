@@ -127,7 +127,7 @@ src-tauri/              thin shell: commands, keychain, tray, media panel
       },
       'The API 2 permissions need "api": 2 in the manifest: an API 1 manifest asking for one is refused.',
       'During a blind test, plugins learn nothing of what plays: no track, playing, seek, ended or queue event; the player and its queue read as empty, the history as []. When the test closes, the player’s state is sent once.',
-      'Never available: passwords, tokens, files on the PC, other plugins’ data, the app’s own commands. API versions only grow: a later app keeps running API 1 plugins. The full reference, with every app.* call, is the plugin guide; worked examples are examples/plugins/sleep-timer and, for API 2, examples/plugins/discord-presence.',
+      'Never available: passwords, tokens, files on the PC, other plugins’ data, the app’s own commands. API versions only grow: a later app keeps running API 1 plugins. The full reference, with every app.* call, is the plugin guide; worked examples are examples/plugins/sleep-timer and, for API 2, examples/plugins/discord-presence. The Discord presence plugin lives at github.com/legato-app/discord-presence (MIT).',
     ],
   },
   {
