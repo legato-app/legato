@@ -248,6 +248,7 @@ const ANSWERS: Record<string, (args: Record<string, unknown>) => unknown> = {
   local_waveform: () => Array.from({ length: 400 }, (_, i) => Math.round(Math.min(255, 40 + 150 * Math.min(1, i / 30, (400 - i) / 40) * (i % 120 > 60 ? 1.2 : 0.9) + 25 * Math.abs(Math.sin(i * 0.9))))),
   play_stats: () => Object.fromEntries(PLAYS.map((p) => [p.trackId, [PLAYS.filter((x) => x.trackId === p.trackId).length, p.startedAt]])),
   recent_plays: ({ since }) => PLAYS.filter((p) => p.startedAt >= (since as number)),
+  history_page: ({ before, limit }) => PLAYS.filter((p) => before === null || p.startedAt < (before as number)).sort((a, b) => b.startedAt - a.startedAt).slice(0, limit as number),
   play_history: () => PLAYS,
   mixes: () => MIXES,
   system_accent: () => null,

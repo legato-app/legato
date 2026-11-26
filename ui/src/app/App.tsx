@@ -3,7 +3,7 @@ import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import { AddonsView, AddView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
+import { AddonsView, AddView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
 import '../features/player/autoplay'
 import { AlbumView, ArtistView } from '../features/library/AlbumArtist'
@@ -359,6 +359,7 @@ export function App() {
               {view.name === 'tv' && <TvHome />}
               {view.name === 'books' && <BooksView />}
               {view.name === 'stats' && <StatsView />}
+              {view.name === 'history' && <HistoryView />}
               {view.name === 'smart' && <SmartView id={view.id} />}
               {view.name === 'notFound' && <NotFoundView />}
               {view.name === 'health' && <HealthView />}

@@ -15,6 +15,7 @@ const load = {
   keyboard: () => import('../features/livingRoom/OnScreenKeyboard').then((m) => ({ default: m.OnScreenKeyboard })),
   radio: () => import('../features/radio/RadioView').then((m) => ({ default: m.RadioView })),
   stats: () => import('../features/stats/StatsView').then((m) => ({ default: m.StatsView })),
+  history: () => import('../features/history/HistoryView').then((m) => ({ default: m.HistoryView })),
   smart: () => import('../features/smart/SmartView').then((m) => ({ default: m.SmartView })),
   notFound: () => import('../features/library/NotFoundView').then((m) => ({ default: m.NotFoundView })),
   health: () => import('../features/library/HealthView').then((m) => ({ default: m.HealthView })),
@@ -77,6 +78,7 @@ export const TvHome = page(load.tv)
 export const OnScreenKeyboard = page(load.keyboard)
 export const MixView = page(load.mix)
 export const StatsView = page(load.stats)
+export const HistoryView = page(load.history)
 export const SmartView = page(load.smart)
 export const NotFoundView = page(load.notFound)
 export const HealthView = page(load.health)

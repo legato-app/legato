@@ -430,6 +430,8 @@ export const api = {
   recentPlays: (since: number) => invoke<Play[]>('recent_plays', { since }),
   /** Every play since `since` (unix s, 0 = all), oldest first: the Stats page. */
   playHistory: (since: number) => invoke<Play[]>('play_history', { since }),
+  /** The History page, newest first: about `limit` plays before `before` (unix s; null: the newest). */
+  historyPage: (before: number | null, limit: number) => invoke<Play[]>('history_page', { before, limit }),
   cacheStats: () => invoke<CacheStats>('cache_stats'),
   /** Bytes the cover cache holds on disk. */
   artCacheSize: () => invoke<number>('art_cache_size'),

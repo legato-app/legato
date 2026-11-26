@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, ChartBar, Disc, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
+import { ArrowDownLeft, ArrowUpRight, ChartBar, ClockCounterClockwise, Disc, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
 import { artistName } from '../../shared/artistName'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
@@ -216,6 +216,7 @@ export function Sidebar() {
         {!phone && !navOff.includes('mixes') && <NavItem on={is('mixes') || is('mix')} icon={Disc} label={tr('Mixes')} onClick={() => go({ name: 'mixes' })} onContextMenu={onMenu(() => navMenu({ name: 'mixes' }))} />}
         {!phone && !navOff.includes('radio') && <NavItem on={is('radio')} icon={Radio} label={tr('Radio')} onClick={() => go({ name: 'radio' })} onContextMenu={onMenu(() => navMenu({ name: 'radio' }))} />}
         {!navOff.includes('stats') && <NavItem on={is('stats')} icon={ChartBar} label={tr('Stats')} onClick={() => go({ name: 'stats' })} onContextMenu={onMenu(() => navMenu({ name: 'stats' }))} />}
+        {!navOff.includes('history') && <NavItem on={is('history')} icon={ClockCounterClockwise} label={tr('History')} onClick={() => go({ name: 'history' })} onContextMenu={onMenu(() => navMenu({ name: 'history' }))} />}
         {!navOff.includes('add') && <NavItem on={is('add')} icon={PlusCircle} label={tr('Add music')} onClick={() => go({ name: 'add' })} onContextMenu={onMenu(() => navMenu({ name: 'add' }))} />}
       </nav>
 

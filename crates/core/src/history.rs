@@ -112,6 +112,18 @@ impl Library {
         Ok(stmt.query_map([since], |r| Ok(Play { track_id: r.get(0)?, started_at: r.get(1)?, listened_ms: r.get(2)?, completed: r.get(3)? }))?.collect::<rusqlite::Result<_>>()?)
     }
 
+    /// A page of the history, newest first: about `limit` plays started before `before` (unix s; None: the newest). Plays
+    /// of the page's last second all come with it, so the next page (before that second) misses none.
+    pub fn plays_before(&self, before: Option<i64>, limit: u32) -> Result<Vec<Play>> {
+        let mut stmt = self.db.prepare_cached(
+            "SELECT track_id, started_at, listened_ms, completed FROM plays
+             WHERE started_at < ?1 AND started_at >= coalesce((SELECT started_at FROM plays WHERE started_at < ?1 ORDER BY started_at DESC LIMIT 1 OFFSET ?2), -9223372036854775807)
+             ORDER BY started_at DESC, id DESC",
+        )?;
+        let last = i64::from(limit.max(1)) - 1;
+        Ok(stmt.query_map([before.unwrap_or(i64::MAX), last], |r| Ok(Play { track_id: r.get(0)?, started_at: r.get(1)?, listened_ms: r.get(2)?, completed: r.get(3)? }))?.collect::<rusqlite::Result<_>>()?)
+    }
+
     /// Per track: listens (full ones, or 30 s heard) and the last start. For "Most played" / "Recently played" sorts.
     /// Per song: listens, last start (unix s, 0 = never), your rating in half stars (0 = none).
     pub fn play_stats(&self) -> Result<HashMap<i64, (u32, i64, u8)>> {
@@ -311,6 +323,20 @@ mod tests {
         assert!(lib.record_play(&Play { track_id: 999, started_at: 1, listened_ms: 1, completed: true }).is_err(), "unknown track");
         lib.clear_history()?;
         assert!(lib.plays()?.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn the_history_comes_in_pages_newest_first_none_lost_at_the_seams() -> Result<()> {
+        let lib = Library::in_memory()?;
+        let song = track(&lib, "a", Source::Youtube, "a");
+        for started_at in [10, 20, 30, 30, 40] {
+            lib.record_play(&Play { track_id: song, started_at, listened_ms: 1000, completed: false })?;
+        }
+        let page = |before| lib.plays_before(before, 2).map(|plays| plays.iter().map(|p| p.started_at).collect::<Vec<_>>());
+        assert_eq!(page(None)?, [40, 30, 30]);
+        assert_eq!(page(Some(30))?, [20, 10]);
+        assert!(page(Some(10))?.is_empty());
         Ok(())
     }
 

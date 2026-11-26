@@ -192,7 +192,7 @@ the order; a line leaves only when it ships or the user drops it.
 - [ ] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back.
 - [ ] `M` Mix covers in several styles, different from one mix to the next, instead of 2×2 grids everywhere.
 - [ ] `M` Normal videos (a story web series) counted as music: rework the detection; no « Like » mix seeded from a non-music video.
-- [ ] `M` A listening history page, local only (plays already feed the mixes).
+- [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.
 
 ## The owner's asks of 2026-11-07, evening
 

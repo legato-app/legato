@@ -81,7 +81,7 @@ export const PRESETS: Theme[] = [
 export const ACCENTS = ['#FF5A1F', '#E5383B', '#F2B705', '#2E8B57', '#2F6FEB', '#171614']
 
 /** The sidebar's entries that can be hidden (Settings, and the way to bring them back, are not among them). */
-export const NAV_ITEMS = ['home', 'mixes', 'radio', 'stats', 'add'] as const
+export const NAV_ITEMS = ['home', 'mixes', 'radio', 'stats', 'history', 'add'] as const
 export type NavItem = (typeof NAV_ITEMS)[number]
 export const COLUMNS = ['album', 'year', 'genre', 'bpm', 'key', 'sources', 'plays', 'rating', 'added', 'duration'] as const
 /** List sorts (features/library/filter): checked on load. */

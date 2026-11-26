@@ -16,6 +16,7 @@ const PAGES: [View, string, string?][] = [
   [{ name: 'mixes' }, msg('Mixes'), msg('daily discover radio')],
   [{ name: 'radio' }, msg('Radio'), msg('internet stations live stream')],
   [{ name: 'stats' }, msg('Stats'), msg('statistics listening history top')],
+  [{ name: 'history' }, msg('History'), msg('recently played listens skipped')],
   [{ name: 'health' }, msg('Library health'), msg('missing files broken videos covers tags duplicates fix')],
   [{ name: 'add' }, msg('Add music'), msg('import playlist link file spotify youtube apple')],
   [{ name: 'addons' }, msg('Add-ons'), msg('plugins extensions')],

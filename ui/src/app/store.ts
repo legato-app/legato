@@ -24,6 +24,7 @@ export type View =
   | { name: 'tv' }
   | { name: 'books' }
   | { name: 'stats' }
+  | { name: 'history' }
   | { name: 'smart'; id: string }
   | { name: 'notFound' }
   | { name: 'health' }

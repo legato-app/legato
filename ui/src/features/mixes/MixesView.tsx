@@ -1,4 +1,4 @@
-import { ArrowCounterClockwise, Play, Prohibit, ThumbsDown } from '@phosphor-icons/react'
+import { Play, Prohibit, ThumbsDown } from '@phosphor-icons/react'
 import { ArrowRight } from '../../shared/ui/directional'
 import { useMemo, useState } from 'react'
 import { useSettings } from '../../app/settings'
@@ -21,7 +21,7 @@ import { isRemote, remoteTrack, usePlayer } from '../player/store'
 import { msg, tr, trn } from '../../shared/i18n/i18n'
 import { useMixes } from './useMixes'
 import { mixReason, mixTitle, monthName, weekdayName } from './words'
-import { ask } from '../../shared/ui/Ask'
+import { ResetHistory } from '../history/ResetHistory'
 import { phoneApp } from '../../shared/platform'
 import { usePhone } from '../../shared/phone'
 
@@ -113,21 +113,6 @@ const SECTIONS: { kind: Mix['kind']; title: string }[] = [
   { kind: 'loved', title: msg('Made from songs you love') },
   { kind: 'explore', title: msg('Explore your library') },
 ]
-
-function ResetHistory({ onDone }: { onDone: () => void }) {
-  return (
-    <Button
-      variant="ghost"
-      onClick={async () => {
-        if (!(await ask({ title: tr('Forget your listening history?'), body: tr('Your plays and “less / never” choices go; mixes start over. Your library stays as it is.'), ok: tr('Forget') }))) return
-        await api.clearHistory().catch((e) => useStore.setState({ error: String(e) }))
-        onDone()
-      }}
-    >
-      <ArrowCounterClockwise size={14} /> {tr('Reset history')}
-    </Button>
-  )
-}
 
 /** Last.fm suggestions (Settings › Playback, off): asks Last.fm for songs by artists close to the ones you play most, and plays them. */
 function DiscoveriesButton() {
