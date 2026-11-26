@@ -765,6 +765,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     the website copy ("Make it look like yours", `site/components/content.tsx` and its locales). Tests: a
     `themefile.rs` round-trip with a `layout` key. Review of 1-4: the docs say that a layout from a newer version, or
     imported while the setting was off, starts to apply later (an update, the setting turned on) without the question.
+    Review of 7-8: the theme docs say that hidden blocks are hidden content, not lost actions (an artist's discography,
+    an album's "More by": the page's own way to releases outside the library).
   - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
     enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
   - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.
