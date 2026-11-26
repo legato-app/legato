@@ -283,6 +283,11 @@ Where a line says "reading", the owner hasn't confirmed it.
       owner's word).
       2026-11-13 (lot 32), looked at before touching anything: the hero at 1440 px (dark) and 375 px (light), through the built-in browser on `next dev`. It is already a product page (the headline as the picture, the real interface tilted in 3D from the demo, one download button, the privacy link, the platforms line) and holds at phone width in the light theme; no redesign was made, because a taste change nobody could judge here would only risk what works. The plan's "too basic" predates the Story and the demo. Left for the owner's eyes: the chapters below the hero, the Features block, the 18 languages' longest lines.
 
+- [ ] `S` The site's build follows only the repository documents it includes: `pages.yml`'s paths list `docs/architecture.md`, `docs/plugins.md` and `CONTRIBUTING.md` in place of `docs/**`, so notes edits don't redeploy an identical site.
+- [ ] `S` Pin one pnpm version: CI pins 10 (`check.yml`, `pages.yml`), the local install is 11; pick one and pin it in both places.
+- [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale.
+- [ ] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
+
 ## The owner's asks of 2026-11-13
 
 - [ ] `S` Remove the rename catch-up (when every PC of the owner runs the new name): delete `src-tauri/src/rename.rs` and its call in
