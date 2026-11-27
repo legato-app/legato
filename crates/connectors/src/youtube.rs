@@ -1,7 +1,6 @@
 //! Keyless YouTube helpers: video links, oEmbed metadata, artist/title from video titles.
 //! Account features (library, search, export) live in `ytmusic` (Google sign-in).
 
-use crate::ytmusic::catalog_artist;
 use anyhow::Result;
 use music_core::matching::reversed_credit;
 use music_core::model::{Source, Track};
@@ -27,14 +26,13 @@ pub fn parse_video(title: &str, channel: &str) -> (String, String) {
     (CHANNEL_NOISE.replace_all(channel, "").into_owned(), title.to_string())
 }
 
-/// `parse_video`'s split put right for a video titled backwards (`music_core::matching::reversed_credit`). `known`: the
-/// library's artists; those YouTube Music's catalog has named count too.
+/// `parse_video`'s split put right for a video titled backwards (`music_core::matching::reversed_credit`).
 pub fn turn_round(track: &mut Track, raw_title: &str, channel: &str, known: impl Fn(&str) -> bool) {
     // Only what the dash split: a topic channel and a channel's name are the artist already.
     if TOPIC.is_match(channel) || !DASH.is_match(raw_title) {
         return;
     }
-    if let Some((artist, title)) = reversed_credit(&track.artist, &track.title, |key| known(key) || catalog_artist(key)) {
+    if let Some((artist, title)) = reversed_credit(&track.artist, &track.title, known) {
         (track.artist, track.title) = (artist, title);
     }
 }
@@ -109,18 +107,18 @@ mod tests {
         assert_eq!(read("Doja Cat", "VinyllMusic"), pair("VinyllMusic", "Doja Cat"));
     }
 
-    #[test]
-    fn an_artist_the_catalog_named_tells_a_backwards_title_too() {
+    #[tokio::test]
+    async fn the_catalog_s_names_tell_a_search_and_never_a_link() {
         let run = |name: &str, kind: &str| json!({ "text": name, "navigationEndpoint": { "browseEndpoint": { "browseEndpointContextSupportedConfigs": { "browseEndpointContextMusicConfig": { "pageType": kind } } } } });
         let column = |runs: Value| json!({ "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": runs } } });
         let row = json!({ "musicResponsiveListItemRenderer": {
             "playlistItemData": { "videoId": "aaaaaaaaaaa" },
-            "flexColumns": [column(json!([{ "text": "Lanterns" }])), column(json!([run("Zed Quill", "MUSIC_PAGE_TYPE_ARTIST"), run("Quill Reuploads", "MUSIC_PAGE_TYPE_USER_CHANNEL")]))],
+            "flexColumns": [column(json!([{ "text": "Lanterns" }])), column(json!([run("Zed Quill", "MUSIC_PAGE_TYPE_ARTIST"), run("Yellow", "MUSIC_PAGE_TYPE_ARTIST"), run("Quill Reuploads", "MUSIC_PAGE_TYPE_USER_CHANNEL")]))],
         } });
         let read = |raw: &str| {
             let (artist, title) = parse_video(raw, "Some Channel");
             let mut track = Track { artist, title, ..Default::default() };
-            turn_round(&mut track, raw, "Some Channel", |_| false);
+            turn_round(&mut track, raw, "Some Channel", crate::ytmusic::catalog_artist);
             (track.artist, track.title)
         };
         let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
@@ -129,6 +127,11 @@ mod tests {
         assert_eq!(read("lanterns - zed quill *slowed*"), pair("zed quill", "lanterns *slowed*"));
         // An uploader's channel is no artist.
         assert_eq!(read("lanterns - quill reuploads"), pair("lanterns", "quill reuploads"));
+        // A band named "Yellow" seen while browsing: a pasted "Coldplay - Yellow" stays as written.
+        let mut server = Server::new_async().await;
+        server.mock("GET", "/oembed").match_query(Matcher::Any).with_body(r#"{"title":"Coldplay - Yellow","author_name":"Some Channel"}"#).create_async().await;
+        let pasted = track_from_link("https://youtu.be/aaaaaaaaaaa", &format!("{}/oembed", server.url()), |_| false).await.unwrap();
+        assert_eq!((pasted.artist, pasted.title), pair("Coldplay", "Yellow"));
     }
 
     #[test]

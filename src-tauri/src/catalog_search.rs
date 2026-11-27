@@ -1,6 +1,7 @@
 //! Search: the catalogs (YouTube Music, YouTube, Apple Music), the suggestions as one types.
 
 use super::*;
+use music_connectors::ytmusic::catalog_artist;
 use music_connectors::ytweb::WebVideo;
 use std::sync::Arc;
 
@@ -47,20 +48,22 @@ async fn web_videos(state: &AppState, query: &str) -> Result<Arc<Vec<WebVideo>>,
     Ok(state.cache.videos.put(&key, videos))
 }
 
-/// Videos as songs, with what kind each is. Reupload channels write "Title - Artist": the artists known tell.
+/// Videos as songs, with what kind each is. Reupload channels write "Title - Artist": the library's artists tell, and
+/// those YouTube Music's catalog has named (a search only: its song results name the usual artist too).
 fn as_songs(state: &AppState, videos: &[WebVideo]) -> Vec<(Track, Musicness)> {
     let known = state.lib().artist_keys().unwrap_or_default();
     videos
         .iter()
         .map(|video| {
             let mut track = video.track.clone();
-            music_connectors::youtube::turn_round(&mut track, &video.raw_title, &video.channel, |key| known.contains(key));
+            music_connectors::youtube::turn_round(&mut track, &video.raw_title, &video.channel, |key| known.contains(key) || catalog_artist(key));
             (track, video.musicness())
         })
         .collect()
 }
 
-/// A pasted or shared YouTube link as a song, its title turned round when the artists known say it was written backwards.
+/// A pasted or shared YouTube link as a song, its title turned round when the library's artists say it was written
+/// backwards.
 pub async fn youtube_link(state: &AppState, link: &str) -> anyhow::Result<Track> {
     // Unread, the title is taken as written: the song comes all the same.
     let known = state.lib().artist_keys().unwrap_or_default();

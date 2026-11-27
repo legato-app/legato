@@ -219,14 +219,18 @@ pub(crate) fn parse_duration(s: &str) -> Option<u32> {
     Some(((n(1) * 60 + n(2)) * 60 + n(3)) * 1000)
 }
 
-/// Artists YouTube Music's catalog has named since the app started, as `primary_artist` keys them: they tell a video
-/// titled backwards (`youtube::turn_round`) with no request of their own. A few thousand names at most.
+/// Artists YouTube Music's catalog has named since the app started, as `primary_artist` keys them: in a video search
+/// they tell a title written backwards (`youtube::turn_round`), with no request of their own.
 static CATALOG_ARTISTS: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Default::default);
+// shortcut: no name noted past this many (a very long run of browsing); drop the oldest if that ever shows.
+const MAX_CATALOG_ARTISTS: usize = 20_000;
 
 /// Notes the catalog's artists among a byline's runs (an uploader's channel is none).
 fn note_artists<'a>(runs: impl IntoIterator<Item = &'a Value>) {
     let names = runs.into_iter().filter(|run| page_type(run) == "MUSIC_PAGE_TYPE_ARTIST").filter_map(|run| run.get("text")?.as_str());
-    CATALOG_ARTISTS.lock().unwrap().extend(names.map(primary_artist));
+    let mut noted = CATALOG_ARTISTS.lock().unwrap();
+    let room = MAX_CATALOG_ARTISTS.saturating_sub(noted.len());
+    noted.extend(names.map(primary_artist).take(room));
 }
 
 /// Has the catalog named this artist (a `primary_artist` key)?
