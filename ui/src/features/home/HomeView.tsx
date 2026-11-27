@@ -111,9 +111,8 @@ function JumpTile({ art, title, onOpen, onPlay, menu }: { art: ReactNode; title:
 }
 
 /** Shortcut tiles on top of Home: Songs, then the lists opened lately (playlists, albums, artists, mixes), filled from what you played. */
-function Shortcuts({ mixes }: { mixes?: Mix[] }) {
-  const { tracks: every, stats, playlists, go } = useStore(useShallow(({ tracks, stats, playlists, go }) => ({ tracks, stats, playlists, go })))
-  const tracks = useMemo(() => withoutBooks(every), [every])
+function Shortcuts({ tracks, mixes }: { tracks: LibraryTrack[]; mixes?: Mix[] }) {
+  const { stats, playlists, go } = useStore(useShallow(({ stats, playlists, go }) => ({ stats, playlists, go })))
   const opened = useOpenedLists((s) => s.list)
   const play = usePlayer((s) => s.playTracks)
   const lists = useMemo(() => jumpLists(opened, { tracks, stats, playlists, mixIds: mixes?.map((m) => m.id) }), [opened, tracks, stats, playlists, mixes])
@@ -548,7 +547,7 @@ export function HomeView() {
   // Show all: the Songs page sorted that way.
   const songsBy = (sort: Sort) => () => (useStore.getState().setSort(sort), go({ name: 'songs' }))
   const sec: Record<HomeSectionId, () => ReactNode> = {
-    quick: () => <Shortcuts mixes={mixes} />,
+    quick: () => <Shortcuts tracks={music} mixes={mixes} />,
     week: () => (
       <Section title={tr('Your week')} sub={tr(sectionHints.week)} onAll={() => go({ name: 'stats' })} menu={menuFor('week')}>
         <YourWeek />
