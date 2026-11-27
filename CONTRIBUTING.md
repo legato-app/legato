@@ -97,7 +97,11 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
 - Back from Beta to Stable the app never downgrades: it waits for a Stable newer than the version it runs.
 - **Legato Lite** (Windows) rides the same releases: `release.yml`'s `lite` job builds `Legato.Lite_X.Y.Z_x64-setup.exe`
   with the same key and its own `latest-lite.json` beside `latest.json`, on `vX.Y.Z` and on `beta`; promote carries it
-  to Stable too. A Lite failure fails only its own jobs: the full app's Beta goes out as before.
+  to Stable too. A Lite failure fails only its own jobs: the full app's Beta goes out as before (the run shows red:
+  that is the signal). Promote a beta only once its release run is over, the Lite attached: earlier, the Lite would
+  land on the Stable afterwards, unchecked and with the Beta notes. An incomplete `latest-lite.json` stops the whole
+  promotion; to promote the full app anyway, delete that asset from the `vX.Y.Z` release and run promote again (Lite
+  PCs stay where they are).
 - **Phones** follow Beta: each Beta's APK is what the Android app offers (Settings › About, a toast), downloaded when
   the user taps Update and installed by Android's installer. Stable carries no APK yet.
 
