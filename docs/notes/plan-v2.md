@@ -905,6 +905,8 @@ colours, mirror, reflection.
     cuts kept (2026-11-27, 160 lines fewer, 44 added).
   - [x] C. `web_reader.rs`: Apple Music's and Spotify's page readers are one (`Site`), each file keeping its inbox and
     commands (2026-11-27, 329 lines out, 292 in; no real account read, the e2e Apple fixtures not run).
+  - [x] D. `add/pageRead.tsx`: the rules, sign-in, reading and picking steps both connect buttons share (2026-11-27,
+    157 lines out, 158 in; no real connection tried).
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md

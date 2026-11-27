@@ -9,29 +9,14 @@ import { Button } from '../../shared/ui/Button'
 import { Dialog } from '../../shared/ui/Dialog'
 import { Card } from './Card'
 import { ListPick } from './ListPick'
+import { firstPageStep, PageReadDialogs, usePageRead, type PageStep } from './pageRead'
 
 // Liked Songs has no playlist of its own on Spotify (music_core::spotify_export::LIKED, spotify_page::LIKED).
 const LIKED = 'liked'
 // Spotify's rules: said once on this PC, before its page is first read.
 const AGREED = 'spotify-rules-read'
 
-const agreed = () => {
-  try {
-    return localStorage.getItem(AGREED) === '1'
-  } catch {
-    return false
-  }
-}
-
-const remember = () => {
-  try {
-    localStorage.setItem(AGREED, '1')
-  } catch {
-    // Said again next time.
-  }
-}
-
-type Step = 'export' | 'failed' | 'rules' | 'sign-in' | 'reading' | 'pick'
+type Step = 'export' | 'failed' | PageStep
 
 const TROUBLES: Record<Exclude<ExportTrouble, 'closed'>, string> = {
   down: msg('Exportify isn’t working right now.'),
@@ -68,14 +53,17 @@ export function SpotifyImport({ label, className }: { label: string; className?:
     setStep('export')
     api.spotifyExportOpen().catch(fail)
   }
-  const signIn = () => {
-    setStep('sign-in')
-    api.spotifyWebOpen().catch(fail)
-  }
+  const signIn = usePageRead<'export' | 'failed'>(step, setStep, {
+    open: api.spotifyWebOpen,
+    signedIn: api.spotifyWebStatus,
+    read: api.spotifyLists,
+    found: (found) => pick([{ id: LIKED, name: '', cover: null, songs: null }, ...found]),
+    fail,
+  })
   const readPage = () => {
     void api.spotifyExportClose().catch(() => {})
-    if (agreed()) signIn()
-    else setStep('rules')
+    if (firstPageStep(AGREED) === 'rules') setStep('rules')
+    else signIn()
   }
 
   useEffect(() => {
@@ -94,31 +82,6 @@ export function SpotifyImport({ label, className }: { label: string; className?:
       void useStore.getState().importSpotifyLists(() => api.spotifyExportImport(picks))
     })
     return () => void off.then((f) => f())
-  }, [step])
-
-  // The session cookie is the sign-in's end (the window stays: it reads next).
-  useEffect(() => {
-    if (step !== 'sign-in') return
-    const id = setInterval(() => {
-      void api.spotifyWebStatus().then((on) => on && setStep((s) => (s === 'sign-in' ? 'reading' : s)), () => {})
-    }, 1500)
-    return () => clearInterval(id)
-  }, [step])
-
-  useEffect(() => {
-    if (step !== 'reading') return
-    let live = true
-    api.spotifyLists().then(
-      (found) => {
-        if (live) pick([{ id: LIKED, name: '', cover: null, songs: null }, ...found])
-      },
-      (e) => {
-        if (live) fail(e)
-      },
-    )
-    return () => {
-      live = false
-    }
   }, [step])
 
   const start = (picks: SpotifyPick[]) => {
@@ -156,33 +119,22 @@ export function SpotifyImport({ label, className }: { label: string; className?:
           </div>
         </Dialog>
       )}
-      {step === 'rules' && (
-        <Dialog title={tr('Before you connect')} onClose={close}>
-          <p className="text-sm text-ink-2">{tr('Legato opens Spotify’s own page and reads your lists as they appear on it. Your password stays with Spotify, and each song is then found on YouTube.')}</p>
-          <p className="text-sm text-ink-2">{tr('Spotify’s rules forbid collecting its data with a tool and allow it to close an account that does. We know of no such case, but we can’t rule it out: the choice is yours.')}</p>
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={close}>
-              {tr('Cancel')}
-            </Button>
-            <Button
-              onClick={() => {
-                remember()
-                signIn()
-              }}
-            >
-              {tr('I understand, continue')}
-            </Button>
-          </div>
-        </Dialog>
-      )}
-      {(step === 'sign-in' || step === 'reading') && (
-        <Dialog title={tr('Connect Spotify')} onClose={close}>
-          <p role="status" className="text-sm text-ink-2">
-            {step === 'sign-in' ? tr('Sign in on Spotify’s page. The next step comes by itself.') : tr('Reading your library on Spotify…')}
-          </p>
-        </Dialog>
-      )}
-      {step === 'pick' && <ListPick title={tr('Your Spotify lists')} lists={lists} onClose={close} onStart={start} />}
+      <PageReadDialogs
+        step={step}
+        rulesKey={AGREED}
+        words={{
+          title: tr('Connect Spotify'),
+          reads: tr('Legato opens Spotify’s own page and reads your lists as they appear on it. Your password stays with Spotify, and each song is then found on YouTube.'),
+          rules: tr('Spotify’s rules forbid collecting its data with a tool and allow it to close an account that does. We know of no such case, but we can’t rule it out: the choice is yours.'),
+          signIn: tr('Sign in on Spotify’s page. The next step comes by itself.'),
+          reading: tr('Reading your library on Spotify…'),
+          pick: tr('Your Spotify lists'),
+        }}
+        lists={lists}
+        signIn={signIn}
+        start={start}
+        close={close}
+      />
     </>
   )
 }
