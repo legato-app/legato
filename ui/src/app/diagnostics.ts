@@ -31,7 +31,8 @@ export function startDiagnostics(): void {
   // WebView2 and Android's WebView report long tasks; another engine would not.
   if (typeof PerformanceObserver !== 'undefined' && PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
     new PerformanceObserver((list) => {
-      for (const task of list.getEntries()) if (task.duration >= STALL_MS) report('warn', 'ui', `a stall of ${Math.round(task.duration)} ms`)
+      // Whole seconds: stalls alike are one line a minute (`throttled`), not thirty that push the errors out.
+      for (const task of list.getEntries()) if (task.duration >= STALL_MS) report('warn', 'ui', `a stall of ${Math.round(task.duration / 1000)} s`)
     }).observe({ type: 'longtask' })
   }
 }

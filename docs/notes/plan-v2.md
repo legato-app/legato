@@ -201,6 +201,7 @@ the order; a line leaves only when it ships or the user drops it.
     - Decided alone (2026-11-27): the phone’s leaving is heard from the shell (`shared/screen.ts`), since the page never
       gets `visibilitychange` there; a switch repeated within a minute is said once.
   - Left out, as the design says: network failures as such (a failed command is already logged through its alert).
+  - 2026-11-27, after review: a stall is told in whole seconds, so stalls alike are said once a minute. Test only.
 - [x] `M` Screen off on the phone: our extras rest (the visualizer's analysis, our own animation and polling loops), YouTube's player untouched (the owner, 2026-11-19). Sonnet: `9dce33b9`, `306de9a3`, `cbec7f0c`. Not seen on a phone yet.
 - [x] `M` The update between two songs does not seem to happen: find why (the owner, 2026-11-19: "le fameux truc de update entre deux song a pas l'air de marcher"). Opus, `f164d866`. The PC already worked; the phone now waits for the song's end; INFO lines in the log. Not tried on the phone.
 - [x] `S` One « More… » per right-click menu, never two (`5ae44406`).

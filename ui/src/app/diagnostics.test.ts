@@ -23,8 +23,9 @@ it('logs a stall of a second or more, and a phone leaving and coming back', () =
   )
   vi.stubGlobal('window', { addEventListener: vi.fn() })
   startDiagnostics()
-  tasks({ getEntries: () => [{ duration: 999 }, { duration: 1500.4 }] })
-  expect(report.mock.calls).toEqual([['warn', 'ui', 'a stall of 1500 ms']])
+  tasks({ getEntries: () => [{ duration: 999 }, { duration: 1503 }, { duration: 1904.7 }] })
+  // The same words for both: said once by `throttled`.
+  expect(report.mock.calls).toEqual([['warn', 'ui', 'a stall of 2 s'], ['warn', 'ui', 'a stall of 2 s']])
   useScreen.setState({ on: false })
   useScreen.setState({ on: true })
   expect(note.mock.calls).toEqual([['app', 'went to the background'], ['app', 'came back']])
