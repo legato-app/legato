@@ -28,6 +28,13 @@ it('each included document exists, and is the one its links are read from', () =
   }
 })
 
+it('a change to an included document builds the site again', () => {
+  const workflow = readFileSync(join(repository, '.github/workflows/pages.yml'), 'utf8')
+  const paths = /^\s*paths: \[([^\]]*)\]/m.exec(workflow)![1].split(', ')
+  expect(paths.filter((path) => path.endsWith('.md')).sort()).toEqual(Object.values(INCLUDED).sort())
+  expect(paths).not.toContain('docs/**')
+})
+
 it('each old section has its page', () => {
   for (const section of ['install', 'first-steps', 'import', 'sync', 'share', 'stream-deck', 'shortcuts', 'architecture', 'plugins', 'themes', 'build', 'contribute']) {
     const page = oldAnchor(`#${section}`)!.replace(/^\/docs\/|\/$/g, '')
