@@ -854,7 +854,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     // Played before its video started (restored paused, paused as it loaded): watched again. Refused by Google
     // meanwhile: loaded again now, the press asks for it.
     if (!playing && now.via === 'youtube' && get().positionMs <= get().startAt) {
-      if (refusedPlay === get().playId && now.youtubeId) reload(now.youtubeId, get().playId, 'played after a refusal', 'by the user')
+      if (refusedPlay === get().playId && now.youtubeId && !watching(now.youtubeId)) reload(now.youtubeId, get().playId, 'played after a refusal', 'by the user')
       else watchForStuck(get().playId)
     }
     // Fade on pause: down (from where a running fade, the sleep timer's, has got to), then pause. On play: play silent,
@@ -1149,13 +1149,15 @@ function overlap() {
 }
 
 /**
- * Report of the overlap's tail (PlayerBar): its fade out to its song's end, then stopped there. Volume to send it, if
- * any. The end comes from the overlap: YouTube sends a video's length once, as it loads (2026-10-30: read from each
- * report, the tail never faded and played on at full volume under the next song).
+ * Report of the other embed (PlayerBar): the overlap's tail, fading out to its song's end, then stopped there. Volume
+ * to send it, if any. The end comes from the overlap: YouTube sends a video's length once, as it loads (2026-10-30: read
+ * from each report, the tail never faded and played on at full volume under the next song). Stopped or cued and playing
+ * anyway (YouTube ignores a stop while a video starts): 'stop' again.
  */
-export function tailVolume(u: YtUpdate): number | undefined {
+export function tailReport(u: YtUpdate): number | 'stop' | undefined {
   const { tail, volume, fade } = usePlayer.getState()
-  if (!tail || tail.done) return
+  if (!tail) return
+  if (tail.done) return u.state === 1 ? 'stop' : undefined
   if (u.state === 0 || u.error !== undefined || (u.time !== undefined && u.time * 1000 >= tail.end)) return void usePlayer.setState({ tail: stopTail(tail) })
   if (u.time !== undefined) return Math.round(volume * fadeGain(u.time * 1000, tail.end, fade, false) * 100)
 }

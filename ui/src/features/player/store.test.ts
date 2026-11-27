@@ -4,7 +4,8 @@ import { api, type LibraryTrack } from '../../shared/api'
 import { rememberEnd } from './ends'
 import { NO_FADE } from './fade'
 import { useSponsor } from './sponsor'
-import { bindFrame, onQueueEnd, splitIntoParts, tailVolume, usePlayer } from './store'
+import { bindFrame, onQueueEnd, splitIntoParts, tailReport, usePlayer } from './store'
+import { useWatch } from './watch'
 
 const song = (id: number): LibraryTrack => ({ id, added: 0, addedAt: null, title: `Song ${id}`, artist: 'Artist', album: null, durationMs: null, isrc: null, ids: { youtube: `video${id}` } })
 // No Tauri here: IPC calls fail, other uploads come back empty. A macrotask lets their awaits settle.
@@ -129,8 +130,8 @@ describe('song ends', () => {
     expect(usePlayer.getState().now?.youtubeId).toBe('video32')
     expect(usePlayer.getState().tail).toMatchObject({ videoId: 'video31', end: 200_000, done: false })
     // Regression guard: the old song played on at full volume under the next one (2026-10-30).
-    expect(tailVolume({ time: 196 })).toBe(50)
-    expect(tailVolume({ time: 200 })).toBeUndefined()
+    expect(tailReport({ time: 196 })).toBe(50)
+    expect(tailReport({ time: 200 })).toBeUndefined()
     expect(usePlayer.getState().tail?.done).toBe(true)
   })
 
@@ -393,6 +394,28 @@ describe('a YouTube video that never starts', () => {
     expect(usePlayer.getState()).toMatchObject({ frameKey: tail!.key, tail: { key: frameKey, videoId: 'video86', done: true } })
     expect(usePlayer.getState().now?.youtubeId).toBe('video87')
     usePlayer.setState({ tail: null })
+  })
+
+  it('stops the other embed again when it plays after its stop', () => {
+    usePlayer.getState().playTracks([song(88), song(89)], 0)
+    usePlayer.getState().onYoutube({ state: 1, time: 0.3 })
+    usePlayer.getState().onYoutube({ time: 6 })
+    // Cued, silent: left as it is.
+    expect(tailReport({ state: 5 })).toBeUndefined()
+    // YouTube ignores a stop while a video starts, then plays it: nobody would hear of it again.
+    expect(tailReport({ state: 1 })).toBe('stop')
+    usePlayer.setState({ tail: null })
+  })
+
+  it('refused by Google, then on its watch page: Play loads nothing into the embed', async () => {
+    usePlayer.getState().playTracks([song(90)], 0)
+    usePlayer.getState().onYoutube({ refused: 429 })
+    expect(loads()).toEqual(['video90'])
+    useWatch.setState({ video: 'video90' })
+    usePlayer.getState().toggle()
+    usePlayer.getState().toggle()
+    expect(loads()).toEqual(['video90'])
+    useWatch.setState({ video: null })
   })
 
   it('stuck again once loaded again: refused, then the next song when nothing else can play it', async () => {

@@ -1257,7 +1257,17 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
       `setVideoId` only for playlists the account can change.
     - 2026-11-27 (review): an account that finds nothing no longer ends the search; the next ones are tried
       (`remove_from_owner`). Nothing found and no failure still counts as removed.
-- [ ] `S` Crossfade: check that a refused embed (or the crossfade's other player) never keeps sounding once the watch page takes over.
+- [x] `S` Crossfade: check that a refused embed (or the crossfade's other player) never keeps sounding once the watch page takes over.
+  - 2026-11-27: checked in the code, tested with fake reports, not tried for real. The refused embed was covered
+    (paused on the switch, paused again if it plays: `embedReport`). The other embed was not: a stop sent while its
+    video starts is ignored by YouTube (a stale cue swapped by a quick Next), and nothing stopped it after
+    (`tailReport` now does). Fixed too: after a Google refusal, Play loaded the video into the embed while the watch
+    page played it. The watch page's own webview was not checked.
+    - Decided alone (2026-11-27): an overlap's old song still finishes its fade out when the next one goes to the watch
+      page (bounded by its end; that is the crossfade).
+- [ ] `S` A video refused before, reached by an overlap or by Next into the cued embed with Now Playing closed: no embed
+      is bound yet, so `videoRect()` finds no place and another upload plays instead of its watch page (read in
+      `playOnWatchPage`, not reproduced).
 - [ ] `S` Share page: no covers and no player yet (covers would load from YouTube's host for the visitor).
 - [x] `S` Stats recap cards. Ticked 2026-11-18 (lot 63, audit of the line): the recap shipped (`812a8d96` a year or a month as cards to share, `d725d9fe` the profile card; `features/stats/RecapView.tsx`, `recapCards.ts`, `recapDraw.ts`, tested in `recap.test.ts`). What the line still asked is a try by hand (the card from the web page, the QR's look and size): Check live.
 - [ ] `M` Whole-app security pass (for Opus).

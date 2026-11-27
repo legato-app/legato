@@ -20,7 +20,7 @@ import { trackArt } from '../../shared/art'
 import { Cover } from '../../shared/ui/Cover'
 import { ArtistLink } from './ArtistLink'
 import { artistName } from '../../shared/artistName'
-import { bindFrame, tailVolume, useNowTrack, usePlayer, useVideoSlot } from './store'
+import { bindFrame, tailReport, useNowTrack, usePlayer, useVideoSlot } from './store'
 import { volumeWheelRef } from './volume'
 import { pop } from '../../shared/motion'
 import { embedUrl, parseYt, ytPost } from './youtube'
@@ -121,8 +121,9 @@ function YouTubeFrame({ videoId, tail = false, idle = false, cue = false }: { vi
       if (!u) return
       if (isTail.current) {
         // Fades out to its song's own end (learned early end), then only silence is left: stopped too.
-        const volume = tailVolume(u)
-        if (volume !== undefined) ytPost(frame.current, 'command', 'setVolume', [volume])
+        const answer = tailReport(u)
+        if (answer === 'stop') ytPost(frame.current, 'command', 'stopVideo')
+        else if (answer !== undefined) ytPost(frame.current, 'command', 'setVolume', [answer])
         return
       }
       // Subtitles off (default): YouTube may turn them on from the Google account, unload them once per video.

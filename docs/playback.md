@@ -160,6 +160,8 @@ Songs started in the last 24 h (play stats) come after all the others, spread th
   decoder for ~15 s with data buffered (measured 2026-10-28, also with `about:blank`). The two embeds swap roles at
   each overlap; the next song loads into the stopped one. In the tray the first one is born in a hidden page, where
   Chromium never starts its video: the page is held `visible` until the music moves (`hold_page`).
+  A stopped or cued embed that reports "playing" is stopped again (2026-11-27, `tailReport`): YouTube ignores a stop
+  while a video starts. The watch page takes over mid-overlap: the tail finishes its fade out.
 - Early endings (2026-10-28, Settings › Playback › Fades, on by default): videos that run on after their song
   (silence, a silent end screen). `live.js` listens (levels only when nothing else needs the sound: the element keeps
   its own sound) and reports `end` once the sound stayed under −50 LUFS for 2 s within the video's last 25 s. The
