@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { BENCH_ID, benchFolders, browserArgs, carriesId, cpuSeconds, isBuildInput, kindsText, memory, noticesReady, parseArgs, plan, share, shuffleLine, summarize, tableRow, withRow } from './bench.mjs'
+import { BENCH_ID, benchFolders, browserArgs, buildCommand, carriesId, EDITIONS, LITE_BENCH_ID, cpuSeconds, isBuildInput, kindsText, memory, noticesReady, parseArgs, plan, share, shuffleLine, summarize, tableRow, withRow } from './bench.mjs'
 
 const MB = 1024 * 1024
 const proc = (pid: number, name: string, cpu: number, wsp: number | null) => ({ pid, name, cpu, wsp })
@@ -39,7 +39,7 @@ describe('bench safety', () => {
   })
 
   it('refuses every other identifier, the installed app and the dev build first', () => {
-    for (const id of ['app.legato.desktop', 'app.legato.desktop.devbuild', 'dev.musicapp.desktop', 'app.legato.desktop.bench\\..', '']) {
+    for (const id of ['app.legato.desktop', 'app.legato.lite', 'app.legato.lite.devbuild', 'app.legato.desktop.devbuild', 'dev.musicapp.desktop', 'app.legato.desktop.bench\\..', '']) {
       expect(() => benchFolders(id, roaming, local), id).toThrow()
     }
   })
@@ -49,10 +49,18 @@ describe('bench safety', () => {
     expect(() => benchFolders(BENCH_ID, roaming, 'Local')).toThrow('APPDATA')
   })
 
-  it('uses the identifier of the bench config, which is not the installed app', () => {
-    const conf = (f: string) => JSON.parse(readFileSync(new URL(`../src-tauri/${f}`, import.meta.url), 'utf8'))
-    expect(conf('tauri.bench.conf.json').identifier).toBe(BENCH_ID)
-    expect(conf('tauri.conf.json').identifier).not.toBe(BENCH_ID)
+  it('uses each edition’s bench identifier, which is not an installed app’s', () => {
+    const conf = (file: string) => JSON.parse(readFileSync(new URL(`../src-tauri/${file}`, import.meta.url), 'utf8'))
+    for (const edition of Object.values(EDITIONS)) expect(conf(edition.configs.at(-1)!).identifier).toBe(edition.id)
+    for (const installed of ['tauri.conf.json', 'tauri.lite.conf.json']) expect([BENCH_ID, LITE_BENCH_ID]).not.toContain(conf(installed).identifier)
+    expect(benchFolders(LITE_BENCH_ID, roaming, local)[0]).toMatch(/app\.legato\.lite\.bench$/)
+  })
+
+  it('builds the Lite as pnpm build:lite does, under the bench identifier', () => {
+    expect(buildCommand(EDITIONS.lite)).toBe('pnpm tauri build --no-bundle --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite.bench.conf.json -- --no-default-features')
+    expect(buildCommand(EDITIONS.full)).toBe('pnpm tauri build --no-bundle --config src-tauri/tauri.bench.conf.json')
+    expect(parseArgs(['--lite'])).toMatchObject({ lite: true })
+    expect(() => parseArgs(['--lite', '--visualizer'])).toThrow('no visualizer')
   })
 
   it('knows an exe built for another identifier', () => {

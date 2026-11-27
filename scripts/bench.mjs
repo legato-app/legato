@@ -11,6 +11,8 @@
 //
 //   pnpm bench                full run, about 20 minutes, row saved
 //   pnpm bench --quick        short windows (15 s, 1 min in the tray), not saved unless --save
+//   --lite                    Legato Lite instead, as `pnpm build:lite` builds it, under its own bench identifier; same
+//                             library and steps, "Legato Lite" in the row's notes (no visualizer there)
 //   --visualizer              instead: the CPU of the whole app with the visualizer open on a playing song, each look in
 //                             Now Playing and full screen, against the same run with it off. Built with the silent output
 //                             (the e2e feature: nothing reaches the speakers), so it is its own build; not saved
@@ -33,21 +35,35 @@ import { Cdp, sleep, waitForPage } from './cdp.mjs'
 import { browserArgs, carriesId, freePort, inputsHash, isBuildInput } from './guest.mjs'
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-const CONF = path.join(ROOT, 'src-tauri', 'tauri.bench.conf.json')
-const EXE = path.join(ROOT, 'target', 'bench', 'legato-bench.exe')
 const BUILT = path.join(ROOT, 'target', 'release', 'legato.exe')
 const PERF = path.join(ROOT, 'docs', 'performance.md')
 export const BENCH_ID = 'app.legato.desktop.bench'
+export const LITE_BENCH_ID = 'app.legato.lite.bench'
+
+/** What is built and run: the identifier (its own data folders), the exe's own name, the `tauri build` arguments. */
+export const EDITIONS = {
+  full: { id: BENCH_ID, configs: ['tauri.bench.conf.json'], exe: 'legato-bench.exe', features: '', cargo: '' },
+  // `lite.conf` first (name, front-end build), the bench's own identifier over it.
+  lite: { id: LITE_BENCH_ID, configs: ['tauri.lite.conf.json', 'tauri.lite.bench.conf.json'], exe: 'legato-lite-bench.exe', features: '--features lite ', cargo: ' -- --no-default-features' },
+}
+
+/** `pnpm tauri build` of an edition; `silent`: the e2e feature's silent output (the visualizer run). */
+export function buildCommand({ configs, features, cargo }, silent = false) {
+  return `pnpm tauri build --no-bundle ${silent ? '--features e2e ' : ''}${features}${configs.map((file) => `--config src-tauri/${file}`).join(' ')}${cargo}`
+}
+
+const exePath = (edition) => path.join(ROOT, 'target', 'bench', edition.exe)
 const SONGS = 10_000
 const MB = 1024 * 1024
 
 // ---- Pure parts (scripts/bench.test.ts) ----
 
 export function parseArgs(argv) {
-  const o = { quick: false, visualizer: false, skipBuild: false, buildOnly: false, save: undefined, keep: false, note: '', shots: '', looks: '' }
+  const o = { quick: false, lite: false, visualizer: false, skipBuild: false, buildOnly: false, save: undefined, keep: false, note: '', shots: '', looks: '' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--quick') o.quick = true
+    else if (a === '--lite') o.lite = true
     else if (a === '--visualizer') o.visualizer = true
     else if (a === '--looks') o.looks = argv[++i] ?? ''
     else if (a === '--skip-build') o.skipBuild = true
@@ -59,6 +75,7 @@ export function parseArgs(argv) {
     else if (a === '--shots') o.shots = argv[++i] ?? ''
     else throw new Error(`unknown option ${a} (the top of scripts/bench.mjs lists them)`)
   }
+  if (o.lite && o.visualizer) throw new Error('--visualizer has nothing to measure with --lite: Lite has no visualizer')
   // Short runs are not numbers of record.
   o.save ??= !o.quick && !o.visualizer
   return o
@@ -69,9 +86,9 @@ export function plan(quick) {
   return quick ? { settle: 5, idle: 15, play: 15, tray: 60, trace: [30] } : { settle: 15, idle: 60, play: 60, tray: 600, trace: [60, 240, 360] }
 }
 
-/** The two folders this script may delete. Any other identifier: refused, so the installed app's data is out of reach. */
+/** The two folders this script may delete. Any other identifier: refused, so the installed apps' data is out of reach. */
 export function benchFolders(id, appData, localAppData) {
-  if (id !== BENCH_ID) throw new Error(`the bench identifier is ${BENCH_ID}, not ${id}`)
+  if (id !== BENCH_ID && id !== LITE_BENCH_ID) throw new Error(`the bench identifiers are ${BENCH_ID} and ${LITE_BENCH_ID}, not ${id}`)
   for (const base of [appData, localAppData]) if (!base || !path.win32.isAbsolute(base)) throw new Error('APPDATA and LOCALAPPDATA must be set')
   return [path.win32.join(appData, id), path.win32.join(localAppData, id)]
 }
@@ -181,31 +198,33 @@ const fail = (message) => {
 }
 
 const started = new Set()
+// The exe of the edition measured (`main`).
+let benchExe = exePath(EDITIONS.full)
 
 /** Stops a process this script started (and its children), by PID, after checking the PID still is our exe. */
 function stop(pid) {
-  const name = path.basename(EXE)
+  const name = path.basename(benchExe)
   const listed = spawnSync('tasklist', ['/FI', `PID eq ${pid}`, '/FO', 'CSV', '/NH'], { encoding: 'utf8' }).stdout ?? ''
   if (listed.toLowerCase().includes(`"${name}"`)) spawnSync('taskkill', ['/PID', String(pid), '/T', '/F'], { stdio: 'ignore' })
   started.delete(pid)
 }
 
 function runningBench() {
-  const listed = spawnSync('tasklist', ['/FI', `IMAGENAME eq ${path.basename(EXE)}`, '/FO', 'CSV', '/NH'], { encoding: 'utf8' }).stdout ?? ''
+  const listed = spawnSync('tasklist', ['/FI', `IMAGENAME eq ${path.basename(benchExe)}`, '/FO', 'CSV', '/NH'], { encoding: 'utf8' }).stdout ?? ''
   return listed
     .split('\n')
-    .filter((l) => l.toLowerCase().startsWith(`"${path.basename(EXE).toLowerCase()}"`))
+    .filter((l) => l.toLowerCase().startsWith(`"${path.basename(benchExe).toLowerCase()}"`))
     .map((l) => l.split('","')[1])
 }
 
 /** `tauri build --no-bundle` under the bench identifier, then the exe copied to its own name and folder: only this script
  *  writes target/bench, so what runs there never is a normal build made later by `pnpm build`. */
-function ensureBuild(o) {
-  const stamp = `${EXE}.inputs`
+function ensureBuild(o, edition) {
+  const stamp = `${benchExe}.inputs`
   // The visualizer run is a different build (silent output): its own stamp, so neither run reuses the other's exe.
   const hash = inputsHash(ROOT) + (o.visualizer ? ':silent' : '')
-  if (o.skipBuild && existsSync(EXE) && existsSync(stamp) && readFileSync(stamp, 'utf8') === hash) {
-    console.log('build: inputs unchanged, reusing target/bench/legato-bench.exe')
+  if (o.skipBuild && existsSync(benchExe) && existsSync(stamp) && readFileSync(stamp, 'utf8') === hash) {
+    console.log(`build: inputs unchanged, reusing target/bench/${edition.exe}`)
     return
   }
   // The release profile stops in build.rs without the notices; only `pnpm notices` writes them (git-ignored, cargo-about).
@@ -214,12 +233,12 @@ function ensureBuild(o) {
   if (!noticesReady(existsSync(notices) ? readFileSync(notices, 'utf8') : null)) {
     fail('src-tauri/third-party-licenses.html is missing (or only the dev placeholder): the release build stops without it. Run `pnpm notices` once (needs cargo-about, docs/licenses.md), then pnpm bench again')
   }
-  const fresh =existsSync(EXE) && existsSync(stamp) && readFileSync(stamp, 'utf8') === hash
+  const fresh =existsSync(benchExe) && existsSync(stamp) && readFileSync(stamp, 'utf8') === hash
   console.log(`build: tauri build --no-bundle (release, LTO: minutes)${fresh ? ' - the inputs have not changed, --skip-build would save them' : ''}`)
-  const built = spawnSync(`pnpm tauri build --no-bundle ${o.visualizer ? '--features e2e ' : ''}--config src-tauri/tauri.bench.conf.json`, { cwd: ROOT, stdio: 'inherit', shell: true })
+  const built = spawnSync(buildCommand(edition, o.visualizer), { cwd: ROOT, stdio: 'inherit', shell: true })
   if (built.status !== 0) fail('the build failed')
-  mkdirSync(path.dirname(EXE), { recursive: true })
-  copyFileSync(BUILT, EXE)
+  mkdirSync(path.dirname(benchExe), { recursive: true })
+  copyFileSync(BUILT, benchExe)
   writeFileSync(stamp, hash)
 }
 
@@ -440,7 +459,7 @@ async function launch(helper, args) {
   const flags = `--remote-debugging-port=${port} --lang=en-US ${args}`
   const env = { ...process.env, WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: flags }
   const t0 = Date.now()
-  const child = spawn(EXE, [], { env, stdio: 'ignore' })
+  const child = spawn(benchExe, [], { env, stdio: 'ignore' })
   child.on('error', (e) => fail(`the bench app did not start: ${e.message}`))
   started.add(child.pid)
   const watching = helper.call(`watch ${child.pid}`)
@@ -596,14 +615,17 @@ async function main() {
     fail(e.message)
   }
   if (process.platform !== 'win32') fail('pnpm bench measures WebView2 and Windows counters: Windows only')
-  const conf = JSON.parse(readFileSync(CONF, 'utf8'))
+  const edition = o.lite ? EDITIONS.lite : EDITIONS.full
+  benchExe = exePath(edition)
+  const conf = JSON.parse(readFileSync(path.join(ROOT, 'src-tauri', edition.configs.at(-1)), 'utf8'))
+  if (conf.identifier !== edition.id) fail(`${edition.configs.at(-1)} says ${conf.identifier}, not ${edition.id}`)
   const [dataDir, localDir] = benchFolders(conf.identifier, process.env.APPDATA, process.env.LOCALAPPDATA)
   const alone = runningBench()
   if (alone.length) fail(`a bench app already runs (PID ${alone.join(', ')}): stop it first, by PID`)
 
-  ensureBuild(o)
+  ensureBuild(o, edition)
   if (o.buildOnly) return
-  if (!carriesId(readFileSync(EXE), conf.identifier)) fail(`${EXE} was not built for ${conf.identifier}: run without --skip-build`)
+  if (!carriesId(readFileSync(benchExe), conf.identifier)) fail(`${benchExe} was not built for ${conf.identifier}: run without --skip-build`)
 
   const shuffle = shuffleBench()
   console.log(shuffle ?? 'shuffle 10000: not measured (the vitest run failed)')
@@ -688,7 +710,7 @@ async function main() {
       play,
       tray,
       trace,
-      note: [o.quick ? 'quick run' : null, 'other apps were running', `PC load ${Math.round(idle.pcLoad ?? 0)} / ${Math.round(play.pcLoad ?? 0)} / ${Math.round(tray.pcLoad ?? 0)} %`, shuffle, o.note || null].filter(Boolean).join('; '),
+      note: [o.lite ? 'Legato Lite' : null, o.quick ? 'quick run' : null, 'other apps were running', `PC load ${Math.round(idle.pcLoad ?? 0)} / ${Math.round(play.pcLoad ?? 0)} / ${Math.round(tray.pcLoad ?? 0)} %`, shuffle, o.note || null].filter(Boolean).join('; '),
     }
     print(result)
     if (o.save) {
