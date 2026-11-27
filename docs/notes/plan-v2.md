@@ -912,6 +912,8 @@ colours, mirror, reflection.
   - [x] D. `add/pageRead.tsx`: the rules, sign-in, reading and picking steps both connect buttons share (2026-11-27,
     157 lines out, 158 in; no real connection tried).
   - [x] E. `app/notifyError.ts` for error toasts: 42 call sites (2026-11-27; the error banner calls left as they were).
+  - [x] 6. `Library::setting_as` / `set_setting_as` for typed settings: 19 reads and 7 writes (2026-11-27; 26 long
+    lines made short, 20 added with the test).
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md

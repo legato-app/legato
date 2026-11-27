@@ -76,7 +76,7 @@ fn now() -> i64 {
 }
 
 fn saved(app: &AppHandle) -> Saved {
-    app.try_state::<AppState>().and_then(|s| s.lib().setting(KEY).ok().flatten()).and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    app.try_state::<AppState>().and_then(|s| s.lib().setting_as(KEY)).unwrap_or_default()
 }
 
 fn save(app: &AppHandle, s: &Saved) {

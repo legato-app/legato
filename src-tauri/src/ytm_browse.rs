@@ -92,7 +92,7 @@ const CHANNELS: &str = "ytChannels";
 /// its songs, on YouTube), the channel that song's byline links (an uploader such as a small producer's channel), kept for next time.
 /// Public pages, asked without the account. Same pacing as before: the callers' (`artist_picture`'s turn, its 6-hour miss, a refusal ends it).
 pub(crate) async fn artist_page_for(state: &AppState, name: &str, titles: &[String], video: Option<String>) -> anyhow::Result<Option<Artist>> {
-    let mut kept: std::collections::BTreeMap<String, String> = state.lib().setting(CHANNELS).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default();
+    let mut kept: std::collections::BTreeMap<String, String> = state.lib().setting_as(CHANNELS).unwrap_or_default();
     let id = kept.get(&music_core::channels::key(name)).cloned();
     let (page, found) = public_ytm().artist_or_channel(name, titles, id.as_deref(), video.as_deref()).await?;
     if let Some(found) = found

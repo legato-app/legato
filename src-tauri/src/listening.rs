@@ -77,7 +77,7 @@ pub const BLOCKED_FINDS: &str = "blockedFinds";
 pub const MAX_BLOCKED: usize = 2_000;
 
 pub fn blocked_finds(state: &AppState) -> std::collections::HashSet<String> {
-    state.lib().setting(BLOCKED_FINDS).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    state.lib().setting_as(BLOCKED_FINDS).unwrap_or_default()
 }
 
 /// "Never in mixes" on a song a mix discovered (it has no library row): its title and artist are remembered (`block`
@@ -89,7 +89,7 @@ pub async fn block_find(state: State<'_, AppState>, title: String, artist: Strin
     }
     let mut all = blocked_finds(&state);
     music_core::mixes::set_blocked(&mut all, &title, &artist, block, MAX_BLOCKED);
-    state.lib().set_setting(BLOCKED_FINDS, &serde_json::to_value(&all).map_err(err)?).map_err(err)?;
+    state.lib().set_setting_as(BLOCKED_FINDS, &all).map_err(err)?;
     state.cache.mixes.clear();
     Ok(())
 }

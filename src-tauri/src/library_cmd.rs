@@ -38,12 +38,12 @@ pub async fn playlist_tracks(state: State<'_, AppState>, id: i64) -> CmdResult<R
 }
 
 pub fn folders(lib: &Library) -> Vec<String> {
-    lib.setting("folders").ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    lib.setting_as("folders").unwrap_or_default()
 }
 
 /// Audio files dropped on their own, outside the watched folders (`folders::add_dropped`).
 pub fn loose_files(lib: &Library) -> Vec<String> {
-    lib.setting("files").ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    lib.setting_as("files").unwrap_or_default()
 }
 
 /// Scan off the IPC thread, then mirror into library. Returns local file count. Files dropped on their own go with the

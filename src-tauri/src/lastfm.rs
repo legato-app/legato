@@ -173,7 +173,7 @@ pub async fn lastfm_discoveries(state: State<'_, AppState>) -> CmdResult<Vec<mus
     let now = crate::unix_now();
     let (favourites, known) = {
         let lib = state.lib();
-        let kept = lib.setting(DISCOVERIES).ok().flatten().and_then(|v| serde_json::from_value::<Found>(v).ok());
+        let kept = lib.setting_as::<Found>(DISCOVERIES);
         if let Some(r) = asked_today(kept, now) {
             return r;
         }

@@ -218,7 +218,7 @@ impl AppState {
 
     /// Accounts picked in Settings › Accounts (empty = main account only).
     fn ytm_picked(&self) -> Vec<Account> {
-        self.lib().setting("ytm_accounts").ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+        self.lib().setting_as("ytm_accounts").unwrap_or_default()
     }
 
     /// YouTube Music, one connector per picked account. Empty = signed out. Async callers only (WebView2 cookies).

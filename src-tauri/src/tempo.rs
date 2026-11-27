@@ -75,7 +75,7 @@ pub async fn tempo_scan(state: State<'_, AppState>, limit: usize) -> CmdResult<u
     let files = state.lib().untimed_local().map_err(err)?;
     let (fill, todo) = {
         let mut k = kept();
-        let all = k.get_or_insert_with(|| state.lib().setting(KEY).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default());
+        let all = k.get_or_insert_with(|| state.lib().setting_as(KEY).unwrap_or_default());
         split(files, all, modified)
     };
     {
@@ -114,7 +114,7 @@ pub async fn tempo_scan(state: State<'_, AppState>, limit: usize) -> CmdResult<u
             all.pop_first();
         }
         if changed && (left == 0 || CALLS.fetch_add(1, Ordering::Relaxed) % WRITE_EVERY == WRITE_EVERY - 1) {
-            lib.set_setting(KEY, &serde_json::to_value(&*all).map_err(err)?).map_err(err)?;
+            lib.set_setting_as(KEY, &*all).map_err(err)?;
         }
     }
     Ok(left)

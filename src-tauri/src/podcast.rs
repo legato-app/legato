@@ -10,7 +10,7 @@ const KEY: &str = "podcastShows";
 const MAX_KEPT: usize = 100;
 
 fn kept(state: &AppState) -> Vec<Feed> {
-    state.lib().setting(KEY).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    state.lib().setting_as(KEY).unwrap_or_default()
 }
 
 fn icons(shows: &[Feed]) {
@@ -50,7 +50,7 @@ pub async fn podcast_keep(state: State<'_, AppState>, show: Feed, keep: bool) ->
         }
         all.insert(0, s);
     }
-    state.lib().set_setting(KEY, &serde_json::to_value(&all).map_err(err)?).map_err(err)?;
+    state.lib().set_setting_as(KEY, &all).map_err(err)?;
     Ok(all)
 }
 
@@ -76,7 +76,7 @@ pub async fn podcast_import(state: State<'_, AppState>, opml: String) -> CmdResu
             all.push(f);
         }
     }
-    state.lib().set_setting(KEY, &serde_json::to_value(&all).map_err(err)?).map_err(err)?;
+    state.lib().set_setting_as(KEY, &all).map_err(err)?;
     Ok(all)
 }
 

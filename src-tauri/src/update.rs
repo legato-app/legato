@@ -113,7 +113,7 @@ fn now() -> i64 {
 }
 
 fn saved(app: &AppHandle) -> Saved {
-    app.try_state::<AppState>().and_then(|s| s.lib().setting(KEY).ok().flatten()).and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    app.try_state::<AppState>().and_then(|s| s.lib().setting_as(KEY)).unwrap_or_default()
 }
 
 fn save(app: &AppHandle, s: &Saved) {
@@ -287,7 +287,7 @@ impl Updater {
 
 /// Launch right after an update installed from the tray: stay there (before `Updater::new`, which clears the record).
 pub fn back_to_tray(lib: &music_core::library::Library, current: &str) -> bool {
-    let s: Saved = lib.setting(KEY).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default();
+    let s: Saved = lib.setting_as(KEY).unwrap_or_default();
     s.hidden && s.pending.is_some_and(|p| p.to == current)
 }
 

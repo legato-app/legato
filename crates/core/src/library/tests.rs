@@ -1614,3 +1614,14 @@ fn spotify_playlists_can_leave_with_the_account() {
     assert!(!lib.tracks().unwrap().is_empty(), "the songs stay");
     assert_eq!(lib.remove_spotify_playlists().unwrap(), 0);
 }
+
+#[test]
+fn a_setting_is_read_and_written_as_its_type() -> Result<()> {
+    let library = Library::in_memory()?;
+    assert_eq!(library.setting_as::<Vec<String>>("folders"), None);
+    library.set_setting_as("folders", &vec!["music".to_string()])?;
+    assert_eq!(library.setting_as::<Vec<String>>("folders"), Some(vec!["music".to_string()]));
+    // Another shape than asked: as unset.
+    assert_eq!(library.setting_as::<u32>("folders"), None);
+    Ok(())
+}

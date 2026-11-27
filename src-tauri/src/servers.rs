@@ -117,7 +117,7 @@ struct Synced {
 }
 
 fn syncs(state: &AppState) -> BTreeMap<String, Synced> {
-    state.lib().setting(SYNCED).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    state.lib().setting_as(SYNCED).unwrap_or_default()
 }
 
 fn set_synced(state: &AppState, key: &str, s: Option<Synced>) {

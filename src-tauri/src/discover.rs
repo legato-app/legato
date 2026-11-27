@@ -63,7 +63,7 @@ pub async fn new_releases(state: State<'_, AppState>) -> Result<Vec<Release>, St
     let now = unix_now();
     let (_round, artists) = {
         let lib = state.lib();
-        let saved = lib.setting(KEY).ok().flatten().and_then(|v| serde_json::from_value::<Saved>(v).ok());
+        let saved = lib.setting_as::<Saved>(KEY);
         let fresh = saved.as_ref().is_some_and(|s| now - s.at < FRESH_S);
         // Fresh, or a round under way: what is kept.
         let Some(round) = (!fresh).then(Round::start).flatten() else { return Ok(saved.map(|s| s.releases).unwrap_or_default()) };

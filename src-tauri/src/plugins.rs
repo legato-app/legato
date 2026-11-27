@@ -101,7 +101,7 @@ fn dir(app: &AppHandle) -> CmdResult<PathBuf> {
 }
 
 fn registry(state: &AppState) -> HashMap<String, Entry> {
-    state.lib().setting(REGISTRY).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    state.lib().setting_as(REGISTRY).unwrap_or_default()
 }
 
 fn save_registry(state: &AppState, r: &HashMap<String, Entry>) -> CmdResult<()> {

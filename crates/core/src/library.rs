@@ -568,6 +568,15 @@ impl Library {
         Ok(raw.and_then(|s| serde_json::from_str(&s).ok()))
     }
 
+    /// A setting read as `T`; None: unset, unreadable or of another shape.
+    pub fn setting_as<T: serde::de::DeserializeOwned>(&self, key: &str) -> Option<T> {
+        self.setting(key).ok().flatten().and_then(|value| serde_json::from_value(value).ok())
+    }
+
+    pub fn set_setting_as<T: serde::Serialize>(&self, key: &str, value: &T) -> Result<()> {
+        self.set_setting(key, &serde_json::to_value(value)?)
+    }
+
     pub fn set_setting(&self, key: &str, value: &serde_json::Value) -> Result<()> {
         self.db.execute(
             "INSERT INTO settings (key, value) VALUES (?1, ?2) ON CONFLICT (key) DO UPDATE SET value = excluded.value",

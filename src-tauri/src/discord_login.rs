@@ -17,7 +17,7 @@ fn login(state: &AppState) -> DiscordLogin {
 }
 
 fn saved(state: &AppState) -> Option<Profile> {
-    state.lib().setting(PROFILE).ok().flatten().and_then(|v| serde_json::from_value::<Profile>(v).ok()).filter(Profile::valid)
+    state.lib().setting_as::<Profile>(PROFILE).filter(Profile::valid)
 }
 
 /// What a saved profile is worth: it counts only while the keychain still holds the sign-in. Without it (the entry was
@@ -44,22 +44,22 @@ pub fn current(state: &AppState) -> Option<Profile> {
     profile.map(|p| match p.avatar {
         Some(_) => p,
         None => {
-            let avatar = state.lib().setting(CARD).ok().flatten().and_then(|v| serde_json::from_value::<DiscordCard>(v).ok()).and_then(|c| c.avatar).and_then(|a| music_core::share::avatar_hash_of(&a));
+            let avatar = state.lib().setting_as::<DiscordCard>(CARD).and_then(|c| c.avatar).and_then(|a| music_core::share::avatar_hash_of(&a));
             Profile { avatar, ..p }
         }
     })
 }
 
 fn save(state: &AppState, profile: &Profile, card: &DiscordCard) -> CmdResult<()> {
-    state.lib().set_setting(PROFILE, &serde_json::to_value(profile).map_err(err)?).map_err(err)?;
-    state.lib().set_setting(CARD, &serde_json::to_value(card).map_err(err)?).map_err(err)
+    state.lib().set_setting_as(PROFILE, &profile).map_err(err)?;
+    state.lib().set_setting_as(CARD, &card).map_err(err)
 }
 
 /// The signed-in account's card (None = not signed in). A sign-in from before the card existed is read once more.
 #[tauri::command]
 pub async fn discord_login_status(state: State<'_, AppState>) -> CmdResult<Option<DiscordCard>> {
     let Some(profile) = current(&state) else { return Ok(None) };
-    let card = state.lib().setting(CARD).ok().flatten().and_then(|v| serde_json::from_value::<DiscordCard>(v).ok());
+    let card = state.lib().setting_as::<DiscordCard>(CARD);
     if let Some(card) = card {
         return Ok(Some(card));
     }

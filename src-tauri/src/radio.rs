@@ -11,7 +11,7 @@ const KEY: &str = "radioStations";
 const MAX_KEPT: usize = 200;
 
 fn kept(state: &AppState) -> Vec<Station> {
-    state.lib().setting(KEY).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default()
+    state.lib().setting_as(KEY).unwrap_or_default()
 }
 
 /// The icons of these stations may be asked through the `art` scheme from now on (only the ones Rust itself handed out).
@@ -89,7 +89,7 @@ pub async fn radio_keep(state: State<'_, AppState>, station: Station, keep: bool
         }
         all.insert(0, s);
     }
-    state.lib().set_setting(KEY, &serde_json::to_value(&all).map_err(err)?).map_err(err)?;
+    state.lib().set_setting_as(KEY, &all).map_err(err)?;
     Ok(all)
 }
 

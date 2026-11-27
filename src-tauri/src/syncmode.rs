@@ -165,7 +165,7 @@ fn system_property(key: &str) -> Option<String> {
 
 pub(crate) fn config(state: &AppState) -> Config {
     let lib = state.lib();
-    let mut c: Config = lib.setting(CONFIG).ok().flatten().and_then(|v| serde_json::from_value(v).ok()).unwrap_or_default();
+    let mut c: Config = lib.setting_as(CONFIG).unwrap_or_default();
     if sm::device_file(&c.device).is_none() {
         c.device = sm::new_device_id();
         let _ = lib.set_setting(CONFIG, &serde_json::json!(c));
