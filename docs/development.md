@@ -7,9 +7,9 @@ keeps secrets and data. Written 2026-10-17; re-check the Spotify part when Spoti
 
 | System | What to install |
 |---|---|
-| Windows 10 or 11 | [Rust](https://rustup.rs) stable (MSVC), Node.js 22 or later, [pnpm](https://pnpm.io) 10. WebView2 comes with Windows 11. |
-| macOS | Xcode Command Line Tools (`xcode-select --install`), Rust, Node.js 22, pnpm 10. |
-| Linux (Debian, Ubuntu) | Rust, Node.js 22, pnpm 10, and the packages below. |
+| Windows 10 or 11 | [Rust](https://rustup.rs) stable (MSVC), Node.js 22 or later, [pnpm](https://pnpm.io) 11 (`package.json` `packageManager`). WebView2 comes with Windows 11. |
+| macOS | Xcode Command Line Tools (`xcode-select --install`), Rust, Node.js 22, pnpm 11 (`package.json` `packageManager`). |
+| Linux (Debian, Ubuntu) | Rust, Node.js 22, pnpm 11 (`package.json` `packageManager`), and the packages below. |
 | Android (optional, from Windows) | JDK 17, the Android SDK (platform-tools, emulator, an API 36 image), NDK 30.0.16248370, and `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`. On the owner's PC all of it sits in `C:\dev\android` (outside AppData: Claude's shell sees a virtualized one), nothing on the PATH: dot-source `C:\dev\android\env.ps1` (sets `JAVA_HOME`, `ANDROID_HOME`, `NDK_HOME`, the PATH) before an Android build. Emulator: AVD `legato36`. |
 
 ```bash

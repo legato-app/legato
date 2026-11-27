@@ -341,7 +341,11 @@ Where a line says "reading", the owner hasn't confirmed it.
       2026-11-13 (lot 32), looked at before touching anything: the hero at 1440 px (dark) and 375 px (light), through the built-in browser on `next dev`. It is already a product page (the headline as the picture, the real interface tilted in 3D from the demo, one download button, the privacy link, the platforms line) and holds at phone width in the light theme; no redesign was made, because a taste change nobody could judge here would only risk what works. The plan's "too basic" predates the Story and the demo. Left for the owner's eyes: the chapters below the hero, the Features block, the 18 languages' longest lines.
 
 - [ ] `S` The site's build follows only the repository documents it includes: `pages.yml`'s paths list `docs/architecture.md`, `docs/plugins.md` and `CONTRIBUTING.md` in place of `docs/**`, so notes edits don't redeploy an identical site.
-- [ ] `S` Pin one pnpm version: CI pins 10 (`check.yml`, `pages.yml`), the local install is 11; pick one and pin it in both places.
+- [x] `S` Pin one pnpm version: CI pins 10 (`check.yml`, `pages.yml`), the local install is 11; pick one and pin it in both places.
+  - 2026-11-27: `package.json` `packageManager` pins pnpm 11.9.0 and every `pnpm/action-setup` step (check, pages,
+    release) reads it. Both frozen installs pass offline with 11.9.0 here; not tried for real (no CI run yet).
+    - Decided alone (2026-11-27): 11.9.0, the local one (lockfileVersion 9.0 is read by 9 to 11; it needs Node
+      22.13 or later, which `node-version: 22` gives); `release.yml` too, as two versions would stop the action.
 - [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale.
 - [ ] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
 
