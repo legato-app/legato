@@ -6,6 +6,8 @@ import { formatDuration } from '../../shared/format'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { Cover } from '../../shared/ui/Cover'
 import { PageHeader } from '../../shared/ui/PageHeader'
+import { onMenu } from '../../shared/ui/ContextMenu'
+import { trackMenu } from '../menus'
 import { load } from '../player/resumeLong'
 import { usePlayer } from '../player/store'
 import { setEffects } from '../editor/editor'
@@ -35,7 +37,7 @@ export function BooksView() {
             {books.map((b, i) => {
               const p = progress(points, b)
               return (
-                <li key={b.id} className="flex items-center gap-3 border-t border-line-soft py-2.5">
+                <li key={b.id} onContextMenu={onMenu(() => trackMenu(b, { list: books, index: i }))} className="flex items-center gap-3 border-t border-line-soft py-2.5">
                   <Cover title={b.title} art={b.art ? [remoteArt(b.art)] : []} size={48} className="rounded-lg!" />
                   <button type="button" aria-label={tr('Play {title}', { title: b.title })} onClick={() => usePlayer.getState().playTracks(books, i)} className="grid size-9 shrink-0 place-items-center rounded-full bg-raised text-ink hover:brightness-110">
                     <Play weight="fill" size={16} />

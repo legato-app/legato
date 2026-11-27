@@ -728,7 +728,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Decided alone (2026-11-27): only with Audiobooks on (off, nothing changes; replaces “books are still in Songs too”);
       “It’s music” brings a file back; the marked folders are this PC’s (not synced).
       2026-11-27 (review): length alone (two hours and more) lists a file on the page and leaves it in the music (a DJ
-      set, an opera, a sleep track); only `.m4b`, a marked folder or a book genre take it out.
+      set, an opera, a sleep track); only `.m4b`, a marked folder or a book genre take it out. A book’s row has the song’s
+      right-click menu (“It’s music” brings it back).
 - [ ] `S` Audiobooks: an `.m4a` / `.mp4` with chapters is not a book by that alone (needs the chapters read at the scan
       and kept in the library); Albums, Artists, Home’s rows and search still list books.
 - [ ] `M` Stream Deck plugin and an Xbox Game Bar widget (play / skip / like / now playing) over the local hotkeys.
