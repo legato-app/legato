@@ -118,7 +118,7 @@ jobs:
           prerelease: true
           updaterJsonPreferNsis: true
 
-      # Beta's file: the release called `beta` (made once, a prerelease, never "latest") carries only this latest.json,
+      # Beta's file: the release called `beta` (made once, a prerelease, never "latest") carries only this latest.json (and the Lite's),
       # replaced at every release; its installer link points at the release above.
       - name: Point Beta at this release
         shell: bash
@@ -132,7 +132,7 @@ jobs:
           gh release download "v$VERSION" --pattern latest.json --dir "$dir" --clobber
           if ! gh release view beta > /dev/null 2>&1; then
             gh release create beta --prerelease --latest=false --target "$SHA" --title "Legato Beta" \
-              --notes "Only latest.json, which the app's Beta channel reads. Moves with every release; the installers are on the versioned releases."
+              --notes "Only latest.json and latest-lite.json, which the Beta channels of Legato and Legato Lite read. Moves with every release; the installers are on the versioned releases."
           fi
           gh release upload beta "$dir/latest.json" --clobber
 
