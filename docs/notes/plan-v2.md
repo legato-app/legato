@@ -12,13 +12,21 @@ the order; a line leaves only when it ships or the user drops it.
 
 ## The owner's reports and asks of 2026-11-18
 
-- [ ] `M` Songs filled with songs never played (the owner, 2026-11-19: « dans songs ya full songs que je n'ai JAMAIS
+- [x] `M` Songs filled with songs never played (the owner, 2026-11-19: « dans songs ya full songs que je n'ai JAMAIS
       ecouter [...] trouve cde bug »). Cause: a YouTube Music mix saved to the library (id `RD…`: a radio YouTube makes
       up again at each request) was synced every 15 min; each sync put other songs in it, and the ones it dropped
       stayed in the library (`save_playlist` replaces a list's songs, never their rows). Fixed 2026-11-19: the library
       listing skips `RD…` lists except YouTube's own fixed playlists (`RDCLAK…`), `ytmusic.rs` `list_playlists`; the mix
       already imported stays as it is. NOT done, the owner's call: the rows already added (no playlist,
       never played) are not removed; a visible "Clean up songs" with undo would be the way.
+      2026-11-27: the owner’s call of 2026-11-26 (automatic at the update, a backup first) was in since `5789ef7d`: once
+      per library, at the first start after the update, after the first screen (`deferred.rs` → `backup::remove_old_mixes`:
+      a copy next to the library, then `remove_made_up_mixes`, marked `mixCleanup1`; the copy leaves after 30 days). It
+      removes the made-up mixes still in the library and the songs only they hold that were never played, liked, rated or
+      put elsewhere. Tests in core; never run on a real library.
+      Decided alone (2026-11-27): ticked on that; the songs the mixes had already dropped have their own line below.
+- [ ] `S` Songs old mixes dropped, now in no playlist and never played (for the owner): not told apart from songs added
+      by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the way.
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et
