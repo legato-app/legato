@@ -899,6 +899,8 @@ colours, mirror, reflection.
     become (an existing one first), the lines it would remove, and its risk. Ranked by lines saved over risk.
   - Then slices, one cluster per commit, behaviour unchanged, covered by the existing tests plus one for the helper;
     the biggest savings first. No new dependency for it.
+  - [x] A. Settings switches: 65 rows say `toggle`, `SettingToggle` reads and writes the setting (2026-11-27,
+    126 lines fewer; settings pages not seen in the app).
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md
