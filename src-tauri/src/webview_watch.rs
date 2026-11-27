@@ -5,6 +5,7 @@
 
 /// Set just before a restart for a dead browser process; the new process inherits it and never restarts again for the
 /// same reason (a browser that keeps dying would otherwise blink the window forever).
+#[cfg(windows)]
 const RESTARTED_ONCE: &str = "LEGATO_RESTARTED_FOR_DEAD_BROWSER";
 
 /// What follows a failed WebView2 process.
