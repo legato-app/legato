@@ -30,6 +30,7 @@ import { clearRecent } from '../search/recent'
 import { AboutSection } from './AboutSection'
 import { ThemeStudio } from './ThemeStudio'
 import { SettingToggle, type SwitchSetting } from './SettingToggle'
+import { copyText } from '../../app/copyText'
 import { FadeEditor } from './FadeEditor'
 import { BrowserScene, CountsScene, CoverShapes, DensityScene, FadeScene, ListCoversScene, MiniPlayerScene, MixCoverScene, MotionScene, NowPlayingScene, ProgressScene, SleepButtonScene, SourceIconScene, TunerScene, VolumeScene } from './previews'
 import { searchSettings, type SettingEntry } from './search'
@@ -130,7 +131,7 @@ function Row({ label, sub, children, preview, setting, toggle }: RowProps) {
       data-setting={label}
       onContextMenu={onMenu(() => [
         setting && { label: tr('Back to the default'), icon: <ArrowCounterClockwise size={16} />, disabled: !changed, onSelect: () => useSettings.getState().update({ [setting]: DEFAULTS[setting] }) },
-        { label: tr('Copy name'), icon: <Copy size={16} />, onSelect: () => void navigator.clipboard.writeText(tr(labelOf(label))) },
+        { label: tr('Copy name'), icon: <Copy size={16} />, onSelect: () => void copyText(tr(labelOf(label)), tr('Name copied')) },
       ])}
       // A narrow pane (the phone, a small window) keeps the words at least half the row: a wide control goes under them.
       className={ROW}
