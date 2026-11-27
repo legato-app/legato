@@ -1274,7 +1274,7 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
   Skipped 2026-11-11 (decided alone): nothing a user would see beyond that gap (songs added in the last 30 minutes),
   while wiring costs a server request per search on every account and a "not in your library" result kind that
   plays without being in the library. Revisit if a sync gets slower than 30 minutes.
-- [ ] `S` Playlist edits sent back to the server (`updatePlaylist`, `createPlaylist`) when its direction sends.
+- [x] `S` Playlist edits sent back to the server (`updatePlaylist`, `createPlaylist`) when its direction sends.
   2026-11-11: a Subsonic server's playlists take songs (Add to playlist, a drop on the sidebar) and lose them
   (Remove from) from here, sent with `updatePlaylist` in the background and undone here when refused; a
   removal reads the server's list first (it removes by position). 2026-11-13: `createPlaylist` too (a playlist made
@@ -1283,3 +1283,9 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
   `rename_imported` here, `updatePlaylist` with `name` in the background, the old name back and `serverRename`'s text
   when refused). Left: order, Jellyfin and Plex (read-only, said in words). Untried on a real server: mock tests only.
   - Brief: Jellyfin playlist add and remove (read the entries first, as the Subsonic path does), mock tests as in `jellyfin.rs`.
+  2026-11-27: checked, nothing left to wire: adding, removing, creating and renaming are all sent only when the
+  server’s direction sends (`pushes()`), mockito tests pass, the privacy row already says it. No new host. Not tried for
+  real (no real server).
+  Decided alone (2026-11-27): ticked on that; reordering has its own line below, Jellyfin and Plex stay read-only.
+- [ ] `S` Reordering a music server’s playlist from here: imported playlists can’t be reordered in the app yet, so there
+  is no order to send.
