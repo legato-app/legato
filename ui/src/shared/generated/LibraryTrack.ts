@@ -18,7 +18,11 @@ genre?: string, year?: number,
 /**
  * A local file's tempo (whole beats a minute) and key, as its tags say (v22).
  */
-bpm?: number, key?: string, title: string, artist: string, album: string | null, durationMs: number | null, isrc: string | null, ids: { [key in Source]?: string }, 
+bpm?: number, key?: string, 
+/**
+ * An audiobook, while Settings › Audiobooks is on (`audiobooks::BookRule`): judged not music, on its own page.
+ */
+audiobook?: boolean, title: string, artist: string, album: string | null, durationMs: number | null, isrc: string | null, ids: { [key in Source]?: string }, 
 /**
  * Cover art URL (https, served to the UI through the app's image cache).
  */

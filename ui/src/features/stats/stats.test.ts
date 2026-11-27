@@ -34,6 +34,13 @@ describe('stats', () => {
     expect(s.timeline.starts).toHaveLength(28)
   })
 
+  it('leaves audiobooks out, their time too', () => {
+    const book = { ...t(5, 'Book', 'Author'), audiobook: true }
+    const s = statsOf([play(5, 1, 3_600_000), play(1, 0)], [...tracks, book], '4w', now)
+    expect([s.listens, s.ms]).toEqual([1, 200_000])
+    expect(s.topArtists.map((r) => r.item.name)).toEqual(['Daft Punk'])
+  })
+
   it('counts streaks of days in a row', () => {
     const s = statsOf([play(1, 9), play(1, 8), play(1, 7), play(1, 2), play(1, 1), play(1, 0)], tracks, 'all', now)
     expect(s.bestStreak).toBe(3)

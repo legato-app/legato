@@ -147,7 +147,7 @@ mod tests {
     const NOW: i64 = 1_800_000_000;
 
     fn t(id: i64, artist: &str) -> LibraryTrack {
-        LibraryTrack { id, added: id, added_at: None, genre: None, year: None, bpm: None, key: None, track: Track { title: format!("Song {id}"), artist: artist.into(), ..Default::default() } }
+        LibraryTrack { id, added: id, added_at: None, genre: None, year: None, bpm: None, key: None, audiobook: None, track: Track { title: format!("Song {id}"), artist: artist.into(), ..Default::default() } }
     }
 
     /// Alpha and Bravo heard together, Bravo and Charlie too, Delta alone: Alpha → Charlie goes through Bravo.

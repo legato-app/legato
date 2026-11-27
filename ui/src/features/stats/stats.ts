@@ -95,6 +95,8 @@ export function statsOf(history: Play[], tracks: LibraryTrack[], period: Period,
     const at = p.startedAt * 1000
     if (at >= to) continue
     const t = byId.get(p.trackId)
+    // Audiobooks aren't listening to music: out of every number.
+    if (t?.audiobook) continue
     if (at < from) {
       if (t) seenBefore.add(primaryArtist(t.artist))
       continue

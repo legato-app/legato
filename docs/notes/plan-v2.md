@@ -696,7 +696,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
 
 **Low**
 - [ ] `M` Concerts near the user from followed artists (a public API with no account; privacy row).
-- [ ] `M` Audiobooks from local files (m4b chapters, resume per book, speed, sleep at chapter end), apart from music.
+- [x] `M` Audiobooks from local files (m4b chapters, resume per book, speed, sleep at chapter end), apart from music.
       2026-11-12, one half, resume per book (the line stays open): a song of 20 minutes or more, a file of this PC or of a personal
       server, is picked up where it was left: its place is kept every 10 s and when paused (this PC's storage, not synced), the
       song starts there when played again, and a notice says so with "Start over" (`resumeLong.ts`, `resumePoints.ts`); near
@@ -720,6 +720,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       from `TIT2`, any text encoding); `.mp3` now asks too. No new dependency (`core/chapters.rs`). Tested on files built in the
       tests only, never on a real book of either kind; a QuickTime track with an unusual layout (chapters in the audio file's own
       sample description, text in UTF-16 without a mark) shows none.
+      2026-11-27, apart from music: with Audiobooks on, a book (a local or server file: `.m4b`, in a folder marked in
+      Accounts › Local files, two hours and more, or tagged as one and ten minutes) is judged not music
+      (`core/audiobooks.rs`, the one rule): out of Songs, mixes, radio, the blind test, Like seeds, stats and Your week,
+      and not in the hidden videos fold. Chapters, resume, speed, sleep at chapter end and the page already shipped (above).
+      Not tried for real.
+      Decided alone (2026-11-27): only with Audiobooks on (off, nothing changes; replaces “books are still in Songs too”);
+      “It’s music” brings a file back; the marked folders are this PC’s (not synced).
+- [ ] `S` Audiobooks: an `.m4a` / `.mp4` with chapters is not a book by that alone (needs the chapters read at the scan
+      and kept in the library); Albums, Artists, Home’s rows and search still list books.
 - [ ] `M` Stream Deck plugin and an Xbox Game Bar widget (play / skip / like / now playing) over the local hotkeys.
   2026-11-13: Stream Deck done as `integrations/streamdeck` (`docs/streamdeck.md`): play / pause, next, previous, now
   playing, over the phone remote's local routes; logic tested, never loaded by a real Stream Deck. 2026-11-19: its like

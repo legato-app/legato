@@ -150,6 +150,8 @@ interface SettingsState {
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | undefined
+// Audiobooks turned on or off, a folder marked: songs to read again once saved.
+let booksChanged = false
 
 export const useSettings = create<SettingsState>((set, get) => ({
   settings: DEFAULTS,
@@ -176,11 +178,25 @@ export const useSettings = create<SettingsState>((set, get) => ({
 
   // Applied at once, saved after a short pause (sliders fire many updates).
   update(patch) {
-    const s = sanitize({ ...get().settings, ...patch })
+    const before = get().settings
+    const s = sanitize({ ...before, ...patch })
+    booksChanged ||= s.booksPage !== before.booksPage || s.bookFolders.join('\n') !== before.bookFolders.join('\n')
     set({ settings: s })
     apply(s)
     clearTimeout(saveTimer)
-    saveTimer = setTimeout(() => api.saveSettings(s).catch((e) => useStore.setState({ error: String(e) })), 400)
+    saveTimer = setTimeout(
+      () =>
+        api
+          .saveSettings(s)
+          .then(async () => {
+            if (!booksChanged) return
+            booksChanged = false
+            // Rust judges the songs again once the setting is saved: read them.
+            await useStore.getState().refreshChanged()
+          })
+          .catch((e) => useStore.setState({ error: String(e) })),
+      400,
+    )
   },
 
   current: (theme = get().settings.theme) => resolveTheme({ ...get().settings, theme }, systemDark.matches, systemAccent, get().coverAccent),

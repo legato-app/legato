@@ -175,6 +175,10 @@ describe('musicOnly', () => {
     expect(musicOnly(list)).toEqual({ kept: [t(1, 'music'), t(3, 'unsure'), t(4)], hidden: [t(2, 'notMusic')] })
     expect(musicOnly([t(1)]).kept).toEqual([t(1)])
   })
+  it('leaves audiobooks out of the songs and out of the fold', () => {
+    const list = [t(1, 'music'), { ...t(2, 'notMusic'), audiobook: true }]
+    expect(musicOnly(list)).toEqual({ kept: [t(1, 'music')], hidden: [] })
+  })
 })
 
 describe('splitExplicit', () => {

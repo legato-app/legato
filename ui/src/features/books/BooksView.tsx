@@ -13,7 +13,7 @@ import { songKey } from '../player/effects'
 import { pickBooks, progress } from './books'
 import { loadSpeeds, saveSpeeds, STEPS, withSpeed } from './speed'
 
-/** Audiobooks (Settings › General › Audiobooks, off by default): the long local files apart from music, with where each was left. Playing one picks it up there. */
+/** Audiobooks (Settings › General › Audiobooks, off by default): the books apart from music, with where each was left. Playing one picks it up there. */
 export function BooksView() {
   const tracks = useStore((s) => s.tracks)
   const books = useMemo(() => pickBooks(tracks), [tracks])
@@ -64,7 +64,7 @@ export function BooksView() {
             })}
           </ul>
         ) : (
-          <p className="text-sm text-ink-2">{tr('No audiobook yet: a local file tagged as an audiobook, or two hours long and more, shows here.')}</p>
+          <p className="text-sm text-ink-2">{tr('No audiobook yet: an .m4b file, a long file tagged as an audiobook, a file of two hours and more or one in a folder you mark in Accounts shows here.')}</p>
         )}
       </div>
     </>

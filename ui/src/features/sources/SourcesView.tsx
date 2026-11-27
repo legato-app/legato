@@ -14,7 +14,7 @@ import { accountKey, api, type Direction, type PlexPin, type PlexServer, type Se
 import { useGoogleAccounts } from './google'
 import { timeAgo } from '../../shared/format'
 import { Button } from '../../shared/ui/Button'
-import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
+import { Led, LedChip, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 import { remoteArt } from '../../shared/art'
 import { Cover } from '../../shared/ui/Cover'
 import { SourceIcon, sourceLabel } from '../../shared/ui/SourceIcon'
@@ -735,6 +735,9 @@ function LocalFolders() {
   const reading = useScan((s) => s.progress)
   const files = tracks.filter((t) => t.ids.local).length
   useEffect(() => void api.localFolders().then(setFolders), [])
+  const { booksPage, bookFolders } = useSettings(useShallow(({ settings }) => ({ booksPage: settings.booksPage, bookFolders: settings.bookFolders })))
+  const updateSettings = useSettings((s) => s.update)
+  const markBooks = (folder: string) => updateSettings({ bookFolders: bookFolders.includes(folder) ? bookFolders.filter((x) => x !== folder) : [...bookFolders, folder] })
 
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true)
@@ -769,6 +772,7 @@ function LocalFolders() {
           {folders.map((f) => (
             <li key={f} className="flex items-center gap-2 border-b border-line-soft py-1 pe-1 ps-3 last:border-0">
               <span className="flex-1 truncate font-mono text-[0.6875rem]">{f}</span>
+              {booksPage && <LedChip on={bookFolders.includes(f)} label={tr('Audiobooks')} title={tr('Every file in this folder is an audiobook')} onClick={() => markBooks(f)} />}
               <RoundButton label={tr('Remove {folder}', { folder: f })} kind="plain" size="xs" disabled={busy} onClick={() => run(() => api.setLocalFolders(folders.filter((x) => x !== f)))}>
                 <X size={12} />
               </RoundButton>

@@ -203,6 +203,10 @@ pub struct LibraryTrack {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub key: Option<String>,
+    /// An audiobook, while Settings › Audiobooks is on (`audiobooks::BookRule`): judged not music, on its own page.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub audiobook: Option<bool>,
     #[serde(flatten)]
     pub track: Track,
 }
@@ -258,6 +262,7 @@ fn to_track(r: &Row) -> rusqlite::Result<LibraryTrack> {
         year: r.get(11)?,
         bpm: r.get(13)?,
         key: r.get(14)?,
+        audiobook: None,
         track: Track {
             title: r.get(1)?,
             artist: r.get(2)?,
@@ -578,6 +583,7 @@ impl Library {
     }
 
     pub fn set_setting(&self, key: &str, value: &serde_json::Value) -> Result<()> {
+        let books_before = (key == "ui").then(|| self.book_rule()).transpose()?;
         self.db.execute(
             "INSERT INTO settings (key, value) VALUES (?1, ?2) ON CONFLICT (key) DO UPDATE SET value = excluded.value",
             params![key, value.to_string()],
@@ -586,6 +592,12 @@ impl Library {
         // device's own rows (the sync config after every sync) don't: no reason for a devices sync.
         if key == crate::syncmode::TIMES {
             self.versions.setting_written();
+        }
+        // Audiobooks turned on or off, a folder marked: here or merged from another PC.
+        if let Some(before) = books_before
+            && before != self.book_rule()?
+        {
+            self.judge_all_again()?;
         }
         Ok(())
     }

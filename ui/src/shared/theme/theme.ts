@@ -455,6 +455,8 @@ export interface Settings {
   podcastCheck: boolean
   /** Audiobooks page: long local files apart from music, with where each was left (off: no menu entry). */
   booksPage: boolean
+  /** This PC's folders whose files are all audiobooks (Settings › Accounts › Local files, while Audiobooks is on). */
+  bookFolders: string[]
   /** Living-room mode: a larger interface and arrow-key navigation, for a PC on a TV (off: nothing changes). This PC only. */
   livingRoom: boolean
   /** Adds Podcasts to the app menu: open RSS feeds the user types, kept shows, episodes played (off: no entry, nothing asked). */
@@ -677,6 +679,7 @@ export const DEFAULTS: Settings = {
   discordSignIn: false,
   podcastCheck: false,
   booksPage: false,
+  bookFolders: [],
   livingRoom: false,
   podcasts: false,
   blindTest: false,
@@ -962,6 +965,7 @@ export function sanitize(raw: unknown): Settings {
     discordSignIn: r.discordSignIn === true,
     podcastCheck: r.podcastCheck === true,
     booksPage: r.booksPage === true,
+    bookFolders: Array.isArray(r.bookFolders) ? r.bookFolders.filter((folder): folder is string => typeof folder === 'string' && folder.length > 0 && folder.length <= 1000).slice(0, 100) : [],
     livingRoom: r.livingRoom === true,
     podcasts: r.podcasts === true,
     blindTest: r.blindTest === true,

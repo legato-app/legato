@@ -34,6 +34,8 @@ export function weekOf(plays: Play[], tracks: LibraryTrack[], now = new Date()):
   const artistMs = new Map<string, { ms: number; cover: LibraryTrack }>()
   const songPlays = new Map<number, { n: number; ms: number }>()
   for (const p of plays) {
+    // Audiobooks aren't listening to music.
+    if (byId.get(p.trackId)?.audiobook) continue
     const at = p.startedAt * 1000
     if (at < first) {
       if (at >= weekBefore.getTime()) before += p.listenedMs

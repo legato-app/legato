@@ -5,17 +5,9 @@ import { pickBooks, progress } from './books'
 const song = (id: number, over: Partial<LibraryTrack>): LibraryTrack => ({ id, added: 0, addedAt: null, title: `t${id}`, artist: 'a', album: null, durationMs: 200_000, isrc: null, ids: { local: `C:/${id}.mp3` }, ...over })
 
 describe('audiobooks', () => {
-  it('picks long files and tagged ones, not songs or videos, longest first', () => {
-    const list = [
-      song(1, {}),
-      song(2, { durationMs: 3 * 3_600_000 }),
-      song(3, { durationMs: 40 * 60_000, genre: 'Audiobook' }),
-      song(4, { durationMs: 40 * 60_000, genre: 'Rock' }),
-      song(5, { durationMs: 5 * 3_600_000, ids: { youtube: 'x' } }),
-      song(6, { durationMs: 4 * 3_600_000, genre: 'Spoken Word' }),
-      song(7, { durationMs: 3 * 60_000, genre: 'Audiobook' }),
-    ]
-    expect(pickBooks(list).map((t) => t.id)).toEqual([6, 2, 3])
+  it('picks the songs marked as books, longest first', () => {
+    const list = [song(1, {}), song(2, { durationMs: 40 * 60_000, audiobook: true }), song(3, { durationMs: 3 * 3_600_000, audiobook: true })]
+    expect(pickBooks(list).map((t) => t.id)).toEqual([3, 2])
   })
   it('where a book was left, if it is worth resuming', () => {
     const book = song(9, { durationMs: 3_600_000 * 3 })

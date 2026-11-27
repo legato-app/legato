@@ -451,6 +451,7 @@ impl Library {
         for t in &mut rows {
             t.track.musicness = words.get(&t.id).copied().or(t.track.musicness);
         }
+        self.mark_books(&mut rows)?;
         Ok(rows)
     }
 

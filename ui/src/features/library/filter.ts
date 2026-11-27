@@ -238,7 +238,9 @@ export function splitExplicit<T extends Pick<Track, 'explicit'>>(tracks: T[], hi
 
 export const withoutExplicit = <T extends Pick<Track, 'explicit'>>(tracks: T[], hide: boolean): T[] => (hide && tracks.some((t) => t.explicit) ? tracks.filter((t) => !t.explicit) : tracks)
 
-export function musicOnly<T extends Pick<Track, 'musicness'>>(tracks: T[]): { kept: T[]; hidden: T[] } {
-  const hidden = tracks.filter((t) => t.musicness === 'notMusic')
-  return { kept: hidden.length ? tracks.filter((t) => t.musicness !== 'notMusic') : tracks, hidden }
+export function musicOnly<T extends Pick<Track, 'musicness'> & { audiobook?: boolean }>(tracks: T[]): { kept: T[]; hidden: T[] } {
+  const kept = tracks.filter((t) => t.musicness !== 'notMusic')
+  if (kept.length === tracks.length) return { kept: tracks, hidden: [] }
+  // Audiobooks have their own page: not in the fold of videos that aren't music.
+  return { kept, hidden: tracks.filter((t) => t.musicness === 'notMusic' && !t.audiobook) }
 }

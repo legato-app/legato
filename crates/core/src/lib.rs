@@ -1,5 +1,6 @@
 pub mod library;
 pub mod artcache;
+pub mod audiobooks;
 pub mod cache;
 pub mod cover;
 pub mod devices;
