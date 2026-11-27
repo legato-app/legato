@@ -9,11 +9,11 @@ versions are in git. Updated 2026-11-27 (after night window 2).
 
 ## Where things stand
 - **Repository**: `legato-app/legato`. **master** on origin = `4de9fe17`, the Beta v1.2.333 (2026-11-26). **platforms** is
-  50 commits ahead of origin/master; **origin/platforms** = `f062be31` (pushed during the night; `check` was still
-  running on it when this was written, `ce7e0a58` was green). The local `master` checkout lags: use `origin/master`.
+  57 commits ahead of origin/master; **origin/platforms** = `bb706e79` (pushed, lot 14 included; `check` runs on each push).
+  The local `master` checkout lags: use `origin/master`.
   Work goes to master by push only, on the owner's word.
 - **Last Beta**: v1.2.333 = `4de9fe17`. Before it, v1.2.298 = `a4412ea1`. Stable **1.2.10** (2026-11-14).
-- **Beta rule**: a Beta every 30 points (S = 1, M = 2, L = 3). Since v1.2.333: **19 points** (ticked lines in
+- **Beta rule**: a Beta every 30 points (S = 1, M = 2, L = 3). Since v1.2.333: **22 points** (ticked lines in
   `plan-v2.md`; the theme `L` counts once, its slices inside it).
 - **Themes**: the layout is in v1; the `L` line is ticked (`bed4beab`). Slices 1-13 landed (`75ce0116` to `491572ed`):
   a theme's named plugin is a panel surface `plugin:<id>`, at most two, only for an installed plugin granted `ui`.
@@ -49,7 +49,7 @@ versions are in git. Updated 2026-11-27 (after night window 2).
 - The first `check` and `release.yml` runs with pnpm 11.9.0.
 
 ## Next, in order
-1. **The owner's Beta push**, once 30 points are reached (19 now): `git push origin platforms:master`, after a `pnpm dev`
+1. **The owner's Beta push**, once 30 points are reached (22 now): `git push origin platforms:master`, after a `pnpm dev`
    check of the default layout (a YouTube video through the player bar, the sidebar's resize, an album, an artist, a
    playlist, the right-click menus). On the owner's word only.
 2. **Lite build**: plan-v2's `L` line "A Lite build next to the full one". Its design waits for the owner's yes before
@@ -59,7 +59,7 @@ versions are in git. Updated 2026-11-27 (after night window 2).
 4. **AutoEQ profiles** (`S`): check the measurement data's licence first.
 5. **Plugin pictures**, after the 2 Dec reset: an optional manifest `icon`, verified authors only (`M`).
 6. **Open plan lines**, by title (numbers move): "Songs old mixes dropped" (`S`, a "Clean up songs" with undo),
-   "Reordering a music server's playlist" (`S`), "Server songs levelled", "The remaining JSX moved into one component",
+   "Reordering a music server's playlist" (`S`), "Plex album gain" (`S`, to check on a real server), "The remaining JSX moved into one component",
    and "Code quality" (`L`, clusters 7, 9, 12, 13 and 14 left).
 7. **Profiles on one PC**: plan-v2's `M-L` line, design first; the owner reconfirms the launch picker.
 8. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
