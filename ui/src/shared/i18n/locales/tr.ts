@@ -2563,6 +2563,7 @@ const tr: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'podcast rss akış bölüm program ses',
   'Blind test…': 'Kör test…',
   'Not enough songs in your library for a blind test (8 at least)': 'Kör test için kitaplığında yeterli şarkı yok (en az 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'Kör test için bu çalma listesinde yeterli şarkı yok (en az 8)',
   'Score: {score} of {total}': 'Puan: {total} üzerinden {score}',
   'Play again': 'Tekrar oyna',
   'Round {r} of {n} song': 'Tur {r} / {n} şarkı',

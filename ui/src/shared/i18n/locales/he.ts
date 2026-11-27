@@ -2500,6 +2500,7 @@ const he: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'פודקאסטים rss פיד פרקים תוכנית שמע',
   'Blind test…': 'מבחן עיוור…',
   'Not enough songs in your library for a blind test (8 at least)': 'אין מספיק שירים בספרייה שלכם למבחן עיוור (לפחות 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'אין מספיק שירים בפלייליסט הזה למבחן עיוור (לפחות 8)',
   'Score: {score} of {total}': 'ציון: {score} מתוך {total}',
   'Play again': 'לשחק שוב',
   'Round {r} of {n} song': 'סיבוב {r} מתוך {n} שיר',

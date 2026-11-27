@@ -2563,6 +2563,7 @@ const zh: Record<string, string> = {
   'podcasts rss feed episodes show audio': '播客 rss 订阅源 单集 节目 音频',
   'Blind test…': '盲听测试…',
   'Not enough songs in your library for a blind test (8 at least)': '资料库中的歌曲不足，无法进行盲听测试（至少 8 首）',
+  'Not enough songs in this playlist for a blind test (8 at least)': '此播放列表中的歌曲不足，无法进行盲听测试（至少 8 首）',
   'Score: {score} of {total}': '得分：{score} / {total}',
   'Play again': '再玩一次',
   'Round {r} of {n} song': '第 {r} 首，共 {n} 首',

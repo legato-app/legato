@@ -2563,6 +2563,7 @@ const it: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'podcast rss feed episodi programma audio',
   'Blind test…': 'Blind test…',
   'Not enough songs in your library for a blind test (8 at least)': 'Pochi brani nella tua libreria per un blind test (almeno 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'Pochi brani in questa playlist per un blind test (almeno 8)',
   'Score: {score} of {total}': 'Punteggio: {score} su {total}',
   'Play again': 'Gioca ancora',
   'Round {r} of {n} song': 'Round {r} di {n} brano',

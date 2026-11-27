@@ -86,7 +86,7 @@ export function BlindTest() {
     <div role="dialog" aria-modal="true" aria-label={tr('Blind test')} className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-bg p-6 text-ink">
       {!game.length ? (
         <>
-          <p className="max-w-md text-center text-ink-2">{tr('Not enough songs in your library for a blind test (8 at least)')}</p>
+          <p className="max-w-md text-center text-ink-2">{pool ? tr('Not enough songs in this playlist for a blind test (8 at least)') : tr('Not enough songs in your library for a blind test (8 at least)')}</p>
           <Button onClick={closeBlind}>{tr('Close')}</Button>
         </>
       ) : done ? (

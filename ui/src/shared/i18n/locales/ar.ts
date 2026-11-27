@@ -2500,6 +2500,7 @@ const ar: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'بودكاست rss خلاصة حلقات برنامج صوت',
   'Blind test…': 'اختبار الأعين المغمضة…',
   'Not enough songs in your library for a blind test (8 at least)': 'لا تكفي الأغاني في مكتبتك لاختبار الأعين المغمضة (8 على الأقل)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'لا تكفي الأغاني في هذه القائمة لاختبار الأعين المغمضة (8 على الأقل)',
   'Score: {score} of {total}': 'النتيجة: {score} من {total}',
   'Play again': 'العب مرة أخرى',
   'Round {r} of {n} song': 'الجولة {r} من {n} أغنية',

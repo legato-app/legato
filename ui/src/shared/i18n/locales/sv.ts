@@ -2563,6 +2563,7 @@ const sv: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'poddar podcast rss flöde avsnitt program ljud',
   'Blind test…': 'Blindtest…',
   'Not enough songs in your library for a blind test (8 at least)': 'För få låtar i ditt bibliotek för ett blindtest (minst 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'För få låtar i den här spellistan för ett blindtest (minst 8)',
   'Score: {score} of {total}': 'Poäng: {score} av {total}',
   'Play again': 'Spela igen',
   'Round {r} of {n} song': 'Runda {r} av {n} låt',

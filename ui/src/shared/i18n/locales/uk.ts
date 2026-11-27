@@ -2563,6 +2563,7 @@ const uk: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'подкасти rss стрічка випуски передача аудіо',
   'Blind test…': 'Сліпий тест…',
   'Not enough songs in your library for a blind test (8 at least)': 'У медіатеці замало пісень для сліпого тесту (щонайменше 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'У цьому плейлисті замало пісень для сліпого тесту (щонайменше 8)',
   'Score: {score} of {total}': 'Рахунок: {score} із {total}',
   'Play again': 'Зіграти ще',
   'Round {r} of {n} song': 'Раунд {r} із {n} пісні',

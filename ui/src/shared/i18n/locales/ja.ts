@@ -2563,6 +2563,7 @@ const ja: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'ポッドキャスト rss フィード エピソード 番組 音声',
   'Blind test…': 'ブラインドテスト…',
   'Not enough songs in your library for a blind test (8 at least)': 'ブラインドテストにはライブラリの曲が足りません（8 曲以上）',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'ブラインドテストにはこのプレイリストの曲が足りません（8 曲以上）',
   'Score: {score} of {total}': 'スコア：{total} 問中 {score} 問正解',
   'Play again': 'もう一度',
   'Round {r} of {n} song': '{n} 曲中 {r} 曲目',

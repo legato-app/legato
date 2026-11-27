@@ -2563,6 +2563,7 @@ const hi: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'पॉडकास्ट rss फ़ीड एपिसोड शो ऑडियो',
   'Blind test…': 'ब्लाइंड टेस्ट…',
   'Not enough songs in your library for a blind test (8 at least)': 'ब्लाइंड टेस्ट के लिए आपकी लाइब्रेरी में गाने कम हैं (कम से कम 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'ब्लाइंड टेस्ट के लिए इस प्लेलिस्ट में गाने कम हैं (कम से कम 8)',
   'Score: {score} of {total}': 'स्कोर: {total} में से {score}',
   'Play again': 'फिर खेलें',
   'Round {r} of {n} song': 'राउंड {r} / {n} गाना',

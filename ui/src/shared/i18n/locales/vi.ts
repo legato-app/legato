@@ -2563,6 +2563,7 @@ const vi: Record<string, string> = {
   'podcasts rss feed episodes show audio': 'podcast rss nguồn cấp tập chương trình âm thanh',
   'Blind test…': 'Thử nghe đoán…',
   'Not enough songs in your library for a blind test (8 at least)': 'Thư viện chưa đủ bài cho thử nghe đoán (ít nhất 8)',
+  'Not enough songs in this playlist for a blind test (8 at least)': 'Danh sách này chưa đủ bài cho thử nghe đoán (ít nhất 8)',
   'Score: {score} of {total}': 'Điểm: {score} trên {total}',
   'Play again': 'Chơi lại',
   'Round {r} of {n} song': 'Vòng {r} trên {n} bài',

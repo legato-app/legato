@@ -2563,6 +2563,7 @@ const ko: Record<string, string> = {
   'podcasts rss feed episodes show audio': '팟캐스트 rss 피드 에피소드 프로그램 오디오',
   'Blind test…': '블라인드 테스트…',
   'Not enough songs in your library for a blind test (8 at least)': '블라인드 테스트에 필요한 곡이 라이브러리에 부족합니다(8곡 이상)',
+  'Not enough songs in this playlist for a blind test (8 at least)': '블라인드 테스트에 필요한 곡이 이 재생목록에 부족합니다(8곡 이상)',
   'Score: {score} of {total}': '점수: {total}문제 중 {score}',
   'Play again': '다시 하기',
   'Round {r} of {n} song': '{n}곡 중 {r}번째',
