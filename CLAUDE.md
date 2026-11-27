@@ -36,7 +36,7 @@ account. Old share links are not read any more (the owner's word).
   resort. External music plays through YouTube only; Spotify only reads playlists (the owner, 2026-11-25). Never
   download, record or export a platform's audio, never touch DRM. Live processing of what plays is allowed: native chain
   `crates/dsp`, YouTube in its player (`crates/shield` `live.js`, the formulas kept alike).
-- Never copy code from Liner (non-commercial licence). Everything is written from scratch.
+- Never copy code from a project under a non-commercial licence. Everything is written from scratch.
 - YouTube without keys: Google sign-in in an app window (Google's own page), the session in WebView2's cookies, YouTube
   Music's and YouTube's own web APIs (InnerTube: unofficial, may break). Signed out: YouTube Music's public catalog.
   Clear non-music hidden until asked (`music_core::musicness`).
