@@ -568,6 +568,14 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       - Decided alone (2026-11-27): a Lite exe built without its overlay is a guest (exact identifier per edition); Lite
         never registers `legato://` for now (first, it would keep it from a full app installed later); no installer
         hooks nor `.lmix` association in Lite; its Run entry is "Legato Lite".
+    - [x] Slice 4, 2026-11-27: `release.yml` jobs `lite` (its own Windows runner beside `release` and `android`:
+      `tauri build --features lite --bundles nsis`, the same updater key, `latest-lite.json` written in tauri-action's
+      shape) and `lite-attach` (installer, `.sig` and `latest-lite.json` on `vX.Y.Z`, then `latest-lite.json` on `beta`);
+      `scripts/promote.mjs` carries `latest-lite.json` to Stable when the release has one; the site's download picker
+      takes only `Legato_…-setup.exe`. Not tried for real (no release run yet); the site's Lite download is slice 6.
+      - Decided alone (2026-11-27): a runner of its own rather than a second build in `release` (that one would delay
+        the APK's attach and turn the full app's job red); Lite installer `Legato.Lite_X.Y.Z_x64-setup.exe`, NSIS only;
+        a beta without the Lite's file is still promoted (warned), Lite PCs on Stable then find no update until the next.
     - Lighter slices (2026-11-27), each with its number before and after in `docs/performance.md`: 7 one YouTube
       embed (PlayerBar's second `YouTubeFrame` never made; crossfade absent from Settings › Playback, its value kept as
       is in the settings file); 8 `motion` off in Lite's own defaults (the user can turn it on); 9 fewer background
