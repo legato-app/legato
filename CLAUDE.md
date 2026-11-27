@@ -87,9 +87,10 @@ account. Old share links are not read any more (the owner's word).
 - No network from the front end, images included: `shared/art.ts` → the `art` scheme (host allowlist, disk cache).
 - Tauri commands that lock the library, read files or compute: `async fn` (a sync one runs on the window's thread and
   freezes the app).
-- Only the installed app (identifier exactly `app.legato.desktop`: `identity::installed()`) updates, edits the Run entry
-  or migrates folders and keychain entries; any new side effect of a release build outside the app's folders goes
-  behind it. The e2e cargo feature stays off in normal builds: only there may an env var move the network (`hosts.rs`).
+- Only an installed app (identifier exactly `app.legato.desktop`, or `app.legato.lite` for the Lite build:
+  `identity::installed()`) updates, each from its own feed, or edits its Run entry; only the full app migrates folders
+  and keychain entries (the rename catch-up is compiled out of Lite). Any new side effect of a release build outside
+  the app's folders goes behind it. The e2e cargo feature stays off in normal builds: only there may an env var move the network (`hosts.rs`).
 - Updates: Stable's `releases/latest/download/latest.json` is the URL every installed version reads: keep it. Beta =
   every green push to master (`CONTRIBUTING.md` › Releasing).
 - The phone remote and the OBS overlay answer private addresses only, their secret in the keychain.
