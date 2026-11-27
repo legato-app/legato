@@ -26,4 +26,18 @@ describe('Lite plays one YouTube embed', () => {
     expect(usePlayer.getState().tail).toBeNull()
     expect(usePlayer.getState().now?.youtubeId).toBe('video1')
   })
+
+  it.each([
+    ['at the song’s end', () => usePlayer.getState().onYoutube({ state: 0 })],
+    ['on Next', () => usePlayer.getState().step(1)],
+  ])('moves on in the same embed %s', (_when, moveOn) => {
+    usePlayer.setState({ fade: effectiveFade({ crossfade: 8, fade: advanced }) })
+    usePlayer.getState().playTracks([song(1), song(2)], 0)
+    usePlayer.getState().onYoutube({ state: 1, time: 0.3, duration: 100 })
+    usePlayer.getState().onYoutube({ state: 1, time: 6 })
+    const { frameKey } = usePlayer.getState()
+    moveOn()
+    expect(usePlayer.getState()).toMatchObject({ frameKey, tail: null })
+    expect(usePlayer.getState().now?.youtubeId).toBe('video2')
+  })
 })

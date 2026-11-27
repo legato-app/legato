@@ -17,6 +17,6 @@ describe('Lite’s own defaults', () => {
 
   it('draws the glass opaque, unblurred, while animations are off', () => {
     const css = readFileSync(new URL('../../styles.css', import.meta.url), 'utf8').replace(/\r\n/g, '\n')
-    expect(css).toMatch(/\.still \.glass \{\n  background: color-mix\(in srgb, var\(--bg\) 92%, transparent\);\n  backdrop-filter: none;/)
+    expect(css).toMatch(/:where\(\.still\) \.glass \{\n  background: color-mix\(in srgb, var\(--bg\) 92%, transparent\);\n  backdrop-filter: none;/)
   })
 })
