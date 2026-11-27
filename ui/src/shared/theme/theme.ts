@@ -865,6 +865,37 @@ export function pickTheme(theme: Theme, settings: Pick<Settings, 'homeSections'>
   return { theme: theme.id, ...theme.look, ...(homeSections && { homeSections }) }
 }
 
+/** My themes at most: `sanitize` drops what is over. */
+export const MAX_CUSTOM_THEMES = 24
+
+export interface JoinedTheme {
+  /** The one now picked: the theme that joined, or the same one already in My themes. */
+  theme: Theme
+  added: boolean
+  changes: Partial<Settings>
+}
+
+// Two themes are the same one when all but the id is: dropping a file twice adds nothing.
+const contentOf = (theme: Theme) => JSON.stringify({ ...theme, id: undefined })
+
+/**
+ * A theme (checked: `sanitizeTheme`) joins My themes and is picked, its look applied like any picked theme's (`look`
+ * false: a copy of what is on screen, the user's own look choices stay). Null: the list is full.
+ */
+export function withAddedTheme(settings: Pick<Settings, 'customThemes' | 'homeSections'>, theme: Theme, { look = true } = {}): JoinedTheme | null {
+  const same = settings.customThemes.find((own) => contentOf(own) === contentOf(theme))
+  if (!same && settings.customThemes.length >= MAX_CUSTOM_THEMES) return null
+  const picked = same ?? theme
+  const choice = look ? pickTheme(picked, settings) : { theme: picked.id }
+  return { theme: picked, added: !same, changes: { ...choice, ...(!same && { customThemes: [...settings.customThemes, theme] }) } }
+}
+
+/** Undo of `withAddedTheme`: what it changed, as `before` had it. The list as it is `now` (Sync Mode may have added to it), without the theme that joined. */
+export function undoAddedTheme(now: Pick<Settings, 'customThemes'>, before: Settings, joined: JoinedTheme): Partial<Settings> {
+  const restored: Partial<Settings> = Object.fromEntries(Object.keys(joined.changes).map((key) => [key, before[key as keyof Settings]]))
+  return { ...restored, ...(joined.added && { customThemes: now.customThemes.filter((own) => own.id !== joined.theme.id) }) }
+}
+
 /** The look settings as they are now (to save into a theme). */
 export const lookOf = (s: Settings): Look => Object.fromEntries(LOOK_KEYS.map((k) => [k, s[k]])) as Look
 
@@ -888,7 +919,7 @@ function sanitizeShortcuts(raw: unknown): Custom {
 
 export function sanitize(raw: unknown): Settings {
   const r = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {}
-  const customThemes = (Array.isArray(r.customThemes) ? r.customThemes : []).slice(0, 24).map(sanitizeTheme).filter((t): t is Theme => !!t)
+  const customThemes = (Array.isArray(r.customThemes) ? r.customThemes : []).slice(0, MAX_CUSTOM_THEMES).map(sanitizeTheme).filter((t): t is Theme => !!t)
   const ids = ['system', ...PRESETS.map((t) => t.id), ...customThemes.map((t) => t.id)]
   const saved = typeof r.defaultsVersion === 'number' ? r.defaultsVersion : 0
   const columns = Array.isArray(r.columns) ? [...new Set(r.columns.filter((c): c is Column => COLUMNS.includes(c as Column)))] : DEFAULTS.columns

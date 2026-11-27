@@ -1011,9 +1011,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - Backward compatible: a theme without `script` is unchanged; a newer `api` runs no code (colours, CSS and layout
     still apply, the card says it needs a newer Legato), like `LAYOUT_API`. Desktop only (rquickjs has no Android
     bindings); absent from Lite (plugins are cut).
-- [ ] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
+- [x] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
       the layout (`askAboutLayout`, `themeLayoutImport.ts`, the drop handler in `PlayerBar.tsx`). The owner's word,
       2026-11-27: themes "dynamique et rapide", the app really user-friendly. Builder: Sonnet.
+  - 2026-11-27: done. No question before applying; the message says “Theme … added” with Undo (the theme out, the pick
+    and the look back). Every door (drop, import, paste, copy) goes through `withAddedTheme` (`theme.ts`): 24 themes
+    at most said rather than one lost, and the same theme dropped again is picked, nothing added. Tests in
+    `addTheme.test.ts`. Not tried in the app.
+    - Decided alone (2026-11-27): “the same theme” is all but its id (a file differing only in font or look joins);
+      a copy made in the editor leaves the user's look choices as they are (an imported theme applies its own).
 - [ ] `L` Rearrange the app by dragging its parts (sidebar, player, parts of pages), saved into one's own theme (the
       layout v1 format). The owner's ask, 2026-11-27. Opus designs it first.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.

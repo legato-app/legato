@@ -9,7 +9,7 @@ import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, pickTheme, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
 import { LAYOUT_API } from '../../shared/theme/layout'
-import { askAboutLayout } from './themeLayoutImport'
+import { askAboutLayout, joinThemes } from './themeLayoutImport'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 import { notifyError } from '../../app/notifyError'
@@ -325,16 +325,16 @@ export function ThemeStudio() {
   const [paste, setPaste] = useState('')
   const [bad, setBad] = useState(false)
   const system: Theme = { ...current('system'), name: tr('System') }
-  const add = (t: Theme) => {
-    // Read now: an import waits for the user, the list may have moved meanwhile.
-    update({ customThemes: [...useSettings.getState().settings.customThemes, t], theme: t.id })
-    setEditing(t.id)
+  // The theme joins (or the same one already there is picked) and opens in the editor. False: the list is full.
+  const add = (t: Theme, options?: { look?: boolean }) => {
+    const joined = joinThemes(t, options)
+    if (joined) setEditing(joined.theme.id)
+    return !!joined
   }
   // A theme from outside: asked first when it rearranges the app. True: added.
   const addImported = async (t: Theme) => {
     const accepted = await askAboutLayout(t)
-    if (accepted) add(accepted)
-    return !!accepted
+    return !!accepted && add(accepted)
   }
   const fresh = (t: Partial<Theme>) => sanitizeTheme({ ...current(), ...t, id: undefined })
   const importFile = async () => {
@@ -352,7 +352,7 @@ export function ThemeStudio() {
   // A preset can't be edited: one gesture copies it into the custom themes and opens the editor on the copy.
   const dup = (t: Theme, patch: Partial<Theme> = {}) => {
     const c = duplicateTheme(t, tr('{name} custom', { name: t.name }), patch)
-    if (c) add(c)
+    if (c) add(c, { look: false })
   }
   const custom = settings.customThemes.some((x) => x.id === settings.theme)
   const corners = (radius: Theme['radius']) => {
@@ -428,7 +428,7 @@ export function ThemeStudio() {
         <Button
           onClick={() => {
             const t = fresh({ name: tr('{name} custom', { name: current().name }) })
-            if (t) add(t)
+            if (t) add(t, { look: false })
           }}
         >
           <Plus size={14} /> {tr('New theme (copy of current)')}
