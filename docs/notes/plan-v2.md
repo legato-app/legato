@@ -779,13 +779,17 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-27): `pages.nowPlayingColumns` (cover, words: the cover's side), `pages.nowPlaying` (the
       title block: only from, album, source line, lyrics peek and next hide, each reachable otherwise) and
       `pages.nowPlayingControls` (the buttons right of the transport, order only); the phone keeps its own screen.
-  - [ ] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);
+  - [x] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);
     the website copy ("Make it look like yours", `site/components/content.tsx` and its locales). Tests: a
     `themefile.rs` round-trip with a `layout` key. Review of 1-4: the docs say that a layout from a newer version, or
     imported while the setting was off, starts to apply later (an update, the setting turned on) without the question.
     Review of 7-8: the theme docs say that hidden blocks are hidden content, not lost actions (an artist's discography,
     an album's "More by": the page's own way to releases outside the library).
     Review of 9-11: the docs say an older Legato rewriting the themes drops a theme's Home order (`look.homeSections`).
+    2026-11-27: done (`themefile.rs` round trip, `docs/design.md` › Theme layout, the website's theme card in every
+    site language); no file exported or imported in the app, the website not built.
+    - Decided alone (2026-11-27): the website says it now (the feature is on by default): one clause, "and where the
+      parts of the app go"; no in-app theme help exists, the format is documented in the design doc.
   - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
     enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
   - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.

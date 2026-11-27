@@ -155,7 +155,7 @@ export const en: Copy = {
     { title: 'Press K for Karaoke', text: 'Timed lyrics, line by line, in a panel beside any page, big in Now Playing, or full screen like here.', alt: 'Karaoke mode: big lyrics on a blurred cover, the line playing lit as a whole.' },
     { title: 'Press V, lights off', text: 'LED bars, a ring around the cover, VU needles, a spectrogram, MilkDrop-style presets, full screen.', alt: 'The visualizer full screen: columns of LED bars on a dark page.' },
     { title: 'Change a song as it plays', text: 'Speed, pitch, a 10-band EQ, reverb and 3D sound, in the Live Editor.', alt: "The Live Editor beside a big cover: the song's versions, presets, speed and pitch." },
-    { title: 'Make it look like yours', text: 'Colors, fonts, a picture or video background, your own CSS.', alt: "Legato's Songs page in another theme." },
+    { title: 'Make it look like yours', text: 'Colors, fonts, a picture or video background, your own CSS, and where the parts of the app go.', alt: "Legato's Songs page in another theme." },
   ],
   fixes: {
     title: 'What listeners keep asking the big apps for',

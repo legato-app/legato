@@ -33,7 +33,7 @@ export const tr: Copy = {
     { title: 'Karaoke için K’ye bas', text: 'Zamanlanmış şarkı sözleri, satır satır; her sayfanın yanında bir panelde, Şimdi çalıyor’da büyük ya da buradaki gibi tam ekran.', alt: 'Karaoke modu: bulanık bir kapak üzerinde büyük sözler, çalan satır bütünüyle yanıyor.' },
     { title: 'V’ye bas, ışıklar kapansın', text: 'LED çubuklar, kapağın etrafında bir halka, VU iğneleri, bir spektrogram, MilkDrop tarzı ön ayarlar, tam ekran.', alt: 'Tam ekran görselleştirici: koyu bir sayfada LED çubuk sütunları.' },
     { title: 'Bir şarkıyı çalarken değiştir', text: 'Hız, perde, 10 bantlı ekolayzer, yankı ve 3D ses, Live Editor’de.', alt: 'Büyük bir kapağın yanında Live Editor: şarkının sürümleri, ön ayarlar, hız ve perde.' },
-    { title: 'Kendine göre yap', text: 'Renkler, yazı tipleri, arka planda bir resim ya da video, kendi CSS’in.', alt: 'Legato’nun Şarkılar sayfası başka bir temada.' },
+    { title: 'Kendine göre yap', text: 'Renkler, yazı tipleri, arka planda bir resim ya da video, kendi CSS’in ve uygulama bölümlerinin yeri.', alt: 'Legato’nun Şarkılar sayfası başka bir temada.' },
   ],
   fixes: {
     title: 'Dinleyicilerin büyük uygulamalardan hâlâ istedikleri',

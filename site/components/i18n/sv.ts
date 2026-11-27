@@ -33,7 +33,7 @@ export const sv: Copy = {
     { title: 'Tryck K för karaoke', text: 'Synkade låttexter, rad för rad, i en panel bredvid vilken sida som helst, stort i Spelas nu eller i helskärm som här.', alt: 'Karaokeläge: stor text på ett suddigt omslag, raden som spelas lyser upp helt.' },
     { title: 'Tryck V, släck lampan', text: 'LED-staplar, en ring runt omslaget, VU-nålar, ett spektrogram, förinställningar i MilkDrop-stil, i helskärm.', alt: 'Visualiseringen i helskärm: kolumner av LED-staplar på en mörk sida.' },
     { title: 'Ändra en låt medan den spelas', text: 'Hastighet, tonhöjd, en 10-bands-EQ, efterklang och 3D-ljud, i Live Editor.', alt: 'Live Editor bredvid ett stort omslag: låtens versioner, förinställningar, hastighet och tonhöjd.' },
-    { title: 'Gör den till din', text: 'Färger, typsnitt, en bild eller video som bakgrund, din egen CSS.', alt: 'Legatos sida Låtar i ett annat tema.' },
+    { title: 'Gör den till din', text: 'Färger, typsnitt, en bild eller video som bakgrund, din egen CSS och var appens delar ska ligga.', alt: 'Legatos sida Låtar i ett annat tema.' },
   ],
   fixes: {
     title: 'Det lyssnare fortsätter att be de stora apparna om',

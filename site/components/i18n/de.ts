@@ -33,7 +33,7 @@ export const de: Copy = {
     { title: 'K drücken für Karaoke', text: 'Synchronisierte Songtexte, Zeile für Zeile, in einem Bereich neben jeder Seite, groß in der Aktuellen Wiedergabe oder im Vollbild wie hier.', alt: 'Karaoke-Modus: großer Text auf einem verschwommenen Cover, die laufende Zeile leuchtet als Ganzes auf.' },
     { title: 'V drücken, Licht aus', text: 'LED-Balken, ein Ring um das Cover, VU-Nadeln, ein Spektrogramm, Presets im Stil von MilkDrop, im Vollbild.', alt: 'Der Visualizer im Vollbild: Säulen aus LED-Balken auf dunklem Grund.' },
     { title: 'Ändere einen Song beim Hören', text: 'Tempo, Tonhöhe, ein 10-Band-EQ, Hall und 3D-Sound, im Live Editor.', alt: 'Der Live Editor neben einem großen Cover: die Versionen des Songs, Presets, Tempo und Tonhöhe.' },
-    { title: 'Gestalte sie nach deinem Geschmack', text: 'Farben, Schriften, ein Bild oder Video als Hintergrund, dein eigenes CSS.', alt: 'Die Seite Songs von Legato in einem anderen Theme.' },
+    { title: 'Gestalte sie nach deinem Geschmack', text: 'Farben, Schriften, ein Bild oder Video als Hintergrund, dein eigenes CSS und wo die Teile der App stehen.', alt: 'Die Seite Songs von Legato in einem anderen Theme.' },
   ],
   fixes: {
     title: 'Was Hörer sich von den großen Apps immer wieder wünschen',

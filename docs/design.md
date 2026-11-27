@@ -107,6 +107,53 @@ arranged for a thumb). Liner's calm is the spirit, never its look. The rules:
   behind the others and the music goes on (`app/androidBack.ts`, `MainActivity.kt`). A new overlay joins
   `shared/ui/layers.ts`, as `Dialog` does, or Back walks past it.
 
+## Theme layout
+
+A theme may also say where the app's parts go: an optional `layout` key in its JSON (a `.theme` file keeps it). Data
+only, never code: the app checks it (`ui/src/shared/theme/layout.ts`), drops what it doesn't know, and draws its own
+parts in their new places. PC only. Settings › Appearance › Theme › "Let themes arrange the app" turns it off (on by
+default, on every synced PC); right-click › "Default layout" does the same. Importing a theme that changes something
+asks first: its layout, colors only, or cancel.
+
+```json
+"layout": { "v": 1,
+  "regions": { "top": ["topbar"], "left": ["sidePanel"], "right": ["sidebar"], "bottom": ["playerBar"] },
+  "sizes": { "sidebar": 300, "sidePanel": 360 },
+  "hidden": ["sidePanel"],
+  "parts": { "playerBar": { "order": ["actions", "center", "song"], "hidden": ["sleep"] } },
+  "pages": { "header": { "art": "end", "artSize": 160 }, "lists": { "columns": ["plays", "album"] },
+             "artist": { "order": ["discography"], "hidden": ["about"] } } }
+```
+
+- `regions`: `top`, `left`, `right`, `bottom` around the page. `sidebar` and `sidePanel` go left or right, `playerBar`
+  top or bottom, `topbar` stays on top, `brand` (the logo) anywhere. A surface not named keeps its place.
+- `sizes`, px: `sidebar` 220 to 420, `sidePanel` 260 to 420; a size given fixes the width.
+- `hidden`: any surface but the logo (never both the sidebar and the top bar). A hidden top bar keeps the logo, the
+  search, Settings and the window's buttons.
+- `parts.<bar>.order` / `.hidden`, within each group; what hides stays reachable in the bar's More:
+  - `playerBar`: `song center actions` · `transport progress` · `room sleep lyrics upNext volume more fullScreen`
+    (hideable: transport, room, sleep, lyrics, upNext, volume, fullScreen).
+  - `topbar`: `history search offline addons` (hideable: history, addons).
+  - `sidebar`: `nav library` (hideable: nav).
+- `pages.header`: `art` (`start`, `end`, `top`, `none`), `artSize` 120 to 320, `kicker` and `sub` (`false` leaves the
+  line out; a legal notice stays), `actions` (`beside`, `below`). Settings and Add-ons keep their own.
+- `pages.lists.columns`: the order of the songs lists' columns (Title and Artist first, the heart and Time last; which
+  columns show stays the user's).
+- `pages.<page>.order` / `.hidden`:
+  - `album`: `tracks more` (hideable: more).
+  - `artist`: `mostPlayed topSongs discography about links shelves` (hideable: discography, about, shelves).
+  - `songs`: `toolbar browser list`; `albums`, `artists`: `toolbar list`; `home`: `chips sections` (order only).
+  - `nowPlayingColumns`: `cover words` (order only); `nowPlaying`: `from title artists album readout lyrics next`
+    (hideable: from, album, readout, lyrics, next); `nowPlayingControls`: `room lyrics upNext sound more volume`
+    (order only).
+- A part not named follows its usual neighbor. Hidden blocks are hidden content, not lost actions: hiding an artist's
+  discography or an album's "More by" removes the page's own way to releases outside the library.
+- A theme's `look.homeSections` sets Home's order when the theme is picked (the user's to change after; it never turns
+  New releases on or off). An older Legato rewriting the themes drops it.
+- `v` above what the app knows: the layout is kept as it is and ignored, the theme's card says it needs a newer Legato.
+  Such a layout, or one imported while the setting was off, applies later (an update, the setting turned on) without
+  asking again.
+
 ## Palette
 
 Names match `PALETTE_KEYS` (`ui/src/shared/theme/theme.ts`).

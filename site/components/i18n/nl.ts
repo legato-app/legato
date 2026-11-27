@@ -33,7 +33,7 @@ export const nl: Copy = {
     { title: 'Druk op K voor karaoke', text: 'Getimede songteksten, regel voor regel, in een paneel naast elke pagina, groot in Nu aan het afspelen of schermvullend zoals hier.', alt: 'Karaokemodus: grote tekst op een vervaagde hoes, de regel die speelt licht helemaal op.' },
     { title: 'Druk op V, licht uit', text: 'Ledbalken, een ring rond de hoes, VU-naalden, een spectrogram, presets in MilkDrop-stijl, schermvullend.', alt: 'De visualizer schermvullend: kolommen ledbalken op een donkere pagina.' },
     { title: 'Verander een nummer terwijl het speelt', text: 'Snelheid, toonhoogte, een 10-bands-equalizer, galm en 3D-geluid, in de Live Editor.', alt: 'De Live Editor naast een grote hoes: de versies van het nummer, presets, snelheid en toonhoogte.' },
-    { title: 'Maak het helemaal van jou', text: 'Kleuren, lettertypes, een afbeelding of video als achtergrond, je eigen CSS.', alt: 'De pagina Nummers van Legato in een ander thema.' },
+    { title: 'Maak het helemaal van jou', text: 'Kleuren, lettertypes, een afbeelding of video als achtergrond, je eigen CSS en waar de onderdelen van de app staan.', alt: 'De pagina Nummers van Legato in een ander thema.' },
   ],
   fixes: {
     title: 'Wat luisteraars de grote apps steeds weer vragen',

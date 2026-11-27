@@ -33,7 +33,7 @@ export const pt: Copy = {
     { title: 'Aperte K para o karaokê', text: 'Letras sincronizadas, linha por linha, em um painel ao lado de qualquer página, grandes em Tocando agora, ou em tela cheia como aqui.', alt: 'Modo karaokê: letras grandes sobre uma capa desfocada, a linha que toca toda iluminada.' },
     { title: 'Aperte V, luzes apagadas', text: 'Barras de LED, um anel em volta da capa, ponteiros de VU, um espectrograma, presets no estilo MilkDrop, em tela cheia.', alt: 'O visualizador em tela cheia: colunas de barras de LED em uma página escura.' },
     { title: 'Mude uma música enquanto toca', text: 'Velocidade, tom, um equalizador de 10 bandas, reverb e som 3D, no Live Editor.', alt: 'O Live Editor ao lado de uma capa grande: as versões da música, presets, velocidade e tom.' },
-    { title: 'Deixe com a sua cara', text: 'Cores, fontes, uma imagem ou vídeo de fundo, seu próprio CSS.', alt: 'A página Músicas do Legato em outro tema.' },
+    { title: 'Deixe com a sua cara', text: 'Cores, fontes, uma imagem ou vídeo de fundo, seu próprio CSS e o lugar de cada parte do app.', alt: 'A página Músicas do Legato em outro tema.' },
   ],
   fixes: {
     title: 'O que os ouvintes vivem pedindo aos grandes apps',

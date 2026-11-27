@@ -93,6 +93,14 @@ mod tests {
     }
 
     #[test]
+    fn a_theme_file_carries_its_layout_as_written() {
+        // A newer version's keys included: this app keeps them, the interface reads what it knows.
+        let theme = json!({ "name": "Moved", "layout": { "v": 1, "regions": { "right": ["sidebar"] }, "pages": { "header": { "art": "end" } }, "later": [1] } });
+        assert_eq!(unpack(&pack(&theme, None).unwrap()).unwrap().0, theme);
+        assert_eq!(unpack(&pack(&theme, Some(PNG)).unwrap()).unwrap().0, theme);
+    }
+
+    #[test]
     fn a_theme_file_carries_its_picture() {
         let theme = json!({ "name": "Night", "bg": "#000000", "background": { "image": "bg-0000000000000000.png" } });
         let text = pack(&theme, Some(PNG)).unwrap();
