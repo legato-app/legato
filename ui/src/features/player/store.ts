@@ -1152,14 +1152,22 @@ function overlap() {
  * Report of the other embed (PlayerBar): the overlap's tail, fading out to its song's end, then stopped there. Volume
  * to send it, if any. The end comes from the overlap: YouTube sends a video's length once, as it loads (2026-10-30: read
  * from each report, the tail never faded and played on at full volume under the next song). Stopped or cued and playing
- * anyway (YouTube ignores a stop while a video starts): 'stop' again.
+ * anyway (YouTube ignores a stop while a video starts): 'stop' again. `key`: the reporting frame's; the store swaps the
+ * two before the frames render again, so one that is the tail no more is not answered.
  */
-export function tailReport(u: YtUpdate): number | 'stop' | undefined {
+export function tailReport(u: YtUpdate, key: number): number | 'stop' | undefined {
   const { tail, volume, fade } = usePlayer.getState()
-  if (!tail) return
+  if (tail?.key !== key) return
   if (tail.done) return u.state === 1 ? 'stop' : undefined
   if (u.state === 0 || u.error !== undefined || (u.time !== undefined && u.time * 1000 >= tail.end)) return void usePlayer.setState({ tail: stopTail(tail) })
   if (u.time !== undefined) return Math.round(volume * fadeGain(u.time * 1000, tail.end, fade, false) * 100)
+}
+
+/** The other embed's report, answered to it: its fade out's volume, or stopped again. */
+export function answerTail(frame: HTMLIFrameElement | null, u: YtUpdate, key: number) {
+  const answer = tailReport(u, key)
+  if (answer === 'stop') ytPost(frame, 'command', 'stopVideo')
+  else if (answer !== undefined) ytPost(frame, 'command', 'setVolume', [answer])
 }
 
 // A new song, or its video: playAt counts the play before it sets what plays, so the video is watched once it's set.

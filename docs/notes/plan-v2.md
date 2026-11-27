@@ -1269,6 +1269,8 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
     page played it. The watch page's own webview was not checked.
     - Decided alone (2026-11-27): an overlap's old song still finishes its fade out when the next one goes to the watch
       page (bounded by its end; that is the crossfade).
+    - 2026-11-27 (review): the other embed's report is answered only when its frame is still the tail (`answerTail`, by
+      frame key): a late one could stop or fade the new tail.
 - [ ] `S` A video refused before, reached by an overlap or by Next into the cued embed with Now Playing closed: no embed
       is bound yet, so `videoRect()` finds no place and another upload plays instead of its watch page (read in
       `playOnWatchPage`, not reproduced).

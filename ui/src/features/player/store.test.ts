@@ -4,7 +4,7 @@ import { api, type LibraryTrack } from '../../shared/api'
 import { rememberEnd } from './ends'
 import { NO_FADE } from './fade'
 import { useSponsor } from './sponsor'
-import { bindFrame, onQueueEnd, splitIntoParts, tailReport, usePlayer } from './store'
+import { answerTail, bindFrame, onQueueEnd, splitIntoParts, tailReport, usePlayer } from './store'
 import { useWatch } from './watch'
 
 const song = (id: number): LibraryTrack => ({ id, added: 0, addedAt: null, title: `Song ${id}`, artist: 'Artist', album: null, durationMs: null, isrc: null, ids: { youtube: `video${id}` } })
@@ -130,8 +130,12 @@ describe('song ends', () => {
     expect(usePlayer.getState().now?.youtubeId).toBe('video32')
     expect(usePlayer.getState().tail).toMatchObject({ videoId: 'video31', end: 200_000, done: false })
     // Regression guard: the old song played on at full volume under the next one (2026-10-30).
-    expect(tailReport({ time: 196 })).toBe(50)
-    expect(tailReport({ time: 200 })).toBeUndefined()
+    const { key } = usePlayer.getState().tail!
+    expect(tailReport({ time: 196 }, key)).toBe(50)
+    // A late report of the other frame, taken for the tail's: it would stop it before its end.
+    expect(tailReport({ time: 200 }, key + 1)).toBeUndefined()
+    expect(usePlayer.getState().tail?.done).toBe(false)
+    expect(tailReport({ time: 200 }, key)).toBeUndefined()
     expect(usePlayer.getState().tail?.done).toBe(true)
   })
 
@@ -400,10 +404,17 @@ describe('a YouTube video that never starts', () => {
     usePlayer.getState().playTracks([song(88), song(89)], 0)
     usePlayer.getState().onYoutube({ state: 1, time: 0.3 })
     usePlayer.getState().onYoutube({ time: 6 })
-    // Cued, silent: left as it is.
-    expect(tailReport({ state: 5 })).toBeUndefined()
+    const { key } = usePlayer.getState().tail!
+    const heard = vi.fn()
+    const other = { contentWindow: { postMessage: heard } } as unknown as HTMLIFrameElement
+    const sent = () => heard.mock.calls.map(([message]) => JSON.parse(message as string).func as string)
+    // Cued, silent: left as it is. Not the tail's frame: nothing either.
+    answerTail(other, { state: 5 }, key)
+    answerTail(other, { state: 1 }, key + 1)
+    expect(sent()).toEqual([])
     // YouTube ignores a stop while a video starts, then plays it: nobody would hear of it again.
-    expect(tailReport({ state: 1 })).toBe('stop')
+    answerTail(other, { state: 1 }, key)
+    expect(sent()).toEqual(['stopVideo'])
     usePlayer.setState({ tail: null })
   })
 

@@ -20,7 +20,7 @@ import { trackArt } from '../../shared/art'
 import { Cover } from '../../shared/ui/Cover'
 import { ArtistLink } from './ArtistLink'
 import { artistName } from '../../shared/artistName'
-import { bindFrame, tailReport, useNowTrack, usePlayer, useVideoSlot } from './store'
+import { answerTail, bindFrame, useNowTrack, usePlayer, useVideoSlot } from './store'
 import { volumeWheelRef } from './volume'
 import { pop } from '../../shared/motion'
 import { embedUrl, parseYt, ytPost } from './youtube'
@@ -59,7 +59,7 @@ function viaTitle(via: string, path?: string) {
  * songs follow each other without the embed's loading time. Overlapping songs: tail = the old embed, unseen, fading out
  * on its own until its video ends; idle = stopped there, waiting to take the next overlap's song.
  */
-function YouTubeFrame({ videoId, tail = false, idle = false, cue = false }: { videoId: string; tail?: boolean; idle?: boolean; cue?: boolean }) {
+function YouTubeFrame({ frameKey, videoId, tail = false, idle = false, cue = false }: { frameKey: number; videoId: string; tail?: boolean; idle?: boolean; cue?: boolean }) {
   const onYoutube = usePlayer((s) => s.onYoutube)
   const rect = useVideoSlot((s) => s.rect)
   const hidden = useVideoSlot((s) => s.hidden)
@@ -121,9 +121,7 @@ function YouTubeFrame({ videoId, tail = false, idle = false, cue = false }: { vi
       if (!u) return
       if (isTail.current) {
         // Fades out to its song's own end (learned early end), then only silence is left: stopped too.
-        const answer = tailReport(u)
-        if (answer === 'stop') ytPost(frame.current, 'command', 'stopVideo')
-        else if (answer !== undefined) ytPost(frame.current, 'command', 'setVolume', [answer])
+        answerTail(frame.current, u, frameKey)
         return
       }
       // Subtitles off (default): YouTube may turn them on from the Google account, unload them once per video.
@@ -159,7 +157,7 @@ function YouTubeFrame({ videoId, tail = false, idle = false, cue = false }: { vi
       window.removeEventListener('message', onMessage)
       void off.then((f) => f())
     }
-  }, [onYoutube])
+  }, [onYoutube, frameKey])
   // Watch page follows the slot (or this frame's own spot), hidden in cover mode. Gone with the last YouTube track.
   useEffect(() => {
     if (!watch || tail) return
@@ -515,7 +513,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
       {now?.youtubeId &&
         [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]
           .sort((a, b) => a.key - b.key)
-          .map((f) => <YouTubeFrame key={f.key} videoId={f.videoId} tail={f === tail} idle={f === tail && !!tail?.done} cue={f === tail && !!tail?.cue} />)}
+          .map((f) => <YouTubeFrame key={f.key} frameKey={f.key} videoId={f.videoId} tail={f === tail} idle={f === tail && !!tail?.done} cue={f === tail && !!tail?.cue} />)}
       {!hidden && (
         <>
       {phone && now && <ProgressLine className="absolute inset-x-3 top-0" />}
