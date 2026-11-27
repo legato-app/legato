@@ -1239,6 +1239,26 @@ mod tests {
     }
 
     #[test]
+    fn a_song_with_a_youtube_version_too_stays_through_a_disconnect() -> Result<()> {
+        let (a, b) = (Library::in_memory()?, Library::in_memory()?);
+        a.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("both")])?;
+        b.merge(&snap(&a))?;
+        // B found its YouTube version.
+        let mut both = from_spotify("both");
+        both.ids.insert(Source::Youtube, "video".into());
+        b.upsert_track(&both)?;
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        a.remove_spotify_imports()?;
+        // The playlist only.
+        assert_eq!(b.merge(&snap(&a))?.deleted, 1);
+        assert_eq!(titles_sorted(&b)?, ["both"]);
+        // A song with another source again: B's library brings it to A.
+        a.merge(&snap(&b))?;
+        assert_eq!(titles_sorted(&a)?, ["both"]);
+        Ok(())
+    }
+
+    #[test]
     fn an_older_pc_s_library_does_not_bring_them_back() -> Result<()> {
         let (a, b, old) = (Library::in_memory()?, Library::in_memory()?, Library::in_memory()?);
         a.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("gone")])?;
