@@ -37,7 +37,7 @@ impl From<Track> for LocalSong {
     }
 }
 
-const AUDIO: [&str; 6] = ["mp3", "flac", "wav", "ogg", "m4a", "aac"];
+const AUDIO: [&str; 7] = ["mp3", "flac", "wav", "ogg", "m4a", "m4b", "aac"];
 
 /// An audio file the library takes, by its extension.
 pub fn is_audio(path: &Path) -> bool {
@@ -478,6 +478,7 @@ pub(crate) mod tests {
     fn audio_by_extension() {
         assert!(is_audio(Path::new("C:/Music/a.MP3")));
         assert!(is_audio(Path::new("b.flac")));
+        assert!(is_audio(Path::new("a book.M4B")));
         assert!(!is_audio(Path::new("cover.jpg")));
         assert!(!is_audio(Path::new("folder")));
     }

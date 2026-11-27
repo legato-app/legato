@@ -48,7 +48,7 @@ fn mime_of(path: &Path) -> Option<&'static str> {
     Some(match path.extension()?.to_str()?.to_ascii_lowercase().as_str() {
         "mp3" => "audio/mpeg",
         "flac" => "audio/flac",
-        "m4a" | "aac" | "mp4" => "audio/mp4",
+        "m4a" | "m4b" | "aac" | "mp4" => "audio/mp4",
         "ogg" | "oga" | "opus" => "audio/ogg",
         "wav" => "audio/wav",
         _ => return None,

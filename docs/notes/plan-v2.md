@@ -736,6 +736,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     (`withoutBooks`). Not tried for real.
     - Decided alone (2026-11-27): only those books leave these lists; videos that aren't music stay there as before
       (Songs' filter would have taken them too). A book's own album and artist pages still show it.
+  - 2026-11-27: found, folder scans never took `.m4b` files (so no local one was ever a book): they are audio now, Cast
+    serves them. They appear in Songs too while Audiobooks is off. Not tried on a real book.
 - [ ] `M` Stream Deck plugin and an Xbox Game Bar widget (play / skip / like / now playing) over the local hotkeys.
   2026-11-13: Stream Deck done as `integrations/streamdeck` (`docs/streamdeck.md`): play / pause, next, previous, now
   playing, over the phone remote's local routes; logic tested, never loaded by a real Stream Deck. 2026-11-19: its like

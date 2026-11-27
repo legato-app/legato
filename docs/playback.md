@@ -221,7 +221,7 @@ We still pin the policy on the iframe: a meta tag or header added later can't br
 
 ## Local files: `crates/player`
 
-- rodio 0.23 (symphonia decoding): mp3, flac, wav, ogg/vorbis, m4a/aac.
+- rodio 0.23 (symphonia decoding): mp3, flac, wav, ogg/vorbis, m4a/m4b/aac.
 - The engine runs on a dedicated thread that owns the audio output (the cpal stream isn't `Send` on every platform).
   It receives commands over a channel and checks for track ends every 100 ms.
 - Gapless: as soon as a track starts, the next one is appended to the rodio `Player`, which chains sources with no gap.
