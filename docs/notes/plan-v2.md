@@ -531,10 +531,17 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       inside the panel itself (it shows in the box), a language other than the interface's.
       2026-11-18 (lot 61): the translation the user asked for now shows under each sung line in the lyrics panel (a smaller row, in the interface's language, this song only, kept in memory by `translated.ts`; the lines are matched by `alignTranslation`, tested: breaks, empty lines, a short or long answer, a repeated chorus). Nothing new is sent (the same box and "Send and translate"). Left: Karaoke (its fixed seats would need a layout of their own), a language other than the interface's. Decided alone (2026-11-18): no new setting (it appears only after the user's own Translate…), a line the service returns unchanged gets no row. Not tried in the app: the glide after the rows change line heights (the effect re-measures when the translation arrives, from the lot 52 recipe).
       2026-11-19 (night run), the two things left: Karaoke shows the translation the user asked for as a smaller row under each line (`Karaoke.tsx`, the same `underFor` as the panel), and the box has a "Translate into" list of the app's languages, the interface's by default (`TranslateLyrics.tsx`; a translation now shows for its song in whatever language was asked). Decided alone: Karaoke only shows, the Translate… button stays in the panel. Never seen in the app (the Karaoke layout with rows, MyMemory in another language).
-- [ ] `M` Equalizer presets per output device (headphones vs speakers) and AutoEQ profiles for known headphones.
+- [x] `M` Equalizer presets per output device (headphones vs speakers) and AutoEQ profiles for known headphones.
       Skipped 2026-11-12 (not for this run): the engine only knows the default output device (`output.rs`), no name and no change event,
       so per-device presets need platform code (a device-change watch on WASAPI, then the same on the other systems); AutoEQ profiles
       are parametric filters from a large dataset to map onto the 10-band graphic EQ, a data and licence choice. For Opus and the owner.
+      2026-11-27: the preset per output had shipped on 2026-11-13 (`8fc31212`, behind a setting, “Output devices” below);
+      a test that it survives a restart and that an unknown output keeps the current equalizer. Not tried for real (no
+      real headset).
+      Decided alone (2026-11-27): AutoEQ profiles left out (the licences of the measurements they come from to check
+      first, and their parametric filters to map onto 10 bands); the preset stays keyed by the output’s name, on this PC,
+      never logged: a stable id (cpal’s) needs the player to list and pick outputs by id, more than picking a preset; a
+      change of Windows’ own default output is still not seen.
 - [x] `M` Credits and artist pages: who wrote / produced (MusicBrainz), a short bio (Wikipedia), links out.
       Ticked 2026-11-18 (audit): everything the line names shipped: the links (`MusicBrainz::artist_links`), Credits (`eae99997`), the bio (`afb764fd`), YouTube Music's About (`71d4c9bb`). What is left is a try against the real services (Check live).
       2026-11-12, the links out only: an artist's page has "Find links on MusicBrainz" (a click, two requests a second apart, the
