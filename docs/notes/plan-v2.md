@@ -785,6 +785,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     imported while the setting was off, starts to apply later (an update, the setting turned on) without the question.
     Review of 7-8: the theme docs say that hidden blocks are hidden content, not lost actions (an artist's discography,
     an album's "More by": the page's own way to releases outside the library).
+    Review of 9-11: the docs say an older Legato rewriting the themes drops a theme's Home order (`look.homeSections`).
   - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
     enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
   - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.
