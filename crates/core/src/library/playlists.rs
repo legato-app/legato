@@ -419,7 +419,12 @@ impl Library {
 
     /// Deleted now: remembered so other PCs delete it too instead of bringing it back.
     pub(crate) fn gone(&self, kind: &str, key: &str) -> Result<()> {
-        self.db.execute("INSERT OR REPLACE INTO sync_gone (kind, key, at) VALUES (?1, ?2, ?3)", params![kind, key, now_ms()])?;
+        self.gone_since(kind, key, now_ms())
+    }
+
+    /// The same at a time of the caller's: one that must come after another record.
+    pub(crate) fn gone_since(&self, kind: &str, key: &str, at: i64) -> Result<()> {
+        self.db.execute("INSERT OR REPLACE INTO sync_gone (kind, key, at) VALUES (?1, ?2, ?3)", params![kind, key, at])?;
         Ok(())
     }
 

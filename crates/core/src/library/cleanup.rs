@@ -155,20 +155,22 @@ impl Library {
     /// Only Spotify knows it and it left with a disconnect: another PC's library doesn't bring it back.
     pub(crate) fn left_with_spotify(&self, ids: &BTreeMap<Source, String>) -> Result<bool> {
         let Some(spotify_id) = ids.get(&Source::Spotify).filter(|_| ids.len() == 1) else { return Ok(false) };
-        self.is_left(&left_key(spotify_id))
+        Ok(self.left_at(&left_key(spotify_id))?.is_some())
     }
 
-    fn is_left(&self, key: &str) -> Result<bool> {
-        let mut stmt = self.db.prepare_cached(&format!("SELECT 1 FROM sync_gone g WHERE g.key = ?1 AND {LEFT_LIVE}"))?;
-        Ok(stmt.exists([key])?)
+    /// When the song left, while no later import ended that.
+    fn left_at(&self, key: &str) -> Result<Option<i64>> {
+        let mut stmt = self.db.prepare_cached(&format!("SELECT g.at FROM sync_gone g WHERE g.key = ?1 AND {LEFT_LIVE}"))?;
+        Ok(stmt.query_row([key], |row| row.get(0)).optional()?)
     }
 
     /// Imported or added again: a disconnect's record on the song ends, on the other PCs too. Nothing written otherwise.
     pub(crate) fn bring_back_left(&self, t: &Track) -> Result<()> {
         if let Some(key) = t.ids.get(&Source::Spotify).map(|spotify_id| left_key(spotify_id))
-            && self.is_left(&key)?
+            && let Some(left) = self.left_at(&key)?
         {
-            self.gone("import-back", &key)?;
+            // After the record it ends, even when this PC's clock is behind the one that wrote it.
+            self.gone_since("import-back", &key, now_ms().max(left + 1))?;
         }
         Ok(())
     }

@@ -45,6 +45,8 @@ the order; a line leaves only when it ships or the user drops it.
     - Decided alone (2026-11-27): another PC applies the disconnect’s own rule to its own rows, at every merge. A song
       added again by hand or kept as a like ends its record, as an import does, so the next merge leaves it.
     - Limit: an older Legato keeps the songs until it updates (the question says it).
+    - 2026-11-27 (review): an `import-back` comes after the record it ends even on a PC whose clock is behind (else a
+      song added by hand there was swept).
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et

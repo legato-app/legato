@@ -1302,6 +1302,18 @@ mod tests {
     }
 
     #[test]
+    fn a_song_added_by_hand_stays_though_the_disconnect_s_clock_was_ahead() -> Result<()> {
+        let lib = Library::in_memory()?;
+        // Disconnected on a PC whose clock runs far ahead of this one's.
+        lib.db.execute("INSERT INTO sync_gone (kind, key, at) VALUES ('import-left', 'spotify:hand', 9000000000000)", [])?;
+        lib.unremove(&from_spotify("hand"))?;
+        lib.upsert_track(&from_spotify("hand"))?;
+        assert_eq!(lib.merge(&snap(&Library::in_memory()?))?.deleted, 0);
+        assert_eq!(titles_sorted(&lib)?, ["hand"]);
+        Ok(())
+    }
+
+    #[test]
     fn records_stored_before_an_update_clean_up_at_the_next_merge() -> Result<()> {
         let b = Library::in_memory()?;
         b.upsert_track(&from_spotify("gone"))?;
