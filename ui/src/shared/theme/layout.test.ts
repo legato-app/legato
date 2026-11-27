@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arrangeParts, DEFAULT_LAYOUT, headerLayout, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, COLUMNS, headerLayout, orderColumns, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -95,13 +95,27 @@ describe('a page’s parts', () => {
     const got = sanitizeLayout({ v: 1, pages: { album: { order: ['more', 'credits'], hidden: ['tracks', 'more'] }, artist: { hidden: ['mostPlayed', 'topSongs', 'links', 'about'] }, home: { hidden: ['more'] } } })!
     expect(got.pages).toEqual({ album: { order: ['more'], hidden: ['more'] }, artist: { hidden: ['about'] } })
     expect(arrangeParts({ order: ['shelves', 'mostPlayed'] }, pagePartIds('artist'))).toEqual(['shelves', 'mostPlayed', 'topSongs', 'discography', 'about', 'links'])
-    for (const page of ['album', 'artist'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
+    for (const page of ['album', 'artist', 'songs', 'albums', 'artists'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
   })
 
   it('says which pages change', () => {
     const summary = (pages: unknown) => layoutSummary(sanitizeLayout({ v: 1, pages }) ?? undefined)
     expect(summary({ album: { order: ['more', 'tracks'] }, artist: { hidden: ['shelves'] } })).toEqual(['Album pages arranged their own way', 'Artist pages arranged their own way'])
     expect(summary({ album: { order: ['tracks'] } })).toEqual([])
+  })
+})
+
+describe('library lists', () => {
+  it('orders the user’s columns as the theme says, Time last, the set unchanged', () => {
+    expect(orderColumns(['plays', 'duration', 'album', 'nothing'], ['album', 'sources', 'plays', 'duration'])).toEqual(['plays', 'album', 'sources', 'duration'])
+    expect(orderColumns(['year'], ['duration', 'album'])).toEqual(['album', 'duration'])
+    expect(orderColumns(undefined, COLUMNS)).toEqual(COLUMNS)
+  })
+
+  it('keeps and says the column order and the pages’ blocks, none of them hidden', () => {
+    const layout = sanitizeLayout({ v: 1, pages: { lists: { columns: ['plays', 'duration', 'title', 'album'] }, songs: { order: ['list', 'toolbar'], hidden: ['toolbar', 'browser'] }, albums: { hidden: ['list'] } } })!
+    expect(layout.pages).toEqual({ lists: { columns: ['plays', 'album'] }, songs: { order: ['list', 'toolbar'] } })
+    expect(layoutSummary(layout)).toEqual(['Library lists arranged their own way', 'List columns in another order'])
   })
 })
 

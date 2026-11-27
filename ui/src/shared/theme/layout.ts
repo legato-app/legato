@@ -44,6 +44,11 @@ export interface PartsChoice {
 }
 type Parts = Partial<Record<PartedSurface, PartsChoice>>
 
+/** The songs list's columns after Title and Artist, in the app's order. Time stays last, by the heart. */
+export const COLUMNS = ['album', 'year', 'genre', 'bpm', 'key', 'sources', 'plays', 'rating', 'added', 'duration'] as const
+export type Column = (typeof COLUMNS)[number]
+const MOVABLE_COLUMNS = COLUMNS.filter((column) => column !== 'duration')
+
 /** A page header's art: before the words, after them, over them, or left out. */
 const HEADER_ART = ['start', 'end', 'top', 'none'] as const
 const HEADER_ACTIONS = ['beside', 'below'] as const
@@ -66,12 +71,22 @@ export interface HeaderChoice {
 export const PAGE_PARTS = {
   album: [{ id: 'tracks', fixed: true }, { id: 'more' }],
   artist: [{ id: 'mostPlayed', fixed: true }, { id: 'topSongs', fixed: true }, { id: 'discography' }, { id: 'about' }, { id: 'links', fixed: true }, { id: 'shelves' }],
+  songs: [{ id: 'toolbar', fixed: true }, { id: 'browser', fixed: true }, { id: 'list', fixed: true }],
+  albums: [{ id: 'toolbar', fixed: true }, { id: 'list', fixed: true }],
+  artists: [{ id: 'toolbar', fixed: true }, { id: 'list', fixed: true }],
 } as const
 export type PartedPage = keyof typeof PAGE_PARTS
 export const pagePartIds = (page: PartedPage): string[] => PAGE_PARTS[page].map((part) => part.id)
 
 export interface Pages extends Partial<Record<PartedPage, PartsChoice>> {
   header?: HeaderChoice
+  /** The order of every songs list's columns. */
+  lists?: { columns?: string[] }
+}
+
+/** The shown columns as a theme orders them: which show stays the user's pick, Time comes last. */
+export function orderColumns(order: string[] | undefined, shown: readonly Column[]): Column[] {
+  return [...arrangeParts({ order }, MOVABLE_COLUMNS), 'duration' as const].filter((column) => shown.includes(column))
 }
 
 /** The theme file's `layout` key. */
@@ -165,7 +180,9 @@ function sanitizePages(raw: unknown): Pages | undefined {
     const choice = partsChoice(given?.[page], pagePartIds(page), hideable)
     return choice ? [[page, choice]] : []
   })
-  return header || parted.length ? { ...(header && { header }), ...Object.fromEntries(parted) } : undefined
+  const columns = knownList<string>(record(given?.lists)?.columns, MOVABLE_COLUMNS)
+  const lists = columns.length ? { columns } : undefined
+  return header || lists || parted.length ? { ...(header && { header }), ...(lists && { lists }), ...Object.fromEntries(parted) } : undefined
 }
 
 /** Trust boundary (a theme file, stored settings): what is valid is kept; null when nothing is. */
@@ -278,6 +295,8 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     !!placement.pages.header && tr('Page headers arranged another way'),
     pageChanged('album') && tr('Album pages arranged their own way'),
     pageChanged('artist') && tr('Artist pages arranged their own way'),
+    (pageChanged('songs') || pageChanged('albums') || pageChanged('artists')) && tr('Library lists arranged their own way'),
+    orderColumns(placement.pages.lists?.columns, COLUMNS).join() !== COLUMNS.join() && tr('List columns in another order'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines
 }

@@ -761,8 +761,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       top); album: songs (fixed) and More by the artist; artist: most played, Top songs, discography, About, links,
       YouTube shelves, the hideable ones being discography, About and the shelves (links have no menu elsewhere); an
       unnamed part follows its usual neighbor; `usePageParts` reads the shell's context, not the settings.
-  - [ ] `M` 9. Songs, Albums, Artists, and column order in `TrackTable`. Tests: column order resolve (Title and Artist
+  - [x] `M` 9. Songs, Albums, Artists, and column order in `TrackTable`. Tests: column order resolve (Title and Artist
     first, the heart and Time last, the user's set kept).
+    2026-11-27: done; list and toolbar moved in the browser demo (invented data), never in the app.
+    - Decided alone (2026-11-27): Songs (toolbar, column browser, list), Albums and Artists (toolbar, list): all fixed,
+      they only move; `pages.lists.columns` orders every songs list's columns except Time (last, after the heart), an
+      unnamed column keeping its usual neighbor; the warning says each change in one line.
   - [ ] `S` 10. Home's frame parts, `homeSections` in `LOOK_KEYS`. Tests: `sanitizeLook` keeps a theme's Home order,
     picking the theme writes it, the user's later order wins.
   - [ ] `M` 11. Now Playing's parts on the PC (cover side, the title block's order, the controls row). Tests: parts

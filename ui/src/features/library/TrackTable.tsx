@@ -3,7 +3,9 @@ import { PlayingMark } from '../player/PlayingMark'
 import { artistName } from '../../shared/artistName'
 import { useShallow } from 'zustand/react/shallow'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { PageLayout } from '../../shared/ui/pageLayout'
+import { orderColumns } from '../../shared/theme/layout'
 import { useSettings } from '../../app/settings'
 import type { LibraryTrack, Source } from '../../shared/api'
 import { formatCount, formatDuration } from '../../shared/format'
@@ -143,8 +145,10 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
     if (e.key === 'Delete' && editId !== undefined && sel.ids.size) removeChosen()
   }
   // Mockup order: the hover actions and the heart sit right before the time (last column).
-  const lead = phone ? [] : fit.columns.filter((c) => c !== 'duration')
-  const tail = !phone && fit.columns.includes('duration') ? (['duration'] as const) : []
+  // The theme's column order (Time stays apart, after the hover actions).
+  const ordered = orderColumns(useContext(PageLayout).lists?.columns, fit.columns)
+  const lead = phone ? [] : ordered.filter((c) => c !== 'duration')
+  const tail = !phone && ordered.includes('duration') ? (['duration'] as const) : []
   const grid = { gridTemplateColumns: phone ? '24px minmax(0,1fr) max-content' : ['32px', 'minmax(0,2fr)', ...(artistCol ? ['minmax(0,1fr)'] : []), ...lead.map((c) => width[c]), editId ? '188px' : rowActions ? 'max-content' : '96px', ...tail.map((c) => width[c])].join(' ') }
   const cover = density === 'compact' ? 28 : density === 'comfort' ? 36 : 46
   const cell = (t: LibraryTrack, c: Column) =>

@@ -1,7 +1,8 @@
 import { CaretDown, DotsThree, Info, MagnifyingGlass, MicrophoneStage, Play, Plus, ShareNetwork, Shuffle, SlidersHorizontal, SortAscending, VinylRecord } from '@phosphor-icons/react'
 import { artistName } from '../../shared/artistName'
 import { useShallow } from 'zustand/react/shallow'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { usePageParts } from '../../shared/ui/usePageParts'
 import { useSettings } from '../../app/settings'
 import { pageQuery, useStore } from '../../app/store'
 import { api, type LibraryTrack } from '../../shared/api'
@@ -293,13 +294,13 @@ export function SongsView() {
     return browsed ? inPicks(h, browsed) : h
   }, [music, query, filter, browsed])
   const shown = useMemo(() => sortTracks(browsed ? browsed.songs : found, sort, { stats: plays, seed }), [browsed, found, sort, plays, seed])
+  const parts = usePageParts('songs')
   // A pane's double-click or Enter: its songs in the list's order.
   const playSorted = useCallback((list: LibraryTrack[]) => usePlayer.getState().playTracks(sortTracks(list, sort, { stats: plays, seed }), 0), [sort, plays, seed])
 
-  return (
-    <>
-      <PageHeader title={tr('Songs')} sub={reading ? tr('Reading your files… {done} of {total}', { done: reading[0].toLocaleString(), total: reading[1].toLocaleString() }) : `${trn(shown.length, '{n} song', '{n} songs')} · ${totalTime(shown)}${stats.sources > 1 ? ` · ${tr('{pct}% linked', { pct: stats.linkedPct })}` : ''}`} />
-      {/* Mockup: the round play and shuffle first, then the chips. The phone: play and the tools on one row, the chips under it. */}
+  const blocks: Record<string, ReactNode> = {
+    // Mockup: the round play and shuffle first, then the chips. The phone: play and the tools on one row, the chips under it.
+    toolbar: (
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 pb-3 phone:gap-x-3">
         <div className="flex flex-wrap items-center gap-3 phone:contents">
           <PlayAll tracks={shown} />
@@ -314,26 +315,39 @@ export function SongsView() {
           <ColumnsButton extra={() => [browserEntry()]} />
         </div>
       </div>
-      {browsed && <ColumnBrowser b={browsed} play={playSorted} />}
-      <HiddenVideos tracks={hidden} />
-      <HiddenExplicit tracks={filterTracks(clean.hidden, query, filter)} />
-      <TrackTable
-        tracks={shown}
-        sort={sort}
-        onSort={setSort}
-        empty={
-          tracks.length === 0 ? (
-            <div className="flex flex-col items-center gap-3">
-              <p className="text-base text-ink">{tr('Your library is empty')}</p>
-              <p>{tr('Import your YouTube Music playlists: sign in with Google in Accounts, they come in on their own.')}</p>
-              <Button onClick={() => go({ name: 'settings', section: 'sources' })}>{tr('Import from YouTube Music')}</Button>
-              <p className="text-xs">{tr('Or add a music folder in Accounts, paste a YouTube or Spotify playlist link (Ctrl+V), or search in Add music.')}</p>
-            </div>
-          ) : (
-            tr('No matching songs.')
-          )
-        }
-      />
+    ),
+    browser: browsed && <ColumnBrowser b={browsed} play={playSorted} />,
+    list: (
+      <>
+        <HiddenVideos tracks={hidden} />
+        <HiddenExplicit tracks={filterTracks(clean.hidden, query, filter)} />
+        <TrackTable
+          tracks={shown}
+          sort={sort}
+          onSort={setSort}
+          empty={
+            tracks.length === 0 ? (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-base text-ink">{tr('Your library is empty')}</p>
+                <p>{tr('Import your YouTube Music playlists: sign in with Google in Accounts, they come in on their own.')}</p>
+                <Button onClick={() => go({ name: 'settings', section: 'sources' })}>{tr('Import from YouTube Music')}</Button>
+                <p className="text-xs">{tr('Or add a music folder in Accounts, paste a YouTube or Spotify playlist link (Ctrl+V), or search in Add music.')}</p>
+              </div>
+            ) : (
+              tr('No matching songs.')
+            )
+          }
+        />
+      </>
+    ),
+  }
+
+  return (
+    <>
+      <PageHeader title={tr('Songs')} sub={reading ? tr('Reading your files… {done} of {total}', { done: reading[0].toLocaleString(), total: reading[1].toLocaleString() }) : `${trn(shown.length, '{n} song', '{n} songs')} · ${totalTime(shown)}${stats.sources > 1 ? ` · ${tr('{pct}% linked', { pct: stats.linkedPct })}` : ''}`} />
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
     </>
   )
 }
@@ -432,11 +446,11 @@ export function AlbumsView() {
   const query = useStore(pageQuery)
   const all = useMemo(() => tracks.filter((t) => t.album), [tracks])
   const albums = useMemo(() => orderGroups(groupAlbums(filterTracks(all, query, v.filter)).map((g) => ({ ...g, name: g.album })), v.sort, { size: v.size, stats, seed }), [all, query, v, stats, seed])
-  return (
-    <>
-      <PageHeader kicker={tr('Library')} title={tr('Albums')} sub={trn(albums.length, '{n} album', '{n} albums')} />
-      <GroupBar page="albumView" tracks={all} />
-      {albums.length === 0 ? (
+  const parts = usePageParts('albums')
+  const blocks: Record<string, ReactNode> = {
+    toolbar: <GroupBar page="albumView" tracks={all} />,
+    list:
+      albums.length === 0 ? (
         <p className="py-10 text-center text-ink-2">{all.length ? tr('No matching albums.') : tr('No albums yet.')}</p>
       ) : (
         // Media/Card in a grid: the cards' padding is the gap, covers line up with the title.
@@ -469,7 +483,14 @@ export function AlbumsView() {
             </div>
           )}
         />
-      )}
+      ),
+  }
+  return (
+    <>
+      <PageHeader kicker={tr('Library')} title={tr('Albums')} sub={trn(albums.length, '{n} album', '{n} albums')} />
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
     </>
   )
 }
@@ -478,10 +499,11 @@ export function ArtistsView() {
   const { tracks, go, artistView: v, stats, seed } = useStore(useShallow(({ tracks, go, artistView, stats, seed }) => ({ tracks, go, artistView, stats, seed })))
   const query = useStore(pageQuery)
   const artists = useMemo(() => orderGroups(groupArtists(filterTracks(tracks, query, v.filter)).map((g) => ({ ...g, name: g.artist })), v.sort, { size: v.size, stats, seed }), [tracks, query, v, stats, seed])
-  return (
-    <>
-      <PageHeader kicker={tr('Library')} title={tr('Artists')} sub={trn(artists.length, '{n} artist', '{n} artists')} />
-      <GroupBar page="artistView" tracks={tracks} />
+  const parts = usePageParts('artists')
+  const blocks: Record<string, ReactNode> = {
+    toolbar: <GroupBar page="artistView" tracks={tracks} />,
+    list: (
+      <>
       {artists.length === 0 && <p className="py-10 text-center text-ink-2">{tr('No matching artists.')}</p>}
       <VirtualList items={artists} rowHeight={57} className="-mx-2 px-2 pb-6">
         {(a, i) => (
@@ -498,6 +520,15 @@ export function ArtistsView() {
           </div>
         )}
       </VirtualList>
+      </>
+    ),
+  }
+  return (
+    <>
+      <PageHeader kicker={tr('Library')} title={tr('Artists')} sub={trn(artists.length, '{n} artist', '{n} artists')} />
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
     </>
   )
 }

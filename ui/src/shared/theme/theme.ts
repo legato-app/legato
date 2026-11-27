@@ -2,7 +2,7 @@
 import { LANGUAGES, msg, tr } from '../i18n/i18n'
 import { ACTIONS, validCombo, type Custom } from '../../app/keys'
 import { cleanCss } from '../css'
-import { sanitizeLayout, SIDEBAR_MAX, SIDEBAR_MIN, type Layout } from './layout'
+import { COLUMNS, sanitizeLayout, SIDEBAR_MAX, SIDEBAR_MIN, type Column, type Layout } from './layout'
 import { DEFAULT_MENU_LAYOUT, readLayout, type MenuLayout } from '../ui/menuShape'
 import type { GroupSort, Sort } from '../../features/library/filter'
 import type { Levelling } from '../generated/Levelling'
@@ -86,7 +86,7 @@ export const ACCENTS = ['#FF5A1F', '#E5383B', '#F2B705', '#2E8B57', '#2F6FEB', '
 /** The sidebar's entries that can be hidden (Settings, and the way to bring them back, are not among them). */
 export const NAV_ITEMS = ['home', 'mixes', 'radio', 'stats', 'history', 'add'] as const
 export type NavItem = (typeof NAV_ITEMS)[number]
-export const COLUMNS = ['album', 'year', 'genre', 'bpm', 'key', 'sources', 'plays', 'rating', 'added', 'duration'] as const
+export { COLUMNS, type Column }
 /** List sorts (features/library/filter): checked on load. */
 const SORTS: readonly Sort[] = ['manual', 'added-new', 'added-old', 'most-played', 'recently-played', 'rating', 'title', 'title-desc', 'artist', 'album', 'year', 'year-new', 'genre', 'bpm', 'bpm-fast', 'duration', 'duration-short', 'random', 'recent']
 const GROUP_SORTS: readonly GroupSort[] = ['name', 'name-desc', 'artist', 'songs', 'albums', 'added-new', 'added-old', 'most-played', 'recently-played', 'length', 'random']
@@ -169,7 +169,6 @@ export function placeHome(list: HomeSection[], id: HomeSectionId, slot: number):
   out.splice(to, 0, list[i])
   return out
 }
-export type Column = (typeof COLUMNS)[number]
 // Date added and Rating on demand (no date for songs added before 2026-10-23; ratings begin empty).
 const DEFAULT_COLUMNS: Column[] = ['album', 'sources', 'plays', 'duration']
 

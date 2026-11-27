@@ -1264,6 +1264,8 @@ const ar: Record<string, string> = {
   'Page headers arranged another way': 'رؤوس الصفحات مرتّبة بشكل مختلف',
   'Album pages arranged their own way': 'صفحات الألبومات مرتّبة بطريقتها',
   'Artist pages arranged their own way': 'صفحات الفنانين مرتّبة بطريقتها',
+  'Library lists arranged their own way': 'قوائم المكتبة مرتّبة بطريقتها',
+  'List columns in another order': 'أعمدة القائمة بترتيب آخر',
   'Default layout': 'التخطيط الافتراضي',
   'Themes no longer arrange the app': 'لم تعد السمات ترتّب التطبيق',
   'This theme’s layout didn’t work: the default layout is back': 'تعذّر تطبيق تخطيط هذه السمة: عاد التخطيط الافتراضي',

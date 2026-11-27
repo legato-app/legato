@@ -1300,6 +1300,8 @@ const id: Record<string, string> = {
   'Page headers arranged another way': 'Kepala halaman ditata berbeda',
   'Album pages arranged their own way': 'Halaman album ditata sendiri',
   'Artist pages arranged their own way': 'Halaman artis ditata sendiri',
+  'Library lists arranged their own way': 'Daftar pustaka ditata sendiri',
+  'List columns in another order': 'Kolom daftar dalam urutan lain',
   'Default layout': 'Tata letak bawaan',
   'Themes no longer arrange the app': 'Tema tidak lagi menata aplikasi',
   'This theme’s layout didn’t work: the default layout is back': 'Tata letak tema ini gagal: tata letak bawaan dipakai lagi',

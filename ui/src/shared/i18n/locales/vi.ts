@@ -1300,6 +1300,8 @@ const vi: Record<string, string> = {
   'Page headers arranged another way': 'Đầu trang được sắp xếp khác',
   'Album pages arranged their own way': 'Trang album được sắp xếp theo cách riêng',
   'Artist pages arranged their own way': 'Trang nghệ sĩ được sắp xếp theo cách riêng',
+  'Library lists arranged their own way': 'Danh sách thư viện được sắp xếp theo cách riêng',
+  'List columns in another order': 'Các cột danh sách theo thứ tự khác',
   'Default layout': 'Bố cục mặc định',
   'Themes no longer arrange the app': 'Chủ đề không còn sắp xếp ứng dụng',
   'This theme’s layout didn’t work: the default layout is back': 'Bố cục của chủ đề này không hoạt động: đã trở lại bố cục mặc định',

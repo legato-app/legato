@@ -1300,6 +1300,8 @@ const ja: Record<string, string> = {
   'Page headers arranged another way': 'ページ上部の配置を変更',
   'Album pages arranged their own way': 'アルバムページは独自の配置',
   'Artist pages arranged their own way': 'アーティストページは独自の配置',
+  'Library lists arranged their own way': 'ライブラリの一覧は独自の配置',
+  'List columns in another order': '一覧の列の順番を変更',
   'Default layout': '標準の配置',
   'Themes no longer arrange the app': 'テーマはアプリを配置しなくなりました',
   'This theme’s layout didn’t work: the default layout is back': 'このテーマの配置は使えませんでした。標準の配置に戻しました',

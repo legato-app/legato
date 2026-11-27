@@ -1300,6 +1300,8 @@ const pl: Record<string, string> = {
   'Page headers arranged another way': 'Nagłówki stron ułożone inaczej',
   'Album pages arranged their own way': 'Strony albumów ułożone po swojemu',
   'Artist pages arranged their own way': 'Strony wykonawców ułożone po swojemu',
+  'Library lists arranged their own way': 'Listy biblioteki ułożone po swojemu',
+  'List columns in another order': 'Kolumny list w innej kolejności',
   'Default layout': 'Domyślny układ',
   'Themes no longer arrange the app': 'Motywy nie układają już aplikacji',
   'This theme’s layout didn’t work: the default layout is back': 'Układ tego motywu nie zadziałał: wrócił domyślny',

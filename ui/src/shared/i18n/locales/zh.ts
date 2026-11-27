@@ -1300,6 +1300,8 @@ const zh: Record<string, string> = {
   'Page headers arranged another way': '页面顶部的排列方式不同',
   'Album pages arranged their own way': '专辑页面使用自己的排列',
   'Artist pages arranged their own way': '艺人页面使用自己的排列',
+  'Library lists arranged their own way': '资料库列表使用自己的排列',
+  'List columns in another order': '列表列的顺序不同',
   'Default layout': '默认布局',
   'Themes no longer arrange the app': '主题不再调整应用布局',
   'This theme’s layout didn’t work: the default layout is back': '此主题的布局无法使用：已恢复默认布局',
