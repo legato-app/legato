@@ -622,6 +622,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       about song changes are gone from Lite's settings, saved values kept; Sweet fades' analysis never starts. Not
       tried in a Lite.
       - Decided alone (2026-11-27): the fade on pause a full app saved still applies, its row hidden with the rest.
+    - [x] Slice 8, 2026-11-27: built, not measured yet (the bench waits for the owner). Lite's defaults: Animations
+      and Background motion off, only where nothing is saved; with animations off the glass over a picture is an
+      opaque panel without `backdrop-filter`. Home's flowing background reads Background motion. Not tried in a Lite.
+      - Decided alone (2026-11-27): the opaque glass hangs on the `.still` class, so it applies in the full app too and
+        under Windows' own animations-off.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
       item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
       word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).

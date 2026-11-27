@@ -2,6 +2,7 @@
 import { LANGUAGES, msg, tr } from '../i18n/i18n'
 import { ACTIONS, validCombo, type Custom } from '../../app/keys'
 import { cleanCss } from '../css'
+import { LITE } from '../edition'
 import { COLUMNS, sanitizeLayout, SIDEBAR_MAX, SIDEBAR_MIN, type Column, type Layout } from './layout'
 import { DEFAULT_MENU_LAYOUT, readLayout, type MenuLayout } from '../ui/menuShape'
 import type { GroupSort, Sort } from '../../features/library/filter'
@@ -634,12 +635,13 @@ export const DEFAULTS: Settings = {
   immersive: false,
   backdropBlur: 24,
   backdropDim: 40,
-  backdropMotion: true,
+  // Lite starts with animations off (plan-v2 "A Lite build"): the user can turn them on.
+  backdropMotion: !LITE,
   backdropFlow: false,
   homeFlow: false,
   coverClock: false,
   font: 'theme',
-  motion: true,
+  motion: !LITE,
   sidebarCounts: true,
   hiddenNav: [],
   hiddenParts: [],

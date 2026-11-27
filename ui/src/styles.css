@@ -604,6 +604,11 @@ code {
   background: color-mix(in srgb, var(--bg) 62%, transparent);
   backdrop-filter: blur(14px) saturate(1.2);
 }
+/* Animations off: a plain panel, nothing blurred again each time the picture under it changes. */
+.still .glass {
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: none;
+}
 
 /* Track list with the keyboard focus: the row the arrows are on. */
 [data-list]:focus-visible [data-cursor] {
