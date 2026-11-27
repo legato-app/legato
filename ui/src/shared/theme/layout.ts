@@ -36,7 +36,7 @@ export type SizedSurface = keyof typeof SIZE_LIMITS
  *  list opens under it, so it stays on top. */
 const PLACES: Record<BuiltinSurface, readonly Region[]> = { brand: REGIONS, topbar: ['top'], sidebar: ['left', 'right'], sidePanel: ['left', 'right'], playerBar: ['top', 'bottom'] }
 /** A plugin's panel is a column. */
-const placesOf = (surface: Surface): readonly Region[] => (pluginOf(surface) ? ['left', 'right'] : PLACES[surface as BuiltinSurface])
+export const placesOf = (surface: Surface): readonly Region[] => (pluginOf(surface) ? ['left', 'right'] : PLACES[surface as BuiltinSurface])
 
 /** The parts a layout can reorder, per bar, one list per container in the app's order. */
 export const PART_GROUPS = {
@@ -46,7 +46,7 @@ export const PART_GROUPS = {
 } as const
 export type PartedSurface = keyof typeof PART_GROUPS
 /** Those it can hide: each stays reachable from the bar's More. The others only move. */
-const HIDEABLE: Record<PartedSurface, readonly string[]> = { playerBar: ['transport', 'room', 'sleep', 'lyrics', 'upNext', 'volume', 'fullScreen'], topbar: ['history', 'addons'], sidebar: ['nav'] }
+export const HIDEABLE: Record<PartedSurface, readonly string[]> = { playerBar: ['transport', 'room', 'sleep', 'lyrics', 'upNext', 'volume', 'fullScreen'], topbar: ['history', 'addons'], sidebar: ['nav'] }
 
 export interface PartsChoice {
   order?: string[]

@@ -79,15 +79,6 @@ export function queueItems(rows: QueueRow[], mine: readonly number[]): QueueItem
   return [...span(0, cur), { head: 'now' }, { k: cur }, ...(end > cur + 1 ? [{ head: 'mine' as const }, ...span(cur + 1, end)] : []), ...(end < rows.length ? [{ head: 'then' as const }, ...span(end, rows.length)] : [])]
 }
 
-/** Order with list index `i` put at play-order position `at`, a drop slot in Up next (before what was there). */
-export function moveToSlot(order: number[], i: number, at: number): number[] {
-  const from = order.indexOf(i)
-  if (from < 0) return order
-  const out = order.filter((x) => x !== i)
-  out.splice(at > from ? at - 1 : at, 0, i)
-  return out
-}
-
 /** Order with `added` list indexes at play-order position `at` (songs dropped into Up next). */
 export function insertAt(order: number[], added: number[], at: number): number[] {
   const k = Math.max(0, Math.min(order.length, at))

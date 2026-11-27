@@ -1,0 +1,110 @@
+import { describe, expect, it } from 'vitest'
+import { layoutFromPlacement, moveInGroup, moveSurface, toggleHidden, type HideTarget } from './arrange'
+import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
+
+const start = DEFAULT_LAYOUT
+const plugin: Surface = 'plugin:example.panel'
+
+describe('moveSurface', () => {
+  it.each<[Surface, Region]>([
+    ['sidebar', 'right'],
+    ['sidePanel', 'left'],
+    ['playerBar', 'top'],
+    ['brand', 'bottom'],
+  ])('moves %s to %s', (surface, region) => {
+    const moved = moveSurface(start, surface, region)
+    expect(moved.regions[region].at(-1)).toBe(surface)
+    expect(Object.values(moved.regions).flat().filter((other) => other === surface)).toHaveLength(1)
+  })
+
+  it.each<[Surface, Region]>([
+    ['topbar', 'bottom'],
+    ['sidebar', 'top'],
+    ['playerBar', 'left'],
+    [plugin, 'bottom'],
+  ])('refuses %s at %s', (surface, region) => {
+    expect(moveSurface(start, surface, region)).toBe(start)
+  })
+
+  it('takes a slot, within a region too, and says when nothing moved', () => {
+    expect(moveSurface(start, 'sidebar', 'right', 0).regions.right).toEqual(['sidebar', 'sidePanel'])
+    expect(moveSurface(start, 'playerBar', 'top', 1).regions.top).toEqual(['brand', 'playerBar', 'topbar'])
+    expect(moveSurface(start, 'brand', 'top', 2).regions.top).toEqual(['topbar', 'brand'])
+    expect(moveSurface(start, 'brand', 'top', 1)).toBe(start)
+    expect(moveSurface(start, 'sidebar', 'left')).toBe(start)
+  })
+})
+
+describe('moveInGroup', () => {
+  it('reorders a part inside its container only, and forgets an order back to the app’s own', () => {
+    const moved = moveInGroup(start, 'playerBar', 'fullScreen', 0)
+    expect(moved.parts.playerBar!.order).toEqual(['song', 'center', 'actions', 'transport', 'progress', 'fullScreen', 'room', 'sleep', 'lyrics', 'upNext', 'volume', 'more'])
+    expect(moveInGroup(moved, 'playerBar', 'fullScreen', 99).parts).toEqual({})
+  })
+
+  it('keeps what is hidden and ignores a part it does not have', () => {
+    const hidden = toggleHidden(start, { surface: 'topbar', part: 'addons' })
+    expect(moveInGroup(hidden, 'topbar', 'addons', 0).parts.topbar).toEqual({ order: ['addons', 'history', 'search', 'offline'], hidden: ['addons'] })
+    expect(moveInGroup(start, 'topbar', 'nothing', 0)).toBe(start)
+  })
+})
+
+describe('toggleHidden', () => {
+  it.each<HideTarget>([{ surface: 'sidebar' }, { surface: 'playerBar' }, { surface: 'topbar', part: 'history' }, { page: 'album', part: 'more' }])('hides and shows %o', (target) => {
+    const hidden = toggleHidden(start, target)
+    expect(hidden).not.toEqual(start)
+    expect(toggleHidden(hidden, target)).toEqual(start)
+  })
+
+  it.each<HideTarget>([{ surface: 'brand' }, { surface: plugin }, { surface: 'playerBar', part: 'song' }, { surface: 'topbar', part: 'search' }, { page: 'album', part: 'tracks' }, { page: 'songs', part: 'list' }, { page: 'album', part: 'nothing' }])('never hides %o', (target) => {
+    expect(toggleHidden(start, target)).toBe(start)
+  })
+
+  it('never hides both the sidebar and the top bar', () => {
+    const noSidebar = toggleHidden(start, { surface: 'sidebar' })
+    expect(toggleHidden(noSidebar, { surface: 'topbar' })).toBe(noSidebar)
+    const noTopbar = toggleHidden(start, { surface: 'topbar' })
+    expect(toggleHidden(noTopbar, { surface: 'sidebar' })).toBe(noTopbar)
+  })
+})
+
+describe('layoutFromPlacement', () => {
+  it('writes only what differs, nothing for the app’s own', () => {
+    expect(layoutFromPlacement(start)).toBeUndefined()
+    expect(layoutFromPlacement(moveSurface(start, 'sidebar', 'right', 0))).toEqual({ v: 1, regions: { right: ['sidebar', 'sidePanel'] } })
+  })
+
+  it('reads back as the same placement after any two moves, from a layout an older version reads as is', () => {
+    const surfaces: Surface[] = [...SURFACES, plugin]
+    const base: Placement = resolveLayout({ v: 1, regions: { right: ['sidePanel', plugin] }, sizes: { sidebar: 300 }, pages: { header: { art: 'end' } } })
+    const moves: ((placement: Placement) => Placement)[] = [
+      ...surfaces.flatMap((surface) => REGIONS.flatMap((region) => [0, 1, 9].map((at) => (placement: Placement) => moveSurface(placement, surface, region, at)))),
+      ...(Object.keys(PART_GROUPS) as PartedSurface[]).flatMap((surface) =>
+        PART_GROUPS[surface].flat().flatMap((part) => [
+          (placement: Placement) => moveInGroup(placement, surface, part, 0),
+          (placement: Placement) => moveInGroup(placement, surface, part, 9),
+          (placement: Placement) => toggleHidden(placement, { surface, part }),
+        ]),
+      ),
+      ...surfaces.map((surface) => (placement: Placement) => toggleHidden(placement, { surface })),
+      ...(Object.keys(PAGE_PARTS) as PartedPage[]).flatMap((page) => PAGE_PARTS[page].map((part) => (placement: Placement) => toggleHidden(placement, { page, part: part.id }))),
+    ]
+    let checked = 0
+    for (const from of [start, base])
+      for (const first of moves) {
+        const once = first(from)
+        for (const second of moves) {
+          const placement = second(once)
+          const layout = layoutFromPlacement(placement)
+          // `toEqual` per pair is slow at this count: the strings are compared, the first difference shown whole.
+          const same = JSON.stringify(resolveLayout(layout)) === JSON.stringify(placement) && (!layout || JSON.stringify(sanitizeLayout(layout)) === JSON.stringify(layout))
+          if (!same) {
+            expect(resolveLayout(layout), JSON.stringify(layout)).toEqual(placement)
+            expect(sanitizeLayout(layout)).toEqual(layout)
+          }
+          checked++
+        }
+      }
+    expect(checked).toBeGreaterThan(10_000)
+  })
+})

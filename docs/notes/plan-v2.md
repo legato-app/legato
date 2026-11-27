@@ -1021,7 +1021,29 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-27): “the same theme” is all but its id (a file differing only in font or look joins);
       a copy made in the editor leaves the user's look choices as they are (an imported theme applies its own).
 - [ ] `L` Rearrange the app by dragging its parts (sidebar, player, parts of pages), saved into one's own theme (the
-      layout v1 format). The owner's ask, 2026-11-27. Opus designs it first.
+      layout v1 format). The owner's ask, 2026-11-27. Designed by Opus, 2026-11-27.
+  - No new format: everything fits layout v1 (`LAYOUT_API` stays 1, so older themes and versions need no migration), and
+    `layout.ts`' rules stay the only ones (places, hideable and fixed parts, the logo and page lists never hidden).
+  - What drags: sidebar and side panel left or right, player bar top or bottom (YouTube's frames never move in the
+    page), the bars' parts within their container with an eye on the hideable ones, the shown page's parts, list columns
+    by their header, the page header's art, the columns' widths by a handle. Never: Settings, Add-ons, dialogs.
+  - Edit mode: right-click › “Arrange the app…”, Settings › Appearance › Theme, a shortcut without a default key (turns
+    `themeLayouts` back on, and says so). A bar of the app's look: Undo, Redo, Default, Discard, Done; Escape is Done.
+    The draft is drawn live (`useShellLayout`); nothing is written to the settings before Done. Pointer drag
+    (`shared/ui/drag.ts`), and every handle a button (Alt+arrows, Delete hides, a live region says it).
+  - Saved into one's own theme: the current custom theme's `layout` rewritten, a preset or System copied first (“{name}
+    custom”, the 24 cap said, nothing lost); then a toast with Undo. Phones have no edit mode. Lite has it, lazily loaded.
+  - Decided alone (2026-11-27, design): Home keeps its own section order (the `look`), not the layout.
+  - [x] Slice 1 `S` (2026-11-27): pure `shared/theme/arrange.ts` (`moveSurface`, `moveInGroup`, `toggleHidden`,
+    `layoutFromPlacement`) and `shared/order.ts` (`moveToSlot`, the queue's now); table and round-trip tests. Nothing in
+    the interface calls it yet.
+  - [ ] Slice 2 `M`: edit mode (store, draft, bar, entries, history, `saveArrangement`, Undo toast), a lazy chunk.
+  - [ ] Slice 3 `M`: surfaces (drop zones, keyboard, announcements).
+  - [ ] Slice 4 `M`: the three bars' parts and the eye.
+  - [ ] Slice 5 `M`: page parts, columns by their header, the header's choice (check the virtualized table's headers and
+    a drag under Now Playing).
+  - [ ] Slice 6 `S`: size handles (`sizes`).
+  - [ ] Slice 7 `S`: docs (`docs/design.md` › Theme layout, the themes' help, Figma light and dark) and a line on the site.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
 - [x] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
