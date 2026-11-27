@@ -8,8 +8,13 @@ const TURNED_MAX_MS: u32 = 10 * 60_000;
 /// A song nothing but a video named: its YouTube id alone, that video's frame, no album. What a pasted or shared link
 /// and the video search save, title and artist read from the video's own title.
 fn is_video_only(track: &Track) -> bool {
-    let video = track.ids.get(&Source::Youtube).filter(|_| track.ids.len() == 1 && track.album.is_none());
-    video.is_some_and(|video| track.art.as_deref() == Some(crate::model::youtube_art(video).as_str()))
+    track.ids.len() == 1 && track.ids.iter().all(|(source, id)| is_a_video_s_own(source.as_str(), id, track.album.as_deref(), track.art.as_deref()))
+}
+
+/// `is_video_only`'s question of one id, as the database holds it. A song with two ids or more always has one that
+/// answers no (one frame, one video).
+fn is_a_video_s_own(source: &str, id: &str, album: Option<&str>, art: Option<&str>) -> bool {
+    album.is_none() && source == Source::Youtube.as_str() && art == Some(crate::model::youtube_art(id).as_str())
 }
 
 /// A video-only song read backwards, put right (`matching::reversed_credit`); `artists`: the library's (`artist_keys`).
@@ -409,8 +414,17 @@ impl Library {
     /// Every artist the library knows, as `matching::primary_artist` keys them. Not those only a video named: a title
     /// saved backwards would make its song an artist, and keep it backwards.
     pub fn artist_keys(&self) -> Result<HashSet<String>> {
-        let named = self.track_rows(None)?.into_iter().filter(|row| !is_video_only(&row.track));
-        Ok(named.map(|row| crate::matching::primary_artist(&row.track.artist)).filter(|key| !key.is_empty() && key != "unknown artist").collect())
+        // A row per id, what the rule reads and no more: whole rows took 125 ms at 50,000 songs, the library locked.
+        let mut statement = self.db.prepare_cached("SELECT t.artist, t.album, t.art, i.source, i.source_id FROM tracks t JOIN track_ids i ON i.track_id = t.id")?;
+        let mut rows = statement.query([])?;
+        let mut names: HashSet<String> = HashSet::new();
+        while let Some(row) = rows.next()? {
+            let name = row.get_ref(0)?.as_str()?;
+            if !names.contains(name) && !is_a_video_s_own(row.get_ref(3)?.as_str()?, row.get_ref(4)?.as_str()?, row.get_ref(1)?.as_str_or_null()?, row.get_ref(2)?.as_str_or_null()?) {
+                names.insert(name.to_string());
+            }
+        }
+        Ok(names.iter().map(|name| crate::matching::primary_artist(name)).filter(|key| !key.is_empty() && key != "unknown artist").collect())
     }
 
     pub fn tracks(&self) -> Result<Vec<LibraryTrack>> {

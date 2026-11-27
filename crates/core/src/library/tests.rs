@@ -1651,6 +1651,13 @@ fn songs_saved_backwards_are_turned_once_by_the_artists_the_library_names() -> R
     // A video's own reading makes no artist: the backwards row doesn't vouch for itself.
     let artists = lib.artist_keys()?;
     assert!(artists.contains("doja cat") && !artists.contains("like that") && !artists.contains("new band"));
+    // Each thing a video alone doesn't give makes the artist count: another service's id, a second video.
+    for (id, artist, other) in [("w1", "Second Service", Source::Apple), ("w2", "Second Video", Source::Youtube)] {
+        let row = lib.upsert_track(&video(id, id, artist))?;
+        assert!(!lib.artist_keys()?.contains(&artist.to_lowercase()), "{artist}");
+        lib.db.execute("INSERT INTO track_ids (source, source_id, track_id) VALUES (?1, ?2, ?3)", params![other.as_str(), format!("{id}-more"), row])?;
+        assert!(lib.artist_keys()?.contains(&artist.to_lowercase()), "{artist}");
+    }
     let names = |id: i64| -> Result<(String, String)> { Ok(lib.track(id)?.map(|row| (row.track.artist, row.track.title)).unwrap()) };
     let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
     // A PC that ran the first, narrower rule runs this one too.
