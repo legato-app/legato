@@ -79,7 +79,7 @@ changes; older versions are in git. Updated 2026-11-27, end of window 2 on the s
 - The Spotify legal questions.
 
 ## Traps
-- Keep the PC light while the owner plays: vitest per file with `--maxWorkers=1`, one cargo command at a time with
+- Keep local checks light (the PC may be in use): vitest per file with `--maxWorkers=1`, one cargo command at a time with
   `CARGO_BUILD_JOBS=2`. No bench, no `pnpm build`, no e2e while they listen.
 - `node_modules` on one PC links to an old checkout path: `pnpm vitest` then fails ("packages field missing"). Run
   `pnpm install` first. Global `pnpm` 9.12.2 refuses the workspace: use `npx pnpm@11.9.0`.
