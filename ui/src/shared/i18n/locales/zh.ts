@@ -2533,7 +2533,7 @@ const zh: Record<string, string> = {
   '{n} audiobook': '{n} 本有声书',
   '{n} audiobooks': '{n} 本有声书',
   'Audiobooks': '有声书',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': '在应用菜单中加入有声书：.m4b 文件、标记为有声书的较长文件、两小时以上的文件以及你标记的文件夹会放在单独的页面，显示你听到的位置，并从歌曲、混音和统计中移出',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': '在应用菜单中加入有声书：.m4b 文件、标记为有声书的较长文件以及你标记的文件夹会放在单独的页面，显示你听到的位置，并从歌曲、混音和统计中移出。两小时以上的文件也会显示在那里，并仍保留在你的音乐中',
   'audiobooks book audio reading chapters spoken': '有声书 书 朗读 章节',
   'Copy the list as OPML': '将列表复制为 OPML',
   'Living-room mode': '客厅模式',

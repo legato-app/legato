@@ -2533,7 +2533,7 @@ const vi: Record<string, string> = {
   '{n} audiobook': '{n} sách nói',
   '{n} audiobooks': '{n} sách nói',
   'Audiobooks': 'Sách nói',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Thêm Sách nói vào menu ứng dụng: tệp .m4b, tệp dài gắn thẻ sách nói, tệp từ hai giờ trở lên và các thư mục bạn đánh dấu có trang riêng kèm chỗ bạn đã dừng, và không còn trong Bài hát, mix và thống kê',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Thêm Sách nói vào menu ứng dụng: tệp .m4b, tệp dài gắn thẻ sách nói và các thư mục bạn đánh dấu có trang riêng kèm chỗ bạn đã dừng, và không còn trong Bài hát, mix và thống kê. Tệp từ hai giờ trở lên cũng hiện ở đó và vẫn nằm trong nhạc của bạn',
   'audiobooks book audio reading chapters spoken': 'sách nói sách đọc chương',
   'Copy the list as OPML': 'Sao chép danh sách dạng OPML',
   'Living-room mode': 'Chế độ phòng khách',

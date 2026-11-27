@@ -2533,7 +2533,7 @@ const it: Record<string, string> = {
   '{n} audiobook': '{n} audiolibro',
   '{n} audiobooks': '{n} audiolibri',
   'Audiobooks': 'Audiolibri',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Aggiunge Audiolibri al menu dell’app: i file .m4b, i file lunghi con tag audiolibro, quelli di due ore e più e le cartelle che segni hanno una pagina propria con il punto in cui ti sei fermato, ed escono da Brani, mix e statistiche',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Aggiunge Audiolibri al menu dell’app: i file .m4b, i file lunghi con tag audiolibro e le cartelle che segni hanno una pagina propria con il punto in cui ti sei fermato, ed escono da Brani, mix e statistiche. Anche i file di due ore e più compaiono lì e restano nella tua musica',
   'audiobooks book audio reading chapters spoken': 'audiolibri libro audio lettura capitoli',
   'Copy the list as OPML': 'Copia l’elenco come OPML',
   'Living-room mode': 'Modalità salotto',

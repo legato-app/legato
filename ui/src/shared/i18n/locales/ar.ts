@@ -2470,7 +2470,7 @@ const ar: Record<string, string> = {
   '{n} audiobook': '{n} كتاب مسموع',
   '{n} audiobooks': '{n} كتب مسموعة',
   'Audiobooks': 'الكتب المسموعة',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'يضيف «الكتب المسموعة» إلى قائمة التطبيق: ملفات ‎.m4b والملفات الطويلة الموسومة ككتاب مسموع والملفات من ساعتين فأكثر والمجلدات التي تحددها تظهر في صفحتها مع موضع توقفك، وتخرج من الأغاني والمزيجات والإحصاءات',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'يضيف «الكتب المسموعة» إلى قائمة التطبيق: ملفات ‎.m4b والملفات الطويلة الموسومة ككتاب مسموع والمجلدات التي تحددها تظهر في صفحتها مع موضع توقفك، وتخرج من الأغاني والمزيجات والإحصاءات. الملفات من ساعتين فأكثر تظهر هناك أيضًا وتبقى ضمن موسيقاك',
   'audiobooks book audio reading chapters spoken': 'كتب مسموعة كتاب صوت قراءة فصول منطوق',
   'Copy the list as OPML': 'نسخ القائمة بصيغة OPML',
   'Living-room mode': 'وضع غرفة المعيشة',

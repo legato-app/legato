@@ -2533,7 +2533,7 @@ const tr: Record<string, string> = {
   '{n} audiobook': '{n} sesli kitap',
   '{n} audiobooks': '{n} sesli kitap',
   'Audiobooks': 'Sesli kitaplar',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Uygulama menüsüne Sesli kitaplar ekler: .m4b dosyaları, sesli kitap etiketli uzun dosyalar, iki saat ve üzeri dosyalar ve işaretlediğin klasörler kaldığın yerle birlikte kendi sayfasında görünür; şarkılardan, miks’lerden ve istatistiklerden çıkar',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Uygulama menüsüne Sesli kitaplar ekler: .m4b dosyaları, sesli kitap etiketli uzun dosyalar ve işaretlediğin klasörler kaldığın yerle birlikte kendi sayfasında görünür; şarkılardan, miks’lerden ve istatistiklerden çıkar. İki saat ve üzeri dosyalar da orada görünür ve müziğinde kalır',
   'audiobooks book audio reading chapters spoken': 'sesli kitaplar kitap okuma bölümler',
   'Copy the list as OPML': 'Listeyi OPML olarak kopyala',
   'Living-room mode': 'Oturma odası modu',

@@ -2533,7 +2533,7 @@ const ko: Record<string, string> = {
   '{n} audiobook': '오디오북 {n}권',
   '{n} audiobooks': '오디오북 {n}권',
   'Audiobooks': '오디오북',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': '앱 메뉴에 오디오북을 추가합니다. .m4b 파일, 오디오북으로 태그된 긴 파일, 2시간 이상인 파일, 직접 지정한 폴더는 멈춘 위치와 함께 별도 페이지에 표시되고 곡, 믹스, 통계에서 빠집니다',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': '앱 메뉴에 오디오북을 추가합니다. .m4b 파일, 오디오북으로 태그된 긴 파일, 직접 지정한 폴더는 멈춘 위치와 함께 별도 페이지에 표시되고 곡, 믹스, 통계에서 빠집니다. 2시간 이상인 파일도 거기에 표시되며 음악에 그대로 남습니다',
   'audiobooks book audio reading chapters spoken': '오디오북 책 낭독 챕터',
   'Copy the list as OPML': '목록을 OPML로 복사',
   'Living-room mode': '거실 모드',

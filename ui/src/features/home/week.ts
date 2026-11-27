@@ -1,5 +1,6 @@
 import type { LibraryTrack, Play } from '../../shared/api'
 import { primaryArtist } from '../library/filter'
+import { leftMusic } from '../books/books'
 
 /** Home's Your week: the last 7 days of listening, from the play history. */
 export interface Week {
@@ -35,7 +36,7 @@ export function weekOf(plays: Play[], tracks: LibraryTrack[], now = new Date()):
   const songPlays = new Map<number, { n: number; ms: number }>()
   for (const p of plays) {
     // Audiobooks aren't listening to music.
-    if (byId.get(p.trackId)?.audiobook) continue
+    if (leftMusic(byId.get(p.trackId))) continue
     const at = p.startedAt * 1000
     if (at < first) {
       if (at >= weekBefore.getTime()) before += p.listenedMs

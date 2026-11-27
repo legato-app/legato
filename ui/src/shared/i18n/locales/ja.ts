@@ -2533,7 +2533,7 @@ const ja: Record<string, string> = {
   '{n} audiobook': 'オーディオブック {n} 冊',
   '{n} audiobooks': 'オーディオブック {n} 冊',
   'Audiobooks': 'オーディオブック',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'アプリメニューにオーディオブックを追加します。.m4b ファイル、オーディオブックのタグが付いた長いファイル、2 時間以上のファイル、指定したフォルダーは専用ページに止めた位置つきで表示され、曲、ミックス、統計からは外れます',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'アプリメニューにオーディオブックを追加します。.m4b ファイル、オーディオブックのタグが付いた長いファイル、指定したフォルダーは専用ページに止めた位置つきで表示され、曲、ミックス、統計からは外れます。2 時間以上のファイルもそこに表示され、音楽にも残ります',
   'audiobooks book audio reading chapters spoken': 'オーディオブック 本 朗読 章',
   'Copy the list as OPML': '一覧を OPML としてコピー',
   'Living-room mode': 'リビングルームモード',

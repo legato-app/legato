@@ -2533,7 +2533,7 @@ const hi: Record<string, string> = {
   '{n} audiobook': '{n} ऑडियोबुक',
   '{n} audiobooks': '{n} ऑडियोबुक',
   'Audiobooks': 'ऑडियोबुक',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'ऐप मेनू में ऑडियोबुक जोड़ता है: .m4b फ़ाइलें, ऑडियोबुक टैग वाली लंबी फ़ाइलें, दो घंटे और ज़्यादा की फ़ाइलें और आपके चुने फ़ोल्डर अपने पेज पर आते हैं, जहाँ आप रुके थे वहाँ के साथ, और गानों, मिक्स और आँकड़ों से बाहर रहते हैं',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'ऐप मेनू में ऑडियोबुक जोड़ता है: .m4b फ़ाइलें, ऑडियोबुक टैग वाली लंबी फ़ाइलें और आपके चुने फ़ोल्डर अपने पेज पर आते हैं, जहाँ आप रुके थे वहाँ के साथ, और गानों, मिक्स और आँकड़ों से बाहर रहते हैं। दो घंटे और ज़्यादा की फ़ाइलें वहाँ भी दिखती हैं और आपके संगीत में बनी रहती हैं',
   'audiobooks book audio reading chapters spoken': 'ऑडियोबुक किताब कहानी अध्याय',
   'Copy the list as OPML': 'सूची को OPML के रूप में कॉपी करें',
   'Living-room mode': 'लिविंग-रूम मोड',

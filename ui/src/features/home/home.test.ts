@@ -82,9 +82,10 @@ describe('weekOf', () => {
   })
 
   it('leaves audiobooks out', () => {
-    const book = { ...tracks[0], id: 99, audiobook: true }
-    const w = weekOf([play(99, at(1), 3_600_000), play(99, at(10), 60_000), play(2, at(1), 1_000)], [...tracks, book], now)
-    expect([w.total, w.before]).toEqual([1_000, 0])
+    const book = { ...tracks[0], id: 99, audiobook: true, musicness: 'notMusic' as const }
+    const long = { ...tracks[0], id: 98, audiobook: true }
+    const w = weekOf([play(99, at(1), 3_600_000), play(99, at(10), 60_000), play(98, at(1), 2_000), play(2, at(1), 1_000)], [...tracks, book, long], now)
+    expect([w.total, w.before]).toEqual([3_000, 0])
   })
 
   it('is empty with no plays', () => {

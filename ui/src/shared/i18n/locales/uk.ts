@@ -2533,7 +2533,7 @@ const uk: Record<string, string> = {
   '{n} audiobook': '{n} аудіокнига',
   '{n} audiobooks': 'Аудіокниг: {n}',
   'Audiobooks': 'Аудіокниги',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Додає «Аудіокниги» в меню застосунку: файли .m4b, довгі файли з тегом аудіокниги, файли від двох годин і позначені вами папки мають власну сторінку з місцем, де ви зупинилися, і зникають із пісень, міксів і статистики',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Додає «Аудіокниги» в меню застосунку: файли .m4b, довгі файли з тегом аудіокниги та позначені вами папки мають власну сторінку з місцем, де ви зупинилися, і зникають із пісень, міксів і статистики. Файли від двох годин теж з’являються там і залишаються у вашій музиці',
   'audiobooks book audio reading chapters spoken': 'аудіокниги книга читання розділи',
   'Copy the list as OPML': 'Скопіювати список як OPML',
   'Living-room mode': 'Режим вітальні',

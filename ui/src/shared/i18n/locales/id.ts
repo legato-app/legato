@@ -2533,7 +2533,7 @@ const id: Record<string, string> = {
   '{n} audiobook': '{n} buku audio',
   '{n} audiobooks': '{n} buku audio',
   'Audiobooks': 'Buku audio',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Menambahkan Buku audio ke menu aplikasi: berkas .m4b, berkas panjang bertanda buku audio, berkas dua jam ke atas, dan folder yang kamu tandai punya halaman sendiri dengan titik terakhir kamu berhenti, dan keluar dari Lagu, mix, dan statistik',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Menambahkan Buku audio ke menu aplikasi: berkas .m4b, berkas panjang bertanda buku audio, dan folder yang kamu tandai punya halaman sendiri dengan titik terakhir kamu berhenti, dan keluar dari Lagu, mix, dan statistik. Berkas dua jam ke atas juga muncul di sana dan tetap ada di musikmu',
   'audiobooks book audio reading chapters spoken': 'buku audio buku cerita bab',
   'Copy the list as OPML': 'Salin daftar sebagai OPML',
   'Living-room mode': 'Mode ruang tamu',

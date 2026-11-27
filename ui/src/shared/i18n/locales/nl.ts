@@ -2533,7 +2533,7 @@ const nl: Record<string, string> = {
   '{n} audiobook': '{n} luisterboek',
   '{n} audiobooks': '{n} luisterboeken',
   'Audiobooks': 'Luisterboeken',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Voegt Luisterboeken toe aan het appmenu: .m4b-bestanden, lange bestanden met luisterboektag, bestanden van twee uur en meer en de mappen die je markeert krijgen een eigen pagina met de plek waar je bent gestopt, en verdwijnen uit Nummers, mixen en statistieken',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Voegt Luisterboeken toe aan het appmenu: .m4b-bestanden, lange bestanden met luisterboektag en de mappen die je markeert krijgen een eigen pagina met de plek waar je bent gestopt, en verdwijnen uit Nummers, mixen en statistieken. Bestanden van twee uur en meer staan daar ook en blijven in je muziek',
   'audiobooks book audio reading chapters spoken': 'luisterboeken luisterboek boek voorlezen hoofdstukken',
   'Copy the list as OPML': 'Lijst kopiëren als OPML',
   'Living-room mode': 'Huiskamermodus',

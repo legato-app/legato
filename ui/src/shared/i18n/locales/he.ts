@@ -2470,7 +2470,7 @@ const he: Record<string, string> = {
   '{n} audiobook': '{n} ספר שמע',
   '{n} audiobooks': '{n} ספרי שמע',
   'Audiobooks': 'ספרי שמע',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'מוסיף ״ספרי שמע״ לתפריט האפליקציה: קובצי ‎.m4b, קבצים ארוכים המתויגים כספר שמע, קבצים של שעתיים ויותר והתיקיות שתסמנו מקבלים עמוד משלהם עם המקום שבו עצרתם, ויוצאים מהשירים, מהמיקסים ומהסטטיסטיקה',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'מוסיף ״ספרי שמע״ לתפריט האפליקציה: קובצי ‎.m4b, קבצים ארוכים המתויגים כספר שמע והתיקיות שתסמנו מקבלים עמוד משלהם עם המקום שבו עצרתם, ויוצאים מהשירים, מהמיקסים ומהסטטיסטיקה. קבצים של שעתיים ויותר מופיעים שם גם הם ונשארים במוזיקה שלכם',
   'audiobooks book audio reading chapters spoken': 'ספרי שמע ספר שמע קריאה פרקים מדובר',
   'Copy the list as OPML': 'העתקת הרשימה כ-OPML',
   'Living-room mode': 'מצב חדר מגורים',

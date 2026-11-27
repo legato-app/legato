@@ -35,10 +35,12 @@ describe('stats', () => {
   })
 
   it('leaves audiobooks out, their time too', () => {
-    const book = { ...t(5, 'Book', 'Author'), audiobook: true }
-    const s = statsOf([play(5, 1, 3_600_000), play(1, 0)], [...tracks, book], '4w', now)
-    expect([s.listens, s.ms]).toEqual([1, 200_000])
-    expect(s.topArtists.map((r) => r.item.name)).toEqual(['Daft Punk'])
+    const book = { ...t(5, 'Book', 'Author'), audiobook: true, musicness: 'notMusic' as const }
+    // Listed with the books for its length only (a DJ set): music all the same.
+    const long = { ...t(6, 'Set', 'DJ'), audiobook: true, musicness: 'music' as const }
+    const s = statsOf([play(5, 1, 3_600_000), play(6, 1), play(1, 0)], [...tracks, book, long], '4w', now)
+    expect([s.listens, s.ms]).toEqual([2, 400_000])
+    expect(s.topArtists.map((r) => r.item.name).sort()).toEqual(['DJ', 'Daft Punk'])
   })
 
   it('counts streaks of days in a row', () => {

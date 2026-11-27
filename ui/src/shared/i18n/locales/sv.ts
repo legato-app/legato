@@ -2533,7 +2533,7 @@ const sv: Record<string, string> = {
   '{n} audiobook': '{n} ljudbok',
   '{n} audiobooks': '{n} ljudböcker',
   'Audiobooks': 'Ljudböcker',
-  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks, files of two hours and more and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats': 'Lägger till Ljudböcker i appmenyn: .m4b-filer, långa filer taggade som ljudbok, filer på två timmar och mer och mapparna du markerar får en egen sida med stället där du slutade, och försvinner ur Låtar, mixar och statistik',
+  'Adds Audiobooks to the app menu: .m4b files, long files tagged as audiobooks and the folders you mark get their own page with where you stopped, and leave Songs, mixes and stats. Files of two hours and more show there too, and stay in your music': 'Lägger till Ljudböcker i appmenyn: .m4b-filer, långa filer taggade som ljudbok och mapparna du markerar får en egen sida med stället där du slutade, och försvinner ur Låtar, mixar och statistik. Filer på två timmar och mer visas också där och stannar kvar i din musik',
   'audiobooks book audio reading chapters spoken': 'ljudböcker ljudbok bok läsning kapitel',
   'Copy the list as OPML': 'Kopiera listan som OPML',
   'Living-room mode': 'Vardagsrumsläge',

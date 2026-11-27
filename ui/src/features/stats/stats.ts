@@ -2,6 +2,7 @@ import type { LibraryTrack, Play } from '../../shared/api'
 import { formatCount } from '../../shared/format'
 import { tr } from '../../shared/i18n/i18n'
 import { primaryArtist } from '../library/filter'
+import { leftMusic } from '../books/books'
 
 export type Period = '4w' | '6m' | 'year' | 'all'
 
@@ -96,7 +97,7 @@ export function statsOf(history: Play[], tracks: LibraryTrack[], period: Period,
     if (at >= to) continue
     const t = byId.get(p.trackId)
     // Audiobooks aren't listening to music: out of every number.
-    if (t?.audiobook) continue
+    if (leftMusic(t)) continue
     if (at < from) {
       if (t) seenBefore.add(primaryArtist(t.artist))
       continue
