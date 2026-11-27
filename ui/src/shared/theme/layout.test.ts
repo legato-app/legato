@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arrangeParts, DEFAULT_LAYOUT, COLUMNS, headerLayout, orderColumns, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, COLUMNS, headerLayout, orderColumns, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withHiddenParts, withoutLayout, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -134,6 +134,15 @@ describe('Now Playing’s parts', () => {
     expect(layout.pages).toEqual({ nowPlayingColumns: { order: ['words', 'cover'] }, nowPlaying: { order: ['artists', 'title'], hidden: ['next', 'readout'] }, nowPlayingControls: { order: ['volume'] } })
     expect(arrangeParts(layout.pages!.nowPlaying, pagePartIds('nowPlaying'))).toEqual(['from', 'artists', 'album', 'lyrics', 'title'])
     expect(layoutSummary(layout)).toEqual(['Now Playing arranged its own way'])
+  })
+
+  it('hides what the user hid on top of what the theme hides, keeping the theme’s order', () => {
+    const theme = { nowPlaying: { order: ['next', 'from'], hidden: ['readout'] }, home: { hidden: ['chips'] } }
+    const pages = withHiddenParts(theme, ['lyrics', 'readout'])
+    expect(arrangeParts(pages.nowPlaying, pagePartIds('nowPlaying'))).toEqual(['next', 'from', 'title', 'artists', 'album'])
+    expect(pages.home).toBe(theme.home)
+    expect(withHiddenParts({}, ['from']).nowPlaying).toEqual({ hidden: ['from'] })
+    expect(withHiddenParts(theme, [])).toBe(theme)
   })
 })
 

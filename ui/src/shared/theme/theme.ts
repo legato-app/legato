@@ -314,6 +314,10 @@ export interface FadeSettings {
   pause: number
 }
 
+/** Parts of Now Playing the user may hide by hand, on top of what a theme hides (ids of `PAGE_PARTS.nowPlaying`). */
+export const HIDEABLE_PARTS = ['from', 'readout', 'lyrics', 'next'] as const
+export type HideablePart = (typeof HIDEABLE_PARTS)[number]
+
 export interface Settings {
   /** Interface language: 'system' (Windows', English if not offered) or a code from shared/i18n. */
   language: string
@@ -379,6 +383,8 @@ export interface Settings {
   sidebarCounts: boolean
   /** Sidebar entries hidden (right-click one, or Settings › Appearance). Per PC; a hidden page is still reachable. */
   hiddenNav: NavItem[]
+  /** Parts of Now Playing hidden (right-click one; Settings › Appearance shows them again). Synced. */
+  hiddenParts: HideablePart[]
   /** Artists never played again: radio, mixes and autoplay pass over them (an artist's right-click menu; Settings). */
   blockedArtists: string[]
   /** Songs a source marked explicit left out of Songs, playlists and mixes. Off: a parent's choice, not a default. */
@@ -634,6 +640,7 @@ export const DEFAULTS: Settings = {
   motion: true,
   sidebarCounts: true,
   hiddenNav: [],
+  hiddenParts: [],
   blockedArtists: [],
   hideExplicit: false,
   releaseCovers: false,
@@ -919,6 +926,7 @@ export function sanitize(raw: unknown): Settings {
     motion: typeof r.motion === 'boolean' ? r.motion : DEFAULTS.motion,
     sidebarCounts: typeof r.sidebarCounts === 'boolean' ? r.sidebarCounts : DEFAULTS.sidebarCounts,
     hiddenNav: NAV_ITEMS.filter((n) => Array.isArray(r.hiddenNav) && r.hiddenNav.includes(n)),
+    hiddenParts: HIDEABLE_PARTS.filter((part) => Array.isArray(r.hiddenParts) && r.hiddenParts.includes(part)),
     blockedArtists: Array.isArray(r.blockedArtists) ? [...new Set(r.blockedArtists.filter((name): name is string => typeof name === 'string' && !!name.trim() && name.length <= 200))].slice(0, 500) : [],
     hideExplicit: r.hideExplicit === true,
     releaseCovers: r.releaseCovers === true,

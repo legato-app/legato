@@ -2,6 +2,7 @@
 export const DESKTOP_ONLY: ReadonlySet<string> = new Set([
   'Interface size',
   'Let themes arrange the app',
+  'Hidden parts',
   'List columns',
   'Mini player',
   'Mini player place',

@@ -321,6 +321,12 @@ export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
   return copy
 }
 
+/** The theme's pages, with the Now Playing parts the user hid by hand hidden too. */
+export function withHiddenParts(pages: Pages, hidden: readonly string[]): Pages {
+  if (!hidden.length) return pages
+  return { ...pages, nowPlaying: { ...pages.nowPlaying, hidden: [...(pages.nowPlaying?.hidden ?? []), ...hidden] } }
+}
+
 /** The arrangement to draw for a checked layout; the app's own without one, from a newer app, or on a phone. */
 export function resolveLayout(layout: Layout | undefined, phone = false): Placement {
   if (!layout || phone || layout.v > LAYOUT_API) return DEFAULT_LAYOUT

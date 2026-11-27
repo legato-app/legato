@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HOME_SECTIONS, lookOf, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
+import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HIDEABLE_PARTS, HOME_SECTIONS, lookOf, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
+import { PAGE_PARTS } from './layout'
 
 describe('sanitize', () => {
   it('falls back to defaults on junk', () => {
@@ -18,6 +19,13 @@ describe('sanitize', () => {
   it('clamps zoom and keeps valid values', () => {
     const s = sanitize({ theme: 'studio', accent: '#2f6feb', zoom: 300, density: 'compact', readout: false })
     expect(s).toMatchObject({ theme: 'studio', accent: '#2F6FEB', zoom: 125, density: 'compact', readout: false })
+  })
+
+  it('keeps the hidden parts it knows: ones a theme may hide too', () => {
+    expect(sanitize({ hiddenParts: ['next', 'title', 'from', 'next'] }).hiddenParts).toEqual(['from', 'next'])
+    expect(sanitize({ hiddenParts: 'next' }).hiddenParts).toEqual([])
+    const hideable = PAGE_PARTS.nowPlaying.filter((part) => !('fixed' in part)).map((part) => part.id)
+    for (const id of HIDEABLE_PARTS) expect(hideable).toContain(id)
   })
 
   it('keeps custom themes only with full palette', () => {

@@ -196,7 +196,7 @@ function Appearance() {
   const playing = usePlayer((p) => !!p.now)
   const col = (c: Column) => (s.columns.includes(c) ? s.columns.filter((x) => x !== c) : COLUMNS.filter((x) => x === c || s.columns.includes(x)))
   const labels: Record<Column, string> = { album: msg('Album'), year: msg('Year'), genre: msg('Genre'), bpm: msg('BPM'), key: msg('Key'), sources: msg('Sources'), plays: msg('Plays'), rating: msg('Rating'), added: msg('Date added'), duration: msg('Duration') }
-  const reset: Partial<Settings> = { accent: DEFAULTS.accent, covers: DEFAULTS.covers, density: DEFAULTS.density, zoom: DEFAULTS.zoom, readout: DEFAULTS.readout, sleepButton: DEFAULTS.sleepButton, glow: DEFAULTS.glow, volume: DEFAULTS.volume, tuner: DEFAULTS.tuner, columns: DEFAULTS.columns, tint: DEFAULTS.tint, immersive: DEFAULTS.immersive, miniPlayer: DEFAULTS.miniPlayer, font: DEFAULTS.font, motion: DEFAULTS.motion, sidebarCounts: DEFAULTS.sidebarCounts, listCovers: DEFAULTS.listCovers, columnBrowser: DEFAULTS.columnBrowser, stage: DEFAULTS.stage, miniSpot: DEFAULTS.miniSpot, miniPlace: DEFAULTS.miniPlace, textSize: DEFAULTS.textSize, themeLayouts: DEFAULTS.themeLayouts }
+  const reset: Partial<Settings> = { accent: DEFAULTS.accent, covers: DEFAULTS.covers, density: DEFAULTS.density, zoom: DEFAULTS.zoom, readout: DEFAULTS.readout, sleepButton: DEFAULTS.sleepButton, glow: DEFAULTS.glow, volume: DEFAULTS.volume, tuner: DEFAULTS.tuner, columns: DEFAULTS.columns, tint: DEFAULTS.tint, immersive: DEFAULTS.immersive, miniPlayer: DEFAULTS.miniPlayer, font: DEFAULTS.font, motion: DEFAULTS.motion, sidebarCounts: DEFAULTS.sidebarCounts, listCovers: DEFAULTS.listCovers, columnBrowser: DEFAULTS.columnBrowser, stage: DEFAULTS.stage, miniSpot: DEFAULTS.miniSpot, miniPlace: DEFAULTS.miniPlace, textSize: DEFAULTS.textSize, themeLayouts: DEFAULTS.themeLayouts, hiddenParts: DEFAULTS.hiddenParts }
   return (
     <div className="contents">
       <Group title={msg('Theme')} bare>
@@ -296,6 +296,13 @@ function Appearance() {
             />
           </Row>
           <Row setting="coverClock" label={msg('Clock on the cover display')} sub={tr('The cover display (Now Playing, beside Karaoke) shows the time and the day in a corner, for a second screen')} toggle />
+          {!phoneApp && (
+            <Row setting="hiddenParts" label={msg('Hidden parts')} sub={tr('Right-click a part of Now Playing to hide it')}>
+              <Button variant="ghost" disabled={!s.hiddenParts.length} onClick={() => update({ hiddenParts: [] })}>
+                {tr('Show hidden parts')}
+              </Button>
+            </Row>
+          )}
         </div>
       </Group>
       <Group title={msg('Immersive player')}>

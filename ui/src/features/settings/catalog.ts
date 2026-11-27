@@ -137,6 +137,7 @@ export const SETTINGS: SettingDef[] = [
   { id: msg('Progress bar'), in: 'Player', keywords: msg('seek bar squiggly wave line progress style waveform shape') },
   { id: msg('Covers in lists'), in: 'Lists and navigation', keywords: msg('thumbnails artwork rows') },
   { id: msg('Clock on the cover display'), label: msg('Cover display clock'), in: 'Player', keywords: msg('clock time hour day second screen monitor full screen big cover display') },
+  { id: msg('Hidden parts'), in: 'Player', keywords: msg('hide show now playing right-click restore') },
   { id: msg('Column browser'), in: 'Lists and navigation', keywords: msg('artists albums panes filter') },
   { id: msg('Covers for new releases'), label: msg('New release covers'), in: 'Lists and navigation', keywords: msg('cover art archive coverartarchive new releases artists pictures images privacy') },
   { id: msg('Hide explicit songs'), in: 'Lists and navigation', keywords: msg('explicit lyrics parental clean children kids family') },

@@ -1,4 +1,4 @@
-import { ArrowSquareOut, CaretDown, DotsThree, Heart, ImageSquare, MagicWand, MonitorPlay, Queue, Quotes, SlidersHorizontal, ThumbsDown } from '@phosphor-icons/react'
+import { ArrowSquareOut, CaretDown, DotsThree, EyeSlash, Heart, ImageSquare, MagicWand, MonitorPlay, Queue, Quotes, SlidersHorizontal, ThumbsDown } from '@phosphor-icons/react'
 import { artistName } from '../../shared/artistName'
 import { pop } from '../../shared/motion'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -10,7 +10,7 @@ import { primaryArtist } from '../library/filter'
 import type { LibraryTrack, Source } from '../../shared/api'
 import { bigTrackArt, trackArt } from '../../shared/art'
 import { clampRatio } from '../../shared/artbox'
-import { coverGlow, type Settings } from '../../shared/theme/theme'
+import { coverGlow, HIDEABLE_PARTS, type HideablePart, type Settings } from '../../shared/theme/theme'
 import { Button } from '../../shared/ui/Button'
 import { onMenu, openMenu, type MenuEntry } from '../../shared/ui/ContextMenu'
 import { usePhone } from '../../shared/phone'
@@ -298,6 +298,12 @@ export function NowPlaying() {
       {tr('Playing from {source}', { source: tr(viaLabel[now.via]) })}
     </span>
   )
+  // Right-click on a part the user may hide: Hide, then the player's own menu.
+  const hideMenu = (part: string) => {
+    const hideable = HIDEABLE_PARTS.find((id) => id === part)
+    const hide = (id: HideablePart) => update({ hiddenParts: [...useSettings.getState().settings.hiddenParts, id] })
+    return hideable && onMenu(() => [{ label: tr('Hide'), icon: <EyeSlash size={16} />, onSelect: () => hide(hideable) }, '-', ...playerMenu()])
+  }
   // The theme's order of the title block (PC).
   const titleBlocks: Record<string, ReactNode> = {
     from: from && <FromTag />,
@@ -385,7 +391,9 @@ export function NowPlaying() {
     ) : (
       <div className="flex min-w-0 flex-col justify-center gap-4 pb-8">
         {titleParts.map((part) => (
-          <Fragment key={part}>{titleBlocks[part]}</Fragment>
+          <div key={part} className="contents" onContextMenu={hideMenu(part)}>
+            {titleBlocks[part]}
+          </div>
         ))}
       </div>
     )
