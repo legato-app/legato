@@ -9,4 +9,8 @@ error: string | null, folder: string,
 /**
  * Signed by an author the app knows, and unchanged since (`music_plugins::verify`).
  */
-verified: boolean, };
+verified: boolean, 
+/**
+ * It has a picture that passed the checks (`music_plugins::icon`), served as `plugin/<id>` (art.rs).
+ */
+icon: boolean, };

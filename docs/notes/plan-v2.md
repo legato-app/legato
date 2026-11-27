@@ -896,7 +896,14 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       puts its panel in a column).
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
-- [ ] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
+- [x] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
+  - 2026-11-27: the icon is done (`crates/plugins/src/icon.rs`: a plain file, PNG signature and header, 256 KB and
+    512 px at most; served by the `art` scheme as `plugin/<id>`). Rust tests; not tried for real (no plugin with one in
+    the app yet). The author's picture is its own line below.
+    - Decided alone (2026-11-27): any `api` may name one (nothing to grant); without one the card keeps its puzzle
+      piece; the install question shows none (the folder isn't installed yet).
+- [ ] `S` Plugin author's picture, verified authors only, shipped next to `crates/plugins/trusted-authors.json`: no
+      picture file exists to ship (the owner's to give).
 - [x] `S` Legato's signing key (the owner makes it: `pnpm tauri signer generate -w "$env:USERPROFILE\.legato\plugins.key"`), its public key in `trusted-authors.json`, Discord Presence signed (`scripts/plugin-files.mjs` + `pnpm tauri signer sign -f …`) in `examples/` and in `legato-app/discord-presence`, and `discord_move::FILES` carrying `legato.files` + `legato.files.sig`.
   - Done 2026-11-27: the public key trusted, the bundled copy signed (the owner's files), tested against the key; never
     installed in the app. Left, the owner's: sign `legato-app/discord-presence` the same way.

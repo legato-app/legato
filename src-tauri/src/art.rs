@@ -1,5 +1,6 @@
 //! `art` URI scheme (http://art.localhost/… on Windows): images for the UI, served by Rust.
-//! `/<encoded https URL>` = remote image through the cache (allowlisted hosts); `/local/<track id>` = cover embedded in a local file.
+//! `/<encoded https URL>` = remote image through the cache (allowlisted hosts); `/local/<track id>` = cover embedded in a local file;
+//! `/cover/<name>` = the user's own picture; `/plugin/<id>` = an installed plugin's.
 
 use crate::AppState;
 use std::borrow::Cow;
@@ -76,6 +77,11 @@ pub async fn image(app: &tauri::AppHandle, path: &str, size: Option<u32>) -> Opt
     let path = percent_encoding::percent_decode_str(path.trim_start_matches('/')).decode_utf8().ok()?.into_owned();
     if let Some(name) = path.strip_prefix("cover/") {
         return cover(app, name);
+    }
+    // "<id>~<version>": an update's picture is asked anew. Plugins are the desktop's.
+    #[cfg(desktop)]
+    if let Some(plugin) = path.strip_prefix("plugin/") {
+        return Some((crate::plugins::icon(app, plugin.split('~').next()?)?, "image/png".to_string()));
     }
     match path.strip_prefix("local/") {
         // "<id>~<version>": same cover, asked again after an edit (art.ts coverRewritten).

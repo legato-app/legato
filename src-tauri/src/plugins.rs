@@ -48,6 +48,8 @@ pub struct PluginInfo {
     folder: String,
     /// Signed by an author the app knows, and unchanged since (`music_plugins::verify`).
     verified: bool,
+    /// It has a picture that passed the checks (`music_plugins::icon`), served as `plugin/<id>` (art.rs).
+    icon: bool,
 }
 
 /// A folder before installing it: what it is and what it asks for.
@@ -106,6 +108,16 @@ fn registry(state: &AppState) -> HashMap<String, Entry> {
 
 fn save_registry(state: &AppState, r: &HashMap<String, Entry>) -> CmdResult<()> {
     state.lib().set_setting(REGISTRY, &json!(r)).map_err(err)
+}
+
+/// An installed plugin's picture, checked again as it is served.
+pub fn icon(app: &AppHandle, id: &str) -> Option<Vec<u8>> {
+    // The id from a URL: a plain folder name only.
+    if !music_plugins::manifest::id_ok(id) {
+        return None;
+    }
+    let folder = dir(app).ok()?.join(id);
+    music_plugins::icon::read(&folder, &Manifest::read(&folder).ok()?)
 }
 
 /// The files that would be copied: plain files of known kinds, flat, bounded.
@@ -356,6 +368,7 @@ pub async fn plugins_list(app: AppHandle, state: State<'_, AppState>, plugins: S
         };
         out.push(PluginInfo {
             verified: manifest.as_ref().is_some_and(|m| verify::verified(&e.path(), &m.author, &trusted)),
+            icon: manifest.as_ref().is_some_and(|m| music_plugins::icon::read(&e.path(), m).is_some()),
             running: plugins.running.lock().unwrap().contains_key(&id),
             error: broken.or_else(|| plugins.errors.lock().unwrap().get(&id).cloned()),
             folder: e.path().display().to_string(),

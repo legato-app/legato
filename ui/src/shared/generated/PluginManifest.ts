@@ -20,4 +20,8 @@ tags?: Array<string>, homepage?: string | null,
 /**
  * Where the plugin's code lives.
  */
-repository?: string | null, };
+repository?: string | null, 
+/**
+ * Its picture: a `.png` next to the manifest (`icon::read` checks it). Older versions of the app pass over it.
+ */
+icon?: string | null, };

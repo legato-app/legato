@@ -5,6 +5,8 @@ import type { Track } from './api'
 export const remoteArt = (url: string) => convertFileSrc(url, 'art')
 /** Picture the user put in the app (covers/ folder: playlist images, theme backgrounds). */
 export const coverImage = (name: string) => convertFileSrc(`cover/${name}`, 'art')
+/** An installed plugin's picture (Rust checked it); the version in it so an update's shows at once. */
+export const pluginIcon = (id: string, version: string) => convertFileSrc(`plugin/${id}~${version}`, 'art')
 
 // Local covers rewritten this session (Edit song info): a new URL, the webview's cached picture skipped.
 const rewritten = new Map<number, number>()

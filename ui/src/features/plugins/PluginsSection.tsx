@@ -5,6 +5,8 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore } from '../../app/store'
 import { api, type PluginInfo, type PluginInspect } from '../../shared/api'
 import { formatBytes } from '../../shared/format'
+import { pluginIcon } from '../../shared/art'
+import { Cover } from '../../shared/ui/Cover'
 import { tr } from '../../shared/i18n/i18n'
 import { ask } from '../../shared/ui/Ask'
 import { Button } from '../../shared/ui/Button'
@@ -37,6 +39,11 @@ function Permissions({ list, fresh }: { list: string[]; fresh?: string[] }) {
       })}
     </ul>
   )
+}
+
+/** The plugin's own picture (its initials should the picture fail to load). */
+function Picture({ p, size }: { p: PluginInfo; size: number }) {
+  return <Cover title={p.manifest?.name ?? p.id} art={[pluginIcon(p.id, p.manifest?.version ?? '')]} size={size} />
 }
 
 /** Who made it, and whether Rust found their signature on every file (docs/plugins.md › Verified). */
@@ -160,6 +167,7 @@ function Details({ p, onClose }: { p: PluginInfo; onClose: () => void }) {
     <Dialog title={name} kicker={tr('Plugin')} onClose={onClose}>
       {m && (
         <>
+          {p.icon && <Picture p={p} size={56} />}
           <p className="text-[0.8125rem] text-ink-2">{m.description}</p>
           <Tags list={m.tags} />
           <Section title={tr('Authors')}>
@@ -213,7 +221,7 @@ function Card({ p, onDetails }: { p: PluginInfo; onDetails: () => void }) {
   return (
     <article onContextMenu={onMenu(() => pluginMenu(p, onDetails))} className="flex flex-col gap-2 rounded-xl border border-line bg-raised p-4">
       <div className="flex items-center gap-2">
-        <PuzzlePiece size={16} className="text-ink-3" />
+        {p.icon ? <Picture p={p} size={28} /> : <PuzzlePiece size={16} className="text-ink-3" />}
         <h3 className="min-w-0 flex-1 truncate text-[0.875rem] font-semibold">{name}</h3>
         <RoundButton label={hasPanel ? tr('{name} settings', { name }) : tr('About {name}', { name })} kind="plain" size="xs" onClick={onDetails}>
           {hasPanel ? <Gear size={16} /> : <Info size={16} />}

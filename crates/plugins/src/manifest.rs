@@ -38,13 +38,17 @@ pub struct Manifest {
     /// Where the plugin's code lives.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub repository: Option<String>,
+    /// Its picture: a `.png` next to the manifest (`icon::read` checks it). Older versions of the app pass over it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub icon: Option<String>,
 }
 
 fn main_default() -> String {
     "main.js".into()
 }
 
-fn id_ok(id: &str) -> bool {
+/// An id as the manifest's rule has it: safe as a folder's name.
+pub fn id_ok(id: &str) -> bool {
     (3..=64).contains(&id.len()) && id.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'.' || b == b'-') && !id.starts_with(['.', '-']) && !id.contains("..")
 }
 
@@ -69,6 +73,9 @@ impl Manifest {
             bail!("This plugin needs a newer version of Legato (plugin API {}, this app has {API})", m.api);
         }
         ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to the manifest");
+        if let Some(icon) = &m.icon {
+            ensure!(icon.to_ascii_lowercase().ends_with(".png") && !icon.contains(['/', '\\', ':']) && !icon.starts_with('.') && icon.len() <= 64, "manifest: icon must be a .png file next to the manifest");
+        }
         ensure!(m.tags.len() <= 5 && m.tags.iter().all(|tag| !tag.trim().is_empty() && tag.chars().count() <= 20), "manifest: tags must be 5 at most, 1-20 characters each");
         ensure!(m.permissions.len() <= 32, "manifest: too many permissions");
         for p in &m.permissions {
@@ -121,6 +128,16 @@ mod tests {
         std::fs::remove_dir_all(&folder).unwrap();
         assert!(Manifest::parse(&json(r#","repository":"http://x""#)).is_err());
         assert!(Manifest::parse(&json("").replace("\"api\":1", "\"api\":3")).unwrap_err().to_string().contains("newer version of Legato"));
+    }
+
+    #[test]
+    fn an_icon_is_a_png_next_to_the_manifest_and_unknown_fields_pass() {
+        assert_eq!(Manifest::parse(&json(r#","icon":"My Icon.PNG""#)).unwrap().icon.as_deref(), Some("My Icon.PNG"));
+        for bad in ["icon.svg", "../icon.png", "art/icon.png", "C:icon.png", ".png"] {
+            assert!(Manifest::parse(&json(&format!(r#","icon":"{bad}""#))).is_err(), "{bad}");
+        }
+        // How an older app reads a newer manifest: what it doesn't know, it passes over.
+        assert!(Manifest::parse(&json(r#","mascot":"cat.png""#)).is_ok());
     }
 
     #[test]
