@@ -78,6 +78,7 @@ const pl: Record<string, string> = {
   'Something new for you': 'Coś nowego dla Ciebie',
   'New for you': 'Nowe dla Ciebie',
   'Guess the artist': 'Zgadnij wykonawcę',
+  'Time to answer': 'Czas na odpowiedź',
   'Which artist is playing?': 'Którego wykonawcy słychać?',
   'Blind test from this playlist…': 'Test w ciemno z tej playlisty…',
   'Translate into': 'Przetłumacz na',

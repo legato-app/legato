@@ -78,6 +78,7 @@ const ko: Record<string, string> = {
   'Something new for you': '새로운 곡',
   'New for you': '회원님을 위한 새로운 곡',
   'Guess the artist': '아티스트 맞히기',
+  'Time to answer': '답하는 시간',
   'Which artist is playing?': '어떤 아티스트의 곡일까요?',
   'Blind test from this playlist…': '이 재생목록으로 블라인드 테스트…',
   'Translate into': '번역할 언어',

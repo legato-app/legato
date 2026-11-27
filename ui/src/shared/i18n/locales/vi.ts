@@ -78,6 +78,7 @@ const vi: Record<string, string> = {
   'Something new for you': 'Điều mới dành cho bạn',
   'New for you': 'Mới cho bạn',
   'Guess the artist': 'Đoán nghệ sĩ',
+  'Time to answer': 'Thời gian trả lời',
   'Which artist is playing?': 'Nghệ sĩ nào đang phát?',
   'Blind test from this playlist…': 'Thử nghe mù từ danh sách này…',
   'Translate into': 'Dịch sang',

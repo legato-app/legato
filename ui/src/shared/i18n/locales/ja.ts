@@ -78,6 +78,7 @@ const ja: Record<string, string> = {
   'Something new for you': 'あなたに新しい一曲',
   'New for you': 'あなたへの新着',
   'Guess the artist': 'アーティストを当てる',
+  'Time to answer': '回答時間',
   'Which artist is playing?': 'どのアーティストの曲？',
   'Blind test from this playlist…': 'このプレイリストでブラインドテスト…',
   'Translate into': '翻訳先',

@@ -78,6 +78,7 @@ const fr: Record<string, string> = {
   'Something new for you': 'Une nouveauté pour vous',
   'New for you': 'Nouveautés pour vous',
   'Guess the artist': 'Deviner l’artiste',
+  'Time to answer': 'Temps pour répondre',
   'Which artist is playing?': 'Quel artiste joue ?',
   'Blind test from this playlist…': 'Blind test de cette playlist…',
   'Translate into': 'Traduire en',

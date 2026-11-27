@@ -78,6 +78,7 @@ const sv: Record<string, string> = {
   'Something new for you': 'Något nytt för dig',
   'New for you': 'Nytt för dig',
   'Guess the artist': 'Gissa artisten',
+  'Time to answer': 'Svarstid',
   'Which artist is playing?': 'Vilken artist spelas?',
   'Blind test from this playlist…': 'Blindtest från den här spellistan…',
   'Translate into': 'Översätt till',

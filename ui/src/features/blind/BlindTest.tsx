@@ -6,7 +6,7 @@ import { LedChip } from '../../shared/ui/controls'
 import { leaders, playerOf, scored, turnsOf } from './players'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { usePlayer } from '../player/store'
-import { ANSWER_MS, pickRounds, pointFor, SNIPPET_MS, snippetStart, TIMED_OUT } from './rounds'
+import { ANSWER_SECONDS, DEFAULT_ANSWER_SECONDS, pickRounds, pointFor, SNIPPET_MS, snippetStart, TIMED_OUT } from './rounds'
 import { holdLayer } from '../../shared/ui/layers'
 import { closeBlind, useBlind } from './blindOpen'
 
@@ -33,6 +33,8 @@ export function BlindTest() {
   // Up to 4 players passing the device round, one answering each round (players.ts); alone, the one score.
   const [players, setPlayers] = useState(1)
   const [scores, setScores] = useState([0])
+  // Time to answer each round, kept while the game is open.
+  const [answerSeconds, setAnswerSeconds] = useState(DEFAULT_ANSWER_SECONDS)
   const done = round >= game.length
   const current = game[round]
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -59,9 +61,9 @@ export function BlindTest() {
     const id = setTimeout(() => {
       usePlayer.getState().pauseNow()
       setAnswer(TIMED_OUT)
-    }, ANSWER_MS)
+    }, answerSeconds * 1000)
     return () => clearTimeout(id)
-  }, [current, answer])
+  }, [current, answer, answerSeconds])
   useEffect(() => () => usePlayer.getState().pauseNow(), [])
   // Android's Back closes the game (it is a full-window cover over the page, not a page of its own).
   useEffect(() => holdLayer(closeBlind), [])
@@ -127,6 +129,22 @@ export function BlindTest() {
               ))}
             </select>
             {players > 1 && <span className="text-sm font-semibold">{tr('Player {n}', { n: playerOf(round, players) + 1 })}</span>}
+            {/* Switching starts a new game: no round gets more time half way. */}
+            <select
+              aria-label={tr('Time to answer')}
+              value={answerSeconds}
+              onChange={(e) => {
+                setAnswerSeconds(Number(e.target.value))
+                again()
+              }}
+              className="rounded-md border border-line bg-bg px-2 py-0.5 text-xs text-ink-2"
+            >
+              {ANSWER_SECONDS.map((n) => (
+                <option key={n} value={n}>
+                  {tr('{n} seconds', { n })}
+                </option>
+              ))}
+            </select>
             {/* Switching starts a new game: the answers change kind. */}
             {canArtists && (
               <LedChip
@@ -140,7 +158,7 @@ export function BlindTest() {
             )}
           </div>
           <h2 className="text-2xl font-black">{answer === null ? (artists ? tr('Which artist is playing?') : tr('Which song is playing?')) : answer === right ? tr('Correct!') : tr('It was “{title}” by {artist}', { title: current.song.title, artist: current.song.artist })}</h2>
-          {answer === null && <span aria-hidden key={round} className="h-0.5 w-full max-w-xl origin-left rounded-full bg-accent" style={{ animation: `blind-clock ${ANSWER_MS}ms linear forwards` }} />}
+          {answer === null && <span aria-hidden key={`${current.song.id}-${answerSeconds}`} className="h-0.5 w-full max-w-xl origin-left rounded-full bg-accent" style={{ animation: `blind-clock ${answerSeconds}s linear forwards` }} />}
           <ul className="flex w-full max-w-xl flex-col gap-2">
             {current.choices.map((c, i) => (
               <li key={c.id}>

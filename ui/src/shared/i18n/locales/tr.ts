@@ -78,6 +78,7 @@ const tr: Record<string, string> = {
   'Something new for you': 'Senin için yeni bir şey',
   'New for you': 'Senin için yeni',
   'Guess the artist': 'Sanatçıyı tahmin et',
+  'Time to answer': 'Cevaplama süresi',
   'Which artist is playing?': 'Hangi sanatçı çalıyor?',
   'Blind test from this playlist…': 'Bu çalma listesiyle kör test…',
   'Translate into': 'Şuna çevir',

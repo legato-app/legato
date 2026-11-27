@@ -70,6 +70,7 @@ const ar: Record<string, string> = {
   'Something new for you': 'شيء جديد لك',
   'New for you': 'جديد لك',
   'Guess the artist': 'خمّن الفنان',
+  'Time to answer': 'وقت الإجابة',
   'Which artist is playing?': 'أي فنان يُشغَّل؟',
   'Blind test from this playlist…': 'اختبار أعمى من هذه القائمة…',
   'Translate into': 'ترجمة إلى',

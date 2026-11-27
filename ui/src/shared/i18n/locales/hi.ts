@@ -78,6 +78,7 @@ const hi: Record<string, string> = {
   'Something new for you': 'आपके लिए कुछ नया',
   'New for you': 'आपके लिए नया',
   'Guess the artist': 'कलाकार पहचानें',
+  'Time to answer': 'जवाब देने का समय',
   'Which artist is playing?': 'कौन-सा कलाकार चल रहा है?',
   'Blind test from this playlist…': 'इस प्लेलिस्ट से ब्लाइंड टेस्ट…',
   'Translate into': 'इसमें अनुवाद करें',

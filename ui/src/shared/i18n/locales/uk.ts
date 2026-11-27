@@ -78,6 +78,7 @@ const uk: Record<string, string> = {
   'Something new for you': 'Щось нове для вас',
   'New for you': 'Нове для вас',
   'Guess the artist': 'Вгадати виконавця',
+  'Time to answer': 'Час на відповідь',
   'Which artist is playing?': 'Який виконавець грає?',
   'Blind test from this playlist…': 'Сліпий тест із цього плейлиста…',
   'Translate into': 'Перекласти на',

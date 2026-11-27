@@ -70,6 +70,7 @@ const he: Record<string, string> = {
   'Something new for you': 'משהו חדש בשבילך',
   'New for you': 'חדש בשבילך',
   'Guess the artist': 'נחשו את האמן',
+  'Time to answer': 'זמן לתשובה',
   'Which artist is playing?': 'איזה אמן מתנגן?',
   'Blind test from this playlist…': 'מבחן עיוור מהפלייליסט הזה…',
   'Translate into': 'תרגום ל',

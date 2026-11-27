@@ -78,6 +78,7 @@ const nl: Record<string, string> = {
   'Something new for you': 'Iets nieuws voor jou',
   'New for you': 'Nieuw voor jou',
   'Guess the artist': 'Raad de artiest',
+  'Time to answer': 'Tijd om te antwoorden',
   'Which artist is playing?': 'Welke artiest speelt?',
   'Blind test from this playlist…': 'Blindtest van deze afspeellijst…',
   'Translate into': 'Vertalen naar',

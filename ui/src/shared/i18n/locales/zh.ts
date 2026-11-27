@@ -78,6 +78,7 @@ const zh: Record<string, string> = {
   'Something new for you': '给你的新鲜感',
   'New for you': '为你推荐的新歌',
   'Guess the artist': '猜艺术家',
+  'Time to answer': '回答时间',
   'Which artist is playing?': '正在播放哪位艺术家的歌？',
   'Blind test from this playlist…': '用此播放列表做盲听测试…',
   'Translate into': '翻译成',
