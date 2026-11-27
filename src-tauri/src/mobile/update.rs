@@ -187,6 +187,7 @@ impl Updater {
             return self.failed(app, "download", e.to_string());
         }
         notice(&title, &music_connectors::apk::sizes(size, size), 1000);
+        crate::diag::downloaded(&found.version, size);
         *self.found.lock().unwrap() = Some((found.clone(), Some(to)));
         self.set(app, State::Ready { version: found.version, notes: found.notes });
     }

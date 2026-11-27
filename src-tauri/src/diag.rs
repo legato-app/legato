@@ -102,6 +102,11 @@ pub fn info(area: &str, message: &str, detail: &str) {
     write(Level::Info, area, message, detail);
 }
 
+/// An update's file is in: its version and size.
+pub fn downloaded(version: &str, bytes: u64) {
+    info("update", "downloaded", &format!("{version}, {} MB", bytes.div_ceil(1_000_000)));
+}
+
 pub fn warn(area: &str, message: &str, detail: &str) {
     write(Level::Warn, area, message, detail);
 }

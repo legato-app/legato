@@ -4,6 +4,7 @@
 use crate::{AppState, CmdResult, err, unix_now};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Instant;
 use tauri::{Emitter, State};
 
 /// Trust boundary: a song key the UI makes (features/player/effects.ts songKey).
@@ -67,6 +68,7 @@ pub async fn export_edit(app: tauri::AppHandle, input: String, output: String, e
         return Err("an export is already running".into());
     }
     EXPORT_STOP.store(false, Ordering::Relaxed);
+    let started = Instant::now();
     let done = tauri::async_runtime::spawn_blocking(move || {
         music_player::export::export(&input, &output, effects, &EXPORT_STOP, |p| {
             let _ = app.emit_to("main", "export", p);
@@ -74,7 +76,9 @@ pub async fn export_edit(app: tauri::AppHandle, input: String, output: String, e
     })
     .await;
     EXPORT_BUSY.store(false, Ordering::Release);
-    done.map_err(err)?.map_err(|e| e.to_string())
+    done.map_err(err)?.map_err(|e| e.to_string())?;
+    crate::diag::info("editor", "export done", &format!("{} s", started.elapsed().as_secs()));
+    Ok(())
 }
 
 #[tauri::command]

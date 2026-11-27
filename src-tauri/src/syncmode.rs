@@ -301,7 +301,7 @@ async fn round(app: &AppHandle) -> CmdResult<Merged> {
         Ok(m) => {
             inner.last = Some(now_ms());
             inner.error = None;
-            Ok(m)
+            logged("folder", Ok(m))
         }
         Err(e) => {
             let text = e.to_string();
@@ -311,11 +311,14 @@ async fn round(app: &AppHandle) -> CmdResult<Merged> {
     }
 }
 
-/// A failed exchange (`kind` = folder, offering or joining) in the diagnostics log: no device name or path in the
-/// message, the text as the detail. The result goes on unchanged.
-pub(crate) fn logged<T>(kind: &str, result: CmdResult<T>) -> CmdResult<T> {
-    if let Err(e) = &result {
-        crate::diag::warn("syncmode", &format!("{kind} sync failed"), e);
+/// A sync exchange (`kind` = folder, offering, joining…) in the diagnostics log: a failure, or what a merge changed.
+/// No device name or path in the message; the error's text or the counts as the detail. The result goes on unchanged.
+pub(crate) fn logged(kind: &str, result: CmdResult<Merged>) -> CmdResult<Merged> {
+    match &result {
+        Err(e) => crate::diag::warn("syncmode", &format!("{kind} sync failed"), e),
+        // Most rounds change nothing: not one line a minute.
+        Ok(merged) if merged.any() => crate::diag::info("syncmode", &format!("{kind} sync merged"), &merged.summary()),
+        Ok(_) => {}
     }
     result
 }

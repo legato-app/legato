@@ -221,6 +221,7 @@ impl Updater {
             .await;
         match bytes {
             Ok(bytes) => {
+                crate::diag::downloaded(&version, bytes.len() as u64);
                 let notes = update.body.clone();
                 *self.ready.lock().unwrap() = Some((update, bytes));
                 self.set(app, State::Ready { version, notes });

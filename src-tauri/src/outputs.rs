@@ -44,6 +44,8 @@ pub async fn set_output_device(state: State<'_, AppState>, name: Option<String>)
         }
     }
     state.lib().set_setting(KEY, &serde_json::json!(name.clone().unwrap_or_default())).map_err(err)?;
+    // Which one stays out: a device's name can be a person's.
+    crate::diag::info("output", if name.is_some() { "a chosen device" } else { "default device" }, "");
     state.player.send(Command::SetDevice { name });
     Ok(())
 }

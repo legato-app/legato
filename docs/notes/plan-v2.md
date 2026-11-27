@@ -190,6 +190,11 @@ the order; a line leaves only when it ships or the user drops it.
     to the picked file, phone included (`diag_save`). Tests in core; neither button nor phone tried for real.
     - Decided alone (2026-11-27): the button says “Save” beside Copy and shares its “Include details” box; the file
       is named “Legato diagnostics <date>.txt” (UTC date).
+  - [x] Slice 3 (2026-11-27): INFO lines for a downloaded update (version, MB), a sync that merged something (counts), the
+    audio output changed, a Live Editor export. The summary tested in core; the shell lines not tried for real (the phone
+    one not even compiled here).
+    - Decided alone (2026-11-27): automatic device syncs log their merges too; the fallback to the default device when
+      a chosen one is unplugged stays silent (the player crate has no log).
 - [x] `M` Screen off on the phone: our extras rest (the visualizer's analysis, our own animation and polling loops), YouTube's player untouched (the owner, 2026-11-19). Sonnet: `9dce33b9`, `306de9a3`, `cbec7f0c`. Not seen on a phone yet.
 - [x] `M` The update between two songs does not seem to happen: find why (the owner, 2026-11-19: "le fameux truc de update entre deux song a pas l'air de marcher"). Opus, `f164d866`. The PC already worked; the phone now waits for the song's end; INFO lines in the log. Not tried on the phone.
 - [x] `S` One « More… » per right-click menu, never two (`5ae44406`).

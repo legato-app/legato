@@ -182,12 +182,13 @@ A local log for bug reports, nothing sent: `diagnostics.log` (then `.1` to `.4`,
 folder. `crates/core/src/diag.rs` is the pure part: the size-rotating writer (the time-based appenders of `tracing` can't
 hold a size), the line (`2026-10-30T12:34:56.789Z WARN update check failed | the raw error`), the redaction and the report
 text. `src-tauri/src/diag.rs` runs a writer thread (a caller only queues a line, so a slow disk never holds up the
-window; the file opens at the first line), a panic hook chained to the default one, and two async commands: `diag_log`
+window; the file opens at the first line), a panic hook chained to the default one, and three async commands: `diag_log`
 (the interface's errors and playback switches, `shared/diag.ts`: throttled, one line per minute at most per text, 30 a
-minute) and `diag_report`. The updater, Sync Mode, sync reports, YouTube Music refusals, the Google session refresh and
+minute), `diag_report` and `diag_save`. The updater, Sync Mode, sync reports, YouTube Music refusals, the Google session refresh and
 the startup stop log from Rust. Rust lines are not throttled: Sync Mode's minute timer therefore logs a failed folder
 round once, and again only when the failure text changes or a round succeeds in between (else one line a minute would
-push a real crash out of the report's 20 latest problems).
+push a real crash out of the report's 20 latest problems). Plain facts are INFO lines: an update downloaded (version,
+size), a sync that merged something (the counts), a change of audio output (never its name), an export done.
 
 A line is a message and an optional detail. The message is our own words in English (a service, a kind of failure: no
 song title, account name or path); the detail is what the error said, and is copied out only with "Include details".

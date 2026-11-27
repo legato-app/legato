@@ -379,7 +379,7 @@ fn wrong_try(app: &AppHandle) {
     };
     if closed {
         announce(app);
-        let _ = app.emit_to("main", "device-offer", syncmode::logged::<Merged>("offering", Err("Too many wrong codes: start again".into())));
+        let _ = app.emit_to("main", "device-offer", syncmode::logged("offering", Err("Too many wrong codes: start again".into())));
         emit(app);
     }
 }
@@ -835,10 +835,13 @@ async fn auto_round(app: &AppHandle) {
             }
             inner.tried.insert(peer.card.id.clone(), now);
         }
-        if let Err(e) = sync_with(app, peer).await {
-            let fresh = dev(app).inner.lock().unwrap().failed.insert(peer.card.id.clone(), e.clone()).is_none_or(|old| old != e);
-            if fresh && heard {
-                crate::diag::warn("syncmode", "device sync failed", &e);
+        match sync_with(app, peer).await {
+            Ok(merged) => drop(syncmode::logged("device", Ok(merged))),
+            Err(e) => {
+                let fresh = dev(app).inner.lock().unwrap().failed.insert(peer.card.id.clone(), e.clone()).is_none_or(|old| old != e);
+                if fresh && heard {
+                    crate::diag::warn("syncmode", "device sync failed", &e);
+                }
             }
         }
     }

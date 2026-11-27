@@ -232,6 +232,12 @@ impl Merged {
     pub fn any(&self) -> bool {
         *self != Merged::default()
     }
+
+    /// The counts that aren't zero, for the diagnostics log: "3 playlists, 12 songs".
+    pub fn summary(&self) -> String {
+        let counts = [(self.playlists, "playlists"), (self.deleted, "deletions"), (self.songs, "songs"), (self.removed, "removals"), (self.plays, "plays"), (self.edits, "edits"), (self.settings, "settings")];
+        counts.iter().filter(|(count, _)| *count > 0).map(|(count, what)| format!("{count} {what}")).collect::<Vec<_>>().join(", ")
+    }
 }
 
 /// Track rows → snapshot indexes, built as rows are met.
@@ -981,6 +987,12 @@ mod tests {
     use super::*;
     use crate::history::{Play, Pref};
     use crate::library::PlaylistEdit;
+
+    #[test]
+    fn a_merge_sums_up_what_changed_only() {
+        assert_eq!(Merged { playlists: 3, songs: 12, ..Default::default() }.summary(), "3 playlists, 12 songs");
+        assert_eq!(Merged::default().summary(), "");
+    }
 
     fn song(title: &str, yt: &str) -> Track {
         Track { title: title.into(), artist: "Artist".into(), album: None, duration_ms: Some(200_000), isrc: None, ids: BTreeMap::from([(Source::Youtube, yt.into())]), art: None, musicness: None, explicit: false }
