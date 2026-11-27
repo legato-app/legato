@@ -190,7 +190,7 @@ round once, and again only when the failure text changes or a round succeeds in 
 push a real crash out of the report's 20 latest problems). Plain facts are INFO lines: an update downloaded (version,
 size), a sync that merged something (the counts), a change of audio output (never its name), an export done.
 `src-tauri/src/webview_watch.rs` logs a WebView2 process that dies: a dead renderer reloads the page, a dead browser
-process restarts the app (no webview survives it; not in the first minute, so a broken WebView2 doesn't loop).
+process restarts the app once (no webview survives it; an env mark stops a second restart, so a broken WebView2 never loops).
 
 A line is a message and an optional detail. The message is our own words in English (a service, a kind of failure: no
 song title, account name or path); the detail is what the error said, and is copied out only with "Include details".

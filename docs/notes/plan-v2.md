@@ -17,7 +17,7 @@ the order; a line leaves only when it ships or the user drops it.
       (`ytm::refresh`, 90 s after launch) got a passkey request from Google's page on a PC with Windows Hello; closing
       the window under it killed WebView2's browser process, and every webview with it. Fixed 2026-11-27: the hidden
       page has no `navigator.credentials` and leaves for `about:blank` before closing (`ytm.rs`); a dead browser process
-      restarts the app after its first minute (`webview_watch.rs`). Not tried for real: no build installed on that PC.
+      restarts the app, once (`webview_watch.rs`). Not tried for real: no build installed on that PC.
 - [x] `M` Songs filled with songs never played (the owner, 2026-11-19: « dans songs ya full songs que je n'ai JAMAIS
       ecouter [...] trouve cde bug »). Cause: a YouTube Music mix saved to the library (id `RD…`: a radio YouTube makes
       up again at each request) was synced every 15 min; each sync put other songs in it, and the ones it dropped
