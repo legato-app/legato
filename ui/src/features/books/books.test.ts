@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { LibraryTrack } from '../../shared/api'
-import { pickBooks, progress } from './books'
+import { pickBooks, progress, withoutBooks } from './books'
 
 const song = (id: number, over: Partial<LibraryTrack>): LibraryTrack => ({ id, added: 0, addedAt: null, title: `t${id}`, artist: 'a', album: null, durationMs: 200_000, isrc: null, ids: { local: `C:/${id}.mp3` }, ...over })
 
@@ -8,6 +8,13 @@ describe('audiobooks', () => {
   it('picks the songs marked as books, longest first', () => {
     const list = [song(1, {}), song(2, { durationMs: 40 * 60_000, audiobook: true }), song(3, { durationMs: 3 * 3_600_000, audiobook: true })]
     expect(pickBooks(list).map((t) => t.id)).toEqual([3, 2])
+  })
+  it('leaves the music lists without the books out of it, and nothing else', () => {
+    const list = [song(1, {}), song(2, { audiobook: true, musicness: 'notMusic' }), song(3, { audiobook: true, musicness: 'music' }), song(4, { musicness: 'notMusic' })]
+    expect(withoutBooks(list).map((t) => t.id)).toEqual([1, 3, 4])
+    // None to leave out: the same list.
+    const songs = [song(1, {})]
+    expect(withoutBooks(songs)).toBe(songs)
   })
   it('where a book was left, if it is worth resuming', () => {
     const book = song(9, { durationMs: 3_600_000 * 3 })

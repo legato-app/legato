@@ -29,6 +29,7 @@ import { remoteTrack, usePlayer } from '../player/store'
 import { isListLink, linkKind, youtubeLink } from '../welcome/firstRun'
 import { addRecent } from './recent'
 import { countBy, errorOf, isSong, isVideo, libraryMatches, topOf, type Kind, type LibraryMatches, type Scope } from './results'
+import { withoutBooks } from '../books/books'
 
 const order = ['youtube', 'apple', 'spotify', 'local'] as const
 /** Rows and cards a section shows before its See all. */
@@ -195,7 +196,7 @@ export function SearchView() {
   const request = useStore((s) => s.search)
   const { tracks: every, playlists, stats, go } = useStore(useShallow(({ tracks, playlists, stats, go }) => ({ tracks, playlists, stats, go })))
   const clean = useExplicit(every)
-  const tracks = clean.kept
+  const tracks = useMemo(() => withoutBooks(clean.kept), [clean])
   const play = usePlayer((s) => s.playTracks)
   const rememberSearches = useSettings((s) => s.settings.rememberSearches)
   const q = request?.q ?? ''

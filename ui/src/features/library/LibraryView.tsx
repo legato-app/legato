@@ -35,6 +35,7 @@ import { browse, inPicks } from './browse'
 import { ColumnBrowser, SharePanel } from '../../app/pages'
 import { browserEntry, useBrowse } from './browserPicks'
 import { msg, tr, trn } from '../../shared/i18n/i18n'
+import { withoutBooks } from '../books/books'
 
 // The playlist page's header is drawn on a wall of its covers (loaded with the page, not at launch).
 const PlaylistBackdrop = lazy(() => import('./PlaylistBanner').then((m) => ({ default: m.PlaylistBackdrop })))
@@ -444,7 +445,7 @@ export function PlaylistView({ id }: { id: number }) {
 export function AlbumsView() {
   const { tracks, go, albumView: v, stats, seed } = useStore(useShallow(({ tracks, go, albumView, stats, seed }) => ({ tracks, go, albumView, stats, seed })))
   const query = useStore(pageQuery)
-  const all = useMemo(() => tracks.filter((t) => t.album), [tracks])
+  const all = useMemo(() => withoutBooks(tracks).filter((t) => t.album), [tracks])
   const albums = useMemo(() => orderGroups(groupAlbums(filterTracks(all, query, v.filter)).map((g) => ({ ...g, name: g.album })), v.sort, { size: v.size, stats, seed }), [all, query, v, stats, seed])
   const parts = usePageParts('albums')
   const blocks: Record<string, ReactNode> = {
@@ -498,10 +499,11 @@ export function AlbumsView() {
 export function ArtistsView() {
   const { tracks, go, artistView: v, stats, seed } = useStore(useShallow(({ tracks, go, artistView, stats, seed }) => ({ tracks, go, artistView, stats, seed })))
   const query = useStore(pageQuery)
-  const artists = useMemo(() => orderGroups(groupArtists(filterTracks(tracks, query, v.filter)).map((g) => ({ ...g, name: g.artist })), v.sort, { size: v.size, stats, seed }), [tracks, query, v, stats, seed])
+  const all = useMemo(() => withoutBooks(tracks), [tracks])
+  const artists = useMemo(() => orderGroups(groupArtists(filterTracks(all, query, v.filter)).map((g) => ({ ...g, name: g.artist })), v.sort, { size: v.size, stats, seed }), [all, query, v, stats, seed])
   const parts = usePageParts('artists')
   const blocks: Record<string, ReactNode> = {
-    toolbar: <GroupBar page="artistView" tracks={tracks} />,
+    toolbar: <GroupBar page="artistView" tracks={all} />,
     list: (
       <>
       {artists.length === 0 && <p className="py-10 text-center text-ink-2">{tr('No matching artists.')}</p>}

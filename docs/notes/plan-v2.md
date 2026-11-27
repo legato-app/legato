@@ -731,7 +731,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       set, an opera, a sleep track); only `.m4b`, a marked folder or a book genre take it out. A book’s row has the song’s
       right-click menu (“It’s music” brings it back).
 - [ ] `S` Audiobooks: an `.m4a` / `.mp4` with chapters is not a book by that alone (needs the chapters read at the scan
-      and kept in the library); Albums, Artists, Home’s rows and search still list books.
+      and kept in the library).
+  - 2026-11-27: Albums, Artists, the sidebar's lists of both, Home and search no longer list books out of the music
+    (`withoutBooks`). Not tried for real.
+    - Decided alone (2026-11-27): only those books leave these lists; videos that aren't music stay there as before
+      (Songs' filter would have taken them too). A book's own album and artist pages still show it.
 - [ ] `M` Stream Deck plugin and an Xbox Game Bar widget (play / skip / like / now playing) over the local hotkeys.
   2026-11-13: Stream Deck done as `integrations/streamdeck` (`docs/streamdeck.md`): play / pause, next, previous, now
   playing, over the phone remote's local routes; logic tested, never loaded by a real Stream Deck. 2026-11-19: its like

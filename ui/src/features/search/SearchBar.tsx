@@ -17,6 +17,7 @@ import { clearRecent, forgetRecent, useRecent } from './recent'
 import { libraryMatches } from './results'
 import { phoneApp } from '../../shared/platform'
 import { usePhone } from '../../shared/phone'
+import { withoutBooks } from '../books/books'
 
 // Pages that filter their own list as you type.
 const FILTERS = ['songs', 'playlist', 'albums', 'artists']
@@ -118,8 +119,9 @@ export function SearchBar({ children }: { children?: ReactNode }) {
 
   // Artists and albums made once per library, only once the list needs them.
   const wantLibrary = open && !scope && !!text
-  const groups = useMemo(() => (wantLibrary ? { artists: groupArtists(tracks), albums: groupAlbums(tracks) } : null), [tracks, wantLibrary])
-  const lib = useMemo(() => (groups ? libraryMatches(tracks, playlists, text, groups, stats) : null), [tracks, playlists, text, groups, stats])
+  const music = useMemo(() => withoutBooks(tracks), [tracks])
+  const groups = useMemo(() => (wantLibrary ? { artists: groupArtists(music), albums: groupAlbums(music) } : null), [music, wantLibrary])
+  const lib = useMemo(() => (groups ? libraryMatches(music, playlists, text, groups, stats) : null), [music, playlists, text, groups, stats])
   // Pages, actions and settings: made as the list opens (the keys bound and the language then).
   // The list (and the settings' index it carries) loads the first time it is wanted, out of the launch.
   const [makeList, setMakeList] = useState<(() => Command[]) | null>(null)

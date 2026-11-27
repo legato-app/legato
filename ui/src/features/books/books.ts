@@ -7,6 +7,9 @@ export const pickBooks = (tracks: LibraryTrack[]): LibraryTrack[] => tracks.filt
 /** A book out of the music, so out of the listening numbers: not a file listed with the books for its length only. */
 export const leftMusic = (t: Pick<LibraryTrack, 'audiobook' | 'musicness'> | undefined): boolean => !!t?.audiobook && t.musicness === 'notMusic'
 
+/** The library's lists of music without those books. The same list when there are none (memoized pages stay as they are). */
+export const withoutBooks = (tracks: LibraryTrack[]): LibraryTrack[] => (tracks.some(leftMusic) ? tracks.filter((t) => !leftMusic(t)) : tracks)
+
 /** Where a book was left (from the resume points, key `t:<id>`): milliseconds and the share of the book, or null when it is not started. */
 export function progress(points: Points, t: LibraryTrack): { ms: number; share: number } | null {
   const ms = t.durationMs ? pointFor(points, `t:${t.id}`, t.durationMs) : null

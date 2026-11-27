@@ -36,6 +36,7 @@ import { jumpLists, useOpenedLists, type OpenedList } from './recentLists'
 import { weekOf } from './week'
 import { phoneApp } from '../../shared/platform'
 import { notifyError } from '../../app/notifyError'
+import { withoutBooks } from '../books/books'
 
 const ROW = 12
 
@@ -111,7 +112,8 @@ function JumpTile({ art, title, onOpen, onPlay, menu }: { art: ReactNode; title:
 
 /** Shortcut tiles on top of Home: Songs, then the lists opened lately (playlists, albums, artists, mixes), filled from what you played. */
 function Shortcuts({ mixes }: { mixes?: Mix[] }) {
-  const { tracks, stats, playlists, go } = useStore(useShallow(({ tracks, stats, playlists, go }) => ({ tracks, stats, playlists, go })))
+  const { tracks: every, stats, playlists, go } = useStore(useShallow(({ tracks, stats, playlists, go }) => ({ tracks, stats, playlists, go })))
+  const tracks = useMemo(() => withoutBooks(every), [every])
   const opened = useOpenedLists((s) => s.list)
   const play = usePlayer((s) => s.playTracks)
   const lists = useMemo(() => jumpLists(opened, { tracks, stats, playlists, mixIds: mixes?.map((m) => m.id) }), [opened, tracks, stats, playlists, mixes])
@@ -516,8 +518,9 @@ export function HomeView() {
   // YouTube Music picked, then signed out: everything again.
   const filter: HomeFilter = homeFilter === 'youtube' && !(ytOn && ytSection) ? 'all' : homeFilter
   const visible = (id: HomeSectionId) => (mood ? id === 'youtube' : filter === 'library' ? id !== 'youtube' : filter === 'youtube' ? id === 'youtube' : true)
-  const recent = useMemo(() => tracks.filter((t) => stats[t.id]?.[1]).sort((a, b) => stats[b.id][1] - stats[a.id][1]).slice(0, ROW), [tracks, stats])
-  const added = useMemo(() => [...tracks].sort((a, b) => b.added - a.added).slice(0, ROW), [tracks])
+  const music = useMemo(() => withoutBooks(tracks), [tracks])
+  const recent = useMemo(() => music.filter((t) => stats[t.id]?.[1]).sort((a, b) => stats[b.id][1] - stats[a.id][1]).slice(0, ROW), [music, stats])
+  const added = useMemo(() => [...music].sort((a, b) => b.added - a.added).slice(0, ROW), [music])
   const shown = useMemo(() => playlists.filter((p) => !hidden.includes(playlistKey(p))).slice(0, ROW), [playlists, hidden])
 
   // Moves skip hidden sections: one press = one visible place.

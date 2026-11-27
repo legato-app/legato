@@ -26,6 +26,7 @@ import { groupAlbums, groupArtists } from '../library/filter'
 import { msg, tr, trn } from '../../shared/i18n/i18n'
 import { newSmartList, smartTracks } from '../smart/rules'
 import { saveSmart, smartMenu } from '../smart/actions'
+import { withoutBooks } from '../books/books'
 
 /** Home, Mixes, Stats, Add music: icon Regular at rest, Fill when on (docs/design.md). */
 function NavItem({ on, icon: Icon, label, onClick, onContextMenu }: { on: boolean; icon: typeof House; label: string; onClick: () => void; onContextMenu?: (e: React.MouseEvent) => void }) {
@@ -159,8 +160,8 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
   const notFound = useStore((s) => s.notFound.length)
   const stats = useStore((s) => s.stats)
   const smartSongs = useMemo(() => new Map(smart.map((l) => [l.id, smartTracks(l, tracks, stats).map((t) => t.id)])), [smart, tracks, stats])
-  const albums = useMemo(() => (kind === 'albums' ? groupAlbums(tracks).sort((a, b) => coll.compare(a.album, b.album)) : []), [kind, tracks])
-  const artists = useMemo(() => (kind === 'artists' ? groupArtists(tracks).sort((a, b) => coll.compare(a.artist, b.artist)) : []), [kind, tracks])
+  const albums = useMemo(() => (kind === 'albums' ? groupAlbums(withoutBooks(tracks)).sort((a, b) => coll.compare(a.album, b.album)) : []), [kind, tracks])
+  const artists = useMemo(() => (kind === 'artists' ? groupArtists(withoutBooks(tracks)).sort((a, b) => coll.compare(a.artist, b.artist)) : []), [kind, tracks])
   const songs = (n: number) => (counts ? trn(n, '{n} song', '{n} songs') : '')
   const tile = (icon: ReactNode, look: string) => <span className={`grid size-full place-items-center ${look}`}>{icon}</span>
   const update = useSettings((s) => s.update)
