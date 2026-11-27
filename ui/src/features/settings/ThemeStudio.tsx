@@ -14,7 +14,6 @@ import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 import { notifyError } from '../../app/notifyError'
 
-const fail = notifyError
 
 /** Mini window drawn in the theme's own colors (and picture). */
 function ThemeThumb({ t, tall = false }: { t: Palette & Partial<Pick<Theme, 'background' | 'radius'>>; tall?: boolean }) {
@@ -145,17 +144,17 @@ function ThemeEditor({ id, onClose }: { id: string; onClose: () => void }) {
   }
   const bg = (patch: Partial<Background>) => t.background && save({ background: { ...t.background, ...patch } })
   const pickPicture = async () => {
-    const file = await pickFile({ filters: [{ name: tr('Pictures and videos'), extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm'] }] }).catch((e) => void fail(e))
+    const file = await pickFile({ filters: [{ name: tr('Pictures and videos'), extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm'] }] }).catch((e) => void notifyError(e))
     if (!file) return
     try {
       const image = await api.saveBackground(file)
       save({ background: { image, fit: t.background?.fit ?? 'cover', dim: t.background?.dim ?? 35, blur: t.background?.blur ?? 0, panels: t.background?.panels ?? 80 } })
     } catch (e) {
-      fail(e)
+      notifyError(e)
     }
   }
   const exportFile = async () => {
-    await saveFile({ defaultPath: `${t.name}.theme`, filters: [{ name: 'Legato theme', extensions: ['theme'] }] }, (path) => api.exportTheme(path, t)).then((name) => name && useStore.getState().notify(tr('Theme saved'), { kind: 'ok' }), fail)
+    await saveFile({ defaultPath: `${t.name}.theme`, filters: [{ name: 'Legato theme', extensions: ['theme'] }] }, (path) => api.exportTheme(path, t)).then((name) => name && useStore.getState().notify(tr('Theme saved'), { kind: 'ok' }), notifyError)
   }
   const report = contrastReport(t)
   return (
@@ -339,14 +338,14 @@ export function ThemeStudio() {
   }
   const fresh = (t: Partial<Theme>) => sanitizeTheme({ ...current(), ...t, id: undefined })
   const importFile = async () => {
-    const file = await pickFile({ filters: [{ name: 'Legato theme', extensions: ['theme', 'json'] }] }).catch((e) => void fail(e))
+    const file = await pickFile({ filters: [{ name: 'Legato theme', extensions: ['theme', 'json'] }] }).catch((e) => void notifyError(e))
     if (!file) return
     try {
       const t = sanitizeTheme({ ...((await api.importTheme(file)) as object), id: undefined })
       if (!t) throw new Error(tr('Invalid theme: all 13 colors are needed, as #RRGGBB.'))
       await addImported(t)
     } catch (e) {
-      fail(e)
+      notifyError(e)
     }
   }
   const pick = (t: Theme) => update(pickTheme(t, settings))

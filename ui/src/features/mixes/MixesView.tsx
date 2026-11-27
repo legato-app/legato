@@ -134,7 +134,7 @@ function DiscoveriesButton() {
         api
           .lastfmDiscoveries()
           .then((songs) => play(songs.map(remoteTrack), 0))
-          .catch((e) => notifyError(e))
+          .catch(notifyError)
           .finally(() => setBusy(false))
       }}
     >

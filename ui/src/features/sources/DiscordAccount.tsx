@@ -48,7 +48,7 @@ export function DiscordAccount() {
   }, [on])
   const signIn = () => {
     setBusy(true)
-    api.discordLoginConnect().then(setCard, (e) => notifyError(e)).finally(() => setBusy(false))
+    api.discordLoginConnect().then(setCard, notifyError).finally(() => setBusy(false))
   }
   const signOut = () => void api.discordLoginDisconnect().then(() => setCard(null), () => {})
   return (

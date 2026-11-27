@@ -17,7 +17,6 @@ import { kindLabel, left, rowNote, typedCode } from './devicesView'
 import { mergedText } from './merged'
 import { notifyError } from '../../app/notifyError'
 
-const fail = notifyError
 
 /** Nothing new from it: said here. Changes are told by the `sync` event. */
 function done(m: Merged, text: string) {
@@ -225,13 +224,13 @@ export function Devices() {
     try {
       done(await api.deviceSync(r.id), tr('Up to date with {name}', { name: r.name }))
     } catch (e) {
-      fail(e)
+      notifyError(e)
     } finally {
       setBusy(null)
       refresh()
     }
   }
-  const row = (r: SyncDeviceRow) => <Row key={r.id} r={r} busy={busy === r.id} onSync={() => void sync(r)} onPair={() => setAdding({ mode: 'enter', name: r.name })} onForget={() => void api.deviceForget(r.id).then(refresh, fail)} />
+  const row = (r: SyncDeviceRow) => <Row key={r.id} r={r} busy={busy === r.id} onSync={() => void sync(r)} onPair={() => setAdding({ mode: 'enter', name: r.name })} onForget={() => void api.deviceForget(r.id).then(refresh, notifyError)} />
   const trusted = s.rows.filter((r) => r.trusted)
   const nearby = s.rows.filter((r) => !r.trusted)
   const kind = kindLabel(s.os, s.form)
@@ -240,7 +239,7 @@ export function Devices() {
       <h2 className="flex items-center gap-2 text-[0.8125rem] font-semibold">
         <DevicesGlyph size={16} /> <span className="flex-1">{tr('Your devices')}</span>
         <span className="text-xs font-normal text-ink-2 max-sm:sr-only">{tr('Sync over the network')}</span>
-        <Toggle checked={s.network} onChange={(on) => void api.devicesNetwork(on).then(refresh, fail)} label={tr('Sync over the network')} />
+        <Toggle checked={s.network} onChange={(on) => void api.devicesNetwork(on).then(refresh, notifyError)} label={tr('Sync over the network')} />
       </h2>
       <p className="text-xs text-ink-2">{tr('Phones and PCs with Legato on the same Wi-Fi sync everything with each other: paired once with a code or a QR code, then on their own. Nothing goes through the internet.')}</p>
       <ul className="flex flex-col">
@@ -269,7 +268,7 @@ export function Devices() {
         </Button>
         {trusted.length > 0 && (
           <span className="flex items-center gap-2 text-xs text-ink-2">
-            <Toggle checked={s.auto} onChange={(on) => void api.devicesAuto(on).then(refresh, fail)} label={tr('Sync automatically when they’re on this network')} />
+            <Toggle checked={s.auto} onChange={(on) => void api.devicesAuto(on).then(refresh, notifyError)} label={tr('Sync automatically when they’re on this network')} />
             {tr('Sync automatically when they’re on this network')}
           </span>
         )}

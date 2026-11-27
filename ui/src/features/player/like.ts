@@ -43,17 +43,16 @@ export function useLikedIds(): Set<number> {
 
 /** Thumbs down: ranked lower in mixes (Undo = back to normal), and on to the next song. */
 export function lessLikeThis(t: LibraryTrack) {
-  const fail = notifyError
   api
     .setTrackPref(t.id, 'less')
-    .then(() => app().notify(tr('Less of this in your mixes'), { action: { label: tr('Undo'), run: () => void api.setTrackPref(t.id, null).catch(fail) } }), fail)
+    .then(() => app().notify(tr('Less of this in your mixes'), { action: { label: tr('Undo'), run: () => void api.setTrackPref(t.id, null).catch(notifyError) } }), notifyError)
   usePlayer.getState().step(1)
 }
 
 /** Your music server's song: liked = starred there too (Settings › Accounts' direction decides, in Rust). */
 function starOnServer(t: LibraryTrack, on: boolean) {
   const id = t.ids.server ?? app().tracks.find((x) => x.id === t.id)?.ids.server
-  if (id && !id.startsWith('radio:')) api.serverStar(id, on).catch((e: unknown) => notifyError(e))
+  if (id && !id.startsWith('radio:')) api.serverStar(id, on).catch(notifyError)
 }
 
 export async function toggleLike(t: LibraryTrack) {

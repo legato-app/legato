@@ -22,7 +22,6 @@ export function RadioView() {
   const [found, setFound] = useState<RadioStation[] | null>(null)
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
-  const fail = notifyError
   // Starter stations, while none is kept: the user's region (the interface's language, never an IP lookup) and the genres of
   // their own library. Only a country code and up to two genre words go to the directory.
   const [starters, setStarters] = useState<RadioStation[]>([])
@@ -30,7 +29,7 @@ export function RadioView() {
   const stats = useStore((s) => s.stats)
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
-    api.radioKept().then((k) => (setKept(k), setLoaded(true)), fail)
+    api.radioKept().then((k) => (setKept(k), setLoaded(true)), notifyError)
   }, [])
   const asked = useRef(false)
   useEffect(() => {
@@ -43,10 +42,10 @@ export function RadioView() {
     setBusy(true)
     api
       .radioSearch(text)
-      .then(setFound, fail)
+      .then(setFound, notifyError)
       .finally(() => setBusy(false))
   }
-  const keep = (s: RadioStation, on: boolean) => api.radioKeep(s, on).then(setKept, fail)
+  const keep = (s: RadioStation, on: boolean) => api.radioKeep(s, on).then(setKept, notifyError)
   // Next and Previous go to the neighbour in the list the station was started from (results, or Your stations).
   const row = (list: RadioStation[]) => (s: RadioStation) => {
     const mine = kept.some((k) => k.id === s.id)

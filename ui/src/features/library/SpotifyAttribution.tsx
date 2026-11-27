@@ -14,7 +14,7 @@ export function SpotifyAttribution({ sourceId }: { sourceId: string }) {
         {tr('Imported from Spotify')}
       </span>
       {page && (
-        <button type="button" onClick={() => void openUrl(page).catch((e: unknown) => notifyError(e))} className="text-xs font-bold tracking-wide uppercase underline-offset-4 hover:underline">
+        <button type="button" onClick={() => void openUrl(page).catch(notifyError)} className="text-xs font-bold tracking-wide uppercase underline-offset-4 hover:underline">
           {tr('Open Spotify')}
         </button>
       )}

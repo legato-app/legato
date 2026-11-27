@@ -32,7 +32,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
     setAsking(asked)
     api
       .artistLinks(asked)
-      .then((l) => setFound({ artist: asked, links: l }), (e) => notifyError(e))
+      .then((l) => setFound({ artist: asked, links: l }), notifyError)
       .finally(() => setAsking((a) => (a === asked ? null : a)))
   }
   const readBio = () => {
@@ -41,7 +41,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
     setAsking(asked)
     api
       .artistBio(wiki.url)
-      .then((b) => setBioOf({ artist: asked, bio: b }), (e) => notifyError(e))
+      .then((b) => setBioOf({ artist: asked, bio: b }), notifyError)
       .finally(() => setAsking((a) => (a === asked ? null : a)))
   }
   return (
@@ -56,7 +56,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
         <ul className="flex flex-wrap gap-2">
           {links.map((l) => (
             <li key={l.url}>
-              <Button variant="ghost" onClick={() => void openUrl(l.url).catch((e) => notifyError(e))} title={l.url}>
+              <Button variant="ghost" onClick={() => void openUrl(l.url).catch(notifyError)} title={l.url}>
                 {tr(linkLabel(l.kind))} <ArrowSquareOut size={14} />
               </Button>
             </li>

@@ -27,9 +27,8 @@ export function PodcastsView() {
   const [news, setNews] = useState<string[]>([])
   const [paste, setPaste] = useState('')
   const change = (m: Marks) => (setMarks(m), save(m))
-  const fail = notifyError
   useEffect(() => {
-    api.podcastKept().then(setKept, fail)
+    api.podcastKept().then(setKept, notifyError)
   }, [])
   const open = (url: string) => {
     if (!url.trim() || busy) return
@@ -41,7 +40,7 @@ export function PodcastsView() {
         setNews(fresh(m, f.url, f.episodes.map((e) => e.id)))
         change(seen(m, f.url, f.episodes.map((e) => e.id)))
         setShow(f)
-      }, fail)
+      }, notifyError)
       .finally(() => setBusy(false))
   }
   const mine = show ? kept.some((k) => k.url === show.url) : false
@@ -67,7 +66,7 @@ export function PodcastsView() {
               <Button variant="ghost" onClick={() => setShow(null)}>
                 {tr('Back')}
               </Button>
-              <button type="button" aria-pressed={mine} aria-label={mine ? tr('Forget this podcast') : tr('Keep this podcast')} onClick={() => void api.podcastKeep(show, !mine).then(setKept, fail)} className="grid size-8 place-items-center rounded-full text-ink-2 hover:text-ink">
+              <button type="button" aria-pressed={mine} aria-label={mine ? tr('Forget this podcast') : tr('Keep this podcast')} onClick={() => void api.podcastKeep(show, !mine).then(setKept, notifyError)} className="grid size-8 place-items-center rounded-full text-ink-2 hover:text-ink">
                 <Heart weight={mine ? 'fill' : 'regular'} size={18} />
               </button>
               <Button variant="ghost" disabled={busy} onClick={() => open(show.url)}>
@@ -124,7 +123,7 @@ export function PodcastsView() {
             )}
             {kept.length > 0 && (
               <div className="pt-4">
-                <Button variant="ghost" onClick={() => void api.podcastExport().then((t) => navigator.clipboard.writeText(t)).then(() => useStore.getState().notify(tr('Copied to clipboard')), fail)}>
+                <Button variant="ghost" onClick={() => void api.podcastExport().then((t) => navigator.clipboard.writeText(t)).then(() => useStore.getState().notify(tr('Copied to clipboard')), notifyError)}>
                   {tr('Copy the list as OPML')}
                 </Button>
               </div>
@@ -133,7 +132,7 @@ export function PodcastsView() {
               <summary className="cursor-pointer text-sm text-ink-2">{tr('Import from an OPML file')}</summary>
               <p className="py-2 text-xs text-ink-2">{tr('Paste the text of the OPML file your podcast app exported. The shows are kept; nothing is asked of their servers.')}</p>
               <textarea value={paste} onChange={(e) => setPaste(e.target.value)} rows={5} aria-label={tr('OPML text')} className="w-full rounded-lg border border-line bg-transparent p-2 font-mono text-xs outline-none" />
-              <Button disabled={!paste.trim()} onClick={() => api.podcastImport(paste).then((k) => (setKept(k), setPaste('')), fail)}>
+              <Button disabled={!paste.trim()} onClick={() => api.podcastImport(paste).then((k) => (setKept(k), setPaste('')), notifyError)}>
                 {tr('Import')}
               </Button>
             </details>

@@ -17,7 +17,6 @@ import { pluginLinks } from './pluginLinks'
 import { PluginPanel } from './PluginPanel'
 import { notifyError } from '../../app/notifyError'
 
-const fail = notifyError
 
 function Permissions({ list, fresh }: { list: string[]; fresh?: string[] }) {
   if (!list.length) return <p className="text-[0.8125rem] text-ink-2">{tr('Nothing beyond its own storage.')}</p>
@@ -155,7 +154,7 @@ function Details({ p, onClose }: { p: PluginInfo; onClose: () => void }) {
   ]
   const reset = async () => {
     if (!(await ask({ title: tr('Reset {name}?', { name }), body: tr('Its settings and everything it stored are erased.'), ok: tr('Reset') }))) return
-    await api.pluginReset(p.id).then(loadPlugins).catch(fail)
+    await api.pluginReset(p.id).then(loadPlugins).catch(notifyError)
   }
   return (
     <Dialog title={name} kicker={tr('Plugin')} onClose={onClose}>
@@ -198,7 +197,7 @@ function Details({ p, onClose }: { p: PluginInfo; onClose: () => void }) {
         {buttons.map(
           ({ url, label, icon }) =>
             url && (
-              <RoundButton key={label} label={label} kind="plain" size="sm" onClick={() => void openUrl(url).catch(fail)}>
+              <RoundButton key={label} label={label} kind="plain" size="sm" onClick={() => void openUrl(url).catch(notifyError)}>
                 {icon}
               </RoundButton>
             ),
@@ -219,7 +218,7 @@ function Card({ p, onDetails }: { p: PluginInfo; onDetails: () => void }) {
         <RoundButton label={hasPanel ? tr('{name} settings', { name }) : tr('About {name}', { name })} kind="plain" size="xs" onClick={onDetails}>
           {hasPanel ? <Gear size={16} /> : <Info size={16} />}
         </RoundButton>
-        <Toggle label={tr('Turn on {name}', { name })} checked={p.on} onChange={(on) => void api.pluginSet(p.id, on).then(loadPlugins).catch(fail)} />
+        <Toggle label={tr('Turn on {name}', { name })} checked={p.on} onChange={(on) => void api.pluginSet(p.id, on).then(loadPlugins).catch(notifyError)} />
       </div>
       <p className="text-xs leading-relaxed text-ink-2">{p.manifest?.description}</p>
       <Tags list={p.manifest?.tags} />

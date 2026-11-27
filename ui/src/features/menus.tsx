@@ -61,10 +61,9 @@ import { notifyError } from '../app/notifyError'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
-const fail = notifyError
 
 function copy(text: string, done: string) {
-  navigator.clipboard.writeText(text).then(() => app().notify(done), fail)
+  navigator.clipboard.writeText(text).then(() => app().notify(done), notifyError)
 }
 
 /** A text the page shows (an artist's About): copy it. */
@@ -97,7 +96,7 @@ async function saveCover(t: LibraryTrack) {
   if (name) app().notify(tr('Cover saved: {file}', { file: name }))
 }
 
-const saveCoverItem = (t: LibraryTrack) => bigTrackArt(t).length > 0 && { label: tr('Save cover…'), icon: <DownloadSimple size={16} />, onSelect: () => void saveCover(t).catch(fail) }
+const saveCoverItem = (t: LibraryTrack) => bigTrackArt(t).length > 0 && { label: tr('Save cover…'), icon: <DownloadSimple size={16} />, onSelect: () => void saveCover(t).catch(notifyError) }
 
 /** A playlist as an M3U8 / XSPF / CSV file: local songs by path, the others by their page. */
 async function savePlaylistFile(p: LibraryPlaylist) {
@@ -164,7 +163,7 @@ async function addToYoutubePlaylist(p: LibraryPlaylist, ids: number[]) {
     else if (r.already) app().notify(ids.length === 1 ? tr('Already in {name}', { name: p.name }) : tr('All already in {name}', { name: p.name }), { kind: 'info', action: open })
     else app().notify(server ? tr('Nothing added to {name}: not on that server', { name: p.name }) : tr('Nothing added to {name}: no YouTube version', { name: p.name }), { kind: 'info' })
   } catch (e) {
-    fail(e)
+    notifyError(e)
   }
 }
 
@@ -248,9 +247,9 @@ function coverMenu(p: LibraryPlaylist): MenuEntry {
         label: cur.image ? tr('Custom image (change…)') : tr('Custom image…'),
         checked: cur.mode === 'image',
         onSelect: async () => {
-          const path = await pickFile({ title: tr('Playlist cover'), filters: [{ name: tr('Images'), extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }] }).catch((e) => void fail(e))
+          const path = await pickFile({ title: tr('Playlist cover'), filters: [{ name: tr('Images'), extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }] }).catch((e) => void notifyError(e))
           if (!path) return
-          api.saveCover(p.id, path).then((image) => set({ mode: 'image', image }), fail)
+          api.saveCover(p.id, path).then((image) => set({ mode: 'image', image }), notifyError)
         },
       },
       '-',
@@ -307,7 +306,7 @@ const addToLibraryItem = (t: LibraryTrack): MenuEntry => ({
       .addTrack(t)
       .then(() => app().refreshChanged())
       .then(() => app().notify(tr('Added “{title}” to your library', { title: t.title })))
-      .catch(fail),
+      .catch(notifyError),
 })
 
 /**
@@ -341,10 +340,10 @@ function remoteMenu(t: LibraryTrack, list: LibraryTrack[], index: number): MenuE
     addRemoteTo(t),
     '-',
     // A song a mix discovered has no library row to hold "never": it is remembered by title and artist.
-    !isStation(t) && { label: tr('Never in mixes'), icon: <Prohibit size={16} />, onSelect: () => api.blockFind(t.title, t.artist).then(() => app().notify(tr('Left out of your mixes'), { action: { label: tr('Undo'), run: () => void api.blockFind(t.title, t.artist, false).catch(fail) } }), fail) },
+    !isStation(t) && { label: tr('Never in mixes'), icon: <Prohibit size={16} />, onSelect: () => api.blockFind(t.title, t.artist).then(() => app().notify(tr('Left out of your mixes'), { action: { label: tr('Undo'), run: () => void api.blockFind(t.title, t.artist, false).catch(notifyError) } }), notifyError) },
     pages(t).length > 0 && { label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(pages(t)[0].url, tr('Link copied')) },
     { label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
-    ...pages(t).map((p) => ({ label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(fail) })),
+    ...pages(t).map((p) => ({ label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
   ]
 }
 
@@ -364,20 +363,20 @@ function removeFrom(t: LibraryTrack): MenuEntry {
       await api.removeFromPlaylist(p.id, t.id)
       if (mineToo && p.id === youtubeLiked(raw.playlists)?.id) await app().editPlaylist({ type: 'removeTrack', id: mineToo.id, trackId: t.id })
       await app().refreshChanged()
-      const undo = () => void api.addToYoutube(p.id, [t.id]).then(() => app().refreshChanged()).catch(fail)
+      const undo = () => void api.addToYoutube(p.id, [t.id]).then(() => app().refreshChanged()).catch(notifyError)
       app().notify(tr('Removed from {name} on YouTube Music: {songs}', { name: p.name, songs: songs([t.id]) }), { kind: 'removed', action: { label: tr('Undo'), run: undo } })
     } catch (e) {
-      fail(e)
+      notifyError(e)
     }
   }
   const fromServer = async (p: LibraryPlaylist) => {
     try {
       await api.serverPlaylistRemove(p.id, t.id)
       await app().refreshChanged()
-      const undo = () => void api.serverPlaylistAdd(p.id, [t.id]).then(() => app().refreshChanged()).catch(fail)
+      const undo = () => void api.serverPlaylistAdd(p.id, [t.id]).then(() => app().refreshChanged()).catch(notifyError)
       app().notify(tr('Removed from {name} on your music server: {songs}', { name: p.name, songs: songs([t.id]) }), { kind: 'removed', action: { label: tr('Undo'), run: undo } })
     } catch (e) {
-      fail(e)
+      notifyError(e)
     }
   }
   const fromLibrary = async () => {
@@ -388,7 +387,7 @@ function removeFrom(t: LibraryTrack): MenuEntry {
       await app().refreshChanged()
       app().notify(tr('Removed “{title}” from your library', { title: t.title }), { kind: 'removed' })
     } catch (e) {
-      fail(e)
+      notifyError(e)
     }
   }
   return {
@@ -483,7 +482,7 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
               await app().refreshChanged()
               app().notify(r.found ? tr('Full version found') : tr('No full version found'))
             })
-            .catch(fail),
+            .catch(notifyError),
       },
     '-',
     tag('rate', rateItem(t)),
@@ -492,9 +491,9 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
       label: tr('Mixes'),
       icon: <ThumbsDown size={16} />,
       items: [
-        { label: tr('Less like this'), icon: <ThumbsDown size={16} />, onSelect: () => api.setTrackPref(t.id, 'less').then(() => app().notify(tr('Less of this in your mixes')), fail) },
-        { label: tr('Never in mixes'), icon: <Prohibit size={16} />, onSelect: () => api.setTrackPref(t.id, 'never').then(() => app().notify(tr('Left out of your mixes')), fail) },
-        { label: tr('Back to normal'), icon: <ArrowCounterClockwise size={16} />, onSelect: () => api.setTrackPref(t.id, null).then(() => app().notify(tr('Mix preference reset')), fail) },
+        { label: tr('Less like this'), icon: <ThumbsDown size={16} />, onSelect: () => api.setTrackPref(t.id, 'less').then(() => app().notify(tr('Less of this in your mixes')), notifyError) },
+        { label: tr('Never in mixes'), icon: <Prohibit size={16} />, onSelect: () => api.setTrackPref(t.id, 'never').then(() => app().notify(tr('Left out of your mixes')), notifyError) },
+        { label: tr('Back to normal'), icon: <ArrowCounterClockwise size={16} />, onSelect: () => api.setTrackPref(t.id, null).then(() => app().notify(tr('Mix preference reset')), notifyError) },
       ],
     },
     // Music or not, the user's word over the app's guess (hidden videos fold).
@@ -506,10 +505,10 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
     pages(t).length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(pages(t)[0].url, tr('Link copied')) },
     { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
     tag('saveCover', saveCoverItem(t)),
-    ...pages(t).map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(fail) })),
+    ...pages(t).map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
     { id: 'credits', label: tr('Credits…'), icon: <Users size={16} />, onSelect: () => showCredits(t) },
     t.ids.local && { id: 'editInfo', label: tr('Edit song info…'), icon: <PencilSimple size={16} />, onSelect: () => editInfo([t]) },
-    t.ids.local && { id: 'showInFolder', label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(t.ids.local!).catch(fail) },
+    t.ids.local && { id: 'showInFolder', label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(t.ids.local!).catch(notifyError) },
     list.length > 1 && {
       id: 'thisList',
       label: tr('This list'),
@@ -535,15 +534,15 @@ function pluginItems(where: 'track' | 'playlist' | 'player', context: Record<str
 export function pluginMenu(p: PluginInfo, about: () => void): MenuEntry[] {
   const name = p.manifest?.name ?? p.id
   return [
-    { label: p.on ? tr('Turn off') : tr('Turn on'), icon: <Power size={16} />, onSelect: () => void api.pluginSet(p.id, !p.on).then(loadPlugins, fail) },
+    { label: p.on ? tr('Turn off') : tr('Turn on'), icon: <Power size={16} />, onSelect: () => void api.pluginSet(p.id, !p.on).then(loadPlugins, notifyError) },
     { label: tr('About…'), icon: <Info size={16} />, onSelect: about },
-    { label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(p.folder).catch(fail) },
+    { label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(p.folder).catch(notifyError) },
     '-',
     {
       label: tr('Uninstall {name}', { name }),
       icon: <Trash size={16} />,
       danger: true,
-      onSelect: () => void api.pluginUninstall(p.id).then(() => (loadPlugins(), app().notify(tr('{name} uninstalled', { name }), { kind: 'removed' })), fail),
+      onSelect: () => void api.pluginUninstall(p.id).then(() => (loadPlugins(), app().notify(tr('{name} uninstalled', { name }), { kind: 'removed' })), notifyError),
     },
   ]
 }
@@ -565,7 +564,7 @@ export function hitMenu(hit: SearchHit, add: () => void, busy: boolean, play: ()
     '-',
     links.length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(links[0].url, tr('Link copied')) },
     { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${hit.artist} – ${hit.title}`, tr('Title and artist copied')) },
-    ...links.map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(fail) })),
+    ...links.map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
   ])
 }
 
@@ -617,13 +616,13 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
   const pinned = pinnedPlaylists.includes(key)
   const remote = ytImport && `https://music.youtube.com/playlist?list=${p.sourceId.split('~')[0]}`
   return shaped('playlist', [
-    { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().playTracks(t, 0), fail) },
-    { id: 'shuffle', label: tr('Shuffle play'), icon: <Shuffle size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then(shufflePlay, fail) },
-    { id: 'playNext', label: tr('Play next'), icon: <Queue size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().enqueue(t, true), fail) },
-    { id: 'addToQueue', label: tr('Add to queue'), icon: <ListPlus size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().enqueue(t, false), fail) },
-    { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => startRadioFrom(t, p.name), fail) },
-    { id: 'autoDj', label: tr('Auto-DJ'), icon: <VinylRecord size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => startAutoDj(t, p.name), fail) },
-    useSettings.getState().settings.blindTest && { id: 'blindTest', label: tr('Blind test from this playlist…'), icon: <Question size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => openBlind(t), fail) },
+    { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().playTracks(t, 0), notifyError) },
+    { id: 'shuffle', label: tr('Shuffle play'), icon: <Shuffle size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then(shufflePlay, notifyError) },
+    { id: 'playNext', label: tr('Play next'), icon: <Queue size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().enqueue(t, true), notifyError) },
+    { id: 'addToQueue', label: tr('Add to queue'), icon: <ListPlus size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => player().enqueue(t, false), notifyError) },
+    { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => startRadioFrom(t, p.name), notifyError) },
+    { id: 'autoDj', label: tr('Auto-DJ'), icon: <VinylRecord size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => startAutoDj(t, p.name), notifyError) },
+    useSettings.getState().settings.blindTest && { id: 'blindTest', label: tr('Blind test from this playlist…'), icon: <Question size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then((t) => openBlind(t), notifyError) },
     '-',
     { id: 'open', label: tr('Open'), icon: <Playlist size={16} />, onSelect: () => go({ name: 'playlist', id: p.id }) },
     tag('pin', pinned ? { label: tr('Unpin'), icon: <PushPinSlash size={16} />, onSelect: () => togglePinned(key) } : { label: tr('Pin to top'), icon: <PushPin size={16} />, onSelect: () => togglePinned(key) }),
@@ -638,7 +637,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
         { label: tr('New folder…'), icon: <FolderSimplePlus size={16} />, onSelect: () => void newFolder(key) },
       ],
     },
-    { id: 'findDuplicates', label: tr('Find duplicates'), icon: <CopySimple size={16} />, disabled: p.trackCount < 2, onSelect: () => tracks().then((t) => findDuplicates({ name: p.name, ids: t.map((x) => x.id), playlistId: p.id }), fail) },
+    { id: 'findDuplicates', label: tr('Find duplicates'), icon: <CopySimple size={16} />, disabled: p.trackCount < 2, onSelect: () => tracks().then((t) => findDuplicates({ name: p.name, ids: t.map((x) => x.id), playlistId: p.id }), notifyError) },
     p.custom &&
       repeatedRows(app().orders[p.id] ?? []).length > 0 && {
         id: 'removeRepeated',
@@ -646,13 +645,13 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
         icon: <MinusCircle size={16} />,
         onSelect: () => void removePositions(p.id, repeatedRows(app().orders[p.id] ?? [])),
       },
-    { id: 'copyList', label: tr('Copy song list'), icon: <ClipboardText size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then(copyList, fail) },
-    { id: 'saveFile', label: tr('Save as file…'), icon: <DownloadSimple size={16} />, disabled: !p.trackCount, onSelect: () => void savePlaylistFile(p).catch(fail) },
+    { id: 'copyList', label: tr('Copy song list'), icon: <ClipboardText size={16} />, disabled: !p.trackCount, onSelect: () => tracks().then(copyList, notifyError) },
+    { id: 'saveFile', label: tr('Save as file…'), icon: <DownloadSimple size={16} />, disabled: !p.trackCount, onSelect: () => void savePlaylistFile(p).catch(notifyError) },
     ...(p.custom && p.trackCount ? useServers.getState().list.filter((s) => s.kind === 'subsonic') : []).map((s) => ({
       id: 'sendTo',
       label: tr('Send to {name}', { name: serverName(s) }),
       icon: <Devices size={16} />,
-      onSelect: () => void sendToServer(p, s).catch(fail),
+      onSelect: () => void sendToServer(p, s).catch(notifyError),
     })),
     { id: 'copyName', label: tr('Copy name'), icon: <Copy size={16} />, onSelect: () => copy(p.name, tr('Name copied')) },
     // A Subsonic server's playlist too: renamed there in the background, its old name back here if it refuses.
@@ -664,7 +663,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
         const name = await askText({ title: tr('Rename playlist'), ok: tr('Rename'), value: p.name })
         if (!name || name === p.name) return
         if (p.custom) void editPlaylist({ type: 'rename', id: p.id, name })
-        else void api.serverPlaylistRename(p.id, name).then(() => app().refreshChanged(), fail)
+        else void api.serverPlaylistRename(p.id, name).then(() => app().refreshChanged(), notifyError)
       },
     },
     {
@@ -687,7 +686,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
         api
           .exportYoutube(p.id)
           .then((r) => notify(tr('Exported to YouTube Music: {added} added, {already} already there', { added: r.added, already: r.already })))
-          .catch(fail),
+          .catch(notifyError),
     },
     // Services give no dates: "date added" sorts follow the end new songs land on.
     !p.custom && {
@@ -701,7 +700,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
       ],
     },
     remote && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(remote, tr('Link copied')) },
-    remote && { id: 'openYtm', label: tr('Open in YouTube Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(remote).catch(fail) },
+    remote && { id: 'openYtm', label: tr('Open in YouTube Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(remote).catch(notifyError) },
     '-',
     { id: 'hide', label: tr('Hide playlist'), icon: <EyeSlash size={16} />, onSelect: () => (setHidden(playlistKey(p), true), app().notify(tr('{name} hidden · right-click Playlists to show it again', { name: p.name }))) },
     p.custom && {
@@ -726,10 +725,10 @@ export function folderMenu(f: PlaylistFolder, playlists: LibraryPlaylist[]): Men
   // Each song once, in the folder's order.
   const songs = () => Promise.all(playlists.map((p) => playlistSongs(p.id))).then((lists) => [...new Map(lists.flat().map((t) => [t.id, t])).values()])
   return shaped('folder', [
-    { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !some, onSelect: () => songs().then((t) => player().playTracks(t, 0), fail) },
-    { id: 'shuffle', label: tr('Shuffle play'), icon: <Shuffle size={16} />, disabled: !some, onSelect: () => songs().then(shufflePlay, fail) },
-    { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, disabled: !some, onSelect: () => songs().then((t) => startRadioFrom(t, f.name), fail) },
-    { id: 'autoDj', label: tr('Auto-DJ'), icon: <VinylRecord size={16} />, disabled: !some, onSelect: () => songs().then((t) => startAutoDj(t, f.name), fail) },
+    { id: 'play', label: tr('Play'), icon: <Play size={16} />, disabled: !some, onSelect: () => songs().then((t) => player().playTracks(t, 0), notifyError) },
+    { id: 'shuffle', label: tr('Shuffle play'), icon: <Shuffle size={16} />, disabled: !some, onSelect: () => songs().then(shufflePlay, notifyError) },
+    { id: 'startRadio', label: tr('Start radio'), icon: <Radio size={16} />, disabled: !some, onSelect: () => songs().then((t) => startRadioFrom(t, f.name), notifyError) },
+    { id: 'autoDj', label: tr('Auto-DJ'), icon: <VinylRecord size={16} />, disabled: !some, onSelect: () => songs().then((t) => startAutoDj(t, f.name), notifyError) },
     '-',
     { id: 'rename', label: tr('Rename…'), icon: <PencilSimple size={16} />, onSelect: () => void renameFolder(f) },
     { id: 'delete', label: tr('Delete folder'), icon: <Trash size={16} />, danger: true, onSelect: () => deleteFolder(f.id) },
@@ -815,9 +814,9 @@ export function playerMenu({ controls = true }: { controls?: boolean } = {}): Me
     '-',
     video && { id: 'copyVideoUrl', label: tr('Copy video URL'), icon: <Link size={16} />, onSelect: () => copy(`https://youtu.be/${video}`, tr('Video URL copied')) },
     video && { id: 'copyVideoUrlAt', label: tr('Copy video URL at current time'), icon: <Link size={16} />, onSelect: () => copy(`https://youtu.be/${video}?t=${Math.floor(positionMs / 1000)}`, tr('Video URL copied')) },
-    video && { id: 'openYoutube', label: tr('Open on YouTube'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(`https://www.youtube.com/watch?v=${video}&t=${Math.floor(positionMs / 1000)}s`).catch(fail) },
-    now.page && { id: 'listenApple', label: tr('Listen on Apple Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(now.page!).catch(fail) },
-    now.path && { id: 'showInFolder', label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(now.path!).catch(fail) },
+    video && { id: 'openYoutube', label: tr('Open on YouTube'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(`https://www.youtube.com/watch?v=${video}&t=${Math.floor(positionMs / 1000)}s`).catch(notifyError) },
+    now.page && { id: 'listenApple', label: tr('Listen on Apple Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(now.page!).catch(notifyError) },
+    now.path && { id: 'showInFolder', label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(now.path!).catch(notifyError) },
     ...pluginItems('player', { trackId: t?.id ?? null, title: now.title, artist: now.artist }),
   ])
 }
@@ -989,19 +988,19 @@ export function editorMenu(hide: () => void): MenuEntry[] {
 /** A saved version of the playing song. */
 export function editVersionMenu(v: Edit, rename: () => void): MenuEntry[] {
   return [
-    { label: tr('Play with this song'), icon: <Play size={16} />, checked: v.active, onSelect: () => playVersion(v.id).catch(fail) },
+    { label: tr('Play with this song'), icon: <Play size={16} />, checked: v.active, onSelect: () => playVersion(v.id).catch(notifyError) },
     { label: tr('Rename'), icon: <PencilSimple size={16} />, onSelect: rename },
     // This version's settings, not the ones in the editor now (a YouTube song only).
     { label: tr('Share this mix as a file…'), icon: <ShareNetwork size={16} />, disabled: !player().now?.youtubeId, onSelect: () => void import('./editor/remixFile').then((m) => m.exportRemix(presetEffects(v))) },
     { label: tr('Copy this mix’s link'), icon: <Link size={16} />, disabled: !player().now?.youtubeId, onSelect: () => void import('./editor/remixFile').then((m) => m.copyRemixLink(presetEffects(v))) },
     '-',
-    { label: tr('Delete'), icon: <Trash size={16} />, danger: true, onSelect: () => deleteVersion(v.id).catch(fail) },
+    { label: tr('Delete'), icon: <Trash size={16} />, danger: true, onSelect: () => deleteVersion(v.id).catch(notifyError) },
   ]
 }
 
 /** A Live Editor preset: built in (no id) or saved. */
 export function editPresetMenu(name: string, apply: () => void, id?: number): MenuEntry[] {
-  return [{ label: tr('Apply “{name}”', { name }), icon: <SlidersHorizontal size={16} />, onSelect: apply }, id !== undefined && '-', id !== undefined && { label: tr('Delete'), icon: <Trash size={16} />, danger: true, onSelect: () => deletePreset(id).catch(fail) }]
+  return [{ label: tr('Apply “{name}”', { name }), icon: <SlidersHorizontal size={16} />, onSelect: apply }, id !== undefined && '-', id !== undefined && { label: tr('Delete'), icon: <Trash size={16} />, danger: true, onSelect: () => deletePreset(id).catch(notifyError) }]
 }
 
 /** Anywhere without a menu of its own. */

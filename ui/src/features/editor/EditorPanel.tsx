@@ -207,7 +207,6 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
   const current = versions.find((v) => v.id === versionId)
   const sub = <K extends 'reverb' | 'echo' | 'space'>(k: K, p: Partial<Effects[K]>) => setEffects({ [k]: { ...e[k], ...p } } as Partial<Effects>)
   const eq = (i: number, g: number) => setEffects({ eq: e.eq.map((x, j) => (j === i ? g : x)) as Effects['eq'] })
-  const fail = notifyError
 
   return (
     <aside aria-label={tr('Live Editor')} onContextMenu={onMenu(() => editorMenu(onHide))} className="flex min-h-0 flex-col gap-2 rounded-2xl border border-line-soft bg-[color-mix(in_srgb,var(--panel)_55%,transparent)] p-3">
@@ -231,12 +230,12 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
           <section className="flex flex-col gap-2 px-1">
             <h3 className="text-xs font-semibold">{tr('Versions of this song')}</h3>
             <div role="radiogroup" aria-label={tr('Versions of this song')} className="flex flex-wrap gap-1.5">
-              <button role="radio" aria-checked={versionId === null} onClick={() => playVersion(null).catch(fail)} className={chip(versionId === null)}>
+              <button role="radio" aria-checked={versionId === null} onClick={() => playVersion(null).catch(notifyError)} className={chip(versionId === null)}>
                 {tr('Original')}
               </button>
               {versions.map((v) =>
                 renaming === v.id ? null : (
-                  <button key={v.id} role="radio" aria-checked={versionId === v.id} onClick={() => playVersion(v.id).catch(fail)} onContextMenu={onMenu(() => editVersionMenu(v, () => setRenaming(v.id)))} className={chip(versionId === v.id)}>
+                  <button key={v.id} role="radio" aria-checked={versionId === v.id} onClick={() => playVersion(v.id).catch(notifyError)} onContextMenu={onMenu(() => editVersionMenu(v, () => setRenaming(v.id)))} className={chip(versionId === v.id)}>
                     {v.name}
                   </button>
                 ),
@@ -249,7 +248,7 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
                 initial={versions.find((v) => v.id === renaming)?.name ?? ''}
                 onSave={(name) => {
                   setRenaming(null)
-                  renameVersion(renaming, name).catch(fail)
+                  renameVersion(renaming, name).catch(notifyError)
                 }}
                 onCancel={() => setRenaming(null)}
               />
@@ -260,7 +259,7 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
                 initial={tr('Version {n}', { n: versions.length + 1 })}
                 onSave={(name) => {
                   setNaming(null)
-                  saveVersion(name).catch(fail)
+                  saveVersion(name).catch(notifyError)
                 }}
                 onCancel={() => setNaming(null)}
               />
@@ -268,7 +267,7 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
               dirty && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   {current && (
-                    <button onClick={() => updateVersion().catch(fail)} className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-xs font-medium text-bg">
+                    <button onClick={() => updateVersion().catch(notifyError)} className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-xs font-medium text-bg">
                       <FloppyDisk size={13} /> {tr('Save “{name}”', { name: current.name })}
                     </button>
                   )}
@@ -297,7 +296,7 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
               initial={tr('My preset')}
               onSave={(name) => {
                 setNaming(null)
-                savePreset(name).catch(fail)
+                savePreset(name).catch(notifyError)
               }}
               onCancel={() => setNaming(null)}
             />

@@ -16,7 +16,7 @@ const live: PlayDeps = {
   song: (code) => api.shareSong(code, region()),
   library: () => useStore.getState().tracks,
   play: (list) => usePlayer.getState().playTracks(list, 0),
-  fail: (e) => notifyError(e),
+  fail: notifyError,
 }
 
 /**

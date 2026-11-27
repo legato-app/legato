@@ -257,7 +257,7 @@ export function LyricsPanel({ onHide, onUpNext, className = CARD, heading }: { o
       const choices = await api.lyricsChoices(ask)
       if (!choices.length) return notify(tr('No other lyrics found for this song.'))
       const pct = new Intl.NumberFormat(locale(), { style: 'percent', maximumFractionDigits: 0 })
-      const keep = (picked: Lyrics | null) => void api.lyricsPick(ask, picked).then(retry, (e) => notifyError(e))
+      const keep = (picked: Lyrics | null) => void api.lyricsPick(ask, picked).then(retry, notifyError)
       openMenuAt(
         el,
         [
