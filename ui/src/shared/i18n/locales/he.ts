@@ -1266,6 +1266,8 @@ const he: Record<string, string> = {
   'Artist pages arranged their own way': 'עמודי האמנים מסודרים בדרך משלהם',
   'Library lists arranged their own way': 'רשימות הספרייה מסודרות בדרך משלהן',
   'List columns in another order': 'עמודות הרשימה בסדר אחר',
+  'Home arranged its own way': 'מסך הבית מסודר בדרך משלו',
+  'Home sections': 'מקטעי מסך הבית',
   'Default layout': 'פריסת ברירת המחדל',
   'Themes no longer arrange the app': 'ערכות הנושא כבר לא מסדרות את האפליקציה',
   'This theme’s layout didn’t work: the default layout is back': 'הפריסה של ערכת הנושא לא עבדה: פריסת ברירת המחדל חזרה',

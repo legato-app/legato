@@ -7,7 +7,7 @@ import { pickFile, saveFile } from '../../shared/files'
 import { coverImage } from '../../shared/art'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
-import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
+import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, pickTheme, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
 import { LAYOUT_API } from '../../shared/theme/layout'
 import { askAboutLayout } from './themeLayoutImport'
 import { Button } from '../../shared/ui/Button'
@@ -122,6 +122,7 @@ const lookLabels: Record<(typeof LOOK_KEYS)[number], string> = {
   sidebarCounts: msg('Counts in the sidebar'),
   listCovers: msg('Covers in lists'),
   columns: msg('List columns'),
+  homeSections: msg('Home sections'),
 }
 
 /** Backgrounds still used by a theme after this change. */
@@ -161,7 +162,7 @@ function ThemeEditor({ id, onClose }: { id: string; onClose: () => void }) {
       <div className="flex items-center gap-3">
         <span className="size-6.5 rounded-full border-[5px]" style={{ background: t.accent, borderColor: t.bg }} />
         <input value={t.name} aria-label={tr('Theme name')} maxLength={40} onChange={(e) => save({ name: e.target.value })} className="min-w-0 flex-1 bg-transparent text-lg font-bold tracking-tight outline-none" />
-        <Button onClick={() => update({ theme: t.id, ...t.look })} disabled={settings.theme === t.id}>
+        <Button onClick={() => update(pickTheme(t, settings))} disabled={settings.theme === t.id}>
           {settings.theme === t.id ? tr('Applied') : tr('Apply')}
         </Button>
         <RoundButton label={tr('Save as a .theme file')} onClick={() => void exportFile()}>
@@ -347,7 +348,7 @@ export function ThemeStudio() {
       fail(e)
     }
   }
-  const pick = (t: Theme) => update({ theme: t.id, ...t.look })
+  const pick = (t: Theme) => update(pickTheme(t, settings))
   // A preset can't be edited: one gesture copies it into the custom themes and opens the editor on the copy.
   const dup = (t: Theme, patch: Partial<Theme> = {}) => {
     const c = duplicateTheme(t, tr('{name} custom', { name: t.name }), patch)

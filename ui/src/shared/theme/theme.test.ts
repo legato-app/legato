@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HOME_SECTIONS, lookOf, moveHome, placeHome, onAccentFor, paletteFrom, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
+import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HOME_SECTIONS, lookOf, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
 
 describe('sanitize', () => {
   it('falls back to defaults on junk', () => {
@@ -141,6 +141,25 @@ describe('resolveTheme', () => {
     expect(arranged.layout).toEqual({ v: 1, regions: { right: ['sidebar'] } })
     expect(sanitizeTheme(JSON.parse(JSON.stringify(arranged)))!.layout).toEqual(arranged.layout)
     expect(sanitizeTheme({ ...base, layout: 'right' })).not.toHaveProperty('layout')
+  })
+
+  it('brings a theme’s Home order when picked, never turning a section that sends something on or off', () => {
+    const order = [{ id: 'releases', on: true }, { id: 'added', on: true }, { id: 'quick', on: false }]
+    const theme = sanitizeTheme({ ...PRESETS[0], look: { homeSections: order } })!
+    const kept = theme.look!.homeSections!
+    expect(kept.slice(0, 2).map((x) => x.id)).toEqual(expect.arrayContaining(['added']))
+    const own = sanitize({}).homeSections
+    const picked = pickTheme(theme, { homeSections: own })
+    expect(picked.theme).toBe(theme.id)
+    expect(picked.homeSections!.map((x) => x.id)).toEqual(kept.map((x) => x.id))
+    expect(picked.homeSections!.find((x) => x.id === 'releases')!.on).toBe(false)
+    expect(picked.homeSections!.find((x) => x.id === 'quick')!.on).toBe(false)
+    const on = own.map((x) => (x.id === 'releases' ? { ...x, on: true } : x))
+    expect(pickTheme(theme, { homeSections: on }).homeSections!.find((x) => x.id === 'releases')!.on).toBe(true)
+    // Written into the settings: the user's later order wins.
+    const later = [...picked.homeSections!].reverse()
+    expect(sanitize({ ...picked, homeSections: later, defaultsVersion: 12 }).homeSections.map((x) => x.id)).toEqual(later.map((x) => x.id))
+    expect(pickTheme(PRESETS[0], { homeSections: own })).not.toHaveProperty('homeSections')
   })
 
   it('lets themes arrange the app unless turned off', () => {

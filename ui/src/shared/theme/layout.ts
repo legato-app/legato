@@ -74,6 +74,8 @@ export const PAGE_PARTS = {
   songs: [{ id: 'toolbar', fixed: true }, { id: 'browser', fixed: true }, { id: 'list', fixed: true }],
   albums: [{ id: 'toolbar', fixed: true }, { id: 'list', fixed: true }],
   artists: [{ id: 'toolbar', fixed: true }, { id: 'list', fixed: true }],
+  // Home's sections have their own order (the theme's `look`, then the user's).
+  home: [{ id: 'chips', fixed: true }, { id: 'sections', fixed: true }],
 } as const
 export type PartedPage = keyof typeof PAGE_PARTS
 export const pagePartIds = (page: PartedPage): string[] => PAGE_PARTS[page].map((part) => part.id)
@@ -296,6 +298,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     pageChanged('album') && tr('Album pages arranged their own way'),
     pageChanged('artist') && tr('Artist pages arranged their own way'),
     (pageChanged('songs') || pageChanged('albums') || pageChanged('artists')) && tr('Library lists arranged their own way'),
+    pageChanged('home') && tr('Home arranged its own way'),
     orderColumns(placement.pages.lists?.columns, COLUMNS).join() !== COLUMNS.join() && tr('List columns in another order'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines

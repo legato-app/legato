@@ -767,8 +767,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-27): Songs (toolbar, column browser, list), Albums and Artists (toolbar, list): all fixed,
       they only move; `pages.lists.columns` orders every songs list's columns except Time (last, after the heart), an
       unnamed column keeping its usual neighbor; the warning says each change in one line.
-  - [ ] `S` 10. Home's frame parts, `homeSections` in `LOOK_KEYS`. Tests: `sanitizeLook` keeps a theme's Home order,
+  - [x] `S` 10. Home's frame parts, `homeSections` in `LOOK_KEYS`. Tests: `sanitizeLook` keeps a theme's Home order,
     picking the theme writes it, the user's later order wins.
+    2026-11-27: done; tests only, not seen.
+    - Decided alone (2026-11-27): Home's frame is the chips and the sections, both only moving; a theme's Home order
+      is written when the theme is picked, except the switch of a section that sends something (new releases): the
+      user's stays, a theme never turns it on; an older Legato drops a theme's `homeSections` when it saves it.
   - [ ] `M` 11. Now Playing's parts on the PC (cover side, the title block's order, the controls row). Tests: parts
     resolve for its blocks.
   - [ ] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);

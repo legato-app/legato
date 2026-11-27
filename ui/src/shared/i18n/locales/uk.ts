@@ -1302,6 +1302,8 @@ const uk: Record<string, string> = {
   'Artist pages arranged their own way': 'Сторінки виконавців розташовано по-своєму',
   'Library lists arranged their own way': 'Списки медіатеки розташовано по-своєму',
   'List columns in another order': 'Стовпці списку в іншому порядку',
+  'Home arranged its own way': 'Головну розташовано по-своєму',
+  'Home sections': 'Розділи головної',
   'Default layout': 'Типове розташування',
   'Themes no longer arrange the app': 'Теми більше не змінюють розташування елементів',
   'This theme’s layout didn’t work: the default layout is back': 'Розташування цієї теми не спрацювало: повернено типове',

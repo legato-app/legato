@@ -1302,6 +1302,8 @@ const hi: Record<string, string> = {
   'Artist pages arranged their own way': 'कलाकार पेज अपने ढंग से लगाए गए',
   'Library lists arranged their own way': 'लाइब्रेरी की सूचियाँ अपने ढंग से लगाई गईं',
   'List columns in another order': 'सूची के स्तंभ दूसरे क्रम में',
+  'Home arranged its own way': 'होम अपने ढंग से लगाया गया',
+  'Home sections': 'होम के अनुभाग',
   'Default layout': 'डिफ़ॉल्ट व्यवस्था',
   'Themes no longer arrange the app': 'थीम अब ऐप की व्यवस्था नहीं बदलती',
   'This theme’s layout didn’t work: the default layout is back': 'इस थीम की व्यवस्था काम नहीं कर पाई: डिफ़ॉल्ट व्यवस्था लौट आई है',

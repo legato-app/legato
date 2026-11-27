@@ -1302,6 +1302,8 @@ const sv: Record<string, string> = {
   'Artist pages arranged their own way': 'Artistsidorna ordnade på eget sätt',
   'Library lists arranged their own way': 'Bibliotekets listor ordnade på eget sätt',
   'List columns in another order': 'Listkolumnerna i annan ordning',
+  'Home arranged its own way': 'Hem ordnat på eget sätt',
+  'Home sections': 'Hems avsnitt',
   'Default layout': 'Standardlayout',
   'Themes no longer arrange the app': 'Teman ordnar inte längre om appen',
   'This theme’s layout didn’t work: the default layout is back': 'Temats layout fungerade inte: standardlayouten är tillbaka',

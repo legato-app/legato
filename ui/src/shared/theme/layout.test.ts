@@ -82,7 +82,7 @@ describe('headerLayout', () => {
   })
 
   it('travels in the layout, said in the warning, ignored on a phone', () => {
-    const layout = sanitizeLayout({ v: 1, pages: { header: { art: 'none' }, home: {} } })!
+    const layout = sanitizeLayout({ v: 1, pages: { header: { art: 'none' }, radio: {} } })!
     expect(layout.pages).toEqual({ header: { art: 'none' } })
     expect(layoutSummary(layout)).toEqual(['Page headers arranged another way'])
     expect(resolveLayout(layout).pages.header).toEqual({ art: 'none' })
@@ -95,7 +95,7 @@ describe('a page’s parts', () => {
     const got = sanitizeLayout({ v: 1, pages: { album: { order: ['more', 'credits'], hidden: ['tracks', 'more'] }, artist: { hidden: ['mostPlayed', 'topSongs', 'links', 'about'] }, home: { hidden: ['more'] } } })!
     expect(got.pages).toEqual({ album: { order: ['more'], hidden: ['more'] }, artist: { hidden: ['about'] } })
     expect(arrangeParts({ order: ['shelves', 'mostPlayed'] }, pagePartIds('artist'))).toEqual(['shelves', 'mostPlayed', 'topSongs', 'discography', 'about', 'links'])
-    for (const page of ['album', 'artist', 'songs', 'albums', 'artists'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
+    for (const page of ['album', 'artist', 'songs', 'albums', 'artists', 'home'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
   })
 
   it('says which pages change', () => {
@@ -116,6 +116,14 @@ describe('library lists', () => {
     const layout = sanitizeLayout({ v: 1, pages: { lists: { columns: ['plays', 'duration', 'title', 'album'] }, songs: { order: ['list', 'toolbar'], hidden: ['toolbar', 'browser'] }, albums: { hidden: ['list'] } } })!
     expect(layout.pages).toEqual({ lists: { columns: ['plays', 'album'] }, songs: { order: ['list', 'toolbar'] } })
     expect(layoutSummary(layout)).toEqual(['Library lists arranged their own way', 'List columns in another order'])
+  })
+})
+
+describe('Home’s frame', () => {
+  it('moves the chips and the sections, hides neither', () => {
+    const layout = sanitizeLayout({ v: 1, pages: { home: { order: ['sections', 'chips'], hidden: ['chips'] } } })!
+    expect(layout.pages).toEqual({ home: { order: ['sections', 'chips'] } })
+    expect(layoutSummary(layout)).toEqual(['Home arranged its own way'])
   })
 })
 

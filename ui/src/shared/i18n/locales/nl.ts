@@ -1302,6 +1302,8 @@ const nl: Record<string, string> = {
   'Artist pages arranged their own way': 'Artiestpagina’s op hun eigen manier ingedeeld',
   'Library lists arranged their own way': 'Bibliotheeklijsten op hun eigen manier ingedeeld',
   'List columns in another order': 'Lijstkolommen in een andere volgorde',
+  'Home arranged its own way': 'Startpagina op eigen manier ingedeeld',
+  'Home sections': 'Onderdelen van de startpagina',
   'Default layout': 'Standaardindeling',
   'Themes no longer arrange the app': 'Thema’s delen de app niet meer in',
   'This theme’s layout didn’t work: the default layout is back': 'De indeling van dit thema werkte niet: de standaardindeling is terug',

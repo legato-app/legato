@@ -1302,6 +1302,8 @@ const de: Record<string, string> = {
   'Artist pages arranged their own way': 'Künstlerseiten eigens angeordnet',
   'Library lists arranged their own way': 'Bibliothekslisten eigens angeordnet',
   'List columns in another order': 'Listenspalten in anderer Reihenfolge',
+  'Home arranged its own way': 'Startseite eigens angeordnet',
+  'Home sections': 'Abschnitte der Startseite',
   'Default layout': 'Standardanordnung',
   'Themes no longer arrange the app': 'Themes ordnen die App nicht mehr an',
   'This theme’s layout didn’t work: the default layout is back': 'Die Anordnung dieses Themes hat nicht funktioniert: Die Standardanordnung ist zurück',

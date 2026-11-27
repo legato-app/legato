@@ -1311,6 +1311,8 @@ const fr: Record<string, string> = {
   'Artist pages arranged their own way': 'Les pages d’artiste disposées à leur façon',
   'Library lists arranged their own way': 'Les listes de la bibliothèque disposées à leur façon',
   'List columns in another order': 'Les colonnes des listes dans un autre ordre',
+  'Home arranged its own way': 'L’accueil disposé à sa façon',
+  'Home sections': 'Sections de l’accueil',
   'Default layout': 'Disposition par défaut',
   'Themes no longer arrange the app': 'Les thèmes ne disposent plus l’application',
   'This theme’s layout didn’t work: the default layout is back': 'La disposition de ce thème n’a pas fonctionné : celle par défaut est revenue',

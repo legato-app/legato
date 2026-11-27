@@ -4,6 +4,7 @@ import { artistName } from '../../shared/artistName'
 import { useShallow } from 'zustand/react/shallow'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { Fragment, lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { usePageParts } from '../../shared/ui/usePageParts'
 import { useSettings } from '../../app/settings'
 import { playlistSongs, useStore } from '../../app/store'
 import { api, playlistKey, type HomeItem, type LibraryTrack, type ListRef, type Mix, type NewRelease, type Play as PlayRow, type Shelf, type YtmHome } from '../../shared/api'
@@ -539,6 +540,7 @@ export function HomeView() {
     update({ homeFilter: f })
   }
 
+  const parts = usePageParts('home')
   // Show all: the Songs page sorted that way.
   const songsBy = (sort: Sort) => () => (useStore.getState().setSort(sort), go({ name: 'songs' }))
   const sec: Record<HomeSectionId, () => ReactNode> = {
@@ -597,11 +599,9 @@ export function HomeView() {
       ),
   }
 
-  // No page title (mockup): chips, then the shortcut tiles, then the sections.
-  return (
-    <div data-flow={homeFlow ? 'on' : undefined} className="group/home relative isolate flex min-h-0 flex-1 flex-col">
-      {homeFlow && <HomeFlow />}
-      {/* Over the flowing background the sections' own top room is the chips' (no seam: the list fades out under them, below). */}
+  const blocks: Record<string, ReactNode> = {
+    // Over the flowing background the sections' own top room is the chips' (no seam: the list fades out under them, below).
+    chips: (
       <div className={`flex shrink-0 items-start gap-4 phone:items-center phone:gap-1 phone:pb-3 ${homeFlow ? 'pb-0' : 'pb-4'}`}>
         {/* The phone: one row scrolled sideways. */}
         <div role="tablist" aria-label={tr('Show on Home')} className="no-scrollbar flex min-w-0 flex-1 flex-wrap items-center gap-2 phone:flex-nowrap phone:overflow-x-auto">
@@ -617,7 +617,9 @@ export function HomeView() {
           <SlidersHorizontal size={18} />
         </RoundButton>
       </div>
-      {/* Cards' padding reaches 12 px out (CardRow): room for it, or the row would scroll the page sideways. */}
+    ),
+    // Cards' padding reaches 12 px out (CardRow): room for it, or the row would scroll the page sideways.
+    sections: (
       <div className={`@container stagger -mx-3 flex min-h-0 flex-1 flex-col gap-5.5 overflow-y-auto px-3 pb-8 ${homeFlow ? FADE_EDGES : ''}`}>
         {/* Nothing in the library yet: the welcome's ways in, first; tiles and a week with nothing in them, not yet. */}
         {empty && (
@@ -648,6 +650,16 @@ export function HomeView() {
           </p>
         )}
       </div>
+    ),
+  }
+
+  // No page title (mockup): chips, then the shortcut tiles, then the sections.
+  return (
+    <div data-flow={homeFlow ? 'on' : undefined} className="group/home relative isolate flex min-h-0 flex-1 flex-col">
+      {homeFlow && <HomeFlow />}
+      {parts.map((part) => (
+        <Fragment key={part}>{blocks[part]}</Fragment>
+      ))}
       {customizing && <CustomizeHome onClose={() => setCustomizing(false)} />}
     </div>
   )

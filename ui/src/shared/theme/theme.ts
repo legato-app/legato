@@ -46,7 +46,7 @@ export interface Background {
 }
 
 /** Settings a theme can bring along ("parts of the UX"). */
-export const LOOK_KEYS = ['covers', 'density', 'readout', 'volume', 'tuner', 'tint', 'appTint', 'immersive', 'backdropBlur', 'backdropDim', 'backdropMotion', 'motion', 'sidebarCounts', 'listCovers', 'columns'] as const
+export const LOOK_KEYS = ['covers', 'density', 'readout', 'volume', 'tuner', 'tint', 'appTint', 'immersive', 'backdropBlur', 'backdropDim', 'backdropMotion', 'motion', 'sidebarCounts', 'listCovers', 'columns', 'homeSections'] as const
 export type LookKey = (typeof LOOK_KEYS)[number]
 export type Look = Partial<Pick<Settings, LookKey>>
 
@@ -845,6 +845,14 @@ function sanitizeLook(raw: unknown): Look | undefined {
   // Current defaults version: no defaults migration on a look.
   const clean = sanitize({ ...(raw as object), defaultsVersion: DEFAULTS_VERSION })
   return Object.fromEntries(given.map((k) => [k, clean[k]])) as Look
+}
+
+/** A theme picked: itself and the look it brings, written into the settings (the user's to change after). Home's
+ *  sections that send something (`HOME_OFF`) keep the user's own switch: a theme never turns one on or off. */
+export function pickTheme(theme: Theme, settings: Pick<Settings, 'homeSections'>): Partial<Settings> {
+  const order = theme.look?.homeSections
+  const homeSections = order?.map((section) => (HOME_OFF.includes(section.id) ? (settings.homeSections.find((own) => own.id === section.id) ?? { ...section, on: false }) : section))
+  return { theme: theme.id, ...theme.look, ...(homeSections && { homeSections }) }
 }
 
 /** The look settings as they are now (to save into a theme). */
