@@ -578,6 +578,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       - Decided alone (2026-11-27): a runner of its own rather than a second build in `release` (that one would delay
         the APK's attach and turn the full app's job red); Lite installer `Legato.Lite_X.Y.Z_x64-setup.exe`, NSIS only;
         a beta without the Lite's file is still promoted (warned), Lite PCs on Stable then find no update until the next.
+      - Decided alone (2026-11-27): a failed Lite leaves the release run red though the full Beta shipped; kept as the
+        signal (no `continue-on-error`, which would hide it). `lite` stops at 45 min (the one `release` group waits for
+        it); a re-run of an older run never takes Beta's `latest-lite.json` back.
     - [x] Slice 1 review fixes, 2026-11-27: Lite registers `legato://` when it is alone, the full app takes it over from
       an exe in a "Legato Lite" folder (`protocol::keeps`), Lite's `windows/hooks-lite.nsh` deletes the key only when it
       names `$INSTDIR`; `identity::PRODUCT` names the Run entry, tray, mixer (its own group), window title and error box;
