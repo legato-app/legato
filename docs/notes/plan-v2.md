@@ -571,7 +571,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - [x] Slice 1, 2026-11-27 (`9fd3a288`, `761b1626`): feature `lite`, `tauri.lite.conf.json` (and `.lite.dev` for
       `pnpm dev:lite`), `INSTALLED` per edition in `identity.rs`, `latest-lite.json` for Stable and Beta,
       `rename.rs` and the old Run entry compiled out, `__LITE__` and `shared/edition.ts` (read by nothing yet),
-      `pnpm build:lite`. Tests in both editions, `cargo check` / clippy `--features lite`; not tried for real (no Lite
+      `pnpm build:lite`. Tests in both editions, `cargo check` / clippy of the Lite (now `--no-default-features --features lite`); not tried for real (no Lite
       built or installed).
       - Decided alone (2026-11-27): a Lite exe built without its overlay is a guest (exact identifier per edition); Lite
         never registered `legato://` at first (replaced by the review fixes below); no installer
@@ -589,14 +589,14 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       `rooms`, the player's `detector`); Lite builds `--no-default-features --features lite` (`pnpm dev:lite` /
       `build:lite`, `release.yml`'s `lite` job), registering none of the cut commands (plugins, rooms, Music Detector,
       Live Editor exports and edits, remix files, visualizer, remote and overlay, podcasts, Discord sign-in);
-      `check.yml`'s Windows job checks it. `cargo check` and clippy `--all-targets` pass in both editions: 616 crates in
+      `check.yml`'s Windows job runs clippy on it; `lite` with `full` is a compile error. `cargo check` and clippy `--all-targets` pass in both editions: 616 crates in
       the full app, 526 in Lite. Not tried for real (no Lite built, installed or run).
       - Decided alone (2026-11-27): `default = ["full"]`, since Cargo can't drop a dependency for a feature that is on;
         the equalizer, levelling and the engine's meters keep their commands; the rooms' local half and the remote's
         server stay in the code, unregistered (links.rs paces searches through rooms, cast uses the remote's address);
         the AudD token still syncs in Lite (`secrets::AUDD_TOKEN`).
     - [x] Slice 4, 2026-11-27: `release.yml` jobs `lite` (its own Windows runner beside `release` and `android`:
-      `tauri build --features lite --bundles nsis`, the same updater key, `latest-lite.json` written in tauri-action's
+      `tauri build --features lite --bundles nsis -- --no-default-features`, the same updater key, `latest-lite.json` written in tauri-action's
       shape) and `lite-attach` (installer, `.sig` and `latest-lite.json` on `vX.Y.Z`, then `latest-lite.json` on `beta`);
       `scripts/promote.mjs` carries `latest-lite.json` to Stable when the release has one; the site's download picker
       takes only `Legato_…-setup.exe`. Not tried for real (no release run yet); the site's Lite download is slice 6.

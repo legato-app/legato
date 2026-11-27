@@ -214,7 +214,7 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
-  # Legato Lite (`--features lite`, tauri.lite.conf.json, `vite --mode lite`): its own signed NSIS installer and
+  # Legato Lite (`--no-default-features --features lite`, tauri.lite.conf.json, `vite --mode lite`): its own signed NSIS installer and
   # latest-lite.json, built beside the full app on its own runner. Not in the `release` job: there it would hold the APK's
   # attach back by its build time, and a Lite failure would turn the full app's job red. Not with tauri-action either: it
   # would write its own latest.json over the full app's. Same commit, same version, same updater key. Windows only for now.

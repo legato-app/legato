@@ -1,3 +1,7 @@
+// The code goes by `lite`, the dependencies by the default feature `full`: both at once would be a Lite that carries them.
+#[cfg(all(feature = "lite", feature = "full"))]
+compile_error!("Legato Lite: --no-default-features --features lite");
+
 mod spotify_cmd;
 mod webview_watch;
 mod listening;

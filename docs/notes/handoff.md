@@ -47,7 +47,8 @@ changes; older versions are in git. Updated 2026-11-27, end of window 1 on the s
 ## Next, in order (the owner's decisions of 2026-11-27)
 1. **Finish what is in flight**: done, except the Lite tray label LOW (a fix in progress). Then review it and push
    platforms.
-2. **Lite, the rest**: slices 2 and 3 (the UI and Rust cuts, `cargo check --features lite` in CI), 5 (`pnpm bench` on the
+2. **Lite, the rest**: slices 2 and 3 (the UI and Rust cuts,
+   `cargo clippy --no-default-features --features lite` in CI), 5 (`pnpm bench` on the
    Lite), 6 (docs and a Lite download on the site), then the performance slices 7-10, each measured against the target:
    one YouTube embed and no crossfade, animations off by default, fewer background tasks, a 250 MB cover cache. Platform
    order: Windows, then Android (its own overlay `app.legato.lite.mobile`, an APK feed per edition), then Linux.
