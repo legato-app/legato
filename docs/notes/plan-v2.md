@@ -27,6 +27,14 @@ the order; a line leaves only when it ships or the user drops it.
       Decided alone (2026-11-27): ticked on that; the songs the mixes had already dropped have their own line below.
 - [ ] `S` Songs old mixes dropped, now in no playlist and never played (for the owner): not told apart from songs added
       by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the way.
+- [x] `M` Disconnecting Spotify asks once to keep or remove what only Spotify brought, a library backup made first (the
+      owner, 2026-11-26). 2026-11-27: the question after Disconnect removes the imported playlists and the songs only
+      Spotify knows that nothing else holds (`library::cleanup`, the mix cleanup’s rule: no other source, no list that
+      stays, no like, play, rating, preference, bookmark, edit or word of the user’s); the copy leaves after 30 days.
+      Tests in core, not tried for real.
+      Decided alone (2026-11-27): one question (the playlists-only one is gone); a song already matched to a YouTube video
+      has another source and stays; Spotify’s own Liked Songs list does not keep a song (likes are Liked Music’s); Sync
+      Mode removes the playlists on the other PCs, not the songs.
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et

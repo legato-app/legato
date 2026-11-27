@@ -4,16 +4,15 @@ use crate::{AppState, CmdResult, err};
 use std::path::Path;
 use tauri::{AppHandle, Emitter, Manager, State};
 
-/// Once, after the first screen: the mixes older versions synced leave the library (`library::mix_cleanup`), after a
+/// Once, after the first screen: the mixes older versions synced leave the library (`library::cleanup`), after a
 /// copy of it next to it. No copy, no cleanup (tried again next start).
 pub fn remove_old_mixes(app: &AppHandle) {
     let Some(state) = app.try_state::<AppState>() else { return };
     if !matches!(state.lib().mix_cleanup_pending(), Ok(true)) {
         return;
     }
-    let copied = app.path().app_data_dir().map_err(anyhow::Error::from).and_then(|dir| music_core::library::back_up_before_mix_cleanup(&dir.join("library.db")));
     // The library is locked only once the copy is made.
-    match copied.and_then(|_| state.lib().remove_made_up_mixes()) {
+    match back_up_before(app, music_core::library::MIX_CLEANUP_COPY).and_then(|_| state.lib().remove_made_up_mixes()) {
         Ok(removed) => {
             crate::diag::info("library", "old YouTube mixes removed", &format!("{} lists, {} songs", removed.playlists, removed.songs));
             let _ = app.emit_to("main", "local-changed", 0);
@@ -39,14 +38,20 @@ pub fn drop_spotify_art(app: &AppHandle) {
     }
 }
 
-/// After the first screen: the copy made before the mixes' cleanup leaves after 30 days.
-pub fn drop_old_mix_backups(app: &AppHandle) {
-    drop_mix_backups(app, std::time::Duration::from_secs(30 * 86_400));
+/// A copy of the library next to it before a cleanup (`copy` = which).
+pub fn back_up_before(app: &AppHandle, copy: &str) -> anyhow::Result<()> {
+    music_core::library::back_up_before_cleanup(&app.path().app_data_dir()?.join("library.db"), copy)?;
+    Ok(())
+}
+
+/// After the first screen: a copy made before a cleanup leaves after 30 days.
+pub fn drop_old_cleanup_backups(app: &AppHandle) {
+    drop_cleanup_backups(app, std::time::Duration::from_secs(30 * 86_400));
 }
 
 /// Removes those copies `kept` or more old; a failure is only logged.
-pub fn drop_mix_backups(app: &AppHandle, kept: std::time::Duration) {
-    let removed = app.path().app_data_dir().map_err(anyhow::Error::from).and_then(|dir| music_core::library::remove_mix_cleanup_backups(&dir.join("library.db"), kept));
+pub fn drop_cleanup_backups(app: &AppHandle, kept: std::time::Duration) {
+    let removed = app.path().app_data_dir().map_err(anyhow::Error::from).and_then(|dir| music_core::library::remove_cleanup_backups(&dir.join("library.db"), kept));
     if let Err(e) = removed {
         crate::diag::warn("library", "a copy of the library not removed", &format!("{e:#}"));
     }

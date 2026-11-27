@@ -104,13 +104,15 @@ function ServiceRow({ service }: { service: 'spotify' }) {
   const [dirs, setDir] = useDirections()
   const leave = async () => {
     await disconnect(service)
-    const { status, raw, refresh } = useStore.getState()
+    const { status, raw, tracks, refresh } = useStore.getState()
     if (status[service].connected) return
     // The PC's only: a phone has no Spotify page signed in.
     const signedOut = phoneApp ? '' : tr('This PC is also signed out of Spotify’s page.')
-    if (!raw.playlists.some((playlist) => playlist.source === service)) return void (signedOut && useStore.getState().notify(signedOut, { kind: 'info' }))
-    if (!(await ask({ title: tr('Also remove the playlists imported from Spotify?'), body: [tr('The songs stay in your library.'), tr('They’re removed on this PC; a PC still connected to Spotify brings them back.'), signedOut].join('\n'), ok: tr('Remove'), cancel: tr('Keep') }))) return
-    await api.removeSpotifyPlaylists().then(refresh, (e: unknown) => useStore.setState({ error: String(e) }))
+    const brought = raw.playlists.some((playlist) => playlist.source === service) || tracks.some((track) => Object.keys(track.ids).join() === service)
+    if (!brought) return void (signedOut && useStore.getState().notify(signedOut, { kind: 'info' }))
+    const body = [tr('The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.'), tr('They’re removed on this PC; a PC still connected to Spotify brings them back.'), signedOut]
+    if (!(await ask({ title: tr('Also remove what Spotify brought?'), body: body.join('\n'), ok: tr('Remove'), cancel: tr('Keep') }))) return
+    await api.removeSpotifyImports().then(refresh, (e: unknown) => useStore.setState({ error: String(e) }))
   }
   return (
     <div data-setting={sourceLabel[service]} className={`flex flex-col gap-3 border-b border-line-soft px-4 py-3.5 ${selected ? 'bg-bg' : ''}`}>

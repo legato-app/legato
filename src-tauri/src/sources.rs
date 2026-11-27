@@ -46,10 +46,15 @@ pub async fn disconnect(app: tauri::AppHandle, state: State<'_, AppState>, sourc
     Ok(())
 }
 
-/// Asked after Spotify's disconnect: its imported playlists leave too.
+/// Asked after Spotify's disconnect: its imported playlists and the songs only it brought leave, after a copy of the
+/// library (no copy, nothing removed).
 #[tauri::command]
-pub async fn remove_spotify_playlists(state: State<'_, AppState>) -> CmdResult<usize> {
-    state.lib().remove_spotify_playlists().map_err(err)
+pub async fn remove_spotify_imports(app: tauri::AppHandle, state: State<'_, AppState>) -> CmdResult<()> {
+    let copying = app.clone();
+    tauri::async_runtime::spawn_blocking(move || crate::backup::back_up_before(&copying, music_core::library::SPOTIFY_REMOVAL_COPY)).await.map_err(err)?.map_err(err)?;
+    let removed = state.lib().remove_spotify_imports().map_err(err)?;
+    diag::info("library", "Spotify's imports removed", &format!("{} lists, {} songs", removed.playlists, removed.songs));
+    Ok(())
 }
 
 #[tauri::command]

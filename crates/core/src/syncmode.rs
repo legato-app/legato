@@ -104,7 +104,7 @@ impl PlaylistSnap {
 
 impl Snapshot {
     /// Tracks (indexes) its made-up mixes hold, only YouTube can play and nothing of the user's names: no other list,
-    /// add, preference, rating, play or edit (`library::mix_cleanup`'s rule, as far as a snapshot tells).
+    /// add, preference, rating, play or edit (`library::cleanup`'s rule, as far as a snapshot tells).
     fn only_in_made_up_mixes(&self) -> HashSet<u32> {
         let (mixes, others): (Vec<&PlaylistSnap>, Vec<&PlaylistSnap>) = self.playlists.iter().partition(|p| p.made_up_mix());
         let mut only: HashSet<u32> = mixes.iter().flat_map(|p| p.tracks.iter().copied()).collect();
@@ -592,7 +592,7 @@ impl Library {
             local.insert(i, id);
             Ok(id)
         };
-        // A PC not cleaned of the made-up mixes yet (`library::mix_cleanup`): neither they nor the songs only they hold
+        // A PC not cleaned of the made-up mixes yet (`library::cleanup`): neither they nor the songs only they hold
         // come back.
         let only_in_mixes = s.only_in_made_up_mixes();
         for i in s.library.iter().filter(|i| !only_in_mixes.contains(i)) {

@@ -386,8 +386,8 @@ const SPONSOR_KEEP_S: i64 = 30 * 86_400;
 const CACHES: [&str; 5] = ["lyrics", "sponsor", "silence", "loudness", "waveform"];
 
 mod extras;
-mod mix_cleanup;
-pub use mix_cleanup::{MixesRemoved, back_up_before_mix_cleanup, is_made_up_mix, remove_mix_cleanup_backups};
+mod cleanup;
+pub use cleanup::{CleanedUp, MIX_CLEANUP_COPY, SPOTIFY_REMOVAL_COPY, back_up_before_cleanup, is_made_up_mix, remove_cleanup_backups};
 mod playlists;
 mod tracks;
 

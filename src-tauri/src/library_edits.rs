@@ -38,7 +38,7 @@ pub async fn set_rating(state: State<'_, AppState>, track_id: i64, stars: u8) ->
 pub async fn clear_history(app: tauri::AppHandle, state: State<'_, AppState>) -> CmdResult<()> {
     state.lib().clear_history().map_err(err)?;
     // The copy made before the mixes' cleanup holds the history too. The history is forgotten whatever becomes of it.
-    crate::backup::drop_mix_backups(&app, std::time::Duration::ZERO);
+    crate::backup::drop_cleanup_backups(&app, std::time::Duration::ZERO);
     Ok(())
 }
 

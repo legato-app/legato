@@ -1605,17 +1605,6 @@ fn spotify_covers_are_never_kept_and_old_ones_leave_once() {
 }
 
 #[test]
-fn spotify_playlists_can_leave_with_the_account() {
-    let lib = Library::in_memory().unwrap();
-    lib.save_playlist(Source::Spotify, "a", "From Spotify", &[spotify()]).unwrap();
-    lib.save_playlist(Source::Youtube, "b", "From YouTube", &[youtube()]).unwrap();
-    assert_eq!(lib.remove_spotify_playlists().unwrap(), 1);
-    assert_eq!(lib.playlists().unwrap().iter().map(|p| p.name.as_str()).collect::<Vec<_>>(), ["From YouTube"]);
-    assert!(!lib.tracks().unwrap().is_empty(), "the songs stay");
-    assert_eq!(lib.remove_spotify_playlists().unwrap(), 0);
-}
-
-#[test]
 fn a_setting_is_read_and_written_as_its_type() -> Result<()> {
     let library = Library::in_memory()?;
     assert_eq!(library.setting_as::<Vec<String>>("folders"), None);
