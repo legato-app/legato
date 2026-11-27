@@ -274,6 +274,8 @@ the order; a line leaves only when it ships or the user drops it.
     renames no song a PC has.
 - [ ] `S` Mixes' artist key for a YouTube Music upload titled "Title - Artist" (`mixes::credit` splits it on the dash
       and takes the left side): grouping, Like seeds and the artist name a mix may show; no song renamed.
+- [ ] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
+      `turn_video_only` on the songs a merge inserts, never on one already there.
 
 ## The owner's asks of 2026-11-07, evening
 
@@ -566,8 +568,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       `pnpm build:lite`. Tests in both editions, `cargo check` / clippy `--features lite`; not tried for real (no Lite
       built or installed).
       - Decided alone (2026-11-27): a Lite exe built without its overlay is a guest (exact identifier per edition); Lite
-        never registers `legato://` for now (first, it would keep it from a full app installed later); no installer
-        hooks nor `.lmix` association in Lite; its Run entry is "Legato Lite".
+        never registered `legato://` at first (replaced by the review fixes below); no installer
+        hooks of the full app nor `.lmix` association in Lite; its Run entry is "Legato Lite".
     - [x] Slice 4, 2026-11-27: `release.yml` jobs `lite` (its own Windows runner beside `release` and `android`:
       `tauri build --features lite --bundles nsis`, the same updater key, `latest-lite.json` written in tauri-action's
       shape) and `lite-attach` (installer, `.sig` and `latest-lite.json` on `vX.Y.Z`, then `latest-lite.json` on `beta`);
@@ -576,6 +578,13 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       - Decided alone (2026-11-27): a runner of its own rather than a second build in `release` (that one would delay
         the APK's attach and turn the full app's job red); Lite installer `Legato.Lite_X.Y.Z_x64-setup.exe`, NSIS only;
         a beta without the Lite's file is still promoted (warned), Lite PCs on Stable then find no update until the next.
+    - [x] Slice 1 review fixes, 2026-11-27: Lite registers `legato://` when it is alone, the full app takes it over from
+      an exe in a "Legato Lite" folder (`protocol::keeps`), Lite's `windows/hooks-lite.nsh` deletes the key only when it
+      names `$INSTDIR`; `identity::PRODUCT` names the Run entry, tray, mixer (its own group), window title and error box;
+      feature-free tests hold the Lite config's nulls, hooks and identifier. Not tried for real.
+    - Android slice, still open: its own overlay over `tauri.android.conf.json` (`app.legato.lite.mobile`, not the
+      `app.legato.lite` this one would give) and an APK feed per edition (`crates/connectors/src/apk.rs` `BETA` is the
+      full app's `latest.json`: a Lite phone would be offered the full APK).
     - Lighter slices (2026-11-27), each with its number before and after in `docs/performance.md`: 7 one YouTube
       embed (PlayerBar's second `YouTubeFrame` never made; crossfade absent from Settings › Playback, its value kept as
       is in the settings file); 8 `motion` off in Lite's own defaults (the user can turn it on); 9 fewer background

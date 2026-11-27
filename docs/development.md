@@ -29,7 +29,8 @@ at phone size too).
 ## Your dev build has its own data
 
 `pnpm dev` runs as `app.legato.desktop.devbuild` (`src-tauri/tauri.dev.conf.json`): its own library, keychain entries
-and Google session, never the installed app's.
+and Google session, never the installed app's. `pnpm dev:lite` (`app.legato.lite.devbuild`) has its own data too, but
+it uses the same Vite port 5173 and the same `target\debug\legato.exe`: run one or the other, never both at once.
 
 Only the installed app, identifier exactly `app.legato.desktop`, may touch the PC outside its own folders
 (`src-tauri/src/identity.rs`, `identity::installed()`): install an update over itself (`update.rs`), own the HKCU Run
