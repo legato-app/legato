@@ -1,4 +1,10 @@
 import { type ComponentType, createElement, lazy } from 'react'
+import { isCutPage } from '../shared/liteCuts'
+
+/** A page Lite cuts (shared/liteCuts.ts) draws nothing and its chunk is never asked for. */
+function unlessCut<T>(name: string, fetch: () => Promise<T>): () => Promise<T> {
+  return isCutPage(name) ? () => Promise.resolve({ default: () => null } as T) : fetch
+}
 
 // Pages that load on their first visit, not at launch (the shell, sidebar and player bar stay in the first chunk); Now
 // Playing, the lyrics panel and the dialogs too.
@@ -9,10 +15,10 @@ const load = {
   search: () => import('../features/search/SearchView').then((m) => ({ default: m.SearchView })),
   mixes: () => import('../features/mixes/MixesView').then((m) => ({ default: m.MixesView })),
   mix: () => import('../features/mixes/MixesView').then((m) => ({ default: m.MixView })),
-  podcasts: () => import('../features/podcasts/PodcastsView').then((m) => ({ default: m.PodcastsView })),
-  books: () => import('../features/books/BooksView').then((m) => ({ default: m.BooksView })),
-  tv: () => import('../features/livingRoom/TvHome').then((m) => ({ default: m.TvHome })),
-  keyboard: () => import('../features/livingRoom/OnScreenKeyboard').then((m) => ({ default: m.OnScreenKeyboard })),
+  podcasts: unlessCut('podcasts', () => import('../features/podcasts/PodcastsView').then((m) => ({ default: m.PodcastsView }))),
+  books: unlessCut('books', () => import('../features/books/BooksView').then((m) => ({ default: m.BooksView }))),
+  tv: unlessCut('tv', () => import('../features/livingRoom/TvHome').then((m) => ({ default: m.TvHome }))),
+  keyboard: unlessCut('keyboard', () => import('../features/livingRoom/OnScreenKeyboard').then((m) => ({ default: m.OnScreenKeyboard }))),
   radio: () => import('../features/radio/RadioView').then((m) => ({ default: m.RadioView })),
   stats: () => import('../features/stats/StatsView').then((m) => ({ default: m.StatsView })),
   history: () => import('../features/history/HistoryView').then((m) => ({ default: m.HistoryView })),
@@ -26,20 +32,20 @@ const load = {
   notFound: () => import('../features/library/NotFoundView').then((m) => ({ default: m.NotFoundView })),
   health: () => import('../features/library/HealthView').then((m) => ({ default: m.HealthView })),
   settings: () => import('../features/settings/SettingsView').then((m) => ({ default: m.SettingsView })),
-  addons: () => import('../features/addons/AddonsView').then((m) => ({ default: m.AddonsView })),
-  editor: () => import('../features/editor/EditorPanel').then((m) => ({ default: m.EditorPanel })),
+  addons: unlessCut('addons', () => import('../features/addons/AddonsView').then((m) => ({ default: m.AddonsView }))),
+  editor: unlessCut('editor', () => import('../features/editor/EditorPanel').then((m) => ({ default: m.EditorPanel }))),
   shelf: () => import('../features/home/HomeView').then((m) => ({ default: m.YouTubeShelf })),
-  karaoke: () => import('../features/player/Karaoke').then((m) => ({ default: m.Karaoke })),
-  vizScreen: () => import('../features/player/VizScreen').then((m) => ({ default: m.VizScreen })),
+  karaoke: unlessCut('karaoke', () => import('../features/player/Karaoke').then((m) => ({ default: m.Karaoke }))),
+  vizScreen: unlessCut('vizScreen', () => import('../features/player/VizScreen').then((m) => ({ default: m.VizScreen }))),
   coverScreen: () => import('../features/player/CoverScreen').then((m) => ({ default: m.CoverScreen })),
   pipScreen: () => import('../features/player/PipScreen').then((m) => ({ default: m.PipScreen })),
-  pluginColumn: () => import('../features/plugins/PluginColumn').then((m) => ({ default: m.PluginColumn })),
+  pluginColumn: unlessCut('pluginColumn', () => import('../features/plugins/PluginColumn').then((m) => ({ default: m.PluginColumn }))),
   share: () => import('../features/share/ShareDialog').then((m) => ({ default: m.ShareDialog })),
-  room: () => import('../features/rooms/RoomDialog').then((m) => ({ default: m.RoomDialog })),
+  room: unlessCut('room', () => import('../features/rooms/RoomDialog').then((m) => ({ default: m.RoomDialog }))),
   welcome: () => import('../features/welcome/Welcome').then((m) => ({ default: m.Welcome })),
   nowPlaying: () => import('../features/player/NowPlaying').then((m) => ({ default: m.NowPlaying })),
   lyrics: () => import('../features/player/LyricsPanel').then((m) => ({ default: m.LyricsPanel })),
-  blindTest: () => import('../features/blind/BlindTest').then((m) => ({ default: m.BlindTest })),
+  blindTest: unlessCut('blindTest', () => import('../features/blind/BlindTest').then((m) => ({ default: m.BlindTest }))),
   importDialog: () => import('../features/share/ImportDialog').then((m) => ({ default: m.ImportDialog })),
   importScreen: () => import('../features/add/ImportScreen').then((m) => ({ default: m.ImportScreen })),
   connectWizard: () => import('../features/sources/ConnectWizard').then((m) => ({ default: m.ConnectWizard })),

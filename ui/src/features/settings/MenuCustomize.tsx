@@ -6,6 +6,7 @@ import { Button } from '../../shared/ui/Button'
 import { Segmented } from '../../shared/ui/controls'
 import { Dialog } from '../../shared/ui/Dialog'
 import { foldedBy, moveItem, orderedDefs, resetKind, toggleItem, type MenuKind } from '../../shared/ui/menuShape'
+import { isCutMenuItem, isCutMenuKind } from '../../shared/liteCuts'
 
 /** The kinds of right-click menu that have items to choose (album and artist pages use the songs' menu). */
 const KINDS: [MenuKind, string][] = [
@@ -30,7 +31,7 @@ export default function MenuCustomize({ onClose }: { onClose: () => void }) {
   const update = useSettings((s) => s.update)
   const [kind, setKind] = useState<MenuKind>('track')
   const set = (next: typeof layout) => update({ menuLayout: next })
-  const rows = orderedDefs(kind, layout)
+  const rows = orderedDefs(kind, layout).filter((d) => !isCutMenuItem(d.id))
   const hidden = layout.hidden[kind] ?? []
   const touched = hidden.length > 0 || (layout.order[kind]?.length ?? 0) > 0
   return (
@@ -48,7 +49,7 @@ export default function MenuCustomize({ onClose }: { onClose: () => void }) {
           ]}
         />
         <select aria-label={tr('Menu')} value={kind} onChange={(e) => setKind(e.target.value as MenuKind)} className="h-8 w-fit max-w-full rounded-md border border-line bg-bg px-2 text-[0.8125rem]">
-          {KINDS.map(([k, label]) => (
+          {KINDS.filter(([k]) => !isCutMenuKind(k)).map(([k, label]) => (
             <option key={k} value={k}>
               {tr(label)}
             </option>

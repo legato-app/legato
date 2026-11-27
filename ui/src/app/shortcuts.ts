@@ -6,7 +6,7 @@ import { togglePip, usePip } from '../features/player/pipMode'
 import { toggleVizFull, useVizFull } from '../features/player/vizFull'
 import { nudgeVolume } from '../features/player/volume'
 import { api } from '../shared/api'
-import { accelerator, ACTIONS, bindings, comboOf, type ActionId, type Combo } from './keys'
+import { accelerator, bindings, comboOf, OFFERED_ACTIONS, type ActionId, type Combo } from './keys'
 import { useSettings } from './settings'
 import { useStore } from './store'
 import { toggleFullscreen } from './fullscreen'
@@ -87,7 +87,7 @@ export const useGlobalShortcuts = create<{ failed: ActionId[] }>(() => ({ failed
 /** Registers the global bindings with the OS (Rust). Called at launch and whenever they change. */
 async function registerGlobals(custom: Parameters<typeof bindings>[0]) {
   const b = bindings(custom)
-  const list = ACTIONS.flatMap((a) => (b[a.id].global ? [{ id: a.id, accelerator: accelerator(b[a.id].global!) }] : []))
+  const list = OFFERED_ACTIONS.flatMap((a) => (b[a.id].global ? [{ id: a.id, accelerator: accelerator(b[a.id].global!) }] : []))
   const failed = await api.setGlobalShortcuts(list).catch(() => list.map((l) => l.id))
   useGlobalShortcuts.setState({ failed: failed as ActionId[] })
 }
@@ -103,7 +103,7 @@ export function startShortcuts(): () => void {
   let custom = useSettings.getState().settings.shortcuts
   const rebuild = () => {
     const b = bindings(custom)
-    map = new Map(ACTIONS.flatMap((a) => (b[a.id].keys ? [[b[a.id].keys!, a.id] as const] : [])))
+    map = new Map(OFFERED_ACTIONS.flatMap((a) => (b[a.id].keys ? [[b[a.id].keys!, a.id] as const] : [])))
   }
   rebuild()
   void registerGlobals(custom)

@@ -61,6 +61,7 @@ import { PhoneTabs } from './PhoneTabs'
 import { Asker } from '../shared/ui/Ask'
 import { WebcamScan } from '../features/share/WebcamScan'
 import { tr, trn, useLang } from '../shared/i18n/i18n'
+import { offered } from '../shared/liteCuts'
 
 // Pages load on first visit (pages.ts), Home's download starts now, in parallel with the settings and the library.
 preloadHome()
@@ -135,7 +136,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
     return () => void off.then((f) => f())
   }, [])
   const shown: string[] = bare ? ['search'] : arrangeParts(choice, PART_GROUPS.topbar[0])
-  const addons = !full && shown.includes('addons') && (
+  const addons = !full && offered('plugins') && shown.includes('addons') && (
     <button className={`${winBtn} rounded-full! phone:hidden ${page === 'addons' ? 'bg-raised' : ''}`} aria-label={tr('Add-ons')} title={tr('Add-ons')} onClick={() => go({ name: 'addons' })} onContextMenu={onMenu(() => navMenu({ name: 'addons' }))}>
       <PuzzlePiece size={18} weight={page === 'addons' ? 'fill' : 'regular'} />
     </button>
@@ -147,7 +148,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
   const hiddenEntries = (): MenuEntry[] => [
     !shown.includes('history') && { label: tr('Back'), icon: <CaretLeft size={16} />, disabled: !canBack, onSelect: goBack },
     !shown.includes('history') && { label: tr('Forward'), icon: <CaretRight size={16} />, disabled: !canForward, onSelect: goForward },
-    !shown.includes('addons') && { label: tr('Add-ons'), icon: <PuzzlePiece size={16} />, onSelect: () => go({ name: 'addons' }) },
+    offered('plugins') && !shown.includes('addons') && { label: tr('Add-ons'), icon: <PuzzlePiece size={16} />, onSelect: () => go({ name: 'addons' }) },
   ]
   const blocks: Record<string, ReactNode> = {
     // ← → of the mockups (the mouse's back / forward buttons do the same). Nowhere to go: not drawn, its place kept
@@ -359,7 +360,7 @@ export function App() {
       if (e.target instanceof Element && e.target.closest('input, textarea, [contenteditable]')) return
       const text = e.clipboardData?.getData('text').trim() ?? ''
       const kind = linkKind(text)
-      if (isRemixLink(text)) void import('../features/editor/remixFile').then((m) => m.openRemixLink(text))
+      if (offered('liveEditor') && isRemixLink(text)) void import('../features/editor/remixFile').then((m) => m.openRemixLink(text))
       else if (isShareCode(text)) useStore.setState({ incoming: text })
       else if (kind === 'spotify') void useStore.getState().importSpotify(text)
       else if (kind === 'deezer' || kind === 'apple') void useStore.getState().importLink(text, kind)

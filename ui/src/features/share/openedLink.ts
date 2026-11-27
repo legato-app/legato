@@ -3,6 +3,7 @@ import { api } from '../../shared/api'
 import { isRemixLink } from '../editor/remixLink'
 import { openInvite, ROOM_LINK } from '../rooms/room'
 import { isShareCode } from './shareCode'
+import { offered } from '../../shared/liteCuts'
 
 /**
  * A `legato://` link Windows handed to the app (the share page's Open in Legato), or a `.lmix` file double-clicked: at
@@ -15,10 +16,10 @@ export function startOpenedLinks(): () => void {
       .linkPending()
       .then((text) => {
         if (!text) return
-        if (isRemixLink(text)) void import('../editor/remixFile').then((m) => m.openRemixLink(text))
+        if (offered('liveEditor') && isRemixLink(text)) void import('../editor/remixFile').then((m) => m.openRemixLink(text))
         // A `.lmix` file double-clicked (protocol.rs `file_of`): read as a dropped one (`lmix_read` checks it again).
-        else if (/\.lmix$/i.test(text)) void import('../editor/remixFile').then((m) => m.openRemix(text))
-        else if (text.startsWith(ROOM_LINK)) openInvite(text)
+        else if (offered('liveEditor') && /\.lmix$/i.test(text)) void import('../editor/remixFile').then((m) => m.openRemix(text))
+        else if (offered('listeningRooms') && text.startsWith(ROOM_LINK)) openInvite(text)
         else if (isShareCode(text)) useStore.setState({ incoming: text })
       })
       .catch(() => {})

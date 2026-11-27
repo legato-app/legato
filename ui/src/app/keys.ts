@@ -1,4 +1,5 @@
 import { msg, tr } from '../shared/i18n/i18n'
+import { isCutShortcut } from '../shared/liteCuts'
 /**
  * Keyboard shortcuts: one table of actions with their default keys, user bindings over it, combos read from physical
  * keys (any keyboard layout). Pure: no store, no window (tests and the settings search import it).
@@ -87,6 +88,10 @@ export const ACTIONS: ActionInfo[] = [
   { id: 'showApp', label: msg('Show Legato'), keys: null, global: 'Ctrl+Alt+KeyM', globalOnly: true },
 ]
 
+/** The actions this edition has (Lite cuts some): what is bound, listed and searched. `ACTIONS` stays the whole table, so a
+ * saved binding of a cut action is kept. */
+export const OFFERED_ACTIONS: ActionInfo[] = ACTIONS.filter((a) => !isCutShortcut(a.id))
+
 /** What the user changed (settings `shortcuts`): null = removed, absent = default. */
 export type Custom = Partial<Record<string, { keys?: Combo | null; global?: Combo | null }>>
 
@@ -141,7 +146,7 @@ export function conflicts(b: Record<ActionId, Binding>): Set<string> {
   const out = new Set<string>()
   for (const kind of ['keys', 'global'] as const) {
     const seen = new Map<Combo, ActionId>()
-    for (const a of ACTIONS) {
+    for (const a of OFFERED_ACTIONS) {
       const c = b[a.id][kind]
       if (!c) continue
       const other = seen.get(c)

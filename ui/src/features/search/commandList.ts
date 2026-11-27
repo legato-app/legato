@@ -1,4 +1,4 @@
-import { ACTIONS, bindings, comboLabel } from '../../app/keys'
+import { bindings, comboLabel, OFFERED_ACTIONS } from '../../app/keys'
 import { useSettings } from '../../app/settings'
 import { RUN } from '../../app/shortcuts'
 import { useStore, type View } from '../../app/store'
@@ -8,6 +8,7 @@ import { SETTINGS_SECTIONS } from '../menus'
 import { DESKTOP_ONLY_PAGES } from '../settings/desktopOnly'
 import { SETTINGS_INDEX } from '../settings/search'
 import type { Command } from './commands'
+import { isCutPage } from '../../shared/liteCuts'
 
 /** Pages the sidebar and the top bar open, with words people may type for them. */
 const PAGES: [View, string, string?][] = [
@@ -35,9 +36,9 @@ export function commandList(): Command[] {
   const section = Object.fromEntries(SETTINGS_SECTIONS)
   const also = (words?: string) => (words ? `${words} ${tr(words)}` : '')
   return [
-    ...PAGES.filter(([to]) => !(phoneApp && DESKTOP_ONLY_PAGES.has(to.name))).map(([to, label, words]): Command => ({ key: `page:${label}`, kind: 'page', label: tr(label), sub: tr('Page'), words: `${label} ${also(words)}`, run: () => go(to) })),
+    ...PAGES.filter(([to]) => !(phoneApp && DESKTOP_ONLY_PAGES.has(to.name)) && !isCutPage(to.name)).map(([to, label, words]): Command => ({ key: `page:${label}`, kind: 'page', label: tr(label), sub: tr('Page'), words: `${label} ${also(words)}`, run: () => go(to) })),
     // Search is this field; Settings is a page above.
-    ...ACTIONS.filter((a) => !a.globalOnly && a.id !== 'search' && a.id !== 'settings').map((a): Command => ({ key: `action:${a.id}`, kind: 'action', label: tr(a.label), sub: tr('Action'), words: a.label, keys: bound[a.id].keys?.split('+').map(comboLabel), run: RUN[a.id] })),
+    ...OFFERED_ACTIONS.filter((a) => !a.globalOnly && a.id !== 'search' && a.id !== 'settings').map((a): Command => ({ key: `action:${a.id}`, kind: 'action', label: tr(a.label), sub: tr('Action'), words: a.label, keys: bound[a.id].keys?.split('+').map(comboLabel), run: RUN[a.id] })),
     ...SETTINGS_INDEX.map((e): Command => ({ key: `setting:${e.section}:${e.label}`, kind: 'setting', label: tr(e.label), sub: tr('Settings › {section}', { section: tr(section[e.section]) }), words: `${e.label} ${also(e.keywords)} ${e.extra ?? ''}`, run: () => go({ name: 'settings', section: e.section, focus: e.label }) })),
   ]
 }

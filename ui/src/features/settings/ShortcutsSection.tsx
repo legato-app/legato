@@ -1,6 +1,6 @@
 import { ArrowCounterClockwise } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
-import { ACTIONS, bindings, comboLabel, comboOf, conflicts, hasModifier, type ActionId, type Combo } from '../../app/keys'
+import { ACTIONS, OFFERED_ACTIONS, bindings, comboLabel, comboOf, conflicts, hasModifier, type ActionId, type Combo } from '../../app/keys'
 import { useSettings } from '../../app/settings'
 import { useGlobalShortcuts } from '../../app/shortcuts'
 import { Button } from '../../shared/ui/Button'
@@ -91,7 +91,7 @@ export function ShortcutsSection() {
           <span className="kicker w-44">{tr('Everywhere')}</span>
           <span className="w-7" />
         </div>
-        {ACTIONS.map((a) => {
+        {OFFERED_ACTIONS.map((a) => {
           const changed = !!custom[a.id] && Object.keys(custom[a.id]!).length > 0
           return (
             <div key={a.id} data-setting={a.label} className="flex items-center gap-4 border-b border-line-soft px-4 py-2.5 last:border-0">

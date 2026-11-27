@@ -9,6 +9,7 @@ import { tr, trn } from '../../shared/i18n/i18n'
 import { usePlayer } from '../player/store'
 import { inRoom, openRoom, useRoom } from '../rooms/room'
 import { CopyField } from '../../app/CopyField'
+import { offered } from '../../shared/liteCuts'
 
 /** Listen together: this playlist plays here in a room friends on the network follow. */
 function Together({ id, onClose }: { id: number; onClose: () => void }) {
@@ -114,7 +115,7 @@ export function SharePanel({ id, name, onClose }: { id: number; name: string; on
             <CopyField value={code.link} />
           </div>
           <Nearby id={id} />
-          <Together id={id} onClose={onClose} />
+          {offered('listeningRooms') && <Together id={id} onClose={onClose} />}
           <p className="text-xs text-ink-2">{tr('The code holds the track list only: YouTube and Apple Music ids, or artist and title. No account, no server.')}</p>
         </>
       )}

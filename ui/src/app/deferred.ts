@@ -3,6 +3,7 @@ import { reportError } from '../shared/diag'
 import { preloadPages } from './pages'
 import { useSettings } from './settings'
 import { useStore } from './store'
+import { isCutStarter } from '../shared/liteCuts'
 
 /**
  * What waits for the first screen (Rust side: src-tauri/src/deferred.rs): Last.fm, ListenBrainz, your music server's plays, Sync Mode's
@@ -45,7 +46,7 @@ export function startDeferred(): () => void {
     ['Listening rooms', () => import('../features/rooms/rooms').then((m) => m.startRooms())],
   ]
   void Promise.allSettled(
-    starts.map(async ([name, start]) => {
+    starts.filter(([name]) => !isCutStarter(name)).map(async ([name, start]) => {
       try {
         const off = await start()
         if (dead) off()

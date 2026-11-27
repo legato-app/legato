@@ -1,8 +1,9 @@
 import type { SettingsSection } from '../../app/store'
-import { ACTIONS, comboLabel } from '../../app/keys'
+import { comboLabel, OFFERED_ACTIONS } from '../../app/keys'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { categoryOf, labelOf, SETTINGS } from './catalog'
 import { fold } from '../../shared/format'
+import { isCutSetting } from '../../shared/liteCuts'
 
 /**
  * One searchable setting. label = its id (catalog.ts: its data-setting, found and highlighted on open), name = the text
@@ -22,8 +23,8 @@ export interface SettingEntry {
 
 /** Every setting of the catalog, on its page, then the shortcuts (one entry per action). */
 export const SETTINGS_INDEX: SettingEntry[] = [
-  ...SETTINGS.map((e): SettingEntry => ({ section: categoryOf(e.id) ?? 'general', label: e.id, name: labelOf(e.id) === e.id ? undefined : labelOf(e.id), keywords: e.keywords, was: e.was })),
-  ...ACTIONS.map((a): SettingEntry => ({ section: 'shortcuts', label: a.label, keywords: msg('keyboard shortcut hotkey global background'), extra: a.keys ? comboLabel(a.keys) : undefined })),
+  ...SETTINGS.filter((e) => !isCutSetting(e.id)).map((e): SettingEntry => ({ section: categoryOf(e.id) ?? 'general', label: e.id, name: labelOf(e.id) === e.id ? undefined : labelOf(e.id), keywords: e.keywords, was: e.was })),
+  ...OFFERED_ACTIONS.map((a): SettingEntry => ({ section: 'shortcuts', label: a.label, keywords: msg('keyboard shortcut hotkey global background'), extra: a.keys ? comboLabel(a.keys) : undefined })),
 ]
 
 /** Entries where every word typed appears in the label or keywords (English or the interface's language); label matches first. */

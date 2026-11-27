@@ -576,6 +576,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       - Decided alone (2026-11-27): a Lite exe built without its overlay is a guest (exact identifier per edition); Lite
         never registered `legato://` at first (replaced by the review fixes below); no installer
         hooks of the full app nor `.lmix` association in Lite; its Run entry is "Legato Lite".
+    - [x] Slice 2, 2026-11-27: what Lite cuts is one table (`ui/src/shared/liteCuts.ts`): pages stubbed in `pages.ts`,
+      shortcuts, settings rows and search, right-click items, start-up modules, plus the few buttons no table reaches
+      (`offered`). Saved settings, shortcuts and menu layouts keep their values. `liteCuts.test.ts` checks each entry is
+      absent in Lite and nothing is in the full app. Not tried for real (no Lite run).
+      - Decided alone (2026-11-27): the loudness meter goes with the visualizer; "effects" are the Live Editor's, so Lite
+        plays songs without their saved edits (kept in the library), the per-output equalizer, Volume levelling and
+        Adaptive Sound staying; a dropped or pasted remix is ignored; Stream Deck goes with the phone remote and the
+        overlay; the cut pages' chunks are still in the bundle (never loaded); "Process YouTube's sound" still names the
+        Live Editor in its text.
     - [x] Slice 4, 2026-11-27: `release.yml` jobs `lite` (its own Windows runner beside `release` and `android`:
       `tauri build --features lite --bundles nsis`, the same updater key, `latest-lite.json` written in tauri-action's
       shape) and `lite-attach` (installer, `.sig` and `latest-lite.json` on `vX.Y.Z`, then `latest-lite.json` on `beta`);

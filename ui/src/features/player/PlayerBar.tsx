@@ -40,6 +40,7 @@ import { discordText, takeLink } from '../library/discordDrop'
 import { ownFile, type DropKind } from '../library/dropKinds'
 import { pickUp, usePickup } from '../syncmode/pickup'
 import { usePip } from './pipMode'
+import { offered } from '../../shared/liteCuts'
 
 export const clock = (ms: number | null) => formatDuration(ms) || '0:00'
 export const fileFormat = (path?: string) => path?.split('.').pop()?.toUpperCase()
@@ -374,7 +375,8 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
       // Legato's own files: a remix plays with the Live Editor open on its settings; a song list, a theme or a backup opens
       // like its page opens it.
       const own = ownFile(paths)
-      if (own?.kind === 'remix') return void import('../editor/remixFile').then((m) => m.openRemix(own.path))
+      // A remix plays in the Live Editor: Lite leaves a dropped one alone.
+      if (own?.kind === 'remix') return void (offered('liveEditor') && import('../editor/remixFile').then((m) => m.openRemix(own.path)))
       if (own) return void import('../library/dropFiles').then((m) => m.openDropped(own.kind as Exclude<DropKind, 'remix'>, own.path))
       void takeDrop(paths).then((took) => {
         if (!took && image)

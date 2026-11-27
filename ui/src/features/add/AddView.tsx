@@ -21,6 +21,7 @@ import { MUSIC_REFUSED, phoneFolders } from './phoneMusic'
 import { AppleConnect } from './AppleConnect'
 import { AppFileImport } from './AppFileImport'
 import { SpotifyConnect } from './SpotifyConnect'
+import { offered } from '../../shared/liteCuts'
 
 export const FIELD = 'h-9 min-w-0 rounded-md border border-line bg-raised px-3 text-[0.8125rem] placeholder:text-ink-3'
 
@@ -280,7 +281,7 @@ export function AddView() {
       <div className="-mx-2 flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-2 pb-6 phone:gap-6">
         <SearchHero />
         <div className="stagger grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4 phone:grid-cols-1 phone:gap-3">
-          <Detector onFound={onFound} />
+          {offered('musicDetector') && <Detector onFound={onFound} />}
           {phoneApp && <FromPc />}
           {phoneApp && <PhoneMusic />}
           <SpotifyConnect />

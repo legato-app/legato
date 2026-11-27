@@ -28,6 +28,7 @@ import { useListenbrainz } from './listenbrainz'
 import { syncServer, useServers } from './servers'
 import { explain } from '../../shared/errors'
 import { labelOf } from '../settings/catalog'
+import { offered } from '../../shared/liteCuts'
 
 /** Each account's sync direction (user's request 2026-10-29), kept in Rust (music_core::sync). */
 function useDirections() {
@@ -772,7 +773,7 @@ function LocalFolders() {
           {folders.map((f) => (
             <li key={f} className="flex items-center gap-2 border-b border-line-soft py-1 pe-1 ps-3 last:border-0">
               <span className="flex-1 truncate font-mono text-[0.6875rem]">{f}</span>
-              {booksPage && <LedChip on={bookFolders.includes(f)} label={tr('Audiobooks')} title={tr('Every file in this folder is an audiobook')} onClick={() => markBooks(f)} />}
+              {booksPage && offered('audiobooks') && <LedChip on={bookFolders.includes(f)} label={tr('Audiobooks')} title={tr('Every file in this folder is an audiobook')} onClick={() => markBooks(f)} />}
               <RoundButton label={tr('Remove {folder}', { folder: f })} kind="plain" size="xs" disabled={busy} onClick={() => run(() => api.setLocalFolders(folders.filter((x) => x !== f)))}>
                 <X size={12} />
               </RoundButton>

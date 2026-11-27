@@ -9,6 +9,7 @@ import { Dialog } from '../../shared/ui/Dialog'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { PHRASES, PLAY_WORDS, voiceCommand } from './voiceCommand'
 import { runVoice, useVoiceAsk } from './voiceRun'
+import { offered } from '../../shared/liteCuts'
 
 type Step = { name: 'ask' } | { name: 'listening'; heard: string } | { name: 'miss'; miss: VoiceMiss }
 
@@ -83,8 +84,8 @@ export function VoiceSearch() {
     <>
       <button
         type="button"
-        aria-label={tr('Microphone: search by voice or identify a song')}
-        title={tr('Search by voice or identify a song')}
+        aria-label={offered('musicDetector') ? tr('Microphone: search by voice or identify a song') : tr('Search by voice')}
+        title={offered('musicDetector') ? tr('Search by voice or identify a song') : tr('Search by voice')}
         aria-haspopup="menu"
         aria-expanded={!!menu}
         onClick={(e) => setMenu(e.currentTarget.getBoundingClientRect())}
@@ -100,7 +101,7 @@ export function VoiceSearch() {
             <div role="menu" onKeyDown={(e) => e.key === 'Escape' && setMenu(null)} className="fixed z-50 flex w-64 flex-col gap-1 rounded-xl border border-line bg-raised p-1.5 shadow-[0_12px_32px_var(--shadow)]" style={{ top: menu.bottom + 6, left: Math.max(8, menu.right - 256) }}>
               {[
                 { icon: <Microphone size={18} />, label: tr('Search by voice'), note: tr('Say a song, an artist…'), run: () => (agreed ? void listen() : setStep({ name: 'ask' })) },
-                { icon: <Waveform size={18} />, label: tr('Identify a song'), note: tr('Name the music playing around you'), run: () => useStore.getState().identifySong() },
+                ...(offered('musicDetector') ? [{ icon: <Waveform size={18} />, label: tr('Identify a song'), note: tr('Name the music playing around you'), run: () => useStore.getState().identifySong() }] : []),
               ].map((o, i) => (
                 <button
                   key={i}

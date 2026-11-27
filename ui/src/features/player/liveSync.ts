@@ -14,6 +14,7 @@ import { claimViz, useVizListeners, viz as frames } from './vizFrames'
 import { wantsWave } from './vizLooks'
 import { songFade, usePlayer } from './store'
 import { startLevelling } from './ytLevel'
+import { offered } from '../../shared/liteCuts'
 
 // Who plays now, for levels: the native engine (local files, server songs, previews) or YouTube. Spotify: its own app, none.
 const playing = () => {
@@ -32,7 +33,7 @@ export function useLiveSync() {
   const meterAsked = useLoudListeners((s) => s.n > 0)
   // The phone's screen off: what only feeds the screen (the visualizer, the moving cover, the loudness meter) is not analysed; processing is.
   const watching = useScreen((s) => s.on)
-  const { coverPulse, viz, meter } = extrasFor(watching, { coverPulse: pulseAsked, viz: vizAsked, meter: meterAsked })
+  const { coverPulse, viz, meter } = extrasFor(watching, { coverPulse: pulseAsked && offered('visualizer'), viz: vizAsked, meter: meterAsked })
   const own = useEditor((s) => s.effects)
   // Equalizer per output device: the picked output's preset joins the song's own edit.
   const device = useOutputs((s) => s.current)
@@ -48,7 +49,8 @@ export function useLiveSync() {
   // Twelfths: the engine's frames in 121 bands; the scopes: with their wave blocks (YouTube's through the wish below).
   useEffect(() => frames.setAsk({ fine, wave }), [fine, wave])
   useEffect(() => startLive(playing), [])
-  useEffect(() => startEditor(), [])
+  // Lite has no Live Editor: a song's saved edit stays in the library and isn't applied.
+  useEffect(() => (offered('liveEditor') ? startEditor() : undefined), [])
   // Volume levelling: YouTube songs measured as they play, levelled from their second play on.
   // Adaptive Sound measures them too: a song heard before starts at its gain.
   useEffect(() => startLevelling(() => levelling, () => levelling !== 'off' || adaptiveSound), [levelling, adaptiveSound])

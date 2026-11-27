@@ -50,6 +50,7 @@ import { RadialRing, VizBackdrop, Visualizer } from './Visualizer'
 import { tr } from '../../shared/i18n/i18n'
 import { RoomFloats, RoomPill } from '../rooms/RoomPill'
 import { inRoom, useRoom } from '../rooms/room'
+import { offered } from '../../shared/liteCuts'
 
 /** Seek bar drawn like a tuner dial: ticks, major every 5, accent needle. */
 function TunerScale({ value, max, onChange }: { value: number; max: number; onChange: (v: number) => void }) {
@@ -241,6 +242,9 @@ export function NowPlaying() {
     useShallow((s) => ({ ...pick(s.settings), theme: s.settings.theme, accent: s.settings.accent, customThemes: s.settings.customThemes, systemDark: s.systemDark })),
   )
   const update = useSettings((s) => s.update)
+  // Saved on by the full app, Lite leaves them as they are and draws nothing.
+  const showVisualizer = visualizer && offered('visualizer')
+  const showEditor = editor && offered('liveEditor')
   const look = useSettings((s) => s.settings.visualizerStyle)
   const vizBackdrop = useSettings((s) => s.settings.visualizerBackdrop)
   // The Radial look's ring is around the cover (Stage): then the strip under it stays away.
@@ -272,7 +276,7 @@ export function NowPlaying() {
   const video = now.via === 'youtube'
   // A file, a preview: its YouTube version, if it has one, can show the video.
   const ytVersion = !video && !!track?.ids.youtube
-  const panel: PanelId | null = editor ? 'editor' : lyrics ? 'lyrics' : upNext ? 'upNext' : null
+  const panel: PanelId | null = showEditor ? 'editor' : lyrics ? 'lyrics' : upNext ? 'upNext' : null
   // Every song (user's pick 2026-10-23): Video on a file or a preview switches to its YouTube version, same spot.
   const show = video ? stage : stage === 'cover' ? 'cover' : 'auto'
   const showOptions = [
@@ -318,7 +322,7 @@ export function NowPlaying() {
     room: <RoomPill className="mr-1 max-w-40 phone:hidden" />,
     lyrics: <PanelToggle id="lyrics" label={tr('Lyrics')} icon={Quotes} active={panel} />,
     upNext: <PanelToggle id="upNext" label={tr('Up next')} icon={Queue} active={panel} />,
-    sound: <PanelToggle id="editor" label={tr('Sound')} icon={SlidersHorizontal} active={panel} />,
+    sound: offered('liveEditor') && <PanelToggle id="editor" label={tr('Sound')} icon={SlidersHorizontal} active={panel} />,
     // Karaoke (K), Cover display (C), Less like this and the rest: one More (a calm player, plan-v2 › U2). The phone
     // has its own in its top bar.
     more: (
@@ -343,8 +347,8 @@ export function NowPlaying() {
       {/* The phone: in More (one main thing on screen, the cover). The PC: only with a video to pick (a file with no
           YouTube version has Auto and Cover alike); always in More too. */}
       {!phone && (video || ytVersion) && <Segmented quiet className="glass" label={tr('Show')} value={show} onChange={pickShow} options={showOptions} />}
-      <Stage video={video} cover={stage === 'cover' || (stage === 'auto' && still === true)} track={track} title={now.title} youtubeId={now.youtubeId} pulse={coverPulse && motion} wantRing={visualizer && motion && look === 'radial'} onRing={setRing} />
-      {visualizer && motion && !ring && <Visualizer />}
+      <Stage video={video} cover={stage === 'cover' || (stage === 'auto' && still === true)} track={track} title={now.title} youtubeId={now.youtubeId} pulse={coverPulse && offered('visualizer') && motion} wantRing={showVisualizer && motion && look === 'radial'} onRing={setRing} />
+      {showVisualizer && motion && !ring && <Visualizer />}
       {now.via === 'preview' && (
         <div className="flex items-center justify-center gap-4">
           <span className="kicker">{tr('30-second preview')}</span>
@@ -403,7 +407,7 @@ export function NowPlaying() {
     // Whole window, under the see-through top bar (logo, Close player and window buttons stay on top, z-30).
     <div role="dialog" aria-label={tr('Now playing')} onContextMenu={onMenu(playerMenu)} className="np-in fixed inset-0 z-20 isolate flex flex-col overflow-hidden bg-bg px-10 pt-17 pb-7 text-ink transition-colors duration-500 phone:px-5 phone:pt-[max(0.5rem,env(safe-area-inset-top))] phone:pb-[max(1rem,env(safe-area-inset-bottom))]" style={ambient}>
       {immersive && <Backdrop url={backdrop} dim={backdropDim} motion={backdropMotion} />}
-      {visualizer && vizBackdrop && motion && <VizBackdrop />}
+      {showVisualizer && vizBackdrop && motion && <VizBackdrop />}
 
       {/* The phone: its own bar in place of the app's (hidden under it): close, where it plays from, More. */}
       {phone && (

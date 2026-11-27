@@ -46,6 +46,7 @@ import { LanguagePicker } from './LanguagePicker'
 import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
 import { notifyError } from '../../app/notifyError'
+import { isCutSetting } from '../../shared/liteCuts'
 
 const ICONS: Record<Category, ReactNode> = {
   general: <GearSix size={15} />,
@@ -78,7 +79,7 @@ function Group({ title, count, hint, bare, children }: { title: string; count?: 
   const phone = usePhone()
   const page = useContext(PageOf)
   const def = groupDef(title)
-  if (phoneApp && DESKTOP_ONLY.has(title)) return null
+  if ((phoneApp && DESKTOP_ONLY.has(title)) || isCutSetting(title)) return null
   // Not in the catalog (the tests forbid it): General, rather than nowhere.
   if (page && (def?.category ?? 'general') !== page) return null
   const rank = def?.index ?? 0
@@ -125,7 +126,7 @@ type RowProps = { label: string; sub?: string; preview?: ReactNode } & ({ toggle
  */
 function Row({ label, sub, children, preview, setting, toggle }: RowProps) {
   const changed = useSettings((st) => !!setting && JSON.stringify(st.settings[setting]) !== JSON.stringify(DEFAULTS[setting]))
-  if (phoneApp && DESKTOP_ONLY.has(label)) return null
+  if ((phoneApp && DESKTOP_ONLY.has(label)) || isCutSetting(label)) return null
   return (
     <div
       data-setting={label}

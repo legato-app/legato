@@ -9,6 +9,7 @@
  */
 
 import { msg } from '../i18n/i18n'
+import { isCutMenuItem } from '../liteCuts'
 
 export type MenuKind = 'track' | 'tracks' | 'playlist' | 'folder' | 'album' | 'artist' | 'queue' | 'visualizer' | 'player' | 'nav' | 'app'
 export type Level = 'essential' | 'standard' | 'detail'
@@ -233,7 +234,8 @@ function tidy<T>(list: Entry<T>[]): Entry<T>[] {
  * `more`: makes the "More…" submenu from the items set aside. A menu never comes out empty when it went in with items.
  */
 export function shapeMenu<T extends Shapeable>(kind: MenuKind, entries: (Entry<T> | false | '' | 0 | null | undefined)[], layout: MenuLayout, more: (items: Entry<T>[]) => T): Entry<T>[] {
-  const all = entries.filter((e): e is Entry<T> => !!e)
+  // An item Lite cuts is never drawn; the user's saved layout keeps naming it.
+  const all = entries.filter((e): e is Entry<T> => !!e && !(typeof e === 'object' && e.id !== undefined && isCutMenuItem(e.id)))
   const defs = new Map((MENU_ITEMS[kind] ?? []).map((d) => [d.id, d]))
   const hidden = new Set(layout.hidden[kind] ?? [])
   const shown = SHOWN[layout.preset] ?? SHOWN.standard
@@ -306,7 +308,9 @@ export function toggleItem(layout: MenuLayout, kind: MenuKind, id: string): Menu
 export function moveItem(layout: MenuLayout, kind: MenuKind, id: string, by: -1 | 1): MenuLayout {
   const ids = orderedDefs(kind, layout).map((d) => d.id)
   const at = ids.indexOf(id)
-  const to = at + by
+  // Past the items this edition doesn't show: they keep their place in the order.
+  let to = at + by
+  while (ids[to] !== undefined && isCutMenuItem(ids[to])) to += by
   if (at < 0 || to < 0 || to >= ids.length) return layout
   ;[ids[at], ids[to]] = [ids[to], ids[at]]
   return { ...layout, order: { ...layout.order, [kind]: ids } }

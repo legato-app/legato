@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { useSettings } from '../../app/settings'
+import { offered } from '../../shared/liteCuts'
 
 // The canvas and its worker come with Now Playing's chunk, loaded by the first mini visualizer shown: never at start-up.
 const Strip = lazy(() => import('./Visualizer').then((m) => ({ default: m.MiniStrip })))
@@ -9,7 +10,7 @@ const Strip = lazy(() => import('./Visualizer').then((m) => ({ default: m.MiniSt
  * Visualizer in the mini player, off by default). Clicks go through to the player.
  */
 export function MiniViz({ className = '' }: { className?: string }) {
-  const on = useSettings((s) => s.settings.visualizer && s.settings.visualizerMini && s.settings.motion)
+  const on = useSettings((s) => offered('visualizer') && s.settings.visualizer && s.settings.visualizerMini && s.settings.motion)
   if (!on) return null
   return (
     <div aria-hidden className={`pointer-events-none h-6 ${className}`}>

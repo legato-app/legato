@@ -21,6 +21,7 @@ import { TranslateLyrics } from './TranslateLyrics'
 import { useTranslated } from './translated'
 import { underFor } from './translateWords'
 import { notifyError } from '../../app/notifyError'
+import { offered } from '../../shared/liteCuts'
 
 /** A hand on the scroll wins for this long. */
 const HAND_MS = 4000
@@ -355,9 +356,11 @@ export function LyricsPanel({ onHide, onUpNext, className = CARD, heading }: { o
             <Timer size={14} />
           </RoundButton>
         )}
-        <RoundButton label={tr('Karaoke')} kind="plain" size="sm" onClick={toggleKaraoke}>
-          <MicrophoneStage size={14} />
-        </RoundButton>
+        {offered('karaoke') && (
+          <RoundButton label={tr('Karaoke')} kind="plain" size="sm" onClick={toggleKaraoke}>
+            <MicrophoneStage size={14} />
+          </RoundButton>
+        )}
         {!heading && (
           <RoundButton label={tr('Show Up next instead')} kind="plain" size="sm" onClick={onUpNext}>
             <Queue size={14} />
