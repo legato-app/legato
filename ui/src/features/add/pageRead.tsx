@@ -1,6 +1,7 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react'
 import type { SpotifyList, SpotifyPick } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
+import { readStored, writeStored } from '../../shared/stored'
 import { Button } from '../../shared/ui/Button'
 import { Dialog } from '../../shared/ui/Dialog'
 import { ListPick } from './ListPick'
@@ -11,25 +12,8 @@ import { ListPick } from './ListPick'
  */
 export type PageStep = 'rules' | 'sign-in' | 'reading' | 'pick'
 
-/** Were the rules under `key` accepted on this PC? */
-const accepted = (key: string) => {
-  try {
-    return localStorage.getItem(key) === '1'
-  } catch {
-    return false
-  }
-}
-
-const rememberAccepted = (key: string) => {
-  try {
-    localStorage.setItem(key, '1')
-  } catch {
-    // Said again next time.
-  }
-}
-
 /** Where reading the page starts: its sign-in, after its rules once. */
-export const firstPageStep = (rulesKey: string): 'rules' | 'sign-in' => (accepted(rulesKey) ? 'sign-in' : 'rules')
+export const firstPageStep = (rulesKey: string): 'rules' | 'sign-in' => (readStored<number>(rulesKey, 0) === 1 ? 'sign-in' : 'rules')
 
 /** Drives the sign-in and the reading while `step` is one of them. `found` takes the lists read. */
 export function usePageRead<Step extends string>(step: Step | PageStep | undefined, setStep: Dispatch<SetStateAction<Step | PageStep | undefined>>, site: { open: () => Promise<unknown>; signedIn: () => Promise<boolean>; read: () => Promise<SpotifyList[]>; found: (lists: SpotifyList[]) => void; fail: (error: unknown) => void }) {
@@ -79,7 +63,8 @@ export function PageReadDialogs({ step, rulesKey, words, lists, signIn, start, c
           </Button>
           <Button
             onClick={() => {
-              rememberAccepted(rulesKey)
+              // Not kept: said again next time.
+              writeStored(rulesKey, 1)
               signIn()
             }}
           >
