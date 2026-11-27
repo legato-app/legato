@@ -195,15 +195,15 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
         <Fragment key={part}>{blocks[part]}</Fragment>
       ))}
       {/* Over Now Playing: the gear alone (Add-ons and More stay out, the player stays calm), on glass like the
-          window's buttons; the page under the player doesn't light it. */}
-      <span className="flex items-center gap-1 pe-2">
+          window's buttons (on the span: on the button it would hide its hover); the page under the player doesn't light it. */}
+      <span className={`flex items-center gap-1 ${full ? 'glass me-2 rounded-full' : 'pe-2'}`}>
         {addonsBySettings && addons}
         {!full && hidesSome && (
           <button className={`${winBtn} rounded-full! phone:hidden`} aria-label={tr('More')} title={tr('More')} onClick={(e) => openMenu(e, hiddenEntries(), { place: 'below' })}>
             <DotsThree size={18} weight="bold" />
           </button>
         )}
-        <button className={`${winBtn} turn rounded-full! ${full ? 'glass' : inSettings ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
+        <button className={`${winBtn} turn rounded-full! ${inSettings ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
           <Gear size={18} weight={inSettings ? 'fill' : 'regular'} />
         </button>
       </span>
