@@ -95,6 +95,9 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
   Updates Ping; Betas released before 2026-11-15 have no "beta" in their title and are not re-announced). Stable PCs read `releases/latest/download/latest.json` and GitHub's "latest" skips prereleases, so a push
   never reaches them. **That URL is the one every installed version has always read (`tauri.conf.json`): keep it.**
 - Back from Beta to Stable the app never downgrades: it waits for a Stable newer than the version it runs.
+- **Legato Lite** (Windows) rides the same releases: `release.yml`'s `lite` job builds `Legato.Lite_X.Y.Z_x64-setup.exe`
+  with the same key and its own `latest-lite.json` beside `latest.json`, on `vX.Y.Z` and on `beta`; promote carries it
+  to Stable too. A Lite failure fails only its own jobs: the full app's Beta goes out as before.
 - **Phones** follow Beta: each Beta's APK is what the Android app offers (Settings › About, a toast), downloaded when
   the user taps Update and installed by Android's installer. Stable carries no APK yet.
 

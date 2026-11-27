@@ -378,6 +378,8 @@ mod tests {
         assert_eq!(conf["plugins"]["updater"]["endpoints"], serde_json::json!(["https://github.com/legato-app/legato/releases/latest/download/latest-lite.json"]));
         // The full app's key: one signature for both editions.
         assert!(conf["plugins"]["updater"].get("pubkey").is_none());
+        let release = include_str!("../../.github/workflows/release.yml");
+        assert!(release.contains("gh release upload beta lite/latest-lite.json"), "nothing feeds the Lite's Beta file");
         #[cfg(feature = "lite")]
         assert_eq!(Channel::Beta.endpoint(), Some("https://github.com/legato-app/legato/releases/download/beta/latest-lite.json"));
     }
