@@ -428,10 +428,15 @@ impl YouTubeMusic {
     }
 
     /// Every occurrence of these videos out of a playlist the account owns. Removing needs each row's own item id
-    /// ("setVideoId"), read fresh here (the library doesn't keep them). Returns how many rows went.
+    /// ("setVideoId"), read fresh here (the library doesn't keep them). Returns how many rows went; an error when they
+    /// are there without that id (another account's playlist).
     pub async fn remove_videos(&self, playlist_id: &str, video_ids: &[String]) -> Result<usize> {
-        let items: Vec<(String, String)> = self.browse_pages(&format!("VL{playlist_id}")).await?.0.iter().flat_map(item_ids).filter(|(v, _)| video_ids.contains(v)).collect();
+        let pages = self.browse_pages(&format!("VL{playlist_id}")).await?.0;
+        let items: Vec<(String, String)> = pages.iter().flat_map(item_ids).filter(|(v, _)| video_ids.contains(v)).collect();
         if items.is_empty() {
+            if pages.iter().flat_map(rows).any(|track| track.ids.get(&Source::Youtube).is_some_and(|video| video_ids.contains(video))) {
+                bail!("YouTube Music gave no way to remove the song");
+            }
             return Ok(0);
         }
         let actions: Vec<Value> = items.iter().map(|(v, s)| json!({ "action": "ACTION_REMOVE_VIDEO", "removedVideoId": v, "setVideoId": s })).collect();
@@ -846,6 +851,18 @@ mod tests {
         s.mock("POST", "/browse/edit_playlist").match_query(Matcher::Any).with_body(json!({ "status": "STATUS_FAILED" }).to_string()).create_async().await;
         let e = YouTubeMusic::with_api(&s.url(), COOKIE).unwrap().remove_videos("PL1", &["v1".into()]).await.unwrap_err().to_string();
         assert!(e.contains("refused to remove"), "{e}");
+    }
+
+    #[tokio::test]
+    async fn a_song_without_its_row_id_is_not_counted_as_removed() {
+        let mut s = Server::new_async().await;
+        let page = json!({ "contents": [row("v1", "A", vec![run("X", None)], None)] });
+        s.mock("POST", "/browse").match_query(Matcher::Any).with_body(page.to_string()).create_async().await;
+        let edit = s.mock("POST", "/browse/edit_playlist").match_query(Matcher::Any).expect(0).create_async().await;
+        let yt = YouTubeMusic::with_api(&s.url(), COOKIE).unwrap();
+        let e = yt.remove_videos("PL1", &["v1".into()]).await.unwrap_err().to_string();
+        assert!(e.contains("no way to remove"), "{e}");
+        edit.assert_async().await;
     }
 
     #[test]
