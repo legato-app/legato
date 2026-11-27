@@ -5,42 +5,39 @@
 //! rows are read by `music_shield::SPOTIFY_SCRIPT`, private playlists and Liked Songs included. No token, no request of
 //! ours to Spotify. Answers come on WebView2's message channel, checked by `music_connectors::spotify_page`.
 
-// Windows only for the channel; the rest still builds everywhere.
-#![cfg_attr(not(windows), allow(dead_code))]
-
-use crate::{AppState, CmdResult, err, links};
-use anyhow::Context;
-use music_connectors::linklist::MAX_TRACKS;
-use music_connectors::spotify_page::{self, Message};
-use music_core::model::{PlaylistRead, Source, Track};
+use crate::web_reader::{Inbox, Site};
+use crate::{AppState, CmdResult};
+use music_connectors::spotify_page;
+use music_core::model::{Source, Track};
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
-use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager, State, Url, WebviewUrl, WebviewWindowBuilder};
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
-use tokio::time::timeout;
+use tauri::{AppHandle, Manager, State, Url};
 
 const PLAYER: &str = "https://open.spotify.com/";
 /// Spotify's own sign-in page, back to the player after.
 const SIGN_IN: &str = "https://accounts.spotify.com/login?continue=https%3A%2F%2Fopen.spotify.com%2F";
 const LABEL: &str = "spotify-web";
-/// Silence from the page past this: it stopped. A list waits up to 20 s for its first rows.
-const QUIET: Duration = Duration::from_secs(40);
 
-/// Where the page's messages go while a job runs.
-static INBOX: Mutex<Option<UnboundedSender<Message>>> = Mutex::new(None);
+static INBOX: Inbox = Inbox::new(None);
 
-/// Signed in on Spotify's page (sp_dc = Spotify web session cookie). Profile shared with the main window.
-/// WebView2: call from async commands or threads only (sync = deadlock).
+static SITE: Site = Site {
+    name: "Spotify",
+    label: LABEL,
+    player: PLAYER,
+    sign_in: SIGN_IN,
+    // sp_dc = Spotify's web session cookie.
+    cookie: "sp_dc",
+    script: music_shield::SPOTIFY_SCRIPT,
+    object: "__legatoSpotify",
+    log: "spotify",
+    inbox: &INBOX,
+    parse: spotify_page::parse,
+    list_path: spotify_page::list_path,
+    save,
+};
+
+/// WebView2: call from async commands or threads only (`Site::signed_in`).
 pub fn signed_in(app: &AppHandle) -> bool {
-    // Phones: no Spotify, Apple or Google sign-in (one webview, signed out). Android's WebView also throws on a page
-    // with no cookie yet (wry 0.57: getCookie(...) must not be null), which aborts the app.
-    if cfg!(mobile) {
-        return false;
-    }
-    let Some(main) = app.get_webview("main") else { return false };
-    let Ok(url) = Url::parse(PLAYER) else { return false };
-    main.cookies_for_url(url).is_ok_and(|c| c.iter().any(|c| c.name() == "sp_dc" && !c.value().is_empty()))
+    SITE.signed_in(app)
 }
 
 /// The sign-in on Spotify's page forgotten: its cookies on its two sites, nothing else of the shared profile.
@@ -61,72 +58,9 @@ pub fn sign_out(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
-/// Opens (or focuses) Spotify's page, straight on its sign-in page when signed out.
 /// WebView2: call from async commands or threads only (`signed_in`).
 pub fn open(app: &AppHandle) -> tauri::Result<()> {
-    if let Some(w) = app.get_webview_window(LABEL) {
-        return w.set_focus();
-    }
-    let page = if signed_in(app) { PLAYER } else { SIGN_IN };
-    WebviewWindowBuilder::new(app, LABEL, WebviewUrl::External(Url::parse(page).expect("valid url"))).additional_browser_args(&crate::background::browser_args()).title("Spotify").inner_size(1100.0, 760.0).initialization_script(music_shield::SPOTIFY_SCRIPT).build()?;
-    #[cfg(windows)]
-    if let Some(wv) = app.get_webview(LABEL) {
-        let _ = crate::shield::watch(&wv);
-        crate::ytwatch::on_message(&wv, |source, message| {
-            if let Some(m) = spotify_page::parse(source, message)
-                && let Some(inbox) = INBOX.lock().unwrap().as_ref()
-            {
-                let _ = inbox.send(m);
-            }
-        })?;
-    }
-    Ok(())
-}
-
-/// Starts a job of the page's script (`call`: a fixed name), on `path` of the player. The new page takes a moment and
-/// the script runs one job at a time: asked again until it says it started.
-async fn start(app: &AppHandle, path: &str, call: &str) -> anyhow::Result<UnboundedReceiver<Message>> {
-    let w = app.get_webview_window(LABEL).context("Spotify's window was closed")?;
-    let (tx, mut rx) = unbounded_channel();
-    *INBOX.lock().unwrap() = Some(tx);
-    w.navigate(Url::parse(&format!("{PLAYER}{path}"))?)?;
-    // The page being left must not take the call.
-    tokio::time::sleep(Duration::from_millis(1500)).await;
-    for _ in 0..30 {
-        w.eval(format!("window.__legatoSpotify && window.__legatoSpotify.{call}()"))?;
-        if let Ok(Some(Message::Started)) = timeout(Duration::from_secs(1), rx.recv()).await {
-            return Ok(rx);
-        }
-    }
-    anyhow::bail!("Spotify's page didn't answer")
-}
-
-async fn next(rx: &mut UnboundedReceiver<Message>) -> anyhow::Result<Message> {
-    match timeout(QUIET, rx.recv()).await {
-        Ok(Some(Message::Failed(e))) => anyhow::bail!("Spotify's page: {e}"),
-        Ok(Some(m)) => Ok(m),
-        _ => anyhow::bail!("Spotify's page stopped answering"),
-    }
-}
-
-/// The songs of one list, as the page draws them. `read`: songs so far, songs the list says it has.
-async fn songs(app: &AppHandle, id: &str, mut read: impl FnMut(usize, usize)) -> anyhow::Result<PlaylistRead> {
-    let path = spotify_page::list_path(id).context("Invalid list")?;
-    let mut rx = start(app, &path, "read").await?;
-    let mut all = Vec::new();
-    let mut announced = 0;
-    loop {
-        match next(&mut rx).await? {
-            Message::Songs { songs, total } => {
-                announced = total;
-                all.extend(songs);
-                all.truncate(MAX_TRACKS);
-                read(all.len(), total.max(all.len()));
-            }
-            Message::Done => return Ok(PlaylistRead::from_page(all, announced)),
-            _ => {}
-        }
-    }
+    SITE.open(app)
 }
 
 /// A list to tick. Song count: Exportify's files give it, Spotify's column doesn't.
@@ -144,19 +78,7 @@ pub struct SpotifyList {
 #[tauri::command]
 pub async fn spotify_lists(app: AppHandle, state: State<'_, AppState>) -> CmdResult<Vec<SpotifyList>> {
     state.spotify_takes()?;
-    async {
-        let mut rx = start(&app, "", "lists").await?;
-        let mut all = Vec::new();
-        loop {
-            match next(&mut rx).await? {
-                Message::Lists(lists) => all.extend(lists.into_iter().map(|l| SpotifyList { id: l.id, name: l.name, cover: l.cover, songs: None })),
-                Message::Done => return anyhow::Ok(all),
-                _ => {}
-            }
-        }
-    }
-    .await
-    .map_err(err)
+    SITE.lists(&app, "").await
 }
 
 #[derive(Debug, Deserialize, ts_rs::TS)]
@@ -229,64 +151,13 @@ pub fn save(state: &AppState, id: &str, name: &str, tracks: &[Track], complete: 
     if id == music_core::spotify_export::LIKED { state.lib().add_likes(tracks) } else { state.lib().save_playlist_read(Source::Spotify, id, name, tracks, complete) }
 }
 
-/// The ticked lists → imported playlists, each song with its YouTube version. Same ids as a Spotify link's import, so a
-/// second import updates them. A list that fails is reported, the others go on. `import_link_stop` ends it with
-/// "canceled": lists already saved stay.
+/// The ticked lists imported (`Site::import`). Same ids as a Spotify link's import, so a second import updates them.
 #[tauri::command]
 pub async fn spotify_import(app: AppHandle, state: State<'_, AppState>, picks: Vec<SpotifyPick>) -> CmdResult<SpotifyLibraryImport> {
-    // Trust boundary: ids checked by list_path, names bounded.
-    if picks.is_empty() || picks.len() > 500 || picks.iter().any(|p| p.name.trim().is_empty() || p.name.chars().count() > 200) {
-        return Err("Invalid lists".into());
-    }
-    let _running = links::begin()?;
-    let window = app.get_webview_window(LABEL).ok_or("Spotify's window was closed")?;
-    // Chromium stops drawing a window hidden behind others, and the list draws its rows as it goes.
-    #[cfg(desktop)]
-    let _ = window.set_always_on_top(true);
-    let lists = picks.len();
-    let mut report = SpotifyLibraryImport { playlist_id: None, lists: 0, songs: 0, playable: 0, failed: Vec::new(), unsearched: 0 };
-    for (n, pick) in picks.iter().enumerate() {
-        if links::stopped() {
-            break;
-        }
-        let before = report.playable;
-        let tell = |matching, done, total, playable, wait_secs, song: Option<&Track>| {
-            let _ = app.emit_to("main", "spotify-import", SpotifyProgress { name: pick.name.clone(), list: n + 1, lists, matching, done, total, all_done: 0, all_total: 0, playable, searched: 0, to_search: 0, wait_secs, song: song.map(SpotifySong::from) });
-        };
-        tell(false, 0, 0, before, 0, None);
-        let read = match songs(&app, &pick.id, |done, total| tell(false, done, total, before, 0, None)).await {
-            Ok(read) if !read.tracks.is_empty() => read,
-            Ok(_) => {
-                report.failed.push(pick.name.clone());
-                continue;
-            }
-            Err(e) => {
-                crate::diag::warn("spotify", "a list couldn't be read", &format!("{e:#}"));
-                report.failed.push(pick.name.clone());
-                continue;
-            }
-        };
-        let total = read.tracks.len();
-        let to_list = |known: &[Track]| save(&state, &pick.id, pick.name.trim(), known, read.complete);
-        let Some((id, links::Found { tracks, unsearched })) = links::save_then_find(&app, &read.tracks, to_list, |step| tell(true, step.done, total, before + step.found, step.wait_secs, step.song)).await? else { break };
-        report.unsearched += unsearched;
-        report.playlist_id.get_or_insert(id);
-        report.lists += 1;
-        report.songs += total;
-        report.playable += tracks.iter().filter(|t| t.ids.contains_key(&Source::Youtube)).count();
-    }
-    let _ = window.close();
-    if links::stopped() {
-        return Err("canceled".into());
-    }
-    Ok(report)
+    SITE.import(&app, &state, picks).await
 }
 
-/// The dialog is gone: its window goes too, the session stays.
 #[tauri::command]
 pub async fn spotify_web_close(app: AppHandle) -> CmdResult<()> {
-    match app.get_webview_window(LABEL) {
-        Some(w) => w.close().map_err(err),
-        None => Ok(()),
-    }
+    SITE.close(&app)
 }

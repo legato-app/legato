@@ -81,6 +81,7 @@ mod tags;
 mod spotify_export;
 mod spotify_paste;
 mod spotify_web;
+mod web_reader;
 mod thumbbar;
 mod themes;
 #[cfg_attr(mobile, path = "mobile/tray.rs")]
