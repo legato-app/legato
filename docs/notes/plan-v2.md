@@ -939,6 +939,31 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - 2026-11-27: slices 1 to 13 landed. Not tried for real: no theme with a layout was ever loaded in the installed app.
     - Decided alone (2026-11-27): ticked on the v1 the owner set (no theme scripts; a plugin named by a theme only
       puts its panel in a column).
+- [ ] `L` Theme code: a theme's own script acts on and changes the interface as much as it can, in a sandbox nothing
+      leaves; only `data-brand` (logo, legal notices) always shows (the owner's ask, 2026-11-27, after layout v1).
+      Design: Opus, 2026-11-27 (report-inbox "Conception thèmes JS").
+  - Engine: the theme's `script` block `{ api, permissions, code }` runs as a plugin of its own kind in
+    `crates/plugins` (rquickjs, own thread, 64 MB, 1 s a run, 3 strikes), id `theme.<theme id>`. Rust checks every call
+    against a theme-only table (`THEME_METHODS`): no `net.fetch`, `library:write`, `history:read`, `discord:presence`,
+    `editor`, files, secrets or raw IPC, whatever the theme asks. A theme asking `network:*` is refused at parse.
+  - API, UI route, data only: `theme.style(css)`, `theme.vars({ --x })` (30 a second, latest only), `theme.classes(surface,
+    names)` on the shell's fixed surfaces, `theme.layout(layout)` (`sanitizeLayout` live, its forced rules),
+    `theme.slot(id, parts)` (panel parts without links or text fields, plus art, progress, lyrics line, shapes),
+    `theme.navigate(page)` and `theme.action(id)` from a fixed list. Events: now playing (art as an `art:` handle),
+    position (4 a second), page, window, colour scheme, and, with their permission, queue, visualizer frames, lyrics.
+  - Nothing leaves: no I/O in the engine; outputs are sanitized data; theme CSS keeps `url()` to `data:` and the
+    app's own `art:` local and theme pictures only (a remote `art:` URL would carry data to an allowlisted host); the
+    page CSP (no remote img, font or connect) is held by a test; storage of its own, 256 KB.
+  - Slices: 1 `S` older-proof first (`sanitizeTheme` keeps `script` as is, unrun; old-fixture test); 2 `M` the theme
+    kind and `THEME_METHODS` in Rust (tests: every other method refused, `network:*` refused); 3 `M` the review at
+    import, `.theme` drop and Sync arrival (per PC, like plugins), setting "Let themes run code", safe start (Shift
+    held, or a crash at the last start) runs none; 4 `L` the UI host (`style`, `vars`, `classes`, `layout`, dropped
+    when the script stops or throws; CSS `url()` rule; CSP test); 5 `M` the events; 6 `M` slots; 7 `S` the brand
+    cover check (`elementFromPoint` over the brand after each change: covered, the theme's CSS and layout are dropped
+    for the run, with a toast); 8 `S` navigate and actions; 9 `S` `docs/themes.md`, an example theme, i18n.
+  - Backward compatible: a theme without `script` is unchanged; a newer `api` runs no code (colours, CSS and layout
+    still apply, the card says it needs a newer Legato), like `LAYOUT_API`. Desktop only (rquickjs has no Android
+    bindings); absent from Lite (plugins are cut).
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
 - [x] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
