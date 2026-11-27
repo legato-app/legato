@@ -560,6 +560,14 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       table and a test that every cut entry is absent when lite; 3 Rust cfgs and optional deps (`cargo check --features
       lite` in CI); 4 `release.yml` second build and feed; 5 `pnpm bench` Lite vs full in `docs/performance.md`; 6 docs
       and the site's download line.
+    - [x] Slice 1, 2026-11-27 (`9fd3a288`, `761b1626`): feature `lite`, `tauri.lite.conf.json` (and `.lite.dev` for
+      `pnpm dev:lite`), `INSTALLED` per edition in `identity.rs`, `latest-lite.json` for Stable and Beta,
+      `rename.rs` and the old Run entry compiled out, `__LITE__` and `shared/edition.ts` (read by nothing yet),
+      `pnpm build:lite`. Tests in both editions, `cargo check` / clippy `--features lite`; not tried for real (no Lite
+      built or installed).
+      - Decided alone (2026-11-27): a Lite exe built without its overlay is a guest (exact identifier per edition); Lite
+        never registers `legato://` for now (first, it would keep it from a full app installed later); no installer
+        hooks nor `.lmix` association in Lite; its Run entry is "Legato Lite".
     - Lighter slices (2026-11-27), each with its number before and after in `docs/performance.md`: 7 one YouTube
       embed (PlayerBar's second `YouTubeFrame` never made; crossfade absent from Settings › Playback, its value kept as
       is in the settings file); 8 `motion` off in Lite's own defaults (the user can turn it on); 9 fewer background
