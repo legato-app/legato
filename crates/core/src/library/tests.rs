@@ -1632,29 +1632,46 @@ fn a_setting_is_read_and_written_as_its_type() -> Result<()> {
 }
 
 #[test]
-fn songs_saved_backwards_are_turned_once_where_the_library_proves_it() -> Result<()> {
+fn songs_saved_backwards_are_turned_once_by_the_artists_the_library_names() -> Result<()> {
     let lib = Library::in_memory()?;
     // As a pasted link or the video search saved it: the video's id and frame, no album.
     let video = |id: &str, title: &str, artist: &str| Track { title: title.into(), artist: artist.into(), ids: BTreeMap::from([(Source::Youtube, id.into())]), art: Some(crate::model::youtube_art(id)), ..Default::default() };
     let swapped = lib.upsert_track(&video("v1", "doja cat *slowed*", "like that"))?;
-    // A channel's own upload reads the same without proof; so does a video nothing else knows.
-    let upload = lib.upsert_track(&video("v2", "Doja Cat *slowed*", "Vinyl Music"))?;
-    let unproven = lib.upsert_track(&video("v3", "Someone", "A Song"))?;
+    let unknown = lib.upsert_track(&video("v2", "Someone", "A Song"))?;
+    // A title that only starts with an artist's name.
+    let love = lib.upsert_track(&video("v3", "Love & Hate", "New Band"))?;
+    let long = lib.upsert_track(&Track { duration_ms: Some(10 * 60_000 + 1), ..video("v4", "doja cat *sped up*", "paint the town") })?;
+    // The usual order.
+    let usual = lib.upsert_track(&video("v5", "Love", "Doja Cat"))?;
     // A song with an album names itself, backwards or not.
-    let named = lib.upsert_track(&Track { album: Some("Mix".into()), ..video("v4", "Doja Cat", "Say So") })?;
-    let catalog = |id: &str, title: &str| Track { art: Some("https://lh3.googleusercontent.com/a".into()), album: Some("Hot Pink".into()), ..video(id, title, "Doja Cat") };
-    lib.upsert_track(&catalog("c1", "Like That (feat. Gucci Mane)"))?;
-    lib.upsert_track(&catalog("c2", "Say So"))?;
+    let named = lib.upsert_track(&Track { album: Some("Mix".into()), ..video("v6", "Doja Cat", "Say So") })?;
+    for (id, artist) in [("c1", "Doja Cat"), ("c2", "Love")] {
+        lib.upsert_track(&Track { art: Some("https://lh3.googleusercontent.com/a".into()), album: Some("Album".into()), ..video(id, id, artist) })?;
+    }
+    // A video's own reading makes no artist: the backwards row doesn't vouch for itself.
+    let artists = lib.artist_keys()?;
+    assert!(artists.contains("doja cat") && !artists.contains("like that") && !artists.contains("new band"));
     let names = |id: i64| -> Result<(String, String)> { Ok(lib.track(id)?.map(|row| (row.track.artist, row.track.title)).unwrap()) };
     let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
+    // A PC that ran the first, narrower rule runs this one too.
+    lib.set_setting("backwardsTitles1", &serde_json::json!(true))?;
     assert_eq!(lib.turn_backwards_titles()?, 1);
     assert_eq!(names(swapped)?, pair("doja cat", "like that *slowed*"));
-    assert_eq!(names(upload)?, pair("Vinyl Music", "Doja Cat *slowed*"));
-    assert_eq!(names(unproven)?, pair("A Song", "Someone"));
+    assert_eq!(names(unknown)?, pair("A Song", "Someone"));
+    assert_eq!(names(love)?, pair("New Band", "Love & Hate"));
+    assert_eq!(names(long)?, pair("paint the town", "doja cat *sped up*"));
+    assert_eq!(names(usual)?, pair("Doja Cat", "Love"));
     assert_eq!(names(named)?, pair("Say So", "Doja Cat"));
     // Once: what comes later is left as it is.
-    let later = lib.upsert_track(&video("v5", "Doja Cat", "Say So"))?;
+    let later = lib.upsert_track(&video("v7", "Doja Cat", "Streets"))?;
     assert_eq!(lib.turn_backwards_titles()?, 0);
-    assert_eq!(names(later)?, pair("Say So", "Doja Cat"));
+    assert_eq!(names(later)?, pair("Streets", "Doja Cat"));
+    // A share code from an older version carries its reading: turned as it arrives.
+    let item = |artist: &str, title: &str| crate::share::Item::Youtube { id: "v8".into(), artist: artist.into(), title: title.into(), secs: 150 };
+    let mut shared = item("like that", "doja cat *slowed*").ready().unwrap();
+    assert!(turn_video_only(&mut shared, &lib.artist_keys()?));
+    assert_eq!((shared.artist.as_str(), shared.title.as_str()), ("doja cat", "like that *slowed*"));
+    // No artist sent: nothing to swap.
+    assert!(!turn_video_only(&mut item("", "Doja Cat").ready().unwrap(), &lib.artist_keys()?));
     Ok(())
 }

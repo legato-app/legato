@@ -1,6 +1,6 @@
 use crate::local::LocalSong;
 use crate::lyrics::{self, LyricHit, Lyrics};
-use crate::matching::{is_count, match_key, normalize, primary_artist, reversed_credit, same_track};
+use crate::matching::{is_count, match_key, reversed_credit, same_track};
 use crate::model::{Source, Track};
 use crate::musicness::Musicness;
 use anyhow::{Context, Result};
@@ -396,6 +396,7 @@ mod cleanup;
 pub use cleanup::{CleanedUp, MIX_CLEANUP_COPY, SPOTIFY_REMOVAL_COPY, back_up_before_cleanup, is_made_up_mix, remove_cleanup_backups};
 mod playlists;
 mod tracks;
+pub use tracks::turn_video_only;
 
 impl Library {
     /// Before migrating an existing library, keeps it as it was (`library-before-v<N>.db` next to it, the first one

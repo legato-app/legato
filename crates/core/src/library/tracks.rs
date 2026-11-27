@@ -2,6 +2,28 @@
 
 use super::*;
 
+/// The longest song whose title is turned: a longer video is a mix or a talk, its title in no known order.
+const TURNED_MAX_MS: u32 = 10 * 60_000;
+
+/// A song nothing but a video named: its YouTube id alone, that video's frame, no album. What a pasted or shared link
+/// and the video search save, title and artist read from the video's own title.
+fn is_video_only(track: &Track) -> bool {
+    let video = track.ids.get(&Source::Youtube).filter(|_| track.ids.len() == 1 && track.album.is_none());
+    video.is_some_and(|video| track.art.as_deref() == Some(crate::model::youtube_art(video).as_str()))
+}
+
+/// A video-only song read backwards, put right (`matching::reversed_credit`); `artists`: the library's (`artist_keys`).
+/// An unknown channel posting "Doja Cat *slowed*" reads the same and turns too: only the video's raw title, not kept,
+/// could tell. True: it did.
+pub fn turn_video_only(track: &mut Track, artists: &HashSet<String>) -> bool {
+    if !is_video_only(track) || track.duration_ms.is_some_and(|length| length > TURNED_MAX_MS) {
+        return false;
+    }
+    let Some((artist, title)) = reversed_credit(&track.artist, &track.title, |key| artists.contains(key)) else { return false };
+    (track.artist, track.title) = (artist, title);
+    true
+}
+
 impl Library {
     /// Insert or merge track (source id, then ISRC, then title+artist+duration). Return row id.
     /// Existing row for this track, without writing (search results: "already added").
@@ -150,27 +172,20 @@ impl Library {
         })
     }
 
-    /// Once: a song older versions saved backwards ("doja cat *slowed*" by "like that") is turned round when the
-    /// library holds the proof, that artist's song of that name from elsewhere. The video's raw title isn't kept, so
-    /// nothing less tells it from a channel's own upload. Only what a video alone named (its id, its frame, no album)
-    /// changes. A sync never renames a song a PC has: two versions don't undo each other. How many were turned.
+    /// Once: the songs older versions saved backwards ("doja cat *slowed*" by "like that") are turned round
+    /// (`turn_video_only`). A sync never renames a song a PC has: two versions don't undo each other. How many were.
     pub fn turn_backwards_titles(&self) -> Result<usize> {
-        const DONE: &str = "backwardsTitles1";
+        // 2: the first rule asked for a proof few libraries had.
+        const DONE: &str = "backwardsTitles2";
         if self.setting(DONE)?.is_some() {
             return Ok(0);
         }
         self.tx(|| {
-            let (videos, others): (Vec<LibraryTrack>, Vec<LibraryTrack>) = self.track_rows(None)?.into_iter().partition(|row| {
-                let video = row.track.ids.get(&Source::Youtube).filter(|_| row.track.ids.len() == 1 && row.track.album.is_none());
-                video.is_some_and(|video| row.track.art.as_deref() == Some(crate::model::youtube_art(video).as_str()))
-            });
-            let songs: HashSet<(String, String)> = others.iter().map(|row| (primary_artist(&row.track.artist), normalize(&row.track.title))).collect();
+            let artists = self.artist_keys()?;
             let mut turned = 0;
-            for row in videos {
-                let name = normalize(&row.track.artist);
-                let proven = |artist: &str| !name.is_empty() && songs.contains(&(artist.to_string(), name.clone()));
-                if let Some((artist, title)) = reversed_credit(&row.track.artist, &row.track.title, proven) {
-                    self.set_details(row.id, &title, &artist, None)?;
+            for mut row in self.track_rows(None)? {
+                if turn_video_only(&mut row.track, &artists) {
+                    self.set_details(row.id, &row.track.title, &row.track.artist, None)?;
                     turned += 1;
                 }
             }
@@ -391,11 +406,11 @@ impl Library {
         Ok(())
     }
 
-    /// Every artist the library knows, as `matching::primary_artist` keys them.
-    pub fn artist_keys(&self) -> Result<std::collections::HashSet<String>> {
-        let mut statement = self.db.prepare("SELECT DISTINCT artist FROM tracks")?;
-        let names = statement.query_map([], |row| row.get::<_, String>(0))?;
-        Ok(names.flatten().map(|name: String| crate::matching::primary_artist(&name)).filter(|key| !key.is_empty() && key != "unknown artist").collect())
+    /// Every artist the library knows, as `matching::primary_artist` keys them. Not those only a video named: a title
+    /// saved backwards would make its song an artist, and keep it backwards.
+    pub fn artist_keys(&self) -> Result<HashSet<String>> {
+        let named = self.track_rows(None)?.into_iter().filter(|row| !is_video_only(&row.track));
+        Ok(named.map(|row| crate::matching::primary_artist(&row.track.artist)).filter(|key| !key.is_empty() && key != "unknown artist").collect())
     }
 
     pub fn tracks(&self) -> Result<Vec<LibraryTrack>> {

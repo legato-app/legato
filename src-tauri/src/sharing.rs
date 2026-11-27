@@ -1,6 +1,7 @@
 //! Sharing: share codes and links for a song or a playlist, the local network's send and receive, a shared item's preview and import.
 
 use super::*;
+use music_core::library::turn_video_only;
 
 #[derive(Serialize, ts_rs::TS)]
 #[serde(rename_all = "camelCase")]
@@ -158,11 +159,12 @@ pub async fn share_import(app: tauri::AppHandle, state: State<'_, AppState>, cod
         let _ = app.emit_to("main", "spotify-import", p);
     };
     say(0, 0, (0, 0), 0, None);
+    let artists = std::sync::Arc::new(state.lib().artist_keys().unwrap_or_default());
     let mut songs: Vec<Option<Track>> = {
         let lib = state.lib();
         let rows = shared.items.iter().map(|i| lib.find(&probe(i))).collect::<anyhow::Result<Vec<_>>>().map_err(err)?;
         let known: HashMap<i64, Track> = if rows.iter().any(Option::is_some) { lib.tracks().map_err(err)?.into_iter().map(|t| (t.id, t.track)).collect() } else { HashMap::new() };
-        shared.items.iter().zip(rows).map(|(item, row)| row.and_then(|r| known.get(&r).cloned()).or_else(|| item.ready())).collect()
+        shared.items.iter().zip(rows).map(|(item, row)| row.and_then(|r| known.get(&r).cloned()).or_else(|| arrived(item, &artists))).collect()
     };
 
     // Apple: one batched lookup.
@@ -170,7 +172,6 @@ pub async fn share_import(app: tauri::AppHandle, state: State<'_, AppState>, cod
     let apple_found = if apple.is_empty() { Vec::new() } else { itunes::lookup(hosts::get().itunes_lookup, &apple, &country).await.unwrap_or_default() };
     // Bare video ids: keyless oEmbed per video, 8 at a time.
     let bare: Vec<(usize, String)> = shared.items.iter().zip(&songs).enumerate().filter_map(|(i, (item, s))| if let (Item::Youtube { id, .. }, None) = (item, s) { Some((i, id.clone())) } else { None }).collect();
-    let known = std::sync::Arc::new(state.lib().artist_keys().unwrap_or_default());
     for chunk in bare.chunks(8) {
         if links::stopped() {
             return Err("canceled".into());
@@ -179,8 +180,8 @@ pub async fn share_import(app: tauri::AppHandle, state: State<'_, AppState>, cod
             .iter()
             .cloned()
             .map(|(i, v)| {
-                let known = known.clone();
-                tauri::async_runtime::spawn(async move { (i, youtube::track_from_link(&format!("https://youtu.be/{v}"), youtube::OEMBED, |key| known.contains(key)).await) })
+                let artists = artists.clone();
+                tauri::async_runtime::spawn(async move { (i, youtube::track_from_link(&format!("https://youtu.be/{v}"), youtube::OEMBED, |key| artists.contains(key)).await) })
             })
             .collect();
         for job in jobs {
@@ -257,6 +258,13 @@ pub struct SharedSong {
     library_id: Option<i64>,
 }
 
+/// A shared video as the code names it, put right on arrival: an older version may send title and artist swapped.
+fn arrived(item: &Item, artists: &HashSet<String>) -> Option<Track> {
+    let mut track = item.ready()?;
+    turn_video_only(&mut track, artists);
+    Some(track)
+}
+
 #[tauri::command]
 pub async fn share_song(state: State<'_, AppState>, code: String, country: String) -> CmdResult<SharedSong> {
     use music_connectors::itunes;
@@ -269,8 +277,9 @@ pub async fn share_song(state: State<'_, AppState>, code: String, country: Strin
     if let Some(row) = known.transpose().map_err(err)?.flatten() {
         return Ok(SharedSong { track: row.track, library_id: Some(row.id) });
     }
+    let artists = state.lib().artist_keys().unwrap_or_default();
     let track = match item {
-        Item::Youtube { id, .. } => match item.ready() {
+        Item::Youtube { id, .. } => match arrived(item, &artists) {
             Some(t) => t,
             None => youtube_link(&state, &format!("https://youtu.be/{id}")).await.map_err(err)?,
         },

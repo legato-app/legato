@@ -90,7 +90,7 @@ pub fn reversed_credit(left: &str, right: &str, known: impl Fn(&str) -> bool) ->
     let (name, edit) = (right[..marker].trim(), right[marker..].trim());
     let is_artist = |key: String| !key.is_empty() && known(&key);
     // The right side whole, not its first credit: it may well be a title ("Love & Hate" with an artist called Love).
-    (!is_artist(primary_artist(left)) && is_artist(normalize(name))).then(|| (name.to_string(), format!("{left} {edit}").trim_end().to_string()))
+    (!left.trim().is_empty() && !is_artist(primary_artist(left)) && is_artist(normalize(name))).then(|| (name.to_string(), format!("{left} {edit}").trim_end().to_string()))
 }
 
 /// First credited artist, normalized ("A, B & C feat. D" → "a").
@@ -334,6 +334,8 @@ mod tests {
         // Neither side known: nothing to tell the order by.
         assert_eq!(turned("some song", "some one *slowed*"), None);
         assert_eq!(turned("like that", "*slowed*"), None);
+        // Nothing on the left to make a title of.
+        assert_eq!(turned("", "Doja Cat"), None);
     }
 
     #[test]
