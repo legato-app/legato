@@ -92,7 +92,9 @@ export interface Pages extends Partial<Record<PartedPage, PartsChoice>> {
 
 /** The shown columns as a theme orders them: which show stays the user's pick, Time comes last. */
 export function orderColumns(order: string[] | undefined, shown: readonly Column[]): Column[] {
-  return [...arrangeParts({ order }, MOVABLE_COLUMNS), 'duration' as const].filter((column) => shown.includes(column))
+  // Without a theme's order, the saved one stays (an older theme's columns, a settings file written by hand).
+  const movable = order ? arrangeParts({ order }, MOVABLE_COLUMNS).filter((column) => shown.includes(column)) : shown.filter((column) => column !== 'duration')
+  return shown.includes('duration') ? [...movable, 'duration'] : movable
 }
 
 /** The theme file's `layout` key. */

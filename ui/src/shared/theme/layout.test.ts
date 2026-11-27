@@ -110,6 +110,7 @@ describe('library lists', () => {
     expect(orderColumns(['plays', 'duration', 'album', 'nothing'], ['album', 'sources', 'plays', 'duration'])).toEqual(['plays', 'album', 'sources', 'duration'])
     expect(orderColumns(['year'], ['duration', 'album'])).toEqual(['album', 'duration'])
     expect(orderColumns(undefined, COLUMNS)).toEqual(COLUMNS)
+    expect(orderColumns(undefined, ['duration', 'plays', 'album'])).toEqual(['plays', 'album', 'duration'])
   })
 
   it('keeps and says the column order and the pages’ blocks, none of them hidden', () => {
