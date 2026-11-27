@@ -2,6 +2,7 @@
 //! Account features (library, search, export) live in `ytmusic` (Google sign-in).
 
 use anyhow::Result;
+use music_core::matching::reversed_credit;
 use music_core::model::{Source, Track};
 use regex::Regex;
 use serde::Deserialize;
@@ -25,6 +26,17 @@ pub fn parse_video(title: &str, channel: &str) -> (String, String) {
     (CHANNEL_NOISE.replace_all(channel, "").into_owned(), title.to_string())
 }
 
+/// `parse_video`'s split put right for a video titled backwards (`music_core::matching::reversed_credit`).
+pub fn turn_round(track: &mut Track, raw_title: &str, channel: &str, known: impl Fn(&str) -> bool) {
+    // Only what the dash split: a topic channel and a channel's name are the artist already.
+    if TOPIC.is_match(channel) || !DASH.is_match(raw_title) {
+        return;
+    }
+    if let Some((artist, title)) = reversed_credit(&track.artist, &track.title, known) {
+        (track.artist, track.title) = (artist, title);
+    }
+}
+
 /// Keyless video metadata endpoint.
 pub const OEMBED: &str = "https://www.youtube.com/oembed";
 
@@ -41,12 +53,19 @@ struct OEmbed {
 
 /// Track from a pasted link, no key or login (oEmbed). oEmbed has no duration.
 pub async fn track_from_link(link: &str, oembed: &str) -> Result<Track> {
+    track_from_link_knowing(link, oembed, |_| false).await
+}
+
+/// The same, `known` artists telling a title written backwards.
+pub async fn track_from_link_knowing(link: &str, oembed: &str, known: impl Fn(&str) -> bool) -> Result<Track> {
     let id = video_id(link).ok_or_else(|| anyhow::anyhow!("YouTube link not recognized"))?;
     let watch = format!("https://www.youtube.com/watch?v={id}");
     let url = Url::parse_with_params(oembed, &[("url", watch.as_str()), ("format", "json")])?;
     let o: OEmbed = crate::http().get(url).send().await?.error_for_status()?.json().await?;
     let (artist, title) = parse_video(&o.title, &o.author_name);
-    Ok(Track { title, artist, art: Some(music_core::model::youtube_art(&id)), ids: BTreeMap::from([(Source::Youtube, id)]), ..Default::default() })
+    let mut track = Track { title, artist, art: Some(music_core::model::youtube_art(&id)), ids: BTreeMap::from([(Source::Youtube, id)]), ..Default::default() };
+    turn_round(&mut track, &o.title, &o.author_name, known);
+    Ok(track)
 }
 
 /// May this video play in an embed? oEmbed answers 401 when its owner turned embedding off (or it's private): false.
@@ -73,6 +92,22 @@ mod tests {
         ] {
             assert_eq!(parse_video(title, channel), (artist.to_string(), out.to_string()), "{title}");
         }
+    }
+
+    #[test]
+    fn a_backwards_title_is_turned_round_only_where_the_dash_split_it() {
+        let known = |key: &str| key == "doja cat";
+        let read = |raw: &str, channel: &str| {
+            let (artist, title) = parse_video(raw, channel);
+            let mut track = Track { artist, title, ..Default::default() };
+            turn_round(&mut track, raw, channel, known);
+            (track.artist, track.title)
+        };
+        let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
+        assert_eq!(read("like that - doja cat *slowed*", "VinyllMusic"), pair("doja cat", "like that *slowed*"));
+        assert_eq!(read("Doja Cat - Like That", "VinyllMusic"), pair("Doja Cat", "Like That"));
+        // No dash: the channel's name is the artist, never the title.
+        assert_eq!(read("Doja Cat", "VinyllMusic"), pair("VinyllMusic", "Doja Cat"));
     }
 
     #[test]

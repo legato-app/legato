@@ -36,8 +36,12 @@ pub async fn video_search(state: &AppState, query: &str) -> Result<Vec<(Track, M
         return Ok((*hit).clone());
     }
     let web = YouTubeWeb::with_api(hosts::get().youtube, ytm::session(&state.app).as_deref());
-    let found: Vec<(Track, Musicness)> = web.search(query).await.map_err(err)?.into_iter().map(|v| {
+    let videos = web.search(query).await.map_err(err)?;
+    // Reupload channels write "Title - Artist": the library's artists tell.
+    let known = state.lib().artist_keys().unwrap_or_default();
+    let found: Vec<(Track, Musicness)> = videos.into_iter().map(|mut v| {
         let m = v.musicness();
+        music_connectors::youtube::turn_round(&mut v.track, &v.raw_title, &v.channel, |key| known.contains(key));
         (v.track, m)
     }).collect();
     state.cache.videos.put(&key, found.clone());

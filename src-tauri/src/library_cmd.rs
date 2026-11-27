@@ -100,7 +100,10 @@ pub async fn add_link(state: State<'_, AppState>, url: String) -> CmdResult<Stri
     let url = url.trim();
     let t = match links::song_link(&state, url).await? {
         Some(t) => t,
-        None => music_connectors::youtube::track_from_link(url, music_connectors::youtube::OEMBED).await.map_err(err)?,
+        None => {
+            let known = state.lib().artist_keys().map_err(err)?;
+            music_connectors::youtube::track_from_link_knowing(url, music_connectors::youtube::OEMBED, |key| known.contains(key)).await.map_err(err)?
+        }
     };
     {
         // Added by hand: a song removed earlier comes back.

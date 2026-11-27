@@ -196,6 +196,12 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `M` Right-click an artist › Never play this artist again (radio, mixes and autoplay skip them), with a way back. 2026-11-26: song and artist menus, Settings › Playback › Auto-DJ › Artists never played; synced. Never seen. Smart shuffle isn't filtered; focus sessions not yet.
 - [x] `M` Mix covers in several styles, different from one mix to the next, instead of 2×2 grids everywhere. 2026-11-26: Settings › Mixes › Mix covers › Varied, the new default (`mixes/coverStyle.ts`); tests only, not seen in the app.
   - Decided alone (2026-11-26): saved settings still on the grid (the old default, not told from a picked one) move to Varied once (v12), Single and Template stay; the tinted look is the lead cover in one flat colour taken from its song's name; numbered mixes next to each other never look alike; "Made from songs you love" keeps its seed cover under Varied; a grid with under 4 covers stays the single cover.
+- [x] `S` A video titled "Title - Artist" (reupload channels) showed the two swapped (the owner, 2026-11-27).
+  2026-11-27: YouTube search and pasted links turn it round when only the right side is an artist of the library, an
+  edit marker after the name staying with the title (`matching::reversed_credit`); never tried in the app.
+  - Decided alone (2026-11-27): "known" is the library's artists only (nothing new asked of the network); a marker
+    alone doesn't turn it ("Artist - Song (slowed)" has it too), so an unknown artist stays read as before; share codes
+    and song lists are left as they were; songs already saved swapped are not rewritten.
 - [ ] `M` Normal videos (a story web series) counted as music: rework the detection; no « Like » mix seeded from a non-music video.
   - Brief: episodic clues in `crates/core/src/musicness.rs` (episode markers, series channels); the Like-mix seed only from tracks judged Music, never Unsure. Tests: one per clue, and a real song titled "Part II" stays Music.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.

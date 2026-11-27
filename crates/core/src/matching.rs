@@ -15,6 +15,10 @@ static BRACKET_NOISE: LazyLock<Regex> = LazyLock::new(|| {
 static REMASTER: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\s+-\s+(?:\d{4}\s+)?remaster(?:ed)?\b.*$").unwrap());
 static FEAT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\s(?:feat|ft)\.?\s.*$").unwrap());
+/// A slowed, sped up… upload's marker after a name, with what it opens: "doja cat *slowed*", "X (sped up + reverb)".
+static EDIT_MARKER: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?i)\s*[*(\[~|]*\s*\b(?:super\s+slowed|slowed|sped[\s-]*up|speed[\s-]*up|reverb(?:ed)?|nightcore|daycore|bass[\s-]*boost(?:ed)?|8d)\b.*$").unwrap()
+});
 static ARTIST_SPLIT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?i),|&|;|/|\s(?:feat|ft)\.?\s|\sx\s|\svs\.?\s").unwrap());
 
@@ -75,6 +79,17 @@ pub fn credits(artist: &str) -> Vec<&str> {
     names.push(artist[from..].trim());
     names.retain(|name| !name.is_empty());
     names
+}
+
+/// A video titled "A - B" is read "Artist - Title"; reupload channels often write it the other way. (artist, title)
+/// when the left side is no artist `known` (by `primary_artist`) and the right one is, an edit marker after the name
+/// aside: it stays with the title. Without a known name the order can't be told: "Artist - Song (slowed)" has the
+/// marker too.
+pub fn reversed_credit(left: &str, right: &str, known: impl Fn(&str) -> bool) -> Option<(String, String)> {
+    let marker = EDIT_MARKER.find(right).map_or(right.len(), |found| found.start());
+    let (name, edit) = (right[..marker].trim(), right[marker..].trim());
+    let is_artist = |text: &str| Some(primary_artist(text)).filter(|key| !key.is_empty()).is_some_and(|key| known(&key));
+    (!is_artist(left) && is_artist(name)).then(|| (name.to_string(), format!("{left} {edit}").trim_end().to_string()))
 }
 
 /// First credited artist, normalized ("A, B & C feat. D" → "a").
@@ -297,6 +312,23 @@ mod tests {
     fn the_comma_names_are_real_names_with_a_comma() {
         assert!(COMMA_NAMES.iter().all(|n| n.contains(',')));
         assert!(COMMA_NAMES.windows(2).all(|w| w[0].len() >= w[1].len()), "longest first");
+    }
+
+    #[test]
+    fn a_video_titled_backwards_is_turned_round_for_a_known_artist_only() {
+        let known = |key: &str| ["doja cat", "yeat"].contains(&key);
+        let turned = |left: &str, right: &str| reversed_credit(left, right, known);
+        let pair = |artist: &str, title: &str| Some((artist.to_string(), title.to_string()));
+        assert_eq!(turned("like that", "doja cat *slowed*"), pair("doja cat", "like that *slowed*"));
+        assert_eq!(turned("like that", "Doja Cat"), pair("Doja Cat", "like that"));
+        assert_eq!(turned("liv like dis", "yeat (sped up + reverb)"), pair("yeat", "liv like dis (sped up + reverb)"));
+        // The usual order stays, marker or not.
+        assert_eq!(turned("Doja Cat", "Like That"), None);
+        assert_eq!(turned("Doja Cat", "Like That *slowed*"), None);
+        assert_eq!(turned("Doja Cat", "Yeat"), None);
+        // Neither side known: nothing to tell the order by.
+        assert_eq!(turned("some song", "some one *slowed*"), None);
+        assert_eq!(turned("like that", "*slowed*"), None);
     }
 
     #[test]

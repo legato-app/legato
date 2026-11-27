@@ -357,6 +357,13 @@ impl Library {
         Ok(())
     }
 
+    /// Every artist the library knows, as `matching::primary_artist` keys them.
+    pub fn artist_keys(&self) -> Result<std::collections::HashSet<String>> {
+        let mut statement = self.db.prepare("SELECT DISTINCT artist FROM tracks")?;
+        let names = statement.query_map([], |row| row.get::<_, String>(0))?;
+        Ok(names.flatten().map(|name: String| crate::matching::primary_artist(&name)).filter(|key| !key.is_empty() && key != "unknown artist").collect())
+    }
+
     pub fn tracks(&self) -> Result<Vec<LibraryTrack>> {
         let rows = self.track_rows(None)?;
         self.judged(rows, None)
