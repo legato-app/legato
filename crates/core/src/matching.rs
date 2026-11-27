@@ -82,14 +82,15 @@ pub fn credits(artist: &str) -> Vec<&str> {
 }
 
 /// A video titled "A - B" is read "Artist - Title"; reupload channels often write it the other way. (artist, title)
-/// when the left side is no artist `known` (by `primary_artist`) and the right one is, an edit marker after the name
-/// aside: it stays with the title. Without a known name the order can't be told: "Artist - Song (slowed)" has the
+/// when the left side is no artist `known` (by `primary_artist`) and the whole right side is one, an edit marker after
+/// the name aside: it stays with the title. Without a known name the order can't be told: "Artist - Song (slowed)" has the
 /// marker too.
 pub fn reversed_credit(left: &str, right: &str, known: impl Fn(&str) -> bool) -> Option<(String, String)> {
     let marker = EDIT_MARKER.find(right).map_or(right.len(), |found| found.start());
     let (name, edit) = (right[..marker].trim(), right[marker..].trim());
-    let is_artist = |text: &str| Some(primary_artist(text)).filter(|key| !key.is_empty()).is_some_and(|key| known(&key));
-    (!is_artist(left) && is_artist(name)).then(|| (name.to_string(), format!("{left} {edit}").trim_end().to_string()))
+    let is_artist = |key: String| !key.is_empty() && known(&key);
+    // The right side whole, not its first credit: it may well be a title ("Love & Hate" with an artist called Love).
+    (!is_artist(primary_artist(left)) && is_artist(normalize(name))).then(|| (name.to_string(), format!("{left} {edit}").trim_end().to_string()))
 }
 
 /// First credited artist, normalized ("A, B & C feat. D" → "a").
@@ -326,6 +327,9 @@ mod tests {
         assert_eq!(turned("Doja Cat", "Like That"), None);
         assert_eq!(turned("Doja Cat", "Like That *slowed*"), None);
         assert_eq!(turned("Doja Cat", "Yeat"), None);
+        // A title that only starts with a known artist's name is no artist.
+        assert_eq!(turned("New Band", "Doja Cat & Friends"), None);
+        assert_eq!(turned("New Band", "Yeat, Again"), None);
         // Neither side known: nothing to tell the order by.
         assert_eq!(turned("some song", "some one *slowed*"), None);
         assert_eq!(turned("like that", "*slowed*"), None);
