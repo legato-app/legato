@@ -282,6 +282,11 @@ impl Library {
             // Removed from the library by the user: stays out.
             let kept: Vec<Track> = tracks.iter().filter(|t| !self.is_removed(t).unwrap_or(false)).cloned().collect();
             let tracks = kept.as_slice();
+            if source == Source::Spotify {
+                for track in tracks {
+                    self.bring_back_left(track)?;
+                }
+            }
             // New rows created oldest first: "date added" holds for newest-first lists too.
             let newest = self.order_of(id)?.0;
             let oldest_first: Vec<&Track> = if newest { tracks.iter().rev().collect() } else { tracks.iter().collect() };

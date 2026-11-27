@@ -128,7 +128,8 @@ impl Snapshot {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Gone {
-    /// playlist / removed / edit / history / import-left (`library::cleanup`). Unknown kinds are kept and sent on.
+    /// playlist / removed / edit / history / import-left and import-back (`library::cleanup`). Unknown kinds are kept
+    /// and sent on.
     pub kind: String,
     pub key: String,
     pub at: i64,
@@ -1251,6 +1252,52 @@ mod tests {
             assert!(!pc.merge(&snap(&old))?.any());
             assert!(pc.tracks()?.is_empty());
         }
+        Ok(())
+    }
+
+    #[test]
+    fn a_reimport_brings_them_back_everywhere() -> Result<()> {
+        let (a, b) = (Library::in_memory()?, Library::in_memory()?);
+        let import = || a.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("back")]);
+        import()?;
+        b.merge(&snap(&a))?;
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        a.remove_spotify_imports()?;
+        b.merge(&snap(&a))?;
+        assert!(b.tracks()?.is_empty());
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        import()?;
+        b.merge(&snap(&a))?;
+        assert_eq!(titles_sorted(&b)?, ["back"]);
+        assert_eq!(names(&b), ["From Spotify"]);
+        // The next import records nothing new.
+        let recorded = snap(&a).gone;
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        import()?;
+        assert_eq!(snap(&a).gone, recorded);
+        // Dropped from the list on Spotify later: a library song like any other, no merge sweeps it.
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        a.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("other")])?;
+        b.merge(&snap(&a))?;
+        for pc in [&a, &b] {
+            pc.merge(&snap(&Library::in_memory()?))?;
+            assert_eq!(titles_sorted(pc)?, ["back", "other"]);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn a_song_added_again_by_hand_or_liked_stays() -> Result<()> {
+        let lib = Library::in_memory()?;
+        lib.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("hand"), from_spotify("liked")])?;
+        lib.remove_spotify_imports()?;
+        // Added by hand, in no list: the next merge leaves it.
+        lib.unremove(&from_spotify("hand"))?;
+        lib.upsert_track(&from_spotify("hand"))?;
+        lib.add_likes(&[from_spotify("liked")])?;
+        assert_eq!(lib.merge(&snap(&Library::in_memory()?))?.deleted, 0);
+        assert_eq!(titles_sorted(&lib)?, ["hand", "liked"]);
+        assert_eq!(snap(&lib).gone.iter().filter(|gone| gone.kind == "import-back").count(), 2);
         Ok(())
     }
 

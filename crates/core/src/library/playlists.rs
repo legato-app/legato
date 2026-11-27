@@ -306,8 +306,9 @@ impl Library {
         Ok(false)
     }
 
-    /// Added again by hand (search, link): the removed mark goes.
+    /// Added again by hand (search, link): the removed mark goes, and a Spotify disconnect's record.
     pub fn unremove(&self, t: &Track) -> Result<()> {
+        self.bring_back_left(t)?;
         let mut stmt = self.db.prepare_cached("DELETE FROM removed WHERE source = ?1 AND source_id = ?2")?;
         for (s, id) in &t.ids {
             if stmt.execute(params![s.as_str(), id])? > 0 {
@@ -382,7 +383,15 @@ impl Library {
         let youtube = self.playlists()?.into_iter().find(|p| p.source == Source::Youtube && !p.custom && p.source_id == "LM").map(|p| p.id);
         let there: BTreeSet<i64> = youtube.map_or(Ok(Vec::new()), |id| self.playlist_track_ids(id))?.into_iter().collect();
         let kept: Vec<&Track> = tracks.iter().filter(|t| !self.is_removed(t).unwrap_or(false)).collect();
-        let ids = self.tx(|| kept.iter().map(|t| self.upsert_track(t)).collect::<Result<Vec<_>>>())?;
+        let ids = self.tx(|| {
+            kept.iter()
+                .map(|t| {
+                    // Spotify's own likes come this way.
+                    self.bring_back_left(t)?;
+                    self.upsert_track(t)
+                })
+                .collect::<Result<Vec<_>>>()
+        })?;
         let mut seen = BTreeSet::new();
         let todo: Vec<i64> = ids.into_iter().filter(|id| !there.contains(id) && seen.insert(*id)).collect();
         match youtube {

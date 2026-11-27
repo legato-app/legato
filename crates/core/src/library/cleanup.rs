@@ -155,8 +155,22 @@ impl Library {
     /// Only Spotify knows it and it left with a disconnect: another PC's library doesn't bring it back.
     pub(crate) fn left_with_spotify(&self, ids: &BTreeMap<Source, String>) -> Result<bool> {
         let Some(spotify_id) = ids.get(&Source::Spotify).filter(|_| ids.len() == 1) else { return Ok(false) };
+        self.is_left(&left_key(spotify_id))
+    }
+
+    fn is_left(&self, key: &str) -> Result<bool> {
         let mut stmt = self.db.prepare_cached(&format!("SELECT 1 FROM sync_gone g WHERE g.key = ?1 AND {LEFT_LIVE}"))?;
-        Ok(stmt.exists([left_key(spotify_id)])?)
+        Ok(stmt.exists([key])?)
+    }
+
+    /// Imported or added again: a disconnect's record on the song ends, on the other PCs too. Nothing written otherwise.
+    pub(crate) fn bring_back_left(&self, t: &Track) -> Result<()> {
+        if let Some(key) = t.ids.get(&Source::Spotify).map(|spotify_id| left_key(spotify_id))
+            && self.is_left(&key)?
+        {
+            self.gone("import-back", &key)?;
+        }
+        Ok(())
     }
 
     /// Songs another PC's disconnect took leave this one too, unless something here holds them (the disconnect's own

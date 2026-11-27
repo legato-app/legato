@@ -125,6 +125,12 @@ Editor version. Deletions are remembered (`sync_gone`: playlist, removed-then-ad
 PC that missed them deletes too instead of bringing things back. Listening history is a union (one listen = song +
 start time). Ties keep what's here. Clocks come from each PC (Windows keeps them in time).
 
+Spotify disconnected with "remove" (2026-11-27): each song that left is recorded (`import-left`, `spotify:<id>`). Every
+merge then takes it from the other PCs by the disconnect's own rule: it stays where that PC has a play, a rating, a
+list or anything else of the user's, or another source. Another PC's library doesn't bring it back. Imported or added
+again (`import-back`, newer): it comes back everywhere. An older Legato keeps the records and sends them on, and keeps
+the songs until it updates.
+
 First sync: the PC set up first (or the one showing the code) is the reference for settings never changed since;
 joining PCs take its settings. After that, any change on any PC wins by its time.
 

@@ -34,13 +34,17 @@ the order; a line leaves only when it ships or the user drops it.
       Tests in core, not tried for real.
       Decided alone (2026-11-27): one question (the playlists-only one is gone); a song already matched to a YouTube video
       has another source and stays; an older Spotify “Liked Songs” list stays, with its songs. Limit: Sync Mode removes the
-      playlists on the other PCs, not the songs, so a synced PC brings the songs back (the question says it). Recording
-      them as removed, as Remove from library does, was left: it would delete them from the other PCs with their plays and
-      playlists there, and a later Spotify import would skip them; doing it right needs a new kind of record in the sync
-      files.
-- [ ] `M` Sync Mode carries the Spotify-disconnect removal: a synced PC brings the removed songs back today. Recording them
+      playlists on the other PCs, and since 2026-11-27 the songs too (next line). Not recorded as removed, as Remove from
+      library does: that would delete them from the other PCs with their plays and playlists there, and a later Spotify
+      import would skip them.
+- [x] `M` Sync Mode carries the Spotify-disconnect removal: a synced PC brings the removed songs back today. Recording them
       as `removed` would also delete the other PCs’ unsynced history and playlists, so it needs a record kind of its own
       (night window 2, 2026-11-27).
+  - 2026-11-27: done, two record kinds (`docs/sync-mode.md` › Conflicts), no schema or file format bump; tests in core
+    between two libraries. Not tried for real (two real PCs).
+    - Decided alone (2026-11-27): another PC applies the disconnect’s own rule to its own rows, at every merge. A song
+      added again by hand or kept as a like ends its record, as an import does, so the next merge leaves it.
+    - Limit: an older Legato keeps the songs until it updates (the question says it).
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et
