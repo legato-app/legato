@@ -1,4 +1,4 @@
-import { ArrowsIn, ArrowsOut, CaretDown, CopySimple, DotsThree, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
+import { CaretDown, CopySimple, DotsThree, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
 import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
@@ -56,7 +56,6 @@ import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from '
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
 import { pushNotice } from './pushNotice'
-import { toggleFullscreen } from './fullscreen'
 import { Toasts } from './Toasts'
 import { PhoneTabs } from './PhoneTabs'
 import { Asker } from '../shared/ui/Ask'
@@ -129,12 +128,8 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
   const { canBack, canForward, goBack, goForward } = useStore(useShallow((s) => ({ canBack: s.back.length > 0, canForward: s.fwd.length > 0, goBack: s.goBack, goForward: s.goForward })))
   const online = useOnline()
   const [maximized, setMaximized] = useState(false)
-  const [fullscreen, setFullscreen] = useState(false)
   useEffect(() => {
-    const check = () => {
-      void win.isMaximized().then(setMaximized, () => {})
-      void win.isFullscreen().then(setFullscreen, () => {})
-    }
+    const check = () => void win.isMaximized().then(setMaximized, () => {})
     check()
     const off = win.onResized(check)
     return () => void off.then((f) => f())
@@ -208,9 +203,6 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
         </button>
       </span>
       <span className={`flex items-center phone:hidden ${full ? 'glass rounded-lg' : ''}`}>
-        <button className={winBtn} aria-label={fullscreen ? tr('Exit full screen (F11)') : tr('Full screen (F11)')} title={fullscreen ? tr('Exit full screen (F11)') : tr('Full screen (F11)')} onClick={() => void toggleFullscreen()}>
-          {fullscreen ? <ArrowsIn size={15} /> : <ArrowsOut size={15} />}
-        </button>
         <button className={winBtn} aria-label={tr('Minimize')} title={tr('Minimize')} onClick={minimizeWindow}>
           <Minus size={16} />
         </button>

@@ -1,6 +1,6 @@
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
-/** Full screen on / off (F11, title bar button). */
+/** Full screen on / off (F11). */
 export async function toggleFullscreen() {
   const w = getCurrentWindow()
   await w.setFullscreen(!(await w.isFullscreen()))
@@ -8,7 +8,7 @@ export async function toggleFullscreen() {
 
 /**
  * A screen that takes the window full screen while it is open (the visualizer's, like karaoke's): `enter` puts it on if it
- * was not, and watches for it being left another way (F11, title bar), which calls `onLeft`; `leave` gives back only what
+ * was not, and watches for it being left another way (F11), which calls `onLeft`; `leave` gives back only what
  * `enter` took. The state is kept in sessionStorage under `flag` too: a page reload while open forgets the module, the
  * window would stay full screen, so `restore` (call it at start) gives it back.
  */

@@ -1606,8 +1606,6 @@ const ru: Record<string, string> = {
   'Loudness': 'Тонкомпенсация',
   'Distortion': 'Дисторшн',
   'Full screen on / off': 'Полный экран вкл. / выкл.',
-  'Full screen (F11)': 'Полный экран (F11)',
-  'Exit full screen (F11)': 'Выйти из полного экрана (F11)',
   'Pictures and videos': 'Картинки и видео',
   'Choose a picture or video…': 'Выбрать картинку или видео…',
   'Another picture or video…': 'Другая картинка или видео…',

@@ -1606,8 +1606,6 @@ const nl: Record<string, string> = {
   'Loudness': 'Loudness',
   'Distortion': 'Vervorming',
   'Full screen on / off': 'Volledig scherm aan / uit',
-  'Full screen (F11)': 'Volledig scherm (F11)',
-  'Exit full screen (F11)': 'Volledig scherm sluiten (F11)',
   'Pictures and videos': 'Afbeeldingen en video’s',
   'Choose a picture or video…': 'Kies een afbeelding of video…',
   'Another picture or video…': 'Andere afbeelding of video…',

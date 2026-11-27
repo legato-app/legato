@@ -1606,8 +1606,6 @@ const uk: Record<string, string> = {
   'Loudness': 'Тонкомпенсація',
   'Distortion': 'Дисторшн',
   'Full screen on / off': 'Повний екран увімк. / вимк.',
-  'Full screen (F11)': 'Повний екран (F11)',
-  'Exit full screen (F11)': 'Вийти з повного екрана (F11)',
   'Pictures and videos': 'Зображення й відео',
   'Choose a picture or video…': 'Вибрати зображення чи відео…',
   'Another picture or video…': 'Інше зображення чи відео…',

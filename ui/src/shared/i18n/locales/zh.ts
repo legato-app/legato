@@ -1606,8 +1606,6 @@ const zh: Record<string, string> = {
   'Loudness': '响度',
   'Distortion': '失真',
   'Full screen on / off': '开启 / 关闭全屏',
-  'Full screen (F11)': '全屏 (F11)',
-  'Exit full screen (F11)': '退出全屏 (F11)',
   'Pictures and videos': '图片和视频',
   'Choose a picture or video…': '选择图片或视频…',
   'Another picture or video…': '换一张图片或视频…',

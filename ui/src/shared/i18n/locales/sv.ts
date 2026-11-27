@@ -1606,8 +1606,6 @@ const sv: Record<string, string> = {
   'Loudness': 'Loudness',
   'Distortion': 'Distorsion',
   'Full screen on / off': 'Helskärm på / av',
-  'Full screen (F11)': 'Helskärm (F11)',
-  'Exit full screen (F11)': 'Lämna helskärm (F11)',
   'Pictures and videos': 'Bilder och videor',
   'Choose a picture or video…': 'Välj en bild eller video…',
   'Another picture or video…': 'En annan bild eller video…',

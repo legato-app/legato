@@ -1552,8 +1552,6 @@ const ar: Record<string, string> = {
   'Loudness': 'علو الصوت',
   'Distortion': 'تشويه',
   'Full screen on / off': 'تشغيل / إيقاف ملء الشاشة',
-  'Full screen (F11)': 'ملء الشاشة (F11)',
-  'Exit full screen (F11)': 'الخروج من ملء الشاشة (F11)',
   'Pictures and videos': 'الصور والفيديوهات',
   'Choose a picture or video…': 'اختر صورة أو فيديو…',
   'Another picture or video…': 'صورة أو فيديو آخر…',

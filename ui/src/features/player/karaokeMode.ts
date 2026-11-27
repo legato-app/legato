@@ -13,7 +13,7 @@ import { usePlayer } from './store'
  */
 export const useKaraoke = create<{ open: boolean }>(() => ({ open: false }))
 
-// Full screen put on by us (given back on leaving), and the listener that sees it left by another way (F11, title bar).
+// Full screen put on by us (given back on leaving), and the listener that sees it left by another way (F11).
 let entered = false
 let unlisten: (() => void) | undefined
 let unkey: (() => void) | undefined

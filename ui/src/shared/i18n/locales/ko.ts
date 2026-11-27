@@ -1606,8 +1606,6 @@ const ko: Record<string, string> = {
   'Loudness': '라우드니스',
   'Distortion': '디스토션',
   'Full screen on / off': '전체 화면 켜기 / 끄기',
-  'Full screen (F11)': '전체 화면 (F11)',
-  'Exit full screen (F11)': '전체 화면 종료 (F11)',
   'Pictures and videos': '사진 및 동영상',
   'Choose a picture or video…': '사진 또는 동영상 선택…',
   'Another picture or video…': '다른 사진 또는 동영상…',

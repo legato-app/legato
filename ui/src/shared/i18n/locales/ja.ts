@@ -1606,8 +1606,6 @@ const ja: Record<string, string> = {
   'Loudness': 'ラウドネス',
   'Distortion': 'ディストーション',
   'Full screen on / off': '全画面のオン / オフ',
-  'Full screen (F11)': '全画面 (F11)',
-  'Exit full screen (F11)': '全画面を終了 (F11)',
   'Pictures and videos': '画像と動画',
   'Choose a picture or video…': '画像または動画を選ぶ…',
   'Another picture or video…': '別の画像または動画…',

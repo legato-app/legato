@@ -1606,8 +1606,6 @@ const id: Record<string, string> = {
   'Loudness': 'Loudness',
   'Distortion': 'Distorsi',
   'Full screen on / off': 'Layar penuh hidup / mati',
-  'Full screen (F11)': 'Layar penuh (F11)',
-  'Exit full screen (F11)': 'Keluar layar penuh (F11)',
   'Pictures and videos': 'Gambar dan video',
   'Choose a picture or video…': 'Pilih gambar atau video…',
   'Another picture or video…': 'Gambar atau video lain…',

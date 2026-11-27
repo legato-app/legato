@@ -1552,8 +1552,6 @@ const he: Record<string, string> = {
   'Loudness': 'לאודנס',
   'Distortion': 'עיוות',
   'Full screen on / off': 'מסך מלא פועל / כבוי',
-  'Full screen (F11)': 'מסך מלא (F11)',
-  'Exit full screen (F11)': 'יציאה ממסך מלא (F11)',
   'Pictures and videos': 'תמונות וסרטונים',
   'Choose a picture or video…': 'בחירת תמונה או סרטון…',
   'Another picture or video…': 'תמונה או סרטון אחר…',

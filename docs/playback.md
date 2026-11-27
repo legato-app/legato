@@ -600,7 +600,7 @@ never: downloading, extracting, recording or exporting a platform's audio, or to
     strip; a click on the strip or the full screen: the next look (`vizClick.ts`, held 300 ms so a double click stays
     one); right-click: look, full screen; Esc or a double click leaves (`vizFullKeys.ts`, capture on the window, a
     menu on top keeps its Esc). The window goes full screen through `holdFullscreen` (`app/fullscreen.ts`: gives back only
-    what it took, sees F11 / the title bar leaving it, sessionStorage flag for a reload), the same care as karaoke's.
+    what it took, sees F11 leaving it, sessionStorage flag for a reload), the same care as karaoke's.
     While it is up Now Playing's F and karaoke's K do nothing; the native watch page (a YouTube video that can't be
     embedded) is hidden, as for karaoke (`PlayerBar.tsx`). Click on the strip still
     does nothing (it did nothing before).

@@ -1606,8 +1606,6 @@ const de: Record<string, string> = {
   'Loudness': 'Loudness',
   'Distortion': 'Verzerrung',
   'Full screen on / off': 'Vollbild ein / aus',
-  'Full screen (F11)': 'Vollbild (F11)',
-  'Exit full screen (F11)': 'Vollbild beenden (F11)',
   'Pictures and videos': 'Bilder und Videos',
   'Choose a picture or video…': 'Bild oder Video wählen…',
   'Another picture or video…': 'Anderes Bild oder Video…',

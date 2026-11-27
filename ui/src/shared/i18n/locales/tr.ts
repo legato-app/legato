@@ -1606,8 +1606,6 @@ const tr: Record<string, string> = {
   'Loudness': 'Loudness',
   'Distortion': 'Distorsiyon',
   'Full screen on / off': 'Tam ekran açık / kapalı',
-  'Full screen (F11)': 'Tam ekran (F11)',
-  'Exit full screen (F11)': 'Tam ekrandan çık (F11)',
   'Pictures and videos': 'Resimler ve videolar',
   'Choose a picture or video…': 'Resim veya video seç…',
   'Another picture or video…': 'Başka bir resim veya video…',

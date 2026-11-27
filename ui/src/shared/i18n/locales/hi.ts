@@ -1606,8 +1606,6 @@ const hi: Record<string, string> = {
   'Loudness': 'लाउडनेस',
   'Distortion': 'डिस्टॉर्शन',
   'Full screen on / off': 'फ़ुल स्क्रीन चालू / बंद',
-  'Full screen (F11)': 'फ़ुल स्क्रीन (F11)',
-  'Exit full screen (F11)': 'फ़ुल स्क्रीन से बाहर (F11)',
   'Pictures and videos': 'तस्वीरें और वीडियो',
   'Choose a picture or video…': 'तस्वीर या वीडियो चुनें…',
   'Another picture or video…': 'दूसरी तस्वीर या वीडियो…',
