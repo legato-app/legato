@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { notesFrom } from './notes.mjs'
-import { betaTitle, compareTags, currentStable, newestBeta, parseTag, promoteArgs, refusal, stableTitle, toTag, withNotes } from './promote.mjs'
+import { betaTitle, compareTags, currentStable, newestBeta, parseTag, promoteArgs, refusal, stableTitle, toTag, updaterFiles, withNotes } from './promote.mjs'
 
 const rel = (tagName: string, isPrerelease = true, isDraft = false) => ({ tagName, isPrerelease, isDraft })
 
@@ -62,6 +62,13 @@ describe('promote', () => {
     expect(() => withNotes(manifest({ platforms: {} }), '1.0.11', 'x')).toThrow('not a complete')
     expect(() => withNotes(manifest({ platforms: { w: { url: 'https://example.com/setup.exe' } } }), '1.0.11', 'x')).toThrow('not a complete')
     expect(() => withNotes('{}', '1.0.11', 'x')).toThrow('not a complete')
+    expect(() => withNotes('{}', '1.0.11', 'x', 'latest-lite.json')).toThrow('latest-lite.json of v1.0.11 is not a complete')
+  })
+
+  it("promotes the Lite's updater file beside the full app's, when the release has one", () => {
+    expect(updaterFiles(['Legato_1.2.5_x64-setup.exe', 'latest.json', 'Legato.Lite_1.2.5_x64-setup.exe', 'latest-lite.json'])).toEqual(['latest.json', 'latest-lite.json'])
+    // A beta from before the Lite, or whose Lite build failed.
+    expect(updaterFiles(['Legato_1.2.5_x64-setup.exe', 'latest.json'])).toEqual(['latest.json'])
   })
 
   it('words the notes like a release does: feat, fix and perf only, grouped', () => {

@@ -55,12 +55,12 @@ export function refusal(release, stableTag) {
   return undefined
 }
 
-/** latest.json with `notes` replaced. Throws when it isn't a complete updater file for `version`: nothing broken becomes Stable. */
-export function withNotes(text, version, notes) {
+/** An updater file (latest.json, latest-lite.json) with `notes` replaced. Throws when it isn't a complete one for `version`: nothing broken becomes Stable. */
+export function withNotes(text, version, notes, name = 'latest.json') {
   const file = JSON.parse(text)
   const platforms = Object.values(file.platforms ?? {})
   if (String(file.version).replace(/^v/, '') !== version || !platforms.length || platforms.some((p) => !p?.url || !p?.signature)) {
-    throw new Error(`latest.json of v${version} is not a complete updater file`)
+    throw new Error(`${name} of v${version} is not a complete updater file`)
   }
   return `${JSON.stringify({ ...file, notes }, null, 2)}\n`
 }
@@ -78,8 +78,13 @@ export function currentStable(read) {
   }
 }
 
+/** The updater files a release carries: always the full app's latest.json, the Lite's when its build made it (none before Lite slice 4, or when that job failed). */
+export function updaterFiles(assetNames) {
+  return ['latest.json', ...(assetNames.includes('latest-lite.json') ? ['latest-lite.json'] : [])]
+}
+
 const run = (cmd, ...args) => execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }).trim()
-const view = (...tag) => JSON.parse(run('gh', 'release', 'view', ...tag, '--json', 'tagName,isPrerelease,isDraft'))
+const view = (...tag) => JSON.parse(run('gh', 'release', 'view', ...tag, '--json', 'tagName,isPrerelease,isDraft,assets'))
 // Stderr kept (not shown): `currentStable` reads it.
 const viewLatest = () => JSON.parse(execFileSync('gh', ['release', 'view', '--json', 'tagName'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })).tagName
 
@@ -90,21 +95,27 @@ function main(argv) {
   const stable = currentStable(viewLatest)
   const tag = input ? toTag(input) : newestBeta(JSON.parse(run('gh', 'release', 'list', '--exclude-drafts', '--limit', '200', '--json', 'tagName,isPrerelease,isDraft')))?.tagName
   if (!tag) throw new Error('No beta to promote')
-  const why = refusal(view(tag), stable)
+  const release = view(tag)
+  const why = refusal(release, stable)
   if (why) throw new Error(why)
 
   const notes = notesFrom(run('git', 'log', '--no-merges', '--format=%s', stable ? `${stable}..${tag}` : tag).split('\n'))
   const dir = mkdtempSync(join(tmpdir(), 'promote-'))
-  const file = join(dir, 'latest.json')
-  run('gh', 'release', 'download', tag, '--pattern', 'latest.json', '--dir', dir)
-  const manifest = withNotes(readFileSync(file, 'utf8'), tag.slice(1), notes)
+  // Every file checked before anything is written.
+  const manifests = updaterFiles(release.assets.map((asset) => asset.name)).map((name) => {
+    run('gh', 'release', 'download', tag, '--pattern', name, '--dir', dir)
+    const file = join(dir, name)
+    return { file, text: withNotes(readFileSync(file, 'utf8'), tag.slice(1), notes, name) }
+  })
+  // No Lite file: Lite PCs on Stable find no update (a 404) until a Stable that has one.
+  if (manifests.length === 1) console.warn(`${tag} has no latest-lite.json: Legato Lite stays where it is`)
   console.log(`${tag} becomes Stable (now ${stable ?? 'none'})\n${notes}`)
   if (dry) return
 
-  writeFileSync(file, manifest)
+  for (const { file, text } of manifests) writeFileSync(file, text)
   const notesFile = join(dir, 'notes.md')
   writeFileSync(notesFile, notes)
-  run('gh', 'release', 'upload', tag, file, '--clobber')
+  run('gh', 'release', 'upload', tag, ...manifests.map(({ file }) => file), '--clobber')
   run('gh', 'release', 'edit', tag, '--notes-file', notesFile)
   // Last: until here it is still a prerelease and nobody's update changes. The title goes back to the Stable one in the same call.
   run('gh', ...promoteArgs(tag))
