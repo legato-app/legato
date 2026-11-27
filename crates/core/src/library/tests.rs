@@ -621,7 +621,7 @@ fn removed_songs_stay_out_of_syncs_until_added_again() -> Result<()> {
 #[test]
 fn local_files_keep_their_genre_and_year() -> Result<()> {
     let lib = Library::in_memory()?;
-    let file = |genre: Option<&str>, year| LocalSong { track: Track { ids: [(Source::Local, "C:/Music/1.flac".into())].into(), ..song(1) }, genre: genre.map(Into::into), year, bpm: year.map(|_| 128), key: year.map(|_| "8A".to_string()) };
+    let file = |genre: Option<&str>, year| LocalSong { track: Track { ids: [(Source::Local, "C:/Music/1.flac".into())].into(), ..song(1) }, genre: genre.map(Into::into), year, bpm: year.map(|_| 128), key: year.map(|_| "8A".to_string()), chapters: 0 };
     lib.replace_local(&[file(Some("Jazz"), Some(1959))])?;
     let t = &lib.tracks()?[0];
     assert_eq!((t.genre.as_deref(), t.year, t.bpm, t.key.as_deref()), (Some("Jazz"), Some(1959), Some(128), Some("8A")));
@@ -1031,6 +1031,22 @@ fn an_older_library_is_copied_before_migrating_a_new_one_is_not() -> Result<()> 
     assert!(keep_daily_copy(&path)?);
     assert!(!keep_daily_copy(&path)?);
     assert_eq!(Connection::open(dir.path().join("library-daily.db"))?.query_row("SELECT count(*) FROM tracks", [], |r| r.get::<_, i64>(0))?, 1);
+    Ok(())
+}
+
+#[test]
+fn a_library_from_before_chapters_gains_their_column_and_keeps_its_songs() -> Result<()> {
+    let dir = tempfile::tempdir()?;
+    let path = dir.path().join("library.db");
+    // As version 25 left it.
+    let old = Library::open(&path)?;
+    old.upsert_track(&song(1))?;
+    old.db.execute_batch("DROP TRIGGER temp.song_set; ALTER TABLE tracks DROP COLUMN chapters; PRAGMA user_version = 25;")?;
+    drop(old);
+    let lib = Library::open(&path)?;
+    assert_eq!(lib.db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))?, SCHEMA_VERSION);
+    assert_eq!(lib.db.query_row("SELECT count(*) FROM tracks WHERE chapters IS NULL", [], |r| r.get::<_, i64>(0))?, 1);
+    assert_eq!(lib.tracks()?.len(), 1);
     Ok(())
 }
 
@@ -1515,7 +1531,7 @@ fn the_caches_clear_alone_and_say_what_they_held() -> Result<()> {
 #[test]
 fn a_guessed_tempo_fills_a_gap_and_never_replaces_a_tag() -> Result<()> {
     let lib = Library::in_memory()?;
-    let file = |n: u32, bpm: Option<u32>| LocalSong { track: Track { ids: [(Source::Local, format!("C:/Music/{n}.flac"))].into(), ..song(n) }, genre: None, year: None, bpm, key: bpm.map(|_| "Am".to_string()) };
+    let file = |n: u32, bpm: Option<u32>| LocalSong { track: Track { ids: [(Source::Local, format!("C:/Music/{n}.flac"))].into(), ..song(n) }, genre: None, year: None, bpm, key: bpm.map(|_| "Am".to_string()), chapters: 0 };
     lib.replace_local(&[file(1, None), file(2, Some(128))])?;
     let todo = lib.untimed_local()?;
     assert_eq!(todo.len(), 1);

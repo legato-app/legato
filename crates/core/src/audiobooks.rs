@@ -6,19 +6,22 @@ use crate::library::{Library, LibraryTrack};
 use crate::model::Source;
 use crate::musicness::Musicness;
 use anyhow::Result;
+use rusqlite::OptionalExtension;
 use serde_json::Value;
 use std::path::Path;
 
 /// A file this long is listed with the books whatever its tags say.
 const LONG_BOOK_MS: u32 = 2 * 3_600_000;
-/// The shortest file its genre makes a book.
+/// The shortest file its genre or its chapters make a book.
 const TAGGED_BOOK_MS: u32 = 10 * 60_000;
+/// Chapters that make an `.m4a` a book: one mark alone says nothing.
+const BOOK_CHAPTERS: u32 = 2;
 const BOOK_GENRES: [&str; 5] = ["audiobook", "audio book", "spoken", "hörbuch", "livre audio"];
 
 /// What the rule makes of a file on the Audiobooks page.
 #[derive(Debug, PartialEq)]
 pub enum Book {
-    /// Said to be one (`.m4b`, a marked folder, its genre): out of the music.
+    /// Said to be one (`.m4b`, a marked folder, its genre, its chapters): out of the music.
     Named,
     /// Very long only (a book, or a DJ set, an opera, a sleep track): still music.
     Long,
@@ -41,8 +44,9 @@ impl BookRule {
         })
     }
 
-    /// A file of this PC or of a server: `.m4b`, in a marked folder, long and tagged as a book, or very long.
-    pub fn judge(&self, song: &LibraryTrack) -> Option<Book> {
+    /// A file of this PC or of a server: `.m4b`, in a marked folder, long and tagged as a book or cut in chapters (a
+    /// local `.m4a`: `chapters` as the scan counted them), or very long.
+    pub fn judge(&self, song: &LibraryTrack, chapters: u32) -> Option<Book> {
         let ids = &song.track.ids;
         if ids.contains_key(&Source::Youtube) || !(ids.contains_key(&Source::Local) || ids.contains_key(&Source::Server)) {
             return None;
@@ -51,7 +55,8 @@ impl BookRule {
         let named = path.is_some_and(|path| path.extension().is_some_and(|extension| extension.eq_ignore_ascii_case("m4b")) || self.folders.iter().any(|folder| path.starts_with(folder)));
         let length = song.track.duration_ms.unwrap_or(0);
         let tagged = song.genre.as_deref().map(str::to_lowercase).is_some_and(|genre| BOOK_GENRES.iter().any(|word| genre.contains(word)));
-        if named || (tagged && length >= TAGGED_BOOK_MS) {
+        let chaptered = path.is_some() && chapters >= BOOK_CHAPTERS;
+        if named || ((tagged || chaptered) && length >= TAGGED_BOOK_MS) {
             Some(Book::Named)
         } else {
             (length >= LONG_BOOK_MS).then_some(Book::Long)
@@ -67,10 +72,12 @@ impl Library {
     /// The books among the rows: marked, the named ones judged not music. Not one the user said "It's music" of.
     pub(crate) fn mark_books(&self, rows: &mut [LibraryTrack]) -> Result<()> {
         let Some(rule) = self.book_rule()? else { return Ok(()) };
-        let mut said_music = self.db.prepare_cached("SELECT 1 FROM tracks WHERE id = ?1 AND musicness = 'user:music'")?;
+        // What the rows don't carry: the chapters, and the user's own word.
+        let mut kept = self.db.prepare_cached("SELECT coalesce(chapters, 0), musicness IS 'user:music' FROM tracks WHERE id = ?1")?;
         for song in rows.iter_mut() {
-            let Some(book) = rule.judge(song) else { continue };
-            if said_music.exists([song.id])? {
+            let (chapters, said_music) = kept.query_row([song.id], |row| Ok((row.get::<_, u32>(0)?, row.get::<_, bool>(1)?))).optional()?.unwrap_or_default();
+            let Some(book) = rule.judge(song, chapters) else { continue };
+            if said_music {
                 continue;
             }
             song.audiobook = Some(true);
@@ -114,11 +121,11 @@ mod tests {
     fn m4b_marked_folders_and_tagged_files_are_books_long_ones_only_listed() {
         let rule = BookRule::from_ui(Some(&json!({ "booksPage": true, "bookFolders": ["C:/Books", "", 7] }))).unwrap();
         for book in [file("C:/a.M4B", 3, ""), file("C:/Books/b/1.mp3", 3, ""), file("C:/d.mp3", 10, "Audio Book"), file("C:/e.mp3", 400, "Spoken Word")] {
-            assert_eq!(rule.judge(&book), Some(Book::Named), "{}", book.track.title);
+            assert_eq!(rule.judge(&book, 0), Some(Book::Named), "{}", book.track.title);
         }
-        assert_eq!(rule.judge(&file("C:/mix.mp3", 120, "Electronic")), Some(Book::Long));
+        assert_eq!(rule.judge(&file("C:/mix.mp3", 120, "Electronic"), 0), Some(Book::Long));
         for song in [file("C:/a.m4a", 3, ""), file("C:/Bookshop/1.mp3", 3, ""), file("C:/c.mp3", 119, "Rock"), file("C:/d.mp3", 9, "Audiobook")] {
-            assert_eq!(rule.judge(&song), None, "{}", song.track.title);
+            assert_eq!(rule.judge(&song, 0), None, "{}", song.track.title);
         }
         let mut video = file("C:/f.m4b", 300, "");
         video.track.ids.insert(Source::Youtube, "video".into());
@@ -126,7 +133,25 @@ mod tests {
         streamed.track.ids = BTreeMap::from([(Source::Spotify, "s".into())]);
         let mut server = file("", 300, "");
         server.track.ids = BTreeMap::from([(Source::Server, "k:1".into())]);
-        assert_eq!([&video, &streamed, &server].map(|song| rule.judge(song)), [None, None, Some(Book::Long)]);
+        assert_eq!([&video, &streamed, &server].map(|song| rule.judge(song, 0)), [None, None, Some(Book::Long)]);
+    }
+
+    #[test]
+    fn a_long_m4a_with_chapters_is_a_book() -> Result<()> {
+        let rule = BookRule::from_ui(Some(&json!({ "booksPage": true }))).unwrap();
+        assert_eq!(rule.judge(&file("C:/a.m4a", 10, ""), 2), Some(Book::Named));
+        // One mark is no chapters; a short file with some is a song.
+        assert_eq!(rule.judge(&file("C:/a.m4a", 10, ""), 1), None);
+        assert_eq!(rule.judge(&file("C:/a.m4a", 9, ""), 12), None);
+        // From the scan to the library.
+        let library = Library::in_memory()?;
+        library.replace_local(&[crate::local::LocalSong { chapters: 3, ..file("C:/b.m4a", 40, "").track.into() }])?;
+        library.set_setting("ui", &json!({ "booksPage": true }))?;
+        assert_eq!(library.tracks()?[0].audiobook, Some(true));
+        // Rescanned without them: music again.
+        library.replace_local(&[file("C:/b.m4a", 40, "").track.into()])?;
+        assert_eq!(library.tracks()?[0].audiobook, None);
+        Ok(())
     }
 
     #[test]

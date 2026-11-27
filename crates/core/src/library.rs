@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS settings (
 ";
 
 /// Schema version this code writes (user_version after migrations).
-pub const SCHEMA_VERSION: i64 = 25;
+pub const SCHEMA_VERSION: i64 = 26;
 
 /// The library was made by a newer version of the app.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -289,8 +289,8 @@ const CHANGE_LOG: &str = "
 CREATE TEMP TABLE IF NOT EXISTS changed (kind INTEGER NOT NULL, id INTEGER NOT NULL, artist TEXT NOT NULL, PRIMARY KEY (kind, id, artist)) WITHOUT ROWID;
 CREATE TEMP TRIGGER IF NOT EXISTS song_in AFTER INSERT ON tracks BEGIN INSERT INTO changed VALUES (0, new.id, '') ON CONFLICT DO NOTHING; END;
 CREATE TEMP TRIGGER IF NOT EXISTS song_set AFTER UPDATE ON tracks
-  WHEN (old.title, old.artist, old.album, old.duration_ms, old.isrc, old.art, old.added, old.added_at, old.musicness, old.genre, old.year, old.explicit, old.bpm, old.key)
-    IS NOT (new.title, new.artist, new.album, new.duration_ms, new.isrc, new.art, new.added, new.added_at, new.musicness, new.genre, new.year, new.explicit, new.bpm, new.key)
+  WHEN (old.title, old.artist, old.album, old.duration_ms, old.isrc, old.art, old.added, old.added_at, old.musicness, old.genre, old.year, old.explicit, old.bpm, old.key, old.chapters)
+    IS NOT (new.title, new.artist, new.album, new.duration_ms, new.isrc, new.art, new.added, new.added_at, new.musicness, new.genre, new.year, new.explicit, new.bpm, new.key, new.chapters)
   BEGIN
     INSERT INTO changed VALUES (0, new.id, '') ON CONFLICT DO NOTHING;
     INSERT INTO changed SELECT 0, old.id, old.artist WHERE old.artist IS NOT new.artist ON CONFLICT DO NOTHING;
@@ -559,6 +559,10 @@ impl Library {
             // v25: songs added here and sent to the playlist's service (`sent`: 0 not sent, 1 sent, 2 seen in its list,
             // 3 missing from the last one). Rows added before v25 stay 0 on purpose: treated as before, the safe side.
             lib.db.execute_batch("BEGIN; ALTER TABLE playlist_added ADD COLUMN sent INTEGER NOT NULL DEFAULT 0; PRAGMA user_version = 25; COMMIT;")?;
+        }
+        if lib.db.query_row("PRAGMA user_version", [], |r| r.get::<_, i64>(0))? < 26 {
+            // v26: how many chapters a local .m4a holds (audiobooks), filled by the next scan.
+            lib.db.execute_batch("BEGIN; ALTER TABLE tracks ADD COLUMN chapters INTEGER; PRAGMA user_version = 26; COMMIT;")?;
         }
         lib.db.execute_batch(CHANGE_LOG)?;
         // Statements on logged tables compile their triggers too: kept, not rebuilt per call.

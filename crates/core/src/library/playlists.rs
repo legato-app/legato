@@ -70,6 +70,7 @@ impl Library {
                 let id = self.upsert_track(&s.track)?;
                 self.set_genre_year(id, s.genre.as_deref(), s.year)?;
                 self.set_tempo_key(id, s.bpm, s.key.as_deref())?;
+                self.set_chapters(id, s.chapters)?;
             }
             let old: Vec<String> = {
                 let mut stmt = self.db.prepare("SELECT source_id FROM track_ids WHERE source = 'local'")?;

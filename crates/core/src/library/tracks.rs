@@ -536,6 +536,13 @@ impl Library {
         Ok(())
     }
 
+    /// A local file's chapters, as the scan counted them (none kept as NULL). Unchanged: nothing written.
+    pub(super) fn set_chapters(&self, id: i64, chapters: u32) -> Result<()> {
+        let chapters = (chapters > 0).then_some(chapters);
+        self.db.prepare_cached("UPDATE tracks SET chapters = ?1 WHERE id = ?2 AND chapters IS NOT ?1")?.execute(params![chapters, id])?;
+        Ok(())
+    }
+
     /// A local file's genre and year, as its tags say now (a scan, Edit song info). Unchanged: nothing written.
     pub fn set_genre_year(&self, id: i64, genre: Option<&str>, year: Option<u32>) -> Result<()> {
         self.db.prepare_cached("UPDATE tracks SET genre = ?1, year = ?2 WHERE id = ?3 AND (genre, year) IS NOT (?1, ?2)")?.execute(params![genre, year, id])?;

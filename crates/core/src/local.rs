@@ -29,6 +29,8 @@ pub struct LocalSong {
     /// Beats per minute and musical key as the tags say (TBPM / tmpo, TKEY / initialkey).
     pub bpm: Option<u32>,
     pub key: Option<String>,
+    /// Chapters an `.m4a` holds (0: none, or another kind of file): enough of them make it an audiobook.
+    pub chapters: u32,
 }
 
 impl From<Track> for LocalSong {
@@ -238,7 +240,15 @@ pub fn read_song(path: &Path) -> LocalSong {
     // Read as the song editor reads them (`file_tags`).
     let bpm = tag.and_then(|t| t.get_string(ItemKey::IntegerBpm).or_else(|| t.get_string(ItemKey::Bpm))).and_then(bpm_of);
     let key = text(tag.and_then(|t| t.get_string(ItemKey::InitialKey).map(Into::into))).filter(|k| k.chars().count() <= 12);
-    LocalSong { track, genre: text(tag.and_then(|t| t.genre())), year: tag.and_then(|t| t.get_string(ItemKey::RecordingDate)).and_then(year_of), bpm, key }
+    LocalSong { track, genre: text(tag.and_then(|t| t.genre())), year: tag.and_then(|t| t.get_string(ItemKey::RecordingDate)).and_then(year_of), bpm, key, chapters: chapter_count(path) }
+}
+
+/// An `.m4b` is a book by its name: only an `.m4a` is opened for its chapters.
+fn chapter_count(path: &Path) -> u32 {
+    if !path.extension().is_some_and(|extension| extension.eq_ignore_ascii_case("m4a")) {
+        return 0;
+    }
+    std::fs::File::open(path).map_or(0, |file| crate::chapters::read_chapters(&mut std::io::BufReader::new(file)).len() as u32)
 }
 
 /// "128", "127.6", " 90 ": whole beats per minute in a believable range (a tag can hold anything), else none.
@@ -471,6 +481,17 @@ pub(crate) mod tests {
     fn a_tempo_tag_is_a_believable_whole_number_or_nothing() {
         for (tag, want) in [("128", Some(128)), (" 90 ", Some(90)), ("127.6", Some(128)), ("0", None), ("29", None), ("9000", None), ("fast", None), ("NaN", None), ("", None), ("-120", None)] {
             assert_eq!(bpm_of(tag), want, "{tag:?}");
+        }
+    }
+
+    #[test]
+    fn an_m4a_s_chapters_are_counted_at_the_scan() {
+        let folder = tempfile::tempdir().unwrap();
+        let bytes = crate::chapters::tests::book(&[(0, "One"), (60_000, "Two")]);
+        for (name, counted) in [("a.m4a", 2), ("a.M4A", 2), ("a.mp3", 0)] {
+            let path = folder.path().join(name);
+            std::fs::write(&path, &bytes).unwrap();
+            assert_eq!(read_song(&path).chapters, counted, "{name}");
         }
     }
 

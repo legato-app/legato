@@ -730,8 +730,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       2026-11-27 (review): length alone (two hours and more) lists a file on the page and leaves it in the music (a DJ
       set, an opera, a sleep track); only `.m4b`, a marked folder or a book genre take it out. A book’s row has the song’s
       right-click menu (“It’s music” brings it back).
-- [ ] `S` Audiobooks: an `.m4a` / `.mp4` with chapters is not a book by that alone (needs the chapters read at the scan
+- [x] `S` Audiobooks: an `.m4a` / `.mp4` with chapters is not a book by that alone (needs the chapters read at the scan
       and kept in the library).
+  - 2026-11-27: the scan counts an `.m4a`'s chapters (schema v26, `tracks.chapters`, migration tested on a v25
+    library): two or more and ten minutes make it a book. Tested on built files only, not tried for real.
+    - Decided alone (2026-11-27): two chapters and ten minutes at least (a marked song or a short one is no book);
+      `.mp4` is left, since folder scans don't take video containers.
   - 2026-11-27: Albums, Artists, the sidebar's lists of both, Home and search no longer list books out of the music
     (`withoutBooks`). Not tried for real.
     - Decided alone (2026-11-27): only those books leave these lists; videos that aren't music stay there as before

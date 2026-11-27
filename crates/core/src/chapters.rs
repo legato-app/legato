@@ -311,7 +311,7 @@ fn stamp_ms(s: &str) -> Option<u64> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use std::io::Cursor;
 
@@ -332,7 +332,7 @@ mod tests {
         boxed(b"chpl", &b)
     }
 
-    fn book(list: &[(u64, &str)]) -> Vec<u8> {
+    pub(crate) fn book(list: &[(u64, &str)]) -> Vec<u8> {
         let mut file = boxed(b"ftyp", b"M4B \0\0\0\0M4B ");
         file.extend(boxed(b"mdat", &[0u8; 100]));
         file.extend(boxed(b"moov", &[boxed(b"mvhd", &[0u8; 20]), boxed(b"udta", &chpl(list))].concat()));
