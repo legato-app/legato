@@ -1222,7 +1222,7 @@ const hi: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': 'यह PC Spotify के पेज से भी साइन आउट हो गया है।',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'ये इस PC से हटते हैं; Spotify से जुड़ा कोई PC प्लेलिस्ट वापस लाता है, और इस PC से सिंक होने वाला PC गाने वापस लाता है।',
   'Also remove what Spotify brought?': 'Spotify से आई चीज़ें भी हटाएं?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify से आयात की गई प्लेलिस्ट हटेंगी, साथ में वे गाने भी जिन्हें सिर्फ़ Spotify जानता है और जिन्हें आपने कभी पसंद, चलाया, रेट या किसी दूसरी प्लेलिस्ट में नहीं डाला। पहले आपकी लाइब्रेरी की एक प्रति बनती है।',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify से आयात की गई प्लेलिस्ट हटेंगी (Liked Songs को छोड़कर), साथ में वे गाने भी जिन्हें सिर्फ़ Spotify जानता है और जिन्हें आपने कभी पसंद, चलाया, रेट या किसी दूसरी प्लेलिस्ट में नहीं डाला। पहले आपकी लाइब्रेरी की एक प्रति बनती है।',
   'Discord presence: your plugin is in Add-ons': 'Discord प्रेज़ेंस: आपका प्लगइन ऐड-ऑन में है',
   'Copies of the library made before updates keep the history until they’re replaced.': 'अपडेट से पहले बनी लाइब्रेरी की कॉपियाँ बदले जाने तक इतिहास रखती हैं।',
   'Authors': 'लेखक',

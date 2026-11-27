@@ -110,7 +110,7 @@ function ServiceRow({ service }: { service: 'spotify' }) {
     const signedOut = phoneApp ? '' : tr('This PC is also signed out of Spotify’s page.')
     const brought = raw.playlists.some((playlist) => playlist.source === service) || tracks.some((track) => Object.keys(track.ids).join() === service)
     if (!brought) return void (signedOut && useStore.getState().notify(signedOut, { kind: 'info' }))
-    const body = [tr('The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.'), tr('They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.'), signedOut]
+    const body = [tr('The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.'), tr('They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.'), signedOut]
     if (!(await ask({ title: tr('Also remove what Spotify brought?'), body: body.join('\n'), ok: tr('Remove'), cancel: tr('Keep') }))) return
     await api.removeSpotifyImports().then(refresh, (e: unknown) => useStore.setState({ error: String(e) }))
   }

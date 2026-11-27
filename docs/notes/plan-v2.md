@@ -33,7 +33,7 @@ the order; a line leaves only when it ships or the user drops it.
       stays, no like, play, rating, preference, bookmark, edit or word of the user’s); the copy leaves after 30 days.
       Tests in core, not tried for real.
       Decided alone (2026-11-27): one question (the playlists-only one is gone); a song already matched to a YouTube video
-      has another source and stays; Spotify’s own Liked Songs list does not keep a song (likes are Liked Music’s); Limit: Sync Mode removes the
+      has another source and stays; an older Spotify “Liked Songs” list stays, with its songs. Limit: Sync Mode removes the
       playlists on the other PCs, not the songs, so a synced PC brings the songs back (the question says it). Recording
       them as removed, as Remove from library does, was left: it would delete them from the other PCs with their plays and
       playlists there, and a later Spotify import would skip them; doing it right needs a new kind of record in the sync

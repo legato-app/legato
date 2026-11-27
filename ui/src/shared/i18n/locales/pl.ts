@@ -1222,7 +1222,7 @@ const pl: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': 'Ten komputer zostaje też wylogowany ze strony Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Zostaną usunięte na tym komputerze; komputer nadal połączony ze Spotify przywróci playlisty, a komputer zsynchronizowany z tym przywróci utwory.',
   'Also remove what Spotify brought?': 'Usunąć też to, co przyszło ze Spotify?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Playlisty zaimportowane ze Spotify znikną razem z utworami znanymi tylko Spotify, których nigdy nie polubiono, nie odtworzono, nie oceniono ani nie dodano do innej playlisty. Najpierw powstanie kopia biblioteki.',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Playlisty zaimportowane ze Spotify (poza „Liked Songs”) znikną razem z utworami znanymi tylko Spotify, których nigdy nie polubiono, nie odtworzono, nie oceniono ani nie dodano do innej playlisty. Najpierw powstanie kopia biblioteki.',
   'Discord presence: your plugin is in Add-ons': 'Status na Discordzie: twoja wtyczka jest w Dodatkach',
   'Copies of the library made before updates keep the history until they’re replaced.': 'Kopie biblioteki zrobione przed aktualizacjami zachowują historię, dopóki nie zostaną zastąpione.',
   'Authors': 'Autorzy',

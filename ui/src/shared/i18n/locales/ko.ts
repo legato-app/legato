@@ -1222,7 +1222,7 @@ const ko: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': '이 PC는 Spotify 페이지에서도 로그아웃됩니다.',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': '이 PC에서 삭제됩니다. 아직 Spotify에 연결된 PC는 플레이리스트를, 이 PC와 동기화하는 PC는 곡을 다시 가져옵니다.',
   'Also remove what Spotify brought?': 'Spotify에서 가져온 항목도 삭제할까요?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify에서 가져온 플레이리스트와, Spotify에만 있고 좋아요·재생·평가하거나 다른 플레이리스트에 넣은 적 없는 곡이 삭제됩니다. 먼저 라이브러리 사본을 만듭니다.',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify에서 가져온 플레이리스트(Liked Songs 제외)와, Spotify에만 있고 좋아요·재생·평가하거나 다른 플레이리스트에 넣은 적 없는 곡이 삭제됩니다. 먼저 라이브러리 사본을 만듭니다.',
   'Discord presence: your plugin is in Add-ons': 'Discord 상태 표시: 사용 중인 플러그인은 애드온에 있습니다',
   'Copies of the library made before updates keep the history until they’re replaced.': '업데이트 전에 만든 보관함 사본은 교체될 때까지 기록을 보관합니다.',
   'Authors': '만든 사람',

@@ -1187,7 +1187,7 @@ const he: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': 'המחשב הזה גם מנותק מדף Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'הם מוסרים במחשב הזה; מחשב שעדיין מחובר ל-Spotify יחזיר את הפלייליסטים, ומחשב המסונכרן עם המחשב הזה יחזיר את השירים.',
   'Also remove what Spotify brought?': 'להסיר גם את מה שהגיע מ-Spotify?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'הפלייליסטים שיובאו מ-Spotify יוסרו, יחד עם השירים שרק Spotify מכיר ושמעולם לא אהבת, ניגנת, דירגת או הוספת לפלייליסט אחר. קודם נשמר עותק של הספרייה.',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'הפלייליסטים שיובאו מ-Spotify יוסרו, מלבד Liked Songs, יחד עם השירים שרק Spotify מכיר ושמעולם לא אהבת, ניגנת, דירגת או הוספת לפלייליסט אחר. קודם נשמר עותק של הספרייה.',
   'Discord presence: your plugin is in Add-ons': 'נוכחות ב-Discord: התוסף שלכם נמצא בתוספים',
   'Copies of the library made before updates keep the history until they’re replaced.': 'עותקי הספרייה שנוצרו לפני עדכונים שומרים את ההיסטוריה עד שיוחלפו.',
   'Authors': 'יוצרים',

@@ -1222,7 +1222,7 @@ const zh: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': '此电脑也会退出 Spotify 网页的登录。',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': '它们会从这台电脑上移除；仍连接 Spotify 的电脑会带回播放列表，与这台电脑同步的电脑会带回歌曲。',
   'Also remove what Spotify brought?': '同时移除来自 Spotify 的内容？',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': '从 Spotify 导入的播放列表会被移除，连同只有 Spotify 收录、且你从未喜欢、播放、评分或加入其他播放列表的歌曲。移除前会先备份你的音乐库。',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': '从 Spotify 导入的播放列表（“Liked Songs”除外）会被移除，连同只有 Spotify 收录、且你从未喜欢、播放、评分或加入其他播放列表的歌曲。移除前会先备份你的音乐库。',
   'Discord presence: your plugin is in Add-ons': 'Discord 状态：你的插件在附加组件中',
   'Copies of the library made before updates keep the history until they’re replaced.': '更新前制作的音乐库副本会保留历史记录，直到被替换。',
   'Authors': '作者',

@@ -1222,7 +1222,7 @@ const uk: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': 'Цей комп’ютер також виходить зі сторінки Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Їх буде видалено на цьому ПК; ПК, досі під’єднаний до Spotify, поверне плейлисти, а ПК, синхронізований із цим, поверне пісні.',
   'Also remove what Spotify brought?': 'Видалити також те, що додав Spotify?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Видаляються плейлисти, імпортовані зі Spotify, і пісні, відомі лише Spotify, які ви ніколи не вподобали, не слухали, не оцінювали й не додавали до іншого плейлиста. Спочатку створюється копія бібліотеки.',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Видаляються плейлисти, імпортовані зі Spotify (крім Liked Songs), і пісні, відомі лише Spotify, які ви ніколи не вподобали, не слухали, не оцінювали й не додавали до іншого плейлиста. Спочатку створюється копія бібліотеки.',
   'Discord presence: your plugin is in Add-ons': 'Статус у Discord: ваш плагін у Доповненнях',
   'Copies of the library made before updates keep the history until they’re replaced.': 'Копії медіатеки, зроблені перед оновленнями, зберігають історію, доки їх не замінять.',
   'Authors': 'Автори',

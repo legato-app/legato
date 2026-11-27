@@ -1222,7 +1222,7 @@ const vi: Record<string, string> = {
   'This PC is also signed out of Spotify’s page.': 'PC này cũng được đăng xuất khỏi trang của Spotify.',
   'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Chúng bị xóa trên PC này; một PC vẫn kết nối Spotify sẽ đưa danh sách phát trở lại, còn PC đồng bộ với máy này sẽ đưa các bài hát trở lại.',
   'Also remove what Spotify brought?': 'Xóa luôn những gì đến từ Spotify?',
-  'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Các danh sách phát nhập từ Spotify bị xóa, cùng những bài chỉ Spotify biết mà bạn chưa từng thích, phát, chấm điểm hay thêm vào danh sách khác. Một bản sao thư viện được tạo trước.',
+  'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Các danh sách phát nhập từ Spotify bị xóa, trừ Liked Songs, cùng những bài chỉ Spotify biết mà bạn chưa từng thích, phát, chấm điểm hay thêm vào danh sách khác. Một bản sao thư viện được tạo trước.',
   'Discord presence: your plugin is in Add-ons': 'Trạng thái Discord: plugin của bạn nằm trong Tiện ích',
   'Copies of the library made before updates keep the history until they’re replaced.': 'Các bản sao thư viện tạo trước khi cập nhật vẫn giữ lịch sử cho đến khi được thay thế.',
   'Authors': 'Tác giả',

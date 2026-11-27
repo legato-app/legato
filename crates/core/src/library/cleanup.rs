@@ -122,8 +122,9 @@ impl Library {
     pub fn remove_spotify_imports(&self) -> Result<CleanedUp> {
         self.tx(|| {
             let theirs: Vec<(i64, String)> = {
-                let mut stmt = self.db.prepare("SELECT id, source_id FROM playlists WHERE source = 'spotify' AND custom = 0")?;
-                stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?.collect::<rusqlite::Result<_>>()?
+                // Not Spotify's own Liked Songs (an older import kept them as a list of its own): likes, the list stays.
+                let mut stmt = self.db.prepare("SELECT id, source_id FROM playlists WHERE source = 'spotify' AND custom = 0 AND source_id != ?1")?;
+                stmt.query_map([crate::spotify_export::LIKED], |row| Ok((row.get(0)?, row.get(1)?)))?.collect::<rusqlite::Result<_>>()?
             };
             let leaving = ids_json(theirs.iter().map(|(id, _)| *id));
             let songs = self.songs_leaving("EXISTS (SELECT 1 FROM track_ids i WHERE i.track_id = t.id AND i.source = ?2)", "spotify", &leaving)?;
@@ -190,6 +191,7 @@ mod tests {
         let mut matched = spotify("matched");
         matched.ids.insert(Source::Youtube, "video".into());
         let imported = lib.save_playlist(Source::Spotify, "p1", "From Spotify", &[spotify("listed"), spotify("kept"), spotify("liked"), spotify("played"), matched])?;
+        let favourites = lib.save_playlist(Source::Spotify, "liked", "Liked Songs", &[spotify("favourite")])?;
         // One in no list any more, one of YouTube's own.
         lib.upsert_track(&spotify("loose"))?;
         lib.upsert_track(&song("video only"))?;
@@ -199,9 +201,9 @@ mod tests {
         assert_eq!(lib.remove_spotify_imports()?, CleanedUp { playlists: 1, songs: 2 });
         let mut left: Vec<String> = lib.tracks()?.into_iter().map(|t| t.track.title).collect();
         left.sort();
-        assert_eq!(left, ["kept", "liked", "matched", "played", "video only"]);
+        assert_eq!(left, ["favourite", "kept", "liked", "matched", "played", "video only"]);
         let lists: Vec<i64> = lib.playlists()?.into_iter().map(|p| p.id).collect();
-        assert!(!lists.contains(&imported) && lists.contains(&mine) && lists.len() == 2);
+        assert!(!lists.contains(&imported) && lists.contains(&mine) && lists.contains(&favourites) && lists.len() == 3);
         assert_eq!(lib.remove_spotify_imports()?, CleanedUp::default());
         Ok(())
     }
