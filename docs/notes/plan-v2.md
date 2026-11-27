@@ -1252,6 +1252,8 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
     back.
     - Decided alone (2026-11-27): such an answer is a refusal (put back here, said). Assumption: YouTube Music gives
       `setVideoId` only for playlists the account can change.
+    - 2026-11-27 (review): an account that finds nothing no longer ends the search; the next ones are tried
+      (`remove_from_owner`). Nothing found and no failure still counts as removed.
 - [ ] `S` Crossfade: check that a refused embed (or the crossfade's other player) never keeps sounding once the watch page takes over.
 - [ ] `S` Share page: no covers and no player yet (covers would load from YouTube's host for the visitor).
 - [x] `S` Stats recap cards. Ticked 2026-11-18 (lot 63, audit of the line): the recap shipped (`812a8d96` a year or a month as cards to share, `d725d9fe` the profile card; `features/stats/RecapView.tsx`, `recapCards.ts`, `recapDraw.ts`, tested in `recap.test.ts`). What the line still asked is a try by hand (the card from the web page, the QR's look and size): Check live.

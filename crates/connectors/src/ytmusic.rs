@@ -537,6 +537,21 @@ impl YouTubeMusic {
     }
 }
 
+/// The videos out of a playlist whose id names no account: each account in turn until one removes them. None found
+/// them and none failed: they are gone already. Else the last failure.
+pub async fn remove_from_owner(accounts: &[YouTubeMusic], playlist_id: &str, video_ids: &[String]) -> Result<()> {
+    let mut failure = None;
+    for account in accounts {
+        match account.remove_videos(playlist_id, video_ids).await {
+            // Nothing seen: maybe not this account's playlist.
+            Ok(0) => {}
+            Ok(_) => return Ok(()),
+            Err(e) => failure = Some(e),
+        }
+    }
+    failure.map_or(Ok(()), Err)
+}
+
 #[async_trait]
 impl Connector for YouTubeMusic {
     fn source(&self) -> Source {
@@ -863,6 +878,28 @@ mod tests {
         let e = yt.remove_videos("PL1", &["v1".into()]).await.unwrap_err().to_string();
         assert!(e.contains("no way to remove"), "{e}");
         edit.assert_async().await;
+    }
+
+    #[tokio::test]
+    async fn an_account_that_finds_nothing_does_not_end_the_search_for_the_owner() {
+        let mine = |s: &Server| YouTubeMusic::with_api(&s.url(), COOKIE).unwrap();
+        let videos = ["v1".to_string()];
+        let mut other = Server::new_async().await;
+        other.mock("POST", "/browse").match_query(Matcher::Any).with_body(json!({ "contents": [] }).to_string()).create_async().await;
+        let mut owner = Server::new_async().await;
+        let mut r = row("v1", "A", vec![run("X", None)], None);
+        r["musicResponsiveListItemRenderer"]["playlistItemData"]["playlistSetVideoId"] = json!("s1");
+        owner.mock("POST", "/browse").match_query(Matcher::Any).with_body(json!({ "contents": [r] }).to_string()).create_async().await;
+        let edit = owner.mock("POST", "/browse/edit_playlist").match_query(Matcher::Any).with_body(json!({ "status": "STATUS_SUCCEEDED" }).to_string()).create_async().await;
+        remove_from_owner(&[mine(&other), mine(&owner)], "PL1", &videos).await.unwrap();
+        edit.assert_async().await;
+        // In no account's list: gone already.
+        remove_from_owner(&[mine(&other)], "PL1", &videos).await.unwrap();
+        // The owner fails: said, whatever the others saw.
+        edit.remove_async().await;
+        owner.mock("POST", "/browse/edit_playlist").match_query(Matcher::Any).with_body(json!({ "status": "STATUS_FAILED" }).to_string()).create_async().await;
+        let e = remove_from_owner(&[mine(&owner), mine(&other)], "PL1", &videos).await.unwrap_err().to_string();
+        assert!(e.contains("refused to remove"), "{e}");
     }
 
     #[test]

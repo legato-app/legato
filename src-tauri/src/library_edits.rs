@@ -1,7 +1,7 @@
 //! Library edits: a song's flags, rating and preferences, history cleared, removals and merges, exports to YouTube.
 
 use super::*;
-use music_connectors::ytmusic::YouTubeMusic;
+use music_connectors::ytmusic::{YouTubeMusic, remove_from_owner};
 
 /// "It's music" (true) / "Not music" (false) from the user, None = back to the app's guess.
 #[tauri::command]
@@ -152,18 +152,7 @@ pub async fn remove_from_playlist(state: State<'_, AppState>, id: i64, track_id:
             None => {
                 // Playlist id carries no account: try each, the owner takes it.
                 let remote = playlist.source_id.split('~').next().unwrap_or(&playlist.source_id).to_string();
-                let mut last = None;
-                let mut done = false;
-                for yt in accounts {
-                    match yt.remove_videos(&remote, &videos).await {
-                        Ok(_) => {
-                            done = true;
-                            break;
-                        }
-                        Err(e) => last = Some(err(e)),
-                    }
-                }
-                if done { Ok(()) } else { Err(refusal(last, "Only playlists you own on YouTube Music can be changed.")) }
+                remove_from_owner(&accounts, &remote, &videos).await.map_err(|e| refusal(Some(err(e)), "Only playlists you own on YouTube Music can be changed."))
             }
         };
         if let Err(reason) = sent {
