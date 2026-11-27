@@ -26,24 +26,29 @@ const latest = () =>
     })
     .catch(() => ({ href: RELEASES, lite: null, version: null })))
 
+/** The newest Beta's APK, under a name that never changes (release.yml's `apk` job). Never the latest release's page: that
+ *  is Stable's, whose APK is older than a phone's Beta, and Android refuses the downgrade. */
+export const BETA_APK = `${GITHUB}/releases/download/beta/Legato_android-arm64.apk`
+
 type Android = { href: string; version: string | null }
+
+/** The Android download: always that file. GitHub's list of releases only says its version: the newest release carrying a
+ *  versioned APK (none known: no version). */
+export function androidDownload(releases: Release[]): Android {
+  const versioned = releases.find((release) => release.assets.some((asset) => /^Legato_[0-9.]+_android-arm64\.apk$/.test(asset.name)))
+  return { href: BETA_APK, version: versioned?.tag_name.replace(/^v/, '') ?? null }
+}
+
 let pendingApk: Promise<Android> | null = null
-// The APK is attached to every Beta (a prerelease), so Stable's "latest" may have none: the newest release that has one.
 const apk = () =>
   (pendingApk ??= fetch('https://api.github.com/repos/legato-app/legato/releases?per_page=10')
     .then((r) => (r.ok ? (r.json() as Promise<Release[]>) : Promise.reject(new Error(String(r.status)))))
-    .then((all) => {
-      for (const r of all) {
-        const a = r.assets.find((x) => x.name.endsWith('_android-arm64.apk'))
-        if (a) return { href: a.browser_download_url, version: r.tag_name.replace(/^v/, '') }
-      }
-      return { href: RELEASES, version: null }
-    })
-    .catch(() => ({ href: RELEASES, version: null })))
+    .then(androidDownload)
+    .catch(() => androidDownload([])))
 
-/** The newest Android APK straight from GitHub; the releases page until GitHub answers, or if none has one. */
+/** The newest Android APK straight from GitHub, linked before GitHub's list answers and if it refuses. */
 export function useAndroid(): Android {
-  const [l, setL] = useState<Android>({ href: RELEASES, version: null })
+  const [l, setL] = useState<Android>(() => androidDownload([]))
   useEffect(() => {
     let live = true
     void apk().then((x) => live && setL(x))

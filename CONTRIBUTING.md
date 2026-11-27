@@ -103,7 +103,8 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
   promotion; to promote the full app anyway, delete that asset from the `vX.Y.Z` release and run promote again (Lite
   PCs stay where they are).
 - **Phones** follow Beta: each Beta's APK is what the Android app offers (Settings › About, a toast), downloaded when
-  the user taps Update and installed by Android's installer. Stable carries no APK yet.
+  the user taps Update and installed by Android's installer. Stable carries no APK yet. The website's Android link is
+  `beta`'s `Legato_android-arm64.apk`, the newest Beta's under a name that never changes.
 
 - **Version**: `MAJOR.MINOR` comes from `src-tauri/tauri.conf.json`; n is the number of commits since that
   `MAJOR.MINOR`'s base, the last commit before its bump (`BASES` in `scripts/release.mjs`). The patch is n % 1000 and the

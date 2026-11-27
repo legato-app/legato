@@ -132,7 +132,7 @@ jobs:
           gh release download "v$VERSION" --pattern latest.json --dir "$dir" --clobber
           if ! gh release view beta > /dev/null 2>&1; then
             gh release create beta --prerelease --latest=false --target "$SHA" --title "Legato Beta" \
-              --notes "Only latest.json and latest-lite.json, which the Beta channels of Legato and Legato Lite read. Moves with every release; the installers are on the versioned releases."
+              --notes "latest.json and latest-lite.json, which the Beta channels of Legato and Legato Lite read, and the newest Android APK. Moves with every release; the Windows installers are on the versioned releases."
           fi
           gh release upload beta "$dir/latest.json" --clobber
 
@@ -343,3 +343,21 @@ jobs:
           GH_REPO: ${{ github.repository }}
           VERSION: ${{ needs.release.outputs.version }}
         run: gh release upload "v$VERSION" apk/*.apk --clobber
+
+      # The website's Android link (site/components/latest.ts): the newest Beta's APK on `beta`, under a name that never
+      # changes. A re-run of an older run's job never takes it back: left when beta's latest.json names a higher version.
+      - name: Point Beta at this APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          mkdir -p current fixed
+          gh release download beta --pattern latest.json --dir current --clobber
+          newest=$(jq -r .version current/latest.json)
+          if [ "$(printf '%s\n%s\n' "$newest" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+            echo "::notice::Beta is already v$newest, newer than v$VERSION: its APK is left as is"
+          else
+            cp "apk/Legato_${VERSION}_android-arm64.apk" fixed/Legato_android-arm64.apk
+            gh release upload beta fixed/Legato_android-arm64.apk --clobber
+          fi
