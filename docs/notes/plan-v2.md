@@ -357,7 +357,9 @@ Where a line says "reading", the owner hasn't confirmed it.
     - Decided alone (2026-11-27): 11.9.0, the local one (lockfileVersion 9.0 is read by 9 to 11; it needs Node
       22.13 or later, which `node-version: 22` gives); `release.yml` too, as two versions would stop the action.
 - [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale.
-- [ ] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
+- [x] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
+  - 2026-11-27: `pnpm why motion` in `site/` finds one version, 14.14.0. Site not built, not tried for real.
+    - Decided alone (2026-11-27): lockfile updated offline, so nothing else moved.
 
 ## The owner's asks of 2026-11-13
 
