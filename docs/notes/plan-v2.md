@@ -261,6 +261,16 @@ the order; a line leaves only when it ships or the user drops it.
       never a Like seed).
   - Brief: episodic clues in `crates/core/src/musicness.rs` (episode markers, series channels); the Like-mix seed only from tracks judged Music, never Unsure. Tests: one per clue, and a real song titled "Part II" stays Music.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.
+- [x] `M` Titles written "Title - Artist" still showed swapped ("like that - doja cat *slowed*", the owner again,
+      2026-11-27).
+  2026-11-27: an artist YouTube Music's catalog named since the start now counts beside the library's
+  (`ytmusic::catalog_artist`, no request of its own); a search reads its videos once its song results are in; links
+  from song lists and share codes go the same way. Songs saved swapped are turned once
+  (`Library::turn_backwards_titles`) where the library holds that artist's song of that name. Tests; not tried for real.
+  - Decided alone (2026-11-27): mixes, radio, autoplay and playlist imports take YouTube Music's own artist field (no
+    split, nothing to turn); a saved song without that proof stays swapped (the video's raw title isn't kept, so it
+    can't be told from a channel's own upload); an artist neither saved nor seen stays read as before; a sync renames
+    no song a PC has.
 
 ## The owner's asks of 2026-11-07, evening
 
