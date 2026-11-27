@@ -215,6 +215,10 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `M` Normal videos (a story web series) counted as music: rework the detection; no « Like » mix seeded from a non-music video.
   - 2026-11-27: numbered episodes and series channels in `musicness.rs`; only a song judged Music seeds a Like mix. Tests only, not tried for real.
   - Decided alone (2026-11-27): markers are S1E2, episode / épisode / episodio / folge / Ep. with a number, never a bare season or chapter (song titles), ignored on an artist’s Topic channel; “Ep. 5” alone stays a doubt (it may be a short album); an old import stored as music is taken back for “Episode 3”, not for “S2E4” alone; a series channel is told by its name (series, stories…) and only moves titles with nothing musical; radios seeding discoveries are unchanged.
+  - 2026-11-27, after review: a title that says music beside the number is no episode (“Episode 2 (Official Video)”,
+    “lofi mix ep. 3”), and an artist’s own channel (Topic, VEVO, artist badge) is no series. Tests only.
+    - Decided alone (2026-11-27): a band named “… Stories” on a plain channel with a plain title stays a doubt (shown,
+      never a Like seed).
   - Brief: episodic clues in `crates/core/src/musicness.rs` (episode markers, series channels); the Like-mix seed only from tracks judged Music, never Unsure. Tests: one per clue, and a real song titled "Part II" stays Music.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.
 

@@ -107,7 +107,8 @@ pub fn score(c: &Clues) -> i32 {
     if topic {
         s += 6;
     }
-    if channel.to_lowercase().ends_with("vevo") {
+    let vevo = channel.to_lowercase().ends_with("vevo");
+    if vevo {
         s += 4;
     }
     if c.artist_badge {
@@ -119,13 +120,15 @@ pub fn score(c: &Clues) -> i32 {
     if HASHTAG.is_match(title) {
         s += 2;
     }
-    let episode = !topic && EPISODE.is_match(title);
+    // A numbered episode, unless the title says music beside the number ("Episode 2 (Official Video)", "lofi mix ep. 3").
+    let episode = !topic && EPISODE.is_match(title) && !MUSIC.is_match(&EPISODE.replace_all(title, " "));
     if episode {
         s -= 6;
     } else if ARTIST_DASH_TITLE.is_match(title) {
         s += 2;
     }
-    if SERIES_CHANNEL.is_match(channel) && musical == 0 {
+    // An artist's own channel is no series, whatever its name.
+    if SERIES_CHANNEL.is_match(channel) && musical == 0 && !(topic || vevo || c.artist_badge) {
         s -= 3;
     }
     let strong = STRONG.find_iter(title).count() as i32;
@@ -318,6 +321,21 @@ mod tests {
         assert_eq!(video("The Night the Moon Fell", "Moon Stories", 360), Musicness::Unsure);
         assert_eq!(video("The Night the Moon Fell, part 3", "Lanterns Web Series", 360), Musicness::NotMusic);
         assert_eq!(video("The Night the Moon Fell (Official Audio)", "Moon Stories", 360), Musicness::Music);
+    }
+
+    #[test]
+    fn a_title_that_says_music_is_no_episode() {
+        assert_eq!(video("Some Band - Episode 2 (Official Video)", "Some Band", 220), Musicness::Music);
+        assert_eq!(video("lofi beats mix ep. 3", "Chill House", 3600), Musicness::Music);
+    }
+
+    #[test]
+    fn a_band_called_stories_is_no_series() {
+        assert_eq!(video("Night Drive (Official Video)", "Paper Stories", 220), Musicness::Music);
+        let plain = |channel| score(&Clues { title: "Night Drive", channel, duration_ms: Some(220_000), artist_badge: true, ..Default::default() });
+        assert_eq!(plain("Paper Stories"), plain("Paper Boats"));
+        let topic = |channel| score(&Clues { title: "Night Drive", channel, ..Default::default() });
+        assert_eq!(topic("Paper Stories - Topic"), topic("Paper Boats - Topic"));
     }
 
     #[test]
