@@ -273,7 +273,7 @@ the order; a line leaves only when it ships or the user drops it.
     reads like a swapped title and turns too (the raw title isn't kept); a song of unknown length is turned; a sync
     renames no song a PC has.
 - [ ] `S` Mixes' artist key for a YouTube Music upload titled "Title - Artist" (`mixes::credit` splits it on the dash
-      and takes the left side): grouping and Like seeds only, no name shown wrong on a song.
+      and takes the left side): grouping, Like seeds and the artist name a mix may show; no song renamed.
 
 ## The owner's asks of 2026-11-07, evening
 
