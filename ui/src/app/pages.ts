@@ -17,6 +17,10 @@ const load = {
   stats: () => import('../features/stats/StatsView').then((m) => ({ default: m.StatsView })),
   history: () => import('../features/history/HistoryView').then((m) => ({ default: m.HistoryView })),
   smart: () => import('../features/smart/SmartView').then((m) => ({ default: m.SmartView })),
+  songs: () => import('../features/library/LibraryView').then((m) => ({ default: m.SongsView })),
+  albums: () => import('../features/library/LibraryView').then((m) => ({ default: m.AlbumsView })),
+  artists: () => import('../features/library/LibraryView').then((m) => ({ default: m.ArtistsView })),
+  playlist: () => import('../features/library/LibraryView').then((m) => ({ default: m.PlaylistView })),
   album: () => import('../features/library/AlbumArtist').then((m) => ({ default: m.AlbumView })),
   artist: () => import('../features/library/AlbumArtist').then((m) => ({ default: m.ArtistView })),
   notFound: () => import('../features/library/NotFoundView').then((m) => ({ default: m.NotFoundView })),
@@ -83,6 +87,10 @@ export const MixView = page(load.mix)
 export const StatsView = page(load.stats)
 export const HistoryView = page(load.history)
 export const SmartView = page(load.smart)
+export const SongsView = page(load.songs)
+export const AlbumsView = page(load.albums)
+export const ArtistsView = page(load.artists)
+export const PlaylistView = page(load.playlist)
 export const AlbumView = page(load.album)
 export const ArtistView = page(load.artist)
 export const NotFoundView = page(load.notFound)
@@ -119,7 +127,7 @@ export const preloadPip = () => load.pipScreen()
 
 /** The other pages, one per idle slice once the app is up. A failed fetch is retried by the page itself on its visit. */
 export function preloadPages() {
-  const next = [load.nowPlaying, load.lyrics, load.album, load.search, load.add, load.mixes, load.stats, load.smart, load.editor, load.settings, load.addons, load.karaoke, load.vizScreen, load.coverScreen]
+  const next = [load.songs, load.nowPlaying, load.lyrics, load.album, load.search, load.add, load.mixes, load.stats, load.smart, load.editor, load.settings, load.addons, load.karaoke, load.vizScreen, load.coverScreen]
   const idle = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200))
   const step = () => {
     const f = next.shift()
