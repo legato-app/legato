@@ -230,13 +230,13 @@ impl Conn {
         }
     }
 
-    /// A song's ReplayGain as its server keeps it: Subsonic's (OpenSubsonic's `replayGain`) or Jellyfin's `NormalizationGain`.
-    /// Plex's own loudness measure is not read.
+    /// A song's ReplayGain as its server keeps it: Subsonic's (OpenSubsonic's `replayGain`), Jellyfin's
+    /// `NormalizationGain`, or Plex's measured loudness.
     pub async fn replay_gain(&self, item: &str) -> Result<Option<music_core::local::ReplayGain>> {
         match self {
             Self::Subsonic(s) => s.replay_gain(item).await,
             Self::Jellyfin(j) => j.replay_gain(item).await,
-            Self::Plex(_) => Ok(None),
+            Self::Plex(p) => p.replay_gain(item).await,
         }
     }
 

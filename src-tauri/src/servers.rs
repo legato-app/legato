@@ -607,8 +607,9 @@ pub async fn server_playlist_rename(state: State<'_, AppState>, id: i64, name: S
 /// Songs' levelling gains as their servers gave them, by library id (None: it has none). Asked once per run of the app.
 static GAINS: Mutex<Option<HashMap<String, Option<Gain>>>> = Mutex::new(None);
 
-/// Volume levelling for server songs about to play (`paths`: the engine's): the ReplayGain their server read from
-/// the files' tags, told to the engine. A server that gives none, or doesn't answer: the song plays as it is.
+/// Volume levelling for server songs about to play (`paths`: the engine's): the gain their server gives (from the
+/// files' tags or its own measure), told to the engine. A server that gives none, or doesn't answer: the song plays
+/// as it is.
 pub async fn gains(state: &AppState, paths: Vec<PathBuf>) {
     let known = |id: &str| GAINS.lock().unwrap_or_else(PoisonError::into_inner).get_or_insert_default().get(id).copied();
     let mut list = Vec::new();

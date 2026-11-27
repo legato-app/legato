@@ -369,8 +369,10 @@ visualizer and the media panel apply.
   The row says when only the relay answered.
 - Volume levelling (2026-11-11): a Subsonic server's own ReplayGain (OpenSubsonic's `replayGain` on `getSong`, the
   tags its scanner read), asked once per song as it is about to play (`servers::gains`, with `local_prepare`) and
-  used like a file's tags. A server or a song without it plays as it is; Jellyfin's and Plex's loudness measures
-  aren't read. Untried on a real server.
+  used like a file's tags. Jellyfin (2026-11-19): the item's `NormalizationGain` / `AlbumNormalizationGain`, taken as
+  gains to -18 LUFS. Plex (2026-11-27): the audio stream's `loudness` (taken as integrated LUFS) and `peak`, the gain
+  worked out to -18 LUFS; its own `gain` / `albumGain` are not used (their reference isn't documented), so no album
+  gain. A server or a song without any plays as it is. Untried on a real server.
 - Volume levelling across sources (2026-11-11): a YouTube song's integrated loudness as heard (live.js' levels, before
   the gain and the element's volume) is measured on every play of 30 s or more (`ytLevel.ts`, vizLoud's BS.1770
   count) and kept per video (localStorage `song-loudness`, this PC only); its later plays get `level` = -14 minus it,

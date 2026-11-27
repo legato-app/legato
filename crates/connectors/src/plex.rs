@@ -6,11 +6,13 @@
 //! own token is kept (keychain), the account's forgotten. Every request carries `X-Plex-Token` in a header, never in a
 //! URL anything shows or logs. Reads songs by pages (`X-Plex-Container-Start` / `-Size`), playlists, search; sends
 //! likes as ratings (5 stars, Plexamp's "loved") and plays (`:/scrobble`). Audio: the part's file as kept.
+//! Volume levelling: the loudness the server measured (`replay_gain`).
 
 use crate::art::Signed;
 use crate::linklist::REQUEST_TIMEOUT;
 use crate::servers::{COVER_SIZE, LIST_TIMEOUT, Read, Streamed, base_of, http, note, random_id, reach, refusal, safe_id};
 use anyhow::{Result, anyhow, bail};
+use music_core::local::ReplayGain;
 use music_core::model::{PlaylistRef, Source, Track};
 use music_core::server::{self, Account};
 use reqwest::Method;
@@ -37,6 +39,10 @@ const LOVED: f64 = 10.0;
 const TRY_WAIT: Duration = Duration::from_secs(6);
 /// The transcoder's ceiling, kbit/s (like the other two kinds).
 const MAX_BIT_RATE: &str = "320";
+/// `streamType` of a file's audio stream.
+const AUDIO_STREAM: &str = "2";
+/// What a ReplayGain gain brings its song to.
+const REPLAYGAIN_LUFS: f32 = -18.0;
 
 /// A sign-in's own client identifier: random, 32 hex characters, never the PC's.
 pub fn device_id() -> String {
@@ -273,10 +279,24 @@ fn part_of(key: &str, item: &str) -> Option<String> {
 }
 
 /// A part's path as the server gives it: its own library's files only.
+/// A song's first file (`Media` › `Part`).
+fn first_part(v: &Value) -> Option<&Value> {
+    v.get("Media")?.as_array()?.first()?.get("Part")?.as_array()?.first()
+}
+
 fn part_path(v: &Value) -> Option<String> {
-    let media = v.get("Media")?.as_array()?.first()?;
-    let part = media.get("Part")?.as_array()?.first()?;
-    text(part, "key").filter(|k| k.starts_with("/library/parts/") && !k.contains("..") && !k.contains('?') && !k.contains('#'))
+    text(first_part(v)?, "key").filter(|k| k.starts_with("/library/parts/") && !k.contains("..") && !k.contains('?') && !k.contains('#'))
+}
+
+/// Plex's own measure of a song (its audio stream's `loudness`, taken as integrated LUFS, and `peak`) as a ReplayGain.
+/// Not its `gain` / `albumGain`: what they bring a song to isn't documented. So no album gain.
+fn measured_gain(v: &Value) -> Option<ReplayGain> {
+    let streams = first_part(v)?.get("Stream")?.as_array()?;
+    let audio = streams.iter().find(|stream| text(stream, "streamType").as_deref() == Some(AUDIO_STREAM))?;
+    // Numbers or strings, as the server writes them.
+    let number = |key: &str| text(audio, key)?.parse::<f32>().ok();
+    let track_db = Some(REPLAYGAIN_LUFS - number("loudness")?).filter(|gain| (-60.0..=60.0).contains(gain))?;
+    Some(ReplayGain { track_db, track_peak: number("peak").filter(|peak| (0.000_01..=10.0).contains(peak)), album: None })
 }
 
 #[derive(Clone)]
@@ -481,14 +501,23 @@ impl Plex {
         self.send(Method::GET, "/:/scrobble", &[("key", Self::item(item)?), ("identifier", LIBRARY)], None, REQUEST_TIMEOUT).await.map(|_| ())
     }
 
+    /// One song's own entry: the only answer that has its file's streams.
+    async fn metadata(&self, item: &str) -> Result<Value> {
+        let (c, _) = self.get(&format!("/library/metadata/{item}"), &[], None, REQUEST_TIMEOUT).await?;
+        c.get("Metadata").and_then(Value::as_array).and_then(|a| a.first()).cloned().ok_or_else(|| anyhow!("Your music server doesn't have this item"))
+    }
+
+    /// A song's levelling gain, once the server has analysed its loudness.
+    pub async fn replay_gain(&self, item: &str) -> Result<Option<ReplayGain>> {
+        Ok(measured_gain(&self.metadata(Self::item(item)?).await?))
+    }
+
     /// The song's file on the server: learnt at the sync, else asked once.
     async fn part(&self, item: &str) -> Result<String> {
         if let Some(p) = part_of(&self.key, item) {
             return Ok(p);
         }
-        let (c, _) = self.get(&format!("/library/metadata/{item}"), &[], None, REQUEST_TIMEOUT).await?;
-        let v = c.get("Metadata").and_then(Value::as_array).and_then(|a| a.first()).ok_or_else(|| anyhow!("Your music server doesn't have this item"))?;
-        let p = part_path(v).ok_or_else(|| anyhow!("Your music server sent no audio for this song"))?;
+        let p = part_path(&self.metadata(item).await?).ok_or_else(|| anyhow!("Your music server sent no audio for this song"))?;
         remember(&self.key, item, &p);
         Ok(p)
     }
@@ -678,5 +707,32 @@ mod tests {
         assert!(p.stream("../x", 0, true).await.is_err());
         s.mock("GET", "/library/metadata/303").with_status(401).create_async().await;
         assert!(crate::servers::refused(&p.stream("303", 0, false).await.err().unwrap()));
+    }
+
+    #[tokio::test]
+    async fn a_songs_measured_loudness_is_its_replay_gain_once_the_server_analysed_it() {
+        let mut s = Server::new_async().await;
+        let video = r#"{"streamType":1,"loudness":"-30"}"#;
+        for (id, streams) in [
+            // Strings, as Plex writes them; the audio stream is the one read.
+            ("text", format!(r#"{video},{{"streamType":2,"loudness":"-9.5","peak":"0.5","gain":"-2","albumGain":"-3"}}"#)),
+            ("number", r#"{"streamType":"2","loudness":-27.25}"#.into()),
+            ("odd_peak", r#"{"streamType":2,"loudness":"-20","peak":"15606.7"}"#.into()),
+            ("unanalysed", r#"{"streamType":2}"#.into()),
+            ("out_of_range", r#"{"streamType":2,"loudness":"-200"}"#.into()),
+            ("not_a_number", r#"{"streamType":2,"loudness":"nan"}"#.into()),
+            ("no_audio", video.into()),
+        ] {
+            let body = container(&format!(r#""Metadata":[{{"ratingKey":"{id}","Media":[{{"Part":[{{"Stream":[{streams}]}}]}}]}}]"#));
+            s.mock("GET", format!("/library/metadata/{id}").as_str()).match_header("x-plex-token", "srv-tok").with_body(body).create_async().await;
+        }
+        let p = Plex::from_account(&account(&s.url()));
+        assert_eq!(p.replay_gain("text").await.unwrap(), Some(ReplayGain { track_db: -8.5, track_peak: Some(0.5), album: None }));
+        assert_eq!(p.replay_gain("number").await.unwrap(), Some(ReplayGain { track_db: 9.25, track_peak: None, album: None }));
+        assert_eq!(p.replay_gain("odd_peak").await.unwrap(), Some(ReplayGain { track_db: 2.0, track_peak: None, album: None }));
+        for id in ["unanalysed", "out_of_range", "not_a_number", "no_audio"] {
+            assert_eq!(p.replay_gain(id).await.unwrap(), None, "{id}");
+        }
+        assert!(p.replay_gain("../x").await.is_err(), "not one of its ids");
     }
 }
