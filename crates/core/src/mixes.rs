@@ -766,7 +766,8 @@ pub fn mixes(input: &Input) -> Vec<Mix> {
             _ => group_of.get(&taste.artist[&t.id]).map(|i| format!("c:{i}")),
         }
     };
-    let mut loved: Vec<(i64, f64)> = input.tracks.iter().filter(|t| taste.allowed(t.id) && taste.pref(t.id) != Some(Pref::Less)).filter_map(|t| Some((t.id, score_of(t.id))).filter(|(_, s)| *s > 0.0)).collect();
+    // A seed is a song for sure: a doubt may sit in a mix, never lead it.
+    let mut loved: Vec<(i64, f64)> = input.tracks.iter().filter(|t| t.track.musicness == Some(Musicness::Music) && taste.allowed(t.id) && taste.pref(t.id) != Some(Pref::Less)).filter_map(|t| Some((t.id, score_of(t.id))).filter(|(_, s)| *s > 0.0)).collect();
     loved.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
     let mut songs_seen = HashSet::new();
     loved.retain(|(id, _)| songs_seen.insert(&taste.song[id]));
@@ -964,7 +965,7 @@ mod tests {
     const NOW: i64 = 1_800_000_000;
 
     fn t(id: i64, artist: &str) -> LibraryTrack {
-        LibraryTrack { id, added: id, added_at: None, genre: None, year: None, bpm: None, key: None, track: Track { title: format!("Song {id}"), artist: artist.into(), ..Default::default() } }
+        LibraryTrack { id, added: id, added_at: None, genre: None, year: None, bpm: None, key: None, track: Track { title: format!("Song {id}"), artist: artist.into(), musicness: Some(Musicness::Music), ..Default::default() } }
     }
 
     fn play(id: i64, at: i64, completed: bool) -> Play {
@@ -1102,6 +1103,17 @@ mod tests {
             assert_eq!(m.words.name.as_deref(), Some(tracks.iter().find(|t| t.id == m.track_ids[0]).unwrap().track.title.as_str()));
         }
         assert_ne!(l[0].track_ids, l[1].track_ids);
+    }
+
+    #[test]
+    fn a_doubt_never_seeds_a_like_mix() {
+        let (mut tracks, plays) = styled();
+        let seeded: Vec<i64> = likes(&run(&tracks, &plays, &HashMap::new(), 3)).iter().map(|m| m.track_ids[0]).collect();
+        for t in tracks.iter_mut().filter(|t| seeded.contains(&t.id)) {
+            t.track.musicness = Some(Musicness::Unsure);
+        }
+        let again = run(&tracks, &plays, &HashMap::new(), 3);
+        assert!(!likes(&again).is_empty() && likes(&again).iter().all(|m| !seeded.contains(&m.track_ids[0])), "{again:?}");
     }
 
     #[test]

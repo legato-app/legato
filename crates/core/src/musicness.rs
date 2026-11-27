@@ -81,6 +81,10 @@ static TALK: LazyLock<Regex> = LazyLock::new(|| {
         r"roblox|robux|studio|scripting|script|coding|programming|programmer|developers?|development|devlog|gamedev|game\s+dev|code|api|ui|ux|lua|luau|typescript|python|javascript|unity|unreal|godot|blender|after\s+effects|davinci|optimi[sz](?:e|ed|ing|ations?)|function|systems?|remote\s*events?|raycast\w*|hitbox|tweens?|npc|vfx|plugin|module|server|cross-server|exploit|bypass|bug|windows|microsoft|setup|career|job|money|business|compan(?:y|ies)|tips|tricks|beginners?|advanced|easiest|underrated|insane|satisfying|finally\s+possible|stop\s+(?:using|creating|doing)|is\s+(?:extremely|really)|voice\s+chat|text\s*chat|loading\s+screen|game|games",
     )
 });
+// A numbered episode: a series, whatever dash its title has. Not "part II", not a bare season or chapter (song titles).
+static EPISODE: LazyLock<Regex> = LazyLock::new(|| words(r"s\d{1,2}\s?e\d{1,3}|(?:episode|[ée]pisode|episodio|epis[óo]dio|folge|ep\.)\s*#?\s*\d+"));
+// Channels that tell stories in series: a doubt with nothing musical in the title.
+static SERIES_CHANNEL: LazyLock<Regex> = LazyLock::new(|| words(r"web[\s-]?series|series|s[ée]ries?|webtoon|episodes|stories|storytime"));
 // Long uploads that are still music.
 static LONG_MUSIC: LazyLock<Regex> = LazyLock::new(|| words(r"mix|playlist|full\s+album|album|compilation|hours?|\d+\s*h|loop|lofi|lo-fi|radio|dj\s+set|set|concert|live|megamix|medley|ost|soundtrack"));
 // Music hashtags (#ncsmusic, #phonk, #lofihiphop…).
@@ -98,7 +102,9 @@ pub fn score(c: &Clues) -> i32 {
         Some(VideoType::User) | None => {}
     }
     let channel = c.channel.trim();
-    if channel.ends_with(" - Topic") {
+    // YouTube's own channel of an artist's songs.
+    let topic = channel.ends_with(" - Topic");
+    if topic {
         s += 6;
     }
     if channel.to_lowercase().ends_with("vevo") {
@@ -113,8 +119,14 @@ pub fn score(c: &Clues) -> i32 {
     if HASHTAG.is_match(title) {
         s += 2;
     }
-    if ARTIST_DASH_TITLE.is_match(title) {
+    let episode = !topic && EPISODE.is_match(title);
+    if episode {
+        s -= 6;
+    } else if ARTIST_DASH_TITLE.is_match(title) {
         s += 2;
+    }
+    if SERIES_CHANNEL.is_match(channel) && musical == 0 {
+        s -= 3;
     }
     let strong = STRONG.find_iter(title).count() as i32;
     s -= 6 * strong.min(2);
@@ -284,6 +296,34 @@ mod tests {
         assert_eq!(judge(Some(Musicness::Music), &tutorial), Musicness::NotMusic);
         let channels = talk_channels([("Roblox Learn", Musicness::NotMusic), ("roblox learn", Musicness::NotMusic), ("Roblox Learn", Musicness::Unsure), ("Band", Musicness::NotMusic), ("Band", Musicness::Music), ("Band", Musicness::Music)]);
         assert_eq!(channels.into_iter().collect::<Vec<_>>(), vec!["roblox learn".to_string()]);
+    }
+
+    #[test]
+    fn numbered_episodes_are_not_music() {
+        // 2026-11-07: a story web series filed as music ("Name - Episode 3" read as artist and title).
+        for title in ["The Quiet Kingdom - Episode 3", "Lost Lights S2E4 | The Door", "La Maison - Épisode 2", "El Faro - Episodio 12"] {
+            assert_eq!(video(title, "Moon House", 360), Musicness::NotMusic, "{title}");
+        }
+        // Stored as music by older rules: taken back.
+        let stored = Clues { title: "The Quiet Kingdom - Episode 3", channel: "Moon House", duration_ms: Some(360_000), ..Default::default() };
+        assert_eq!(judge(Some(Musicness::Music), &stored), Musicness::NotMusic);
+        // "Ep." may be a short album: a doubt.
+        assert_eq!(video("Night Shift Ep. 5", "Moon House", 360), Musicness::Unsure);
+        // A song's own channel still wins over the number.
+        assert_eq!(video("Episode 1", "Some Band - Topic", 220), Musicness::Music);
+    }
+
+    #[test]
+    fn series_channels_leave_a_doubt() {
+        assert_eq!(video("The Night the Moon Fell", "Moon Stories", 360), Musicness::Unsure);
+        assert_eq!(video("The Night the Moon Fell, part 3", "Lanterns Web Series", 360), Musicness::NotMusic);
+        assert_eq!(video("The Night the Moon Fell (Official Audio)", "Moon Stories", 360), Musicness::Music);
+    }
+
+    #[test]
+    fn a_song_in_parts_stays_music() {
+        assert_eq!(video("Pink Floyd - Another Brick in the Wall, Part II", "Pink Floyd", 240), Musicness::Music);
+        assert_eq!(video("Some Band - Long Road (Part 2)", "Some Band", 240), Musicness::Music);
     }
 
     #[test]
