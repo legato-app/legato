@@ -24,11 +24,13 @@ use std::path::PathBuf;
 pub const FORMAT: u32 = 1;
 /// Settings that describe this PC, not the user: never synced (the update channel too: one PC can be the Beta one; the
 /// phone remote: a server on this PC's network).
-/// Also the window and tray, global keys, microphone and Discord: one device's own.
-pub const LOCAL_SETTINGS: [&str; 30] = [
+/// Also the window and tray, global keys, microphone and Discord: one device's own. And the animations: how much a PC can
+/// draw is its own matter (Legato Lite starts with them off, a full app joining it keeps its own).
+pub const LOCAL_SETTINGS: [&str; 32] = [
     "zoom", "miniSpot", "miniWidth", "defaultsVersion", "updateChannel", "coverCacheMb", "phoneRemote", "streamOverlay", "visualizerOverlay", "miniPlace",
     "sidebarWidth", "closeToTray", "autoUpdate", "shortcuts", "welcomed", "reopen", "detectorInput", "detectorPc", "discord", "alarm", "pipPlace", "pipClassicPlace",
     "keepScreenOn", "pipOnMinimize", "hiddenNav", "livingRoom", "discordSignIn", "webcamScan", "detectorSession", "bookFolders",
+    "motion", "backdropMotion",
 ];
 /// Library settings row holding when each interface setting last changed (unix ms).
 pub(crate) const TIMES: &str = "sync_times";
@@ -1510,6 +1512,31 @@ mod tests {
         assert_eq!(b.setting("ui")?.unwrap()["zoom"], 100);
         assert_eq!(a.setting("ui")?.unwrap()["updateChannel"], "beta");
         assert_eq!(b.setting("ui")?.unwrap()["updateChannel"], "stable");
+        Ok(())
+    }
+
+    #[test]
+    fn a_new_lite_never_turns_a_full_apps_animations_off_nor_takes_them_back() -> Result<()> {
+        let full = Library::in_memory()?;
+        let lite = Library::in_memory()?;
+        // A full app's saved settings, then a Lite installed later: its first save stamps everything, newer.
+        full.save_ui_settings(&serde_json::json!({ "theme": "dark", "motion": true, "backdropMotion": true, "backdropFlow": true, "crossfade": 4, "defaultsVersion": 12 }), 10)?;
+        lite.save_ui_settings(&serde_json::json!({ "theme": "system", "motion": false, "backdropMotion": false, "backdropFlow": false, "crossfade": 2, "defaultsVersion": 12 }), 20)?;
+        full.merge(&snap(&lite))?;
+        lite.merge(&snap(&full))?;
+        for (library, animations) in [(&full, true), (&lite, false)] {
+            let ui = library.setting("ui")?.unwrap();
+            assert_eq!((ui["motion"].as_bool(), ui["backdropMotion"].as_bool()), (Some(animations), Some(animations)));
+            // The rest still travels.
+            assert_eq!(ui["theme"], "system");
+        }
+        // An older version still sends them: ignored here.
+        let mut older = snap(&lite);
+        for key in ["ui.motion", "ui.backdropMotion"] {
+            older.settings.insert(key.into(), Stamped { value: false.into(), at: 99 });
+        }
+        full.merge(&older)?;
+        assert_eq!(full.setting("ui")?.unwrap()["motion"], true);
         Ok(())
     }
 
