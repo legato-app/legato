@@ -350,6 +350,7 @@ Where a line says "reading", the owner hasn't confirmed it.
   - 2026-11-27: the three `<include>`s of `site/content/docs` are the only documents read; `docs.test.ts` fails when
     the workflow’s list and them differ. Not tried for real (no push yet).
     - Decided alone (2026-11-27): the list stays written in the workflow, checked by that test.
+  - 2026-11-27 (review): the root `package.json` and `pnpm-lock.yaml` are listed too (the demo is built with them).
 - [x] `S` Pin one pnpm version: CI pins 10 (`check.yml`, `pages.yml`), the local install is 11; pick one and pin it in both places.
   - 2026-11-27: `package.json` `packageManager` pins pnpm 11.9.0 and every `pnpm/action-setup` step (check, pages,
     release) reads it. Both frozen installs pass offline with 11.9.0 here; not tried for real (no CI run yet).

@@ -9,7 +9,7 @@ on:
     branches: [master]
     # The repository's documents the docs' developer pages take in (site/components/repoDocs.ts, checked by
     # docs.test.ts). Other notes don't redeploy the site.
-    paths: [site/**, ui/**, docs/architecture.md, docs/plugins.md, CONTRIBUTING.md, .github/workflows/pages.yml]
+    paths: [site/**, ui/**, package.json, pnpm-lock.yaml, docs/architecture.md, docs/plugins.md, CONTRIBUTING.md, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:
