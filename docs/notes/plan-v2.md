@@ -519,12 +519,22 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
 - [ ] `L` A Lite build next to the full one (owner's ask 2026-11-25, his words as recorded: "deux versions… une version light
       faite automatiquement à la compilation… l'essentiel de l'app, focus sur l'optimisation"; maybe more variants later).
       Built from the same code by a build flag (cargo feature + a Vite define), never a fork. Its own app: name "Legato Lite",
-      its own identifier, data, keychain entries and update feed (the full app's `latest.json` URL unchanged). Cut: advanced
-      sound (Live Editor, effects, Music Detector, visualizer, loudness meter; the simple EQ and levelling stay), connected
-      extras (Discord, OBS overlay, Stream Deck, phone remote, listening rooms, plugins), modes and games (blind test,
-      karaoke, living-room TV, podcasts, audiobooks). Animations stay. Windows and Android. Built and attached on every
-      Beta and Stable, same release. For Opus: the design first (identity::installed(), rename.rs, updater, Sync Mode
-      between a full and a Lite PC), then slices; measured against the full one with `pnpm bench`.
+      identifier `app.legato.lite`, its own data, keychain entries and update feed (the full app's `latest.json` URL
+      unchanged). Cut: advanced sound (Live Editor, effects, Music Detector, visualizer, loudness meter; the simple EQ and
+      levelling stay), connected extras (Discord, OBS overlay, Stream Deck, phone remote, listening rooms, plugins), modes
+      and games (blind test, karaoke, living-room TV, podcasts, audiobooks). Built and attached on every Beta and Stable,
+      same release. The owner's decisions of 2026-11-27: the design below is validated; Lite is for small Linux machines
+      and small phones, so it also costs less RAM and CPU, not only fewer pages: one YouTube player and no crossfade,
+      animations off by default, fewer background tasks, a smaller image cache, each cut measured. Platforms in this
+      order: Windows, Android, Linux (the Linux line below).
+  - The full app measured (Opus, 2026-11-27), dev build (debug Rust, Vite's dev server, its own 1 799-song library),
+    Ryzen 5 5500 (12 threads), only windows with no cargo/rustc running in any sample. Paused on screen: 364 MB
+    (app 48, WebView2 316, of it the page's renderer 224), 4.7 % of a core. Playing YouTube (two embeds, the next one
+    cued): 490 MB (renderers 307, GPU 84), 26 % of a core (GPU 12, renderers 10). The release reference is the last
+    `docs/performance.md` row (local files): 149 / 183 / 57 MB paused / playing / tray, 0.1 / 2.5 / 0.1 % of the PC.
+  - Target, Lite against full on the same PC and day: release (`pnpm bench`) RAM ≤ 120 MB paused, ≤ 150 MB playing,
+    ≤ 50 MB after 10 min in the tray; CPU ≤ 0.1 % of the PC paused, ≤ 1.5 % playing (18 % of a core). YouTube
+    playing (the dev-build way above, until the bench plays YouTube): ≤ 400 MB and ≤ 20 % of a core.
   - Design (Opus, 2026-11-26):
     - Rust: feature `lite` in `src-tauri/Cargo.toml` next to `e2e`. `crates/plugins` (rquickjs), the rooms' internet half
       (connectors feature `rooms`: str0m and relays) and the Music Detector (player feature) become optional. Their commands
@@ -540,13 +550,23 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       and `hooks.nsh` are compiled out for Lite.
     - Sync Mode: same snapshot and `_legato._tcp`; Lite never deletes what it doesn't show.
     - Decided during the 2026-11-26 run: both editions can be installed side by side, and Lite doesn't register
-      `legato://` when the full app is there. Windows first, Android after. CI time roughly doubles at each release
+      `legato://` when the full app is there. Windows first, then Android, then Linux. CI time roughly doubles at each release
       (accepted). The site offers a second download, "Legato Lite: the essentials, lighter on your PC" (through the
       site's i18n).
     - Slices: 1 edition plumbing (feature, overlay, define, `edition.ts`, identity, feeds, `pnpm build:lite`); 2 UI cut
       table and a test that every cut entry is absent when lite; 3 Rust cfgs and optional deps (`cargo check --features
       lite` in CI); 4 `release.yml` second build and feed; 5 `pnpm bench` Lite vs full in `docs/performance.md`; 6 docs
       and the site's download line.
+    - Lighter slices (2026-11-27), each with its number before and after in `docs/performance.md`: 7 one YouTube
+      embed (PlayerBar's second `YouTubeFrame` never made; crossfade absent from Settings › Playback, its value kept as
+      is in the settings file); 8 `motion` off in Lite's own defaults (the user can turn it on); 9 fewer background
+      tasks (`deferred.rs` / `deferred.ts` start only what Lite shows; the hidden page suspended sooner than
+      `background.rs`'s 5 minutes); 10 a smaller cover cache (`ArtCache::new(…, 500 << 20)` and `coverCacheMb`'s
+      default: 250 MB in Lite). Lite's defaults apply only where the user never chose, as with `DEFAULTS_VERSION`.
+- [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. For Opus: the design
+      first, later. WebKitGTK instead of WebView2: check the YouTube embed there first (codecs, autoplay, the shield's
+      hooks and `live.js`), then the keychain (Secret Service), the tray, Open at startup, packaging (AppImage or .deb)
+      and its update feeds.
 - [ ] `L+` Mobile version, well optimised, the Rust code reused (the owner's ask 2026-11-02): Tauri 2's Android target
       with the same crates and `ui/`, Android first, iPhone after. Spec, seven phases, what stays desktop-only and the
       owner's calls (Android SDK / NDK on this PC, a phone, GitHub or Play Store, YouTube sign-in in a WebView):
