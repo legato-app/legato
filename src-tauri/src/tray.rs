@@ -22,7 +22,7 @@ pub struct Tray {
 
 /// Tooltip and menu header. Windows cuts tooltips at 127 UTF-16 units.
 pub fn label(now: Option<&NowPlaying>) -> String {
-    let Some(n) = now else { return "Legato".into() };
+    let Some(n) = now else { return crate::identity::PRODUCT.into() };
     let text = format!("{} · {}", n.title, n.artist);
     let (mut out, mut units) = (String::new(), 0);
     for c in text.chars() {
@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn label_names_track_and_fits_tooltip() {
-        assert_eq!(label(None), "Legato");
+        assert_eq!(label(None), crate::identity::PRODUCT);
         assert_eq!(label(Some(&np("Get Lucky"))), "Get Lucky · Daft Punk");
         let long = label(Some(&np(&"é".repeat(300))));
         assert!(long.ends_with('…'));
