@@ -162,8 +162,8 @@ export const useSettings = create<SettingsState>((set, get) => ({
     set({ settings: s })
     apply(s)
     sorts(s)
-    // Start screen: replaces the default one, no history entry.
-    if (useStore.getState().view.name === 'songs') useStore.setState({ view: { name: s.startView } })
+    // Start screen: replaces the one the app starts on, unless a page was opened meanwhile. No history entry.
+    if (!useStore.getState().back.length) useStore.setState({ view: { name: s.startView } })
   },
 
   async reload() {

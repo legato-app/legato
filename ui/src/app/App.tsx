@@ -294,10 +294,12 @@ export function App() {
   // First launch: what the app is, what stays on this PC, where the music comes from (features/welcome).
   const [welcome, setWelcome] = useState(false)
   const [up, setUp] = useState(false)
+  const [settingsIn, setSettingsIn] = useState(false)
   // Language changed: everything below renders again in it (nothing remounts: the player keeps playing).
   useLang((s) => s.lang)
   useEffect(() => {
     const settings = useSettings.getState().load()
+    void settings.finally(() => setSettingsIn(true))
     const library = refresh()
     // Settings and library both needed: resume flag, and the saved queue's tracks. First launch after an update:
     // everything back as it was (queue, paused or not, screen), whatever the resume settings.
@@ -421,33 +423,36 @@ export function App() {
           {/* New page: a short rise (styles.css .page-in), not when only its details change. Its padding is what a
               page band undoes to reach the pane's edges (PageHeader). */}
           <div key={pageKey(view)} className="page-in flex min-h-0 flex-1 flex-col px-6 pt-5 phone:px-4 phone:pt-3">
+            {/* No page before the start screen is known: another one would show, and load, for nothing. */}
             {/* Settings and Add-ons keep the app's own pages, whatever the theme: the way back, the permission review. */}
-            <PageLayout.Provider value={view.name === 'settings' || view.name === 'addons' ? DEFAULT_LAYOUT.pages : placement.pages}>
-            <PageBoundary>
-              {view.name === 'home' && <HomeView />}
-              {view.name === 'add' && <AddView />}
-              {view.name === 'search' && <SearchView />}
-              {view.name === 'mixes' && <MixesView />}
-              {view.name === 'radio' && <RadioView />}
-              {view.name === 'podcasts' && <PodcastsView />}
-              {view.name === 'tv' && <TvHome />}
-              {view.name === 'books' && <BooksView />}
-              {view.name === 'stats' && <StatsView />}
-              {view.name === 'history' && <HistoryView />}
-              {view.name === 'smart' && <SmartView id={view.id} />}
-              {view.name === 'notFound' && <NotFoundView />}
-              {view.name === 'health' && <HealthView />}
-              {view.name === 'mix' && <MixView id={view.id} />}
-              {view.name === 'songs' && <SongsView />}
-              {view.name === 'albums' && <AlbumsView />}
-              {view.name === 'album' && <AlbumView album={view.album} artist={view.artist} />}
-              {view.name === 'artists' && <ArtistsView />}
-              {view.name === 'artist' && <ArtistView artist={view.artist} />}
-              {view.name === 'playlist' && <PlaylistView id={view.id} />}
-              {view.name === 'settings' && <SettingsView section={view.section} />}
-              {view.name === 'addons' && <AddonsView />}
-            </PageBoundary>
-            </PageLayout.Provider>
+            {settingsIn && (
+              <PageLayout.Provider value={view.name === 'settings' || view.name === 'addons' ? DEFAULT_LAYOUT.pages : placement.pages}>
+              <PageBoundary>
+                {view.name === 'home' && <HomeView />}
+                {view.name === 'add' && <AddView />}
+                {view.name === 'search' && <SearchView />}
+                {view.name === 'mixes' && <MixesView />}
+                {view.name === 'radio' && <RadioView />}
+                {view.name === 'podcasts' && <PodcastsView />}
+                {view.name === 'tv' && <TvHome />}
+                {view.name === 'books' && <BooksView />}
+                {view.name === 'stats' && <StatsView />}
+                {view.name === 'history' && <HistoryView />}
+                {view.name === 'smart' && <SmartView id={view.id} />}
+                {view.name === 'notFound' && <NotFoundView />}
+                {view.name === 'health' && <HealthView />}
+                {view.name === 'mix' && <MixView id={view.id} />}
+                {view.name === 'songs' && <SongsView />}
+                {view.name === 'albums' && <AlbumsView />}
+                {view.name === 'album' && <AlbumView album={view.album} artist={view.artist} />}
+                {view.name === 'artists' && <ArtistsView />}
+                {view.name === 'artist' && <ArtistView artist={view.artist} />}
+                {view.name === 'playlist' && <PlaylistView id={view.id} />}
+                {view.name === 'settings' && <SettingsView section={view.section} />}
+                {view.name === 'addons' && <AddonsView />}
+              </PageBoundary>
+              </PageLayout.Provider>
+            )}
           </div>
         </main>
         {shell.regions.right.map((surface) => column(surface, 'right'))}

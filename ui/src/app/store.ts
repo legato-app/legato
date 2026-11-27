@@ -260,7 +260,7 @@ export const useStore = create<State>((set, get) => {
   }
 
   return {
-    view: { name: 'songs' },
+    view: { name: 'home' },
     notFound: [],
     back: [],
     fwd: [],
