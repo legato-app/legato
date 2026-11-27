@@ -3,6 +3,8 @@
 //! the running one (single instance in lib.rs). The text is untrusted: it waits here until the interface takes it
 //! (`link_pending`), which reads it like a pasted one (`isShareCode`, then the same import dialog) and nothing else.
 //! Installed app only: the key is outside the app's folders (identity.rs). The installer's uninstall hook removes it.
+//! Legato Lite registers it too when it is alone; the full app takes it over from a Lite (`keeps`), and Lite's uninstaller
+//! removes it only when it still names Lite's exe (`windows/hooks-lite.nsh`).
 //! A `.lmix` file double-clicked comes the same way, as its path (`file_of`): the installer registers that file type
 //! (`tauri.windows.conf.json`), never the running app, and its uninstaller removes it.
 
@@ -47,13 +49,11 @@ pub fn link_pending() -> Option<String> {
 }
 
 /// The link type pointed at this exe, when it is the installed app (updates install in a new folder: a command naming a
-/// gone exe is replaced, another working one is left alone).
+/// gone exe is replaced, another working one is left alone, except a Lite's when this is the full app).
 pub fn register() {
     #[cfg(windows)]
     if !cfg!(debug_assertions)
         && crate::identity::installed()
-        // Nov 2026: Lite never takes `legato://`. Registered first, it would keep it from a full app installed later.
-        && !cfg!(feature = "lite")
         && let Ok(exe) = std::env::current_exe()
     {
         let _ = win::register(&exe);
@@ -63,6 +63,21 @@ pub fn register() {
 #[cfg(any(windows, test))]
 fn command(exe: &std::path::Path) -> String {
     format!("\"{}\" \"%1\"", exe.display())
+}
+
+/// The registered command `have` stays when it is this exe's, or names another exe that works, unless that one is
+/// Legato Lite's and this is the full app: the full app wins whichever was installed first.
+#[cfg(any(windows, test))]
+fn keeps(have: &str, exe: &std::path::Path, lite: bool) -> bool {
+    let named = exe_of(have);
+    have.eq_ignore_ascii_case(&command(exe)) || (named.exists() && (lite || !in_lite_folder(&named)))
+}
+
+/// An exe in Lite's install folder, "Legato Lite" (NSIS: `$LOCALAPPDATA\${PRODUCTNAME}`).
+// shortcut: a Lite installed in a folder of another name keeps the link from the full app; read its exe's identity if that shows up.
+#[cfg(any(windows, test))]
+fn in_lite_folder(exe: &std::path::Path) -> bool {
+    exe.parent().and_then(|dir| dir.file_name()).is_some_and(|name| name.eq_ignore_ascii_case("Legato Lite"))
 }
 
 /// The exe a registered command names.
@@ -81,12 +96,12 @@ mod win {
     const COMMAND: &str = r"Software\Classes\legato\shell\open\command";
 
     pub fn register(exe: &Path) -> Result<()> {
-        let want = super::command(exe);
-        match CURRENT_USER.open(COMMAND).and_then(|k| k.get_string("")) {
-            Ok(have) if have.eq_ignore_ascii_case(&want) => return Ok(()),
-            Ok(have) if super::exe_of(&have).exists() => return Ok(()),
-            _ => {}
+        if let Ok(have) = CURRENT_USER.open(COMMAND).and_then(|k| k.get_string(""))
+            && super::keeps(&have, exe, cfg!(feature = "lite"))
+        {
+            return Ok(());
         }
+        let want = super::command(exe);
         let root = CURRENT_USER.create(KEY)?;
         root.set_string("", "URL:Legato")?;
         root.set_string("URL Protocol", "")?;
@@ -147,6 +162,36 @@ mod tests {
         assert_eq!(command(exe), r#""C:\Program Files\Legato\legato.exe" "%1""#);
         assert_eq!(exe_of(&command(exe)), exe);
         assert_eq!(exe_of("nonsense"), std::path::PathBuf::new());
+    }
+
+    #[test]
+    fn the_full_app_takes_the_link_from_a_lite_and_never_the_other_way() {
+        let dir = std::env::temp_dir().join(format!("legato-protocol-{}", std::process::id()));
+        let exe_in = |folder: &str| {
+            let exe = dir.join(folder).join("legato.exe");
+            std::fs::create_dir_all(exe.parent().unwrap()).unwrap();
+            std::fs::write(&exe, b"").unwrap();
+            exe
+        };
+        let (full, lite, other) = (exe_in("Legato"), exe_in("Legato Lite"), exe_in("Other"));
+        let gone = std::path::Path::new(r"C:\Nowhere\Legato\legato.exe");
+        // Its own command stays; one on a gone exe goes, in both editions.
+        assert!(keeps(&command(&full), &full, false) && keeps(&command(&lite), &lite, true));
+        assert!(!keeps(&command(gone), &full, false) && !keeps(&command(gone), &lite, true));
+        // The full app takes a working Lite's; a Lite leaves a working full app's.
+        assert!(!keeps(&command(&lite), &full, false));
+        assert!(keeps(&command(&full), &lite, true));
+        // Another working exe, not Lite's: left alone by both.
+        assert!(keeps(&command(&other), &full, false) && keeps(&command(&other), &lite, true));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn lites_uninstaller_removes_the_link_only_when_it_is_lites() {
+        let hooks = include_str!("../windows/hooks-lite.nsh");
+        assert!(hooks.contains(r#"ReadRegStr $0 HKCU "Software\Classes\legato\shell\open\command" """#));
+        assert!(hooks.contains(r#"${If} $0 == '"$INSTDIR\${MAINBINARYNAME}.exe" "%1"'"#), "the delete is guarded by the exe it names");
+        assert!(!hooks.contains("Music App"), "the rename catch-up is the full app's only");
     }
 
     #[test]

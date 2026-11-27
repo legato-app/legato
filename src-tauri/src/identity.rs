@@ -14,6 +14,13 @@ pub const INSTALLED: &str = "app.legato.desktop";
 #[cfg(feature = "lite")]
 pub const INSTALLED: &str = "app.legato.lite";
 
+/// The edition's `productName`: its Run entry, tray tooltip, mixer label, window title and error box. Side by side, the two
+/// editions never share one (Tauri's NSIS uninstaller deletes the Run value named after the product).
+#[cfg(not(feature = "lite"))]
+pub const PRODUCT: &str = "Legato";
+#[cfg(feature = "lite")]
+pub const PRODUCT: &str = "Legato Lite";
+
 static RUNNING: OnceLock<String> = OnceLock::new();
 
 /// Exactly the installed app's identifier, no prefix match: `app.legato.desktop.bench` is a guest.
@@ -50,11 +57,25 @@ mod tests {
         assert!(!installed());
     }
 
+    /// Whatever this build's feature (CI tests the full one only): what keeps a Lite installer off the full app's files.
+    #[test]
+    fn the_lite_config_keeps_off_the_full_apps_files() {
+        let lite: serde_json::Value = serde_json::from_str(include_str!("../tauri.lite.conf.json")).unwrap();
+        assert_eq!(lite["identifier"], "app.legato.lite");
+        assert_eq!(lite["productName"], "Legato Lite", "the Run value and the install folder go by it");
+        // Present and null: the overlay deletes the full app's `.lmix` association rather than inheriting it.
+        assert!(lite["bundle"].as_object().unwrap().get("fileAssociations").is_some_and(serde_json::Value::is_null));
+        // Lite's own hooks: the full app's would delete its `legato://` key and run the rename catch-up.
+        assert_eq!(lite["bundle"]["windows"]["nsis"]["installerHooks"], "./windows/hooks-lite.nsh");
+    }
+
     #[test]
     fn the_configs_agree_with_the_guard() {
         let id = |json: &str| serde_json::from_str::<serde_json::Value>(json).unwrap()["identifier"].as_str().unwrap().to_string();
         let installed = if cfg!(feature = "lite") { include_str!("../tauri.lite.conf.json") } else { include_str!("../tauri.conf.json") };
         assert_eq!(id(installed), INSTALLED, "the edition's config is the installed app");
+        let product = serde_json::from_str::<serde_json::Value>(installed).unwrap()["productName"].as_str().unwrap().to_string();
+        assert_eq!(product, PRODUCT, "the shell's name is the installer's");
         for guest in [include_str!("../tauri.dev.conf.json"), include_str!("../tauri.bench.conf.json"), include_str!("../tauri.e2e.conf.json"), include_str!("../tauri.lite.dev.conf.json")] {
             assert!(!is_installed(&id(guest)), "a guest config carries the installed identifier");
         }

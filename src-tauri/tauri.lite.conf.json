@@ -8,7 +8,7 @@
   },
   "bundle": {
     "fileAssociations": null,
-    "windows": { "nsis": { "installerHooks": null } }
+    "windows": { "nsis": { "installerHooks": "./windows/hooks-lite.nsh" } }
   },
   "plugins": {
     "updater": {
