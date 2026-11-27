@@ -639,6 +639,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       picking a preset.
 - [ ] `S` AutoEQ profiles for known headphones (for the owner: the data licence to check first).
       Their parametric filters would also have to be mapped onto the 10-band graphic equalizer.
+      The owner's word, 2026-11-27: "check the data licence yourself; integrate only if it allows a free public app,
+      else drop the line and tell the owner".
 - [x] `M` Credits and artist pages: who wrote / produced (MusicBrainz), a short bio (Wikipedia), links out.
       Ticked 2026-11-18 (audit): everything the line names shipped: the links (`MusicBrainz::artist_links`), Credits (`eae99997`), the bio (`afb764fd`), YouTube Music's About (`71d4c9bb`). What is left is a try against the real services (Check live).
       2026-11-12, the links out only: an artist's page has "Find links on MusicBrainz" (a click, two requests a second apart, the
@@ -981,6 +983,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - Backward compatible: a theme without `script` is unchanged; a newer `api` runs no code (colours, CSS and layout
     still apply, the card says it needs a newer Legato), like `LAYOUT_API`. Desktop only (rquickjs has no Android
     bindings); absent from Lite (plugins are cut).
+- [ ] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
+      the layout (`askAboutLayout`, `themeLayoutImport.ts`, the drop handler in `PlayerBar.tsx`). The owner's word,
+      2026-11-27: themes "dynamique et rapide", the app really user-friendly. Builder: Sonnet.
+- [ ] `L` Rearrange the app by dragging its parts (sidebar, player, parts of pages), saved into one's own theme (the
+      layout v1 format). The owner's ask, 2026-11-27. Opus designs it first.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
 - [x] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.
@@ -990,7 +997,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-27): any `api` may name one (nothing to grant); without one the card keeps its puzzle
       piece; the install question shows none (the folder isn't installed yet).
 - [ ] `S` Plugin author's picture, verified authors only, shipped next to `crates/plugins/trusted-authors.json`: no
-      picture file exists to ship (the owner's to give).
+      picture file exists to ship (the owner's to give). The owner's choice, 2026-11-27: the Legato logo.
 - [x] `S` Legato's signing key (the owner makes it: `pnpm tauri signer generate -w "$env:USERPROFILE\.legato\plugins.key"`), its public key in `trusted-authors.json`, Discord Presence signed (`scripts/plugin-files.mjs` + `pnpm tauri signer sign -f …`) in `examples/` and in `legato-app/discord-presence`, and `discord_move::FILES` carrying `legato.files` + `legato.files.sig`.
   - Done 2026-11-27: the public key trusted, the bundled copy signed (the owner's files), tested against the key; never
     installed in the app. Left, the owner's: sign `legato-app/discord-presence` the same way.
@@ -1033,6 +1040,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Sync Mode's per-PC files, and a wrong first step could mix two people's data. Needs the owner's choices (what is shared, e.g. local
       folders) before the data model.
       Owner's choices (2026-11-25): shared between profiles: local folders, personal servers (Subsonic, Jellyfin, Plex), look and sound (theme, EQ, playback settings); each profile's own: library, likes, history, Last.fm, YouTube cookies (WebView2 profile), keychain entries. A profile picker at launch when there are several; a switch restarts the app. An optional 4-digit code per profile, said in the UI as a lock against mistakes, not real protection.
+      The owner, 2026-11-27: after the Lite, designed by Opus first; the app opens on the last profile (no picker at
+      launch, which replaces the 2026-11-25 choice), switched from the avatar menu.
   - Design (Opus, 2026-11-26):
     - No migration: today's data is the profile "Main", where it already is. `profiles.json` in `app_data_dir`:
       `[{id, uid, name, color, code?}]` plus `last`. `code` is a salted sha256 of the 4 digits, checked in Rust.
