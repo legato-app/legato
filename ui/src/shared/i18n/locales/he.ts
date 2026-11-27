@@ -995,6 +995,7 @@ const he: Record<string, string> = {
   'Fade out length': 'משך המעבר החוצה',
   'Fade in length': 'משך המעבר פנימה',
   '{n} seconds': '{n} שניות',
+  '{n} second': '{n} שנייה',
   'Volume of both songs around a song change': 'עוצמת שני השירים סביב החלפת שיר',
   'Song ends': 'סוף השיר',
   'Next song': 'השיר הבא',

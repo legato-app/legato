@@ -1026,6 +1026,7 @@ const it: Record<string, string> = {
   'Fade out length': 'Durata della dissolvenza in uscita',
   'Fade in length': 'Durata della dissolvenza in entrata',
   '{n} seconds': '{n} secondi',
+  '{n} second': '{n} secondo',
   'Volume of both songs around a song change': 'Volume dei due brani attorno a un cambio di brano',
   'Song ends': 'Fine del brano',
   'Next song': 'Brano successivo',

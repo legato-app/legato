@@ -1026,6 +1026,7 @@ const ko: Record<string, string> = {
   'Fade out length': '페이드 아웃 길이',
   'Fade in length': '페이드 인 길이',
   '{n} seconds': '{n}초',
+  '{n} second': '{n}초',
   'Volume of both songs around a song change': '곡이 바뀔 때 두 곡의 볼륨',
   'Song ends': '곡 끝',
   'Next song': '다음 곡',

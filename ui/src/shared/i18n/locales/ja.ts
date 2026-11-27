@@ -1026,6 +1026,7 @@ const ja: Record<string, string> = {
   'Fade out length': 'フェードアウトの長さ',
   'Fade in length': 'フェードインの長さ',
   '{n} seconds': '{n}秒',
+  '{n} second': '{n}秒',
   'Volume of both songs around a song change': '曲が切り替わる前後の両方の曲の音量',
   'Song ends': '曲の終わり',
   'Next song': '次の曲',

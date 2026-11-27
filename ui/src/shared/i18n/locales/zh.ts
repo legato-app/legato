@@ -1026,6 +1026,7 @@ const zh: Record<string, string> = {
   'Fade out length': '淡出时长',
   'Fade in length': '淡入时长',
   '{n} seconds': '{n} 秒',
+  '{n} second': '{n} 秒',
   'Volume of both songs around a song change': '切换歌曲前后两首歌的音量',
   'Song ends': '歌曲结束',
   'Next song': '下一首',

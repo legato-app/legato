@@ -1035,6 +1035,7 @@ const fr: Record<string, string> = {
   'Fade out length': 'Durée du fondu de sortie',
   'Fade in length': 'Durée du fondu d’entrée',
   '{n} seconds': '{n} secondes',
+  '{n} second': '{n} seconde',
   'Volume of both songs around a song change': 'Volume des deux titres autour d’un changement de titre',
   'Song ends': 'Fin du titre',
   'Next song': 'Titre suivant',

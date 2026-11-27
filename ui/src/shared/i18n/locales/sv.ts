@@ -1026,6 +1026,7 @@ const sv: Record<string, string> = {
   'Fade out length': 'Uttoningens längd',
   'Fade in length': 'Intoningens längd',
   '{n} seconds': '{n} sekunder',
+  '{n} second': '{n} sekund',
   'Volume of both songs around a song change': 'Volymen för båda låtarna kring ett låtbyte',
   'Song ends': 'Låten slutar',
   'Next song': 'Nästa låt',

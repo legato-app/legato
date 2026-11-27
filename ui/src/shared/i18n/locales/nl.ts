@@ -1026,6 +1026,7 @@ const nl: Record<string, string> = {
   'Fade out length': 'Lengte van uitfaden',
   'Fade in length': 'Lengte van infaden',
   '{n} seconds': '{n} seconden',
+  '{n} second': '{n} seconde',
   'Volume of both songs around a song change': 'Volume van beide nummers rond een nummerwissel',
   'Song ends': 'Nummer eindigt',
   'Next song': 'Volgend nummer',

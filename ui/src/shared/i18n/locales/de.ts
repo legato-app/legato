@@ -1026,6 +1026,7 @@ const de: Record<string, string> = {
   'Fade out length': 'Länge des Ausblendens',
   'Fade in length': 'Länge des Einblendens',
   '{n} seconds': '{n} Sekunden',
+  '{n} second': '{n} Sekunde',
   'Volume of both songs around a song change': 'Lautstärke beider Songs rund um einen Songwechsel',
   'Song ends': 'Song endet',
   'Next song': 'Nächster Song',

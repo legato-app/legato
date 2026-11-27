@@ -1026,6 +1026,7 @@ const vi: Record<string, string> = {
   'Fade out length': 'Độ dài mờ dần',
   'Fade in length': 'Độ dài hiện dần',
   '{n} seconds': '{n} giây',
+  '{n} second': '{n} giây',
   'Volume of both songs around a song change': 'Âm lượng của hai bài quanh lúc chuyển bài',
   'Song ends': 'Bài kết thúc',
   'Next song': 'Bài tiếp theo',

@@ -1026,6 +1026,7 @@ const es: Record<string, string> = {
   'Fade out length': 'Duración del fundido de salida',
   'Fade in length': 'Duración del fundido de entrada',
   '{n} seconds': '{n} segundos',
+  '{n} second': '{n} segundo',
   'Volume of both songs around a song change': 'Volumen de las dos canciones en un cambio de canción',
   'Song ends': 'Fin de la canción',
   'Next song': 'Siguiente canción',

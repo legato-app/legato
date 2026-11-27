@@ -1026,6 +1026,7 @@ const ru: Record<string, string> = {
   'Fade out length': 'Длительность затухания',
   'Fade in length': 'Длительность нарастания',
   '{n} seconds': 'Секунд: {n}',
+  '{n} second': '{n} секунда',
   'Volume of both songs around a song change': 'Громкость обеих песен при смене песни',
   'Song ends': 'Конец песни',
   'Next song': 'Следующая песня',

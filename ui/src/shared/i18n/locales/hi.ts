@@ -1026,6 +1026,7 @@ const hi: Record<string, string> = {
   'Fade out length': 'फ़ेड आउट की लंबाई',
   'Fade in length': 'फ़ेड इन की लंबाई',
   '{n} seconds': '{n} सेकंड',
+  '{n} second': '{n} सेकंड',
   'Volume of both songs around a song change': 'गाना बदलने के आसपास दोनों गानों की आवाज़',
   'Song ends': 'गाना खत्म',
   'Next song': 'अगला गाना',

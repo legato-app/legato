@@ -1026,6 +1026,7 @@ const id: Record<string, string> = {
   'Fade out length': 'Durasi fade out',
   'Fade in length': 'Durasi fade in',
   '{n} seconds': '{n} detik',
+  '{n} second': '{n} detik',
   'Volume of both songs around a song change': 'Volume kedua lagu saat pergantian lagu',
   'Song ends': 'Lagu berakhir',
   'Next song': 'Lagu berikutnya',

@@ -144,7 +144,7 @@ export function BlindTest() {
             >
               {ANSWER_SECONDS.map((n) => (
                 <option key={n} value={n}>
-                  {tr('{n} seconds', { n })}
+                  {trn(n, '{n} second', '{n} seconds')}
                 </option>
               ))}
             </select>

@@ -1026,6 +1026,7 @@ const tr: Record<string, string> = {
   'Fade out length': 'Çıkış geçişi süresi',
   'Fade in length': 'Giriş geçişi süresi',
   '{n} seconds': '{n} saniye',
+  '{n} second': '{n} saniye',
   'Volume of both songs around a song change': 'Şarkı değişimi sırasında iki şarkının ses düzeyi',
   'Song ends': 'Şarkı biter',
   'Next song': 'Sonraki şarkı',

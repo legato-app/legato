@@ -1026,6 +1026,7 @@ const pt: Record<string, string> = {
   'Fade out length': 'Duração do fade out',
   'Fade in length': 'Duração do fade in',
   '{n} seconds': '{n} segundos',
+  '{n} second': '{n} segundo',
   'Volume of both songs around a song change': 'Volume das duas músicas em torno de uma troca de música',
   'Song ends': 'Fim da música',
   'Next song': 'Próxima música',

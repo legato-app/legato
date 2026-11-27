@@ -1026,6 +1026,7 @@ const uk: Record<string, string> = {
   'Fade out length': 'Тривалість згасання',
   'Fade in length': 'Тривалість наростання',
   '{n} seconds': 'Секунд: {n}',
+  '{n} second': '{n} секунда',
   'Volume of both songs around a song change': 'Гучність обох пісень під час зміни пісні',
   'Song ends': 'Кінець пісні',
   'Next song': 'Наступна пісня',
