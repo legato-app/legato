@@ -110,7 +110,7 @@ use music_core::musicness::Musicness;
 use music_core::search::{self, Hit};
 use music_core::model::{Connector, SecretStore, Source, Track};
 use music_core::share::{self, Item, Shared};
-use catalog_search::{store, today, video_search, yt_search};
+use catalog_search::{store, today, video_search, youtube_link, yt_search};
 use library_cmd::{folders, loose_files, rescan};
 use library_edits::AddReport;
 use listening::unix_now;
@@ -286,8 +286,8 @@ struct Caches {
     /// Key: UTC offset. Stamp: library and history versions, day (seed), local hour (time-of-day mix).
     mixes: Memo<i64, (u64, u64, u64, i64, u64)>,
     youtube: Ttl<Vec<Track>>,
-    /// Normal YouTube searches: tracks with their music classification.
-    videos: Ttl<Vec<(Track, Musicness)>>,
+    /// Normal YouTube searches, as YouTube gave them (`catalog_search::as_songs`).
+    videos: Ttl<Vec<music_connectors::ytweb::WebVideo>>,
     apple: Ttl<Vec<Track>>,
     /// Sign-in state: keychain and WebView2 cookies, read on every refresh otherwise.
     status: Ttl<Vec<(Source, SourceStatus)>>,

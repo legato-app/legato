@@ -6,15 +6,15 @@ use anyhow::{Context, Result, bail};
 use async_trait::async_trait;
 use music_core::lyrics::Line;
 use music_core::library::is_made_up_mix;
-use music_core::matching::{best_match, is_count};
+use music_core::matching::{best_match, is_count, primary_artist};
 use music_core::model::{Connector, PlaylistRead, PlaylistRef, Source, Track};
 use music_core::musicness::{Clues, VideoType, classify};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha1::{Digest, Sha1};
-use std::collections::BTreeMap;
-use std::sync::LazyLock;
+use std::collections::{BTreeMap, HashSet};
+use std::sync::{LazyLock, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 mod home;
@@ -219,6 +219,21 @@ pub(crate) fn parse_duration(s: &str) -> Option<u32> {
     Some(((n(1) * 60 + n(2)) * 60 + n(3)) * 1000)
 }
 
+/// Artists YouTube Music's catalog has named since the app started, as `primary_artist` keys them: they tell a video
+/// titled backwards (`youtube::turn_round`) with no request of their own. A few thousand names at most.
+static CATALOG_ARTISTS: LazyLock<Mutex<HashSet<String>>> = LazyLock::new(Default::default);
+
+/// Notes the catalog's artists among a byline's runs (an uploader's channel is none).
+fn note_artists<'a>(runs: impl IntoIterator<Item = &'a Value>) {
+    let names = runs.into_iter().filter(|run| page_type(run) == "MUSIC_PAGE_TYPE_ARTIST").filter_map(|run| run.get("text")?.as_str());
+    CATALOG_ARTISTS.lock().unwrap().extend(names.map(primary_artist));
+}
+
+/// Has the catalog named this artist (a `primary_artist` key)?
+pub fn catalog_artist(key: &str) -> bool {
+    CATALOG_ARTISTS.lock().unwrap().contains(key)
+}
+
 /// One list row (song in search, playlist, library) → track. None for rows without a playable video.
 fn row_track(row: &Value) -> Option<Track> {
     row_track_with(row, None)
@@ -234,6 +249,7 @@ fn row_track_with(row: &Value, fallback: Option<&str>) -> Option<Track> {
     let cols: Vec<&Value> = row.get("flexColumns")?.as_array()?.iter().filter_map(|c| c.pointer("/musicResponsiveListItemFlexColumnRenderer/text")).collect();
     let title = text(cols.first()?)?;
     let runs: Vec<&Value> = cols.iter().skip(1).filter_map(|c| c.get("runs")?.as_array()).flatten().collect();
+    note_artists(runs.iter().copied());
     let artists: Vec<String> = runs.iter().filter(|r| page_type(r) == "MUSIC_PAGE_TYPE_ARTIST" || page_type(r) == "MUSIC_PAGE_TYPE_USER_CHANNEL").filter_map(|r| r.get("text")?.as_str().map(String::from)).collect();
     let album = runs.iter().find(|r| page_type(r) == "MUSIC_PAGE_TYPE_ALBUM").and_then(|r| r.get("text")?.as_str().map(String::from));
     let fixed = row.get("fixedColumns").map(|f| all(f, "text").into_iter().filter_map(text).collect::<Vec<_>>()).unwrap_or_default();
@@ -277,6 +293,11 @@ fn rows(v: &Value) -> Vec<Track> {
 /// Playlist pages also carry a "Suggestions" shelf: keep the playlist shelf (rows + its continuation) only.
 fn playlist_shelf(page: &Value) -> &Value {
     all(page, "musicPlaylistShelfRenderer").into_iter().next().unwrap_or(page)
+}
+
+#[cfg(test)]
+pub(crate) fn parse_rows(page: &Value) -> Vec<Track> {
+    rows(page)
 }
 
 #[cfg(test)]

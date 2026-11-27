@@ -1,6 +1,7 @@
 //! Keyless YouTube helpers: video links, oEmbed metadata, artist/title from video titles.
 //! Account features (library, search, export) live in `ytmusic` (Google sign-in).
 
+use crate::ytmusic::catalog_artist;
 use anyhow::Result;
 use music_core::matching::reversed_credit;
 use music_core::model::{Source, Track};
@@ -26,13 +27,14 @@ pub fn parse_video(title: &str, channel: &str) -> (String, String) {
     (CHANNEL_NOISE.replace_all(channel, "").into_owned(), title.to_string())
 }
 
-/// `parse_video`'s split put right for a video titled backwards (`music_core::matching::reversed_credit`).
+/// `parse_video`'s split put right for a video titled backwards (`music_core::matching::reversed_credit`). `known`: the
+/// library's artists; those YouTube Music's catalog has named count too.
 pub fn turn_round(track: &mut Track, raw_title: &str, channel: &str, known: impl Fn(&str) -> bool) {
     // Only what the dash split: a topic channel and a channel's name are the artist already.
     if TOPIC.is_match(channel) || !DASH.is_match(raw_title) {
         return;
     }
-    if let Some((artist, title)) = reversed_credit(&track.artist, &track.title, known) {
+    if let Some((artist, title)) = reversed_credit(&track.artist, &track.title, |key| known(key) || catalog_artist(key)) {
         (track.artist, track.title) = (artist, title);
     }
 }
@@ -51,13 +53,9 @@ struct OEmbed {
     author_name: String,
 }
 
-/// Track from a pasted link, no key or login (oEmbed). oEmbed has no duration.
-pub async fn track_from_link(link: &str, oembed: &str) -> Result<Track> {
-    track_from_link_knowing(link, oembed, |_| false).await
-}
-
-/// The same, `known` artists telling a title written backwards.
-pub async fn track_from_link_knowing(link: &str, oembed: &str, known: impl Fn(&str) -> bool) -> Result<Track> {
+/// Track from a pasted or shared link, no key or login (oEmbed). oEmbed has no duration. `known` artists tell a title
+/// written backwards (`turn_round`).
+pub async fn track_from_link(link: &str, oembed: &str, known: impl Fn(&str) -> bool) -> Result<Track> {
     let id = video_id(link).ok_or_else(|| anyhow::anyhow!("YouTube link not recognized"))?;
     let watch = format!("https://www.youtube.com/watch?v={id}");
     let url = Url::parse_with_params(oembed, &[("url", watch.as_str()), ("format", "json")])?;
@@ -80,6 +78,7 @@ pub async fn embeddable(id: &str, oembed: &str) -> Result<bool> {
 mod tests {
     use super::*;
     use mockito::{Matcher, Server};
+    use serde_json::{Value, json};
 
     #[test]
     fn parses_video_titles() {
@@ -111,6 +110,28 @@ mod tests {
     }
 
     #[test]
+    fn an_artist_the_catalog_named_tells_a_backwards_title_too() {
+        let run = |name: &str, kind: &str| json!({ "text": name, "navigationEndpoint": { "browseEndpoint": { "browseEndpointContextSupportedConfigs": { "browseEndpointContextMusicConfig": { "pageType": kind } } } } });
+        let column = |runs: Value| json!({ "musicResponsiveListItemFlexColumnRenderer": { "text": { "runs": runs } } });
+        let row = json!({ "musicResponsiveListItemRenderer": {
+            "playlistItemData": { "videoId": "aaaaaaaaaaa" },
+            "flexColumns": [column(json!([{ "text": "Lanterns" }])), column(json!([run("Zed Quill", "MUSIC_PAGE_TYPE_ARTIST"), run("Quill Reuploads", "MUSIC_PAGE_TYPE_USER_CHANNEL")]))],
+        } });
+        let read = |raw: &str| {
+            let (artist, title) = parse_video(raw, "Some Channel");
+            let mut track = Track { artist, title, ..Default::default() };
+            turn_round(&mut track, raw, "Some Channel", |_| false);
+            (track.artist, track.title)
+        };
+        let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
+        assert_eq!(read("lanterns - zed quill *slowed*"), pair("lanterns", "zed quill *slowed*"));
+        assert_eq!(crate::ytmusic::parse_rows(&row).len(), 1);
+        assert_eq!(read("lanterns - zed quill *slowed*"), pair("zed quill", "lanterns *slowed*"));
+        // An uploader's channel is no artist.
+        assert_eq!(read("lanterns - quill reuploads"), pair("lanterns", "quill reuploads"));
+    }
+
+    #[test]
     fn finds_video_id_in_links() {
         for link in ["https://www.youtube.com/watch?v=jNQXAC9IVRw", "https://music.youtube.com/watch?list=RD&v=jNQXAC9IVRw&t=3", "https://youtu.be/jNQXAC9IVRw?si=x", "https://www.youtube.com/shorts/jNQXAC9IVRw", "https://www.youtube.com/embed/jNQXAC9IVRw"] {
             assert_eq!(video_id(link).as_deref(), Some("jNQXAC9IVRw"), "{link}");
@@ -126,10 +147,10 @@ mod tests {
             .with_body(r#"{"title":"Daft Punk - Get Lucky (Official Audio)","author_name":"DaftPunkVEVO"}"#)
             .create_async()
             .await;
-        let t = track_from_link("https://youtu.be/5NV6Rdv1a3I", &format!("{}/oembed", s.url())).await.unwrap();
+        let t = track_from_link("https://youtu.be/5NV6Rdv1a3I", &format!("{}/oembed", s.url()), |_| false).await.unwrap();
         assert_eq!((t.artist.as_str(), t.title.as_str(), t.ids[&Source::Youtube].as_str()), ("Daft Punk", "Get Lucky (Official Audio)", "5NV6Rdv1a3I"));
         assert_eq!(t.art.as_deref(), Some("https://i.ytimg.com/vi/5NV6Rdv1a3I/hqdefault.jpg"));
-        assert!(track_from_link("https://example.com", &s.url()).await.is_err());
+        assert!(track_from_link("https://example.com", &s.url(), |_| false).await.is_err());
     }
 
     #[tokio::test]
@@ -141,7 +162,7 @@ mod tests {
         }
         let oembed = format!("{}/oembed", s.url());
         for id in ["aaaaaaaaaaa", "bbbbbbbbbbb"] {
-            let e = track_from_link(&format!("https://youtu.be/{id}"), &oembed).await.unwrap_err();
+            let e = track_from_link(&format!("https://youtu.be/{id}"), &oembed, |_| false).await.unwrap_err();
             assert!(format!("{e:#}").contains(if id.starts_with('a') { "401" } else { "404" }), "{e:#}");
         }
         // Embedding off: known before the embed fails; removed: left to the embed.

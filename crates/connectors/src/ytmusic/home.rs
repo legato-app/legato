@@ -1,7 +1,7 @@
 //! YouTube Music's home: its recommendation shelves (Quick picks, Listen again, Mixed for you…), and the songs behind
 //! a playlist, album or radio there, to play without importing anything. An artist's page: same shelves.
 
-use super::{ARTISTS, YouTubeMusic, all, big_thumb, explicit_badge, is_count, page_type, parse_duration, row_track, row_track_with, text};
+use super::{ARTISTS, YouTubeMusic, all, big_thumb, explicit_badge, is_count, note_artists, page_type, parse_duration, row_track, row_track_with, text};
 use anyhow::Result;
 use music_core::matching::normalize;
 use music_core::searchpace::{Quiet, refused};
@@ -111,6 +111,7 @@ const LABELS: [&str; 11] = ["Song", "Video", "Single", "Album", "EP", "Playlist"
 /// run that isn't a label, a count, a length or a bare number (an album's year).
 fn artist_of(runs: Option<&Value>) -> String {
     let runs: Vec<&Value> = runs.and_then(|s| s.get("runs")?.as_array()).map(|r| r.iter().collect()).unwrap_or_default();
+    note_artists(runs.iter().copied());
     let linked: Vec<&str> = runs.iter().filter(|r| matches!(page_type(r), "MUSIC_PAGE_TYPE_ARTIST" | "MUSIC_PAGE_TYPE_USER_CHANNEL")).filter_map(|r| r.get("text")?.as_str()).collect();
     if !linked.is_empty() {
         return linked.join(", ");

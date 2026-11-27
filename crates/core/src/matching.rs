@@ -328,6 +328,7 @@ mod tests {
         assert_eq!(turned("Doja Cat", "Like That *slowed*"), None);
         assert_eq!(turned("Doja Cat", "Yeat"), None);
         // A title that only starts with a known artist's name is no artist.
+        assert_eq!(reversed_credit("New Band", "Love & Hate", |key| key == "love"), None);
         assert_eq!(turned("New Band", "Doja Cat & Friends"), None);
         assert_eq!(turned("New Band", "Yeat, Again"), None);
         // Neither side known: nothing to tell the order by.

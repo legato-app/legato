@@ -1,6 +1,8 @@
 //! Search: the catalogs (YouTube Music, YouTube, Apple Music), the suggestions as one types.
 
 use super::*;
+use music_connectors::ytweb::WebVideo;
+use std::sync::Arc;
 
 /// UTC day number (mix seed).
 pub fn today() -> u64 {
@@ -31,21 +33,38 @@ pub struct SearchHit {
 
 /// Normal YouTube search (session if signed in, anonymous otherwise), cached 30 min.
 pub async fn video_search(state: &AppState, query: &str) -> Result<Vec<(Track, Musicness)>, String> {
+    Ok(as_songs(state, &web_videos(state, query).await?))
+}
+
+/// The search's videos as YouTube gave them: read into songs at each use (`as_songs`), as more artists get known.
+async fn web_videos(state: &AppState, query: &str) -> Result<Arc<Vec<WebVideo>>, String> {
     let key = query.trim().to_lowercase();
     if let Some(hit) = state.cache.videos.get(&key) {
-        return Ok((*hit).clone());
+        return Ok(hit);
     }
     let web = YouTubeWeb::with_api(hosts::get().youtube, ytm::session(&state.app).as_deref());
     let videos = web.search(query).await.map_err(err)?;
-    // Reupload channels write "Title - Artist": the library's artists tell.
+    Ok(state.cache.videos.put(&key, videos))
+}
+
+/// Videos as songs, with what kind each is. Reupload channels write "Title - Artist": the artists known tell.
+fn as_songs(state: &AppState, videos: &[WebVideo]) -> Vec<(Track, Musicness)> {
     let known = state.lib().artist_keys().unwrap_or_default();
-    let found: Vec<(Track, Musicness)> = videos.into_iter().map(|mut v| {
-        let m = v.musicness();
-        music_connectors::youtube::turn_round(&mut v.track, &v.raw_title, &v.channel, |key| known.contains(key));
-        (v.track, m)
-    }).collect();
-    state.cache.videos.put(&key, found.clone());
-    Ok(found)
+    videos
+        .iter()
+        .map(|video| {
+            let mut track = video.track.clone();
+            music_connectors::youtube::turn_round(&mut track, &video.raw_title, &video.channel, |key| known.contains(key));
+            (track, video.musicness())
+        })
+        .collect()
+}
+
+/// A pasted or shared YouTube link as a song, its title turned round when the artists known say it was written backwards.
+pub async fn youtube_link(state: &AppState, link: &str) -> anyhow::Result<Track> {
+    // Unread, the title is taken as written: the song comes all the same.
+    let known = state.lib().artist_keys().unwrap_or_default();
+    music_connectors::youtube::track_from_link(link, music_connectors::youtube::OEMBED, |key| known.contains(key)).await
 }
 
 #[derive(Serialize, ts_rs::TS)]
@@ -83,7 +102,9 @@ pub async fn search_catalogs(state: State<'_, AppState>, query: String, country:
         }
     });
     let mut errors = Vec::new();
-    let (videos, songs) = tokio::join!(video_search(&state, &query), yt_search(&state, &query));
+    let (videos, songs) = tokio::join!(web_videos(&state, &query), yt_search(&state, &query));
+    // Read once the songs are in: their artists tell too.
+    let videos = videos.map(|videos| as_songs(&state, &videos));
     let videos = videos.unwrap_or_else(|e| {
         errors.push(format!("YouTube: {e}"));
         Vec::new()

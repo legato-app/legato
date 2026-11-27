@@ -3,7 +3,7 @@
 //! A playlist file's library files and YouTube links come as they are (`music_core::playfile`). No service's API involved.
 //! Out: a playlist of yours as such a file (`export_playlist_file`).
 
-use crate::{AppState, CmdResult, err, video_search, yt_search};
+use crate::{AppState, CmdResult, err, video_search, youtube_link, yt_search};
 use music_connectors::youtube;
 use music_core::library::PlaylistEdit;
 use music_core::model::{Source, Track};
@@ -54,7 +54,7 @@ async fn resolve(state: &AppState, plan: Plan) -> Got {
     match plan {
         Plan::Own(id) => Got::Own(id),
         Plan::Video(t) => Got::Track(t),
-        Plan::Link(url) => youtube::track_from_link(&url, youtube::OEMBED).await.map_or(Got::Missing(url), Got::Track),
+        Plan::Link(url) => youtube_link(state, &url).await.map_or(Got::Missing(url), Got::Track),
         Plan::Search(w) => match find(state, &w).await {
             Some(t) => Got::Track(t),
             None if w.artist.is_empty() => Got::Missing(w.title),

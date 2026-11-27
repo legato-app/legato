@@ -170,11 +170,19 @@ pub async fn share_import(app: tauri::AppHandle, state: State<'_, AppState>, cod
     let apple_found = if apple.is_empty() { Vec::new() } else { itunes::lookup(hosts::get().itunes_lookup, &apple, &country).await.unwrap_or_default() };
     // Bare video ids: keyless oEmbed per video, 8 at a time.
     let bare: Vec<(usize, String)> = shared.items.iter().zip(&songs).enumerate().filter_map(|(i, (item, s))| if let (Item::Youtube { id, .. }, None) = (item, s) { Some((i, id.clone())) } else { None }).collect();
+    let known = std::sync::Arc::new(state.lib().artist_keys().unwrap_or_default());
     for chunk in bare.chunks(8) {
         if links::stopped() {
             return Err("canceled".into());
         }
-        let jobs: Vec<_> = chunk.iter().cloned().map(|(i, v)| tauri::async_runtime::spawn(async move { (i, youtube::track_from_link(&format!("https://youtu.be/{v}"), youtube::OEMBED).await) })).collect();
+        let jobs: Vec<_> = chunk
+            .iter()
+            .cloned()
+            .map(|(i, v)| {
+                let known = known.clone();
+                tauri::async_runtime::spawn(async move { (i, youtube::track_from_link(&format!("https://youtu.be/{v}"), youtube::OEMBED, |key| known.contains(key)).await) })
+            })
+            .collect();
         for job in jobs {
             if let Ok((i, Ok(t))) = job.await {
                 songs[i] = Some(t);
@@ -251,7 +259,7 @@ pub struct SharedSong {
 
 #[tauri::command]
 pub async fn share_song(state: State<'_, AppState>, code: String, country: String) -> CmdResult<SharedSong> {
-    use music_connectors::{itunes, youtube};
+    use music_connectors::itunes;
     let shared = share::parse(&code).map_err(err)?;
     let [item] = shared.items.as_slice() else { return Err("A shared song has exactly one song".into()) };
     let known = {
@@ -264,7 +272,7 @@ pub async fn share_song(state: State<'_, AppState>, code: String, country: Strin
     let track = match item {
         Item::Youtube { id, .. } => match item.ready() {
             Some(t) => t,
-            None => youtube::track_from_link(&format!("https://youtu.be/{id}"), youtube::OEMBED).await.map_err(err)?,
+            None => youtube_link(&state, &format!("https://youtu.be/{id}")).await.map_err(err)?,
         },
         Item::Apple(n) => itunes::lookup(hosts::get().itunes_lookup, &[*n], &store(&country)).await.map_err(err)?.into_iter().next().ok_or("This song was not found on Apple Music")?,
         Item::Text { .. } => playable_hit(&state, probe(item)).await?,
