@@ -20,8 +20,8 @@ genre?: string, year?: number,
  */
 bpm?: number, key?: string, 
 /**
- * On the Audiobooks page, while Settings › Audiobooks is on (`audiobooks::BookRule`). One said to be a book is
- * judged not music too; a file only very long stays music.
+ * An audiobook (`audiobooks::BookRule`): on the Audiobooks page while Settings › Audiobooks is on. One said to be a
+ * book is judged not music too; a file only very long stays music. Off, an `.m4b` only.
  */
 audiobook?: boolean, title: string, artist: string, album: string | null, durationMs: number | null, isrc: string | null, ids: { [key in Source]?: string }, 
 /**

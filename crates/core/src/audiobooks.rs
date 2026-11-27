@@ -1,6 +1,6 @@
 //! Audiobooks apart from music (Settings › General › Audiobooks, off by default): which files of the library show on
 //! the Audiobooks page. One said to be a book is judged not music too, so it leaves the song lists and the mixes as such
-//! a video does; a file only very long stays music. Off, nothing changes.
+//! a video does; a file only very long stays music. Off, only an `.m4b` is a book: in no list, on no page.
 
 use crate::library::{Library, LibraryTrack};
 use crate::model::Source;
@@ -25,6 +25,12 @@ pub enum Book {
     Named,
     /// Very long only (a book, or a DJ set, an opera, a sleep track): still music.
     Long,
+}
+
+/// An `.m4b` file of this PC (none a video stands for): a book by its name, whatever the settings say.
+fn named_m4b(song: &LibraryTrack) -> bool {
+    let local = song.track.ids.get(&Source::Local).map(Path::new);
+    !song.track.ids.contains_key(&Source::Youtube) && local.is_some_and(|path| path.extension().is_some_and(|extension| extension.eq_ignore_ascii_case("m4b")))
 }
 
 /// The rule, as the interface settings say it.
@@ -52,7 +58,7 @@ impl BookRule {
             return None;
         }
         let path = ids.get(&Source::Local).map(Path::new);
-        let named = path.is_some_and(|path| path.extension().is_some_and(|extension| extension.eq_ignore_ascii_case("m4b")) || self.folders.iter().any(|folder| path.starts_with(folder)));
+        let named = named_m4b(song) || path.is_some_and(|path| self.folders.iter().any(|folder| path.starts_with(folder)));
         let length = song.track.duration_ms.unwrap_or(0);
         let tagged = song.genre.as_deref().map(str::to_lowercase).is_some_and(|genre| BOOK_GENRES.iter().any(|word| genre.contains(word)));
         let chaptered = path.is_some() && chapters >= BOOK_CHAPTERS;
@@ -71,12 +77,13 @@ impl Library {
 
     /// The books among the rows: marked, the named ones judged not music. Not one the user said "It's music" of.
     pub(crate) fn mark_books(&self, rows: &mut [LibraryTrack]) -> Result<()> {
-        let Some(rule) = self.book_rule()? else { return Ok(()) };
+        let rule = self.book_rule()?;
         // What the rows don't carry: the chapters, and the user's own word.
         let mut kept = self.db.prepare_cached("SELECT coalesce(chapters, 0), musicness IS 'user:music' FROM tracks WHERE id = ?1")?;
-        for song in rows.iter_mut() {
+        // Audiobooks off: only an `.m4b` can be one, no other row is looked up.
+        for song in rows.iter_mut().filter(|song| rule.is_some() || named_m4b(song)) {
             let (chapters, said_music) = kept.query_row([song.id], |row| Ok((row.get::<_, u32>(0)?, row.get::<_, bool>(1)?))).optional()?.unwrap_or_default();
-            let Some(book) = rule.judge(song, chapters) else { continue };
+            let Some(book) = rule.as_ref().map_or(Some(Book::Named), |rule| rule.judge(song, chapters)) else { continue };
             if said_music {
                 continue;
             }
@@ -137,6 +144,21 @@ mod tests {
     }
 
     #[test]
+    fn an_m4b_is_out_of_the_music_with_audiobooks_off_too() -> Result<()> {
+        let library = Library::in_memory()?;
+        let id = library.upsert_track(&file("C:/a.m4b", 3, "").track)?;
+        // A long file of another kind: music while the page is off.
+        library.upsert_track(&file("C:/mix.mp3", 180, "Audiobook").track)?;
+        let read = || library.tracks().map(|songs| songs.iter().map(|song| (song.audiobook, song.track.musicness)).collect::<Vec<_>>());
+        let music = (None, Some(Musicness::Music));
+        assert_eq!(read()?, [(Some(true), Some(Musicness::NotMusic)), music]);
+        // The user's word wins here too.
+        library.db.execute("UPDATE tracks SET musicness = 'user:music' WHERE id = ?1", [id])?;
+        assert_eq!(read()?, [music, music]);
+        Ok(())
+    }
+
+    #[test]
     fn a_long_m4a_with_chapters_is_a_book() -> Result<()> {
         let rule = BookRule::from_ui(Some(&json!({ "booksPage": true }))).unwrap();
         assert_eq!(rule.judge(&file("C:/a.m4a", 10, ""), 2), Some(Book::Named));
@@ -168,17 +190,18 @@ mod tests {
     #[test]
     fn books_leave_the_music_while_audiobooks_is_on() -> Result<()> {
         let library = Library::in_memory()?;
-        let id = library.upsert_track(&file("C:/a.m4b", 40, "").track)?;
+        let id = library.upsert_track(&file("C:/Books/a.mp3", 40, "").track)?;
+        let on = json!({ "booksPage": true, "bookFolders": ["C:/Books"] });
         let read = || library.tracks().map(|songs| (songs[0].audiobook, songs[0].track.musicness));
         assert_eq!(read()?, (None, Some(Musicness::Music)));
         library.take_changes(10)?;
-        library.set_setting("ui", &json!({ "booksPage": true }))?;
+        library.set_setting("ui", &on)?;
         // The interface hears of it at its next read.
         let changes = library.take_changes(10)?.unwrap();
         assert_eq!(changes.tracks.iter().map(|song| (song.id, song.audiobook)).collect::<Vec<_>>(), [(id, Some(true))]);
         assert_eq!(read()?, (Some(true), Some(Musicness::NotMusic)));
         // Another setting: nothing to judge again.
-        library.set_setting("ui", &json!({ "booksPage": true, "language": "fr" }))?;
+        library.set_setting("ui", &json!({ "booksPage": true, "bookFolders": ["C:/Books"], "language": "fr" }))?;
         assert!(library.take_changes(10)?.unwrap().tracks.is_empty());
         // The user's word wins.
         library.db.execute("UPDATE tracks SET musicness = 'user:music' WHERE id = ?1", [id])?;

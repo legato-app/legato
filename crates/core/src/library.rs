@@ -203,8 +203,8 @@ pub struct LibraryTrack {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub key: Option<String>,
-    /// On the Audiobooks page, while Settings › Audiobooks is on (`audiobooks::BookRule`). One said to be a book is
-    /// judged not music too; a file only very long stays music.
+    /// An audiobook (`audiobooks::BookRule`): on the Audiobooks page while Settings › Audiobooks is on. One said to be a
+    /// book is judged not music too; a file only very long stays music. Off, an `.m4b` only.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub audiobook: Option<bool>,
