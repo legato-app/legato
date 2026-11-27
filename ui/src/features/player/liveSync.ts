@@ -45,7 +45,9 @@ export function useLiveSync() {
     if (perDevice) refreshOutputs()
   }, [perDevice])
   // This page owns the visualizer stream from the start: a worker left by a page before a reload is stopped.
-  useEffect(() => claimViz(), [])
+  useEffect(() => {
+    if (offered('visualizer')) claimViz()
+  }, [])
   // Twelfths: the engine's frames in 121 bands; the scopes: with their wave blocks (YouTube's through the wish below).
   useEffect(() => frames.setAsk({ fine, wave }), [fine, wave])
   useEffect(() => startLive(playing), [])

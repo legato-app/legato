@@ -824,7 +824,7 @@ export function SourcesView() {
         <LastfmRow />
         <ListenbrainzRow />
         {/* Discord's sign-in is the PC's only (the loopback page of its OAuth). */}
-        {!phoneApp && <DiscordAccount />}
+        {!phoneApp && offered('discord') && <DiscordAccount />}
         <ServerRow />
         <LocalFolders />
       </div>
