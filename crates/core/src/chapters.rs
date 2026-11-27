@@ -142,7 +142,9 @@ fn quicktime_chapters<R: Read + Seek>(r: &mut R, moov: &[u8]) -> Vec<Chapter> {
                 break 'chunks;
             }
             at.push(pos);
-            pos += size(at.len() - 1).unwrap_or(0) as u64;
+            // A forged offset, past what a file can hold: read no further.
+            let Some(next) = pos.checked_add(size(at.len() - 1).unwrap_or(0) as u64) else { break 'chunks };
+            pos = next;
         }
     }
     let (mut out, mut ticks) = (Vec::new(), 0u64);
@@ -409,25 +411,37 @@ pub(crate) mod tests {
         }
     }
 
+    /// A book holding these sample tables as its chapter track, and no sample.
+    fn forged_book(tables: &[Vec<u8>]) -> Vec<u8> {
+        let tkhd = |id: u32| boxed(b"tkhd", &[b32(0), b32(0), b32(0), b32(id), vec![0u8; 68]].concat());
+        let audio = boxed(b"trak", &[tkhd(1), boxed(b"tref", &boxed(b"chap", &b32(2)))].concat());
+        let text = boxed(b"trak", &[tkhd(2), boxed(b"mdia", &[boxed(b"mdhd", &[b32(0), b32(0), b32(0), b32(1000), b32(0)].concat()), boxed(b"minf", &boxed(b"stbl", &tables.concat()))].concat())].concat());
+        [boxed(b"ftyp", b"M4B \0\0\0\0M4B "), boxed(b"moov", &[audio, text].concat())].concat()
+    }
+
+    #[test]
+    fn a_forged_chunk_offset_at_the_end_of_all_offsets_stops_the_reading() {
+        // One chunk of three samples, 4 bytes each, starting 1 byte short of the last offset there is.
+        let file = forged_book(&[
+            boxed(b"stts", &[b32(0), b32(1), b32(3), b32(1000)].concat()),
+            boxed(b"stsc", &[b32(0), b32(1), b32(1), b32(3), b32(1)].concat()),
+            boxed(b"stsz", &[b32(0), b32(4), b32(3)].concat()),
+            boxed(b"co64", &[b32(0), b32(1), (u64::MAX - 1).to_be_bytes().to_vec()].concat()),
+        ]);
+        assert!(read_chapters(&mut Cursor::new(file)).is_empty());
+    }
+
     #[test]
     fn a_forged_chapter_table_of_empty_chunks_ends_at_once() {
         // 200 000 chunks of no sample, 200 000 runs to look through for each: walked in full, minutes of work.
         let n = 200_000u32;
         let runs: Vec<u8> = [b32(0), b32(n), b32(1), b32(0), b32(1)].into_iter().chain((1..n).map(|_| [b32(u32::MAX), b32(1), b32(1)].concat())).flatten().collect();
-        let stbl = boxed(
-            b"stbl",
-            &[
-                boxed(b"stts", &[b32(0), b32(1), b32(1), b32(1000)].concat()),
-                boxed(b"stsc", &runs),
-                boxed(b"stsz", &[b32(0), b32(4), b32(1)].concat()),
-                boxed(b"stco", &[b32(0), b32(n), (0..n).flat_map(|_| b32(0)).collect()].concat()),
-            ]
-            .concat(),
-        );
-        let tkhd = |id: u32| boxed(b"tkhd", &[b32(0), b32(0), b32(0), b32(id), vec![0u8; 68]].concat());
-        let audio = boxed(b"trak", &[tkhd(1), boxed(b"tref", &boxed(b"chap", &b32(2)))].concat());
-        let text = boxed(b"trak", &[tkhd(2), boxed(b"mdia", &[boxed(b"mdhd", &[b32(0), b32(0), b32(0), b32(1000), b32(0)].concat()), boxed(b"minf", &stbl)].concat())].concat());
-        let file = [boxed(b"ftyp", b"M4B \0\0\0\0M4B "), boxed(b"moov", &[audio, text].concat())].concat();
+        let file = forged_book(&[
+            boxed(b"stts", &[b32(0), b32(1), b32(1), b32(1000)].concat()),
+            boxed(b"stsc", &runs),
+            boxed(b"stsz", &[b32(0), b32(4), b32(1)].concat()),
+            boxed(b"stco", &[b32(0), b32(n), (0..n).flat_map(|_| b32(0)).collect()].concat()),
+        ]);
         let t = std::time::Instant::now();
         assert!(read_chapters(&mut Cursor::new(file)).is_empty());
         assert!(t.elapsed() < std::time::Duration::from_secs(5), "{:?}", t.elapsed());
