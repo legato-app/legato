@@ -112,7 +112,7 @@ jobs:
 
       # Legato Lite as `pnpm build:lite` builds it: the cut commands and their dependencies left out. Windows is enough.
       - if: (runner.os == 'Windows') && steps.scope.outputs.run != 'false'
-        run: cargo check -p legato --no-default-features --features lite
+        run: cargo clippy -p legato --no-default-features --features lite --all-targets -- -D warnings
         env:
           CARGO_NET_OFFLINE: true
 

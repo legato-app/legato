@@ -2,6 +2,7 @@ import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { api } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
+import { offered } from '../../shared/liteCuts'
 import { onScreen } from '../../shared/screen'
 import { loadSong, useEditor } from '../editor/editor'
 import { mergedText } from './merged'
@@ -17,7 +18,8 @@ export function startSyncMode(): () => void {
     if (text) useStore.getState().notify(text, { kind: 'info' })
     if (m.settings) void useSettings.getState().reload()
     void useStore.getState().refreshChanged()
-    if (m.edits) void loadSong(useEditor.getState().song)
+    // Edits from a full app stay in Lite's library, unread.
+    if (m.edits && offered('liveEditor')) void loadSong(useEditor.getState().song)
   })
   void api
     .syncStatus()

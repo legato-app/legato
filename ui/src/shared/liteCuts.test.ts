@@ -13,6 +13,7 @@ async function load(lite: boolean) {
     search: await import('../features/settings/search'),
     menus: await import('./ui/menuShape'),
     theme: await import('./theme/theme'),
+    books: await import('../features/books/books'),
   }
 }
 
@@ -77,6 +78,11 @@ describe('Legato Lite', () => {
     for (const kept of ['Sync Mode', 'Auto sync', 'Alarm']) expect(lite.cuts.isCutStarter(kept), kept).toBe(false)
   })
 
+  it('shows an audiobook among the music, having no Audiobooks page', () => {
+    const tracks = [{ audiobook: true, musicness: 'notMusic' }] as Parameters<Edition['books']['withoutBooks']>[0]
+    expect(lite.books.withoutBooks(tracks)).toBe(tracks)
+  })
+
   it('keeps what a full app saved: its switches and the keys of cut actions', () => {
     const saved = lite.theme.sanitize({ visualizer: true, podcasts: true, livingRoom: true, editor: true, shortcuts: { karaoke: { keys: 'KeyJ' } } })
     expect(saved).toMatchObject({ visualizer: true, podcasts: true, livingRoom: true, editor: true })
@@ -88,6 +94,7 @@ describe('Legato, the full app', () => {
   it('cuts nothing', async () => {
     const full = await load(false)
     expect(full.keys.OFFERED_ACTIONS).toEqual(full.keys.ACTIONS)
+    expect(full.books.withoutBooks([{ audiobook: true, musicness: 'notMusic' }] as Parameters<Edition['books']['withoutBooks']>[0])).toEqual([])
     expect(full.search.SETTINGS_INDEX.map((entry) => entry.label)).toContain('Podcasts')
     for (const page of listed(full, (cut) => cut.pages)) expect(full.cuts.isCutPage(page), page).toBe(false)
     for (const id of listed(full, (cut) => cut.menuItems)) expect(full.cuts.isCutMenuItem(id), id).toBe(false)
