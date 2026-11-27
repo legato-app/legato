@@ -331,6 +331,7 @@ function useYtmHome(on: boolean, mood: string | null) {
 function HomeFlow() {
   const track = useNowTrack()
   const blur = useSettings((s) => s.settings.backdropBlur)
+  const backdropMotion = useSettings((s) => s.settings.backdropMotion)
   const art = track ? trackArt(track)[0] : undefined
   const url = useBackdrop(art, Math.max(blur, 40))
   const [dim, setDim] = useState(BASE_DIM)
@@ -348,7 +349,7 @@ function HomeFlow() {
       live = false
     }
   }, [art, dark])
-  return <Backdrop url={url} dim={dim} motion flowing />
+  return <Backdrop url={url} dim={dim} motion={backdropMotion} flowing />
 }
 
 /** New from your artists: MusicBrainz asked once a day by Rust (`new_releases`), only while the section is on. */
