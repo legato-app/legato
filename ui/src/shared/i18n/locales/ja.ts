@@ -1765,6 +1765,7 @@ const ja: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'バージョン、主な設定、最新のエラーを、不具合報告用のテキストとして。何も送信されません。ログはこのPCにだけ残ります。「詳細を含める」を選ぶと、曲名、アカウント名、ファイルのパスが加わります。',
   'Include details': '詳細を含める',
   'Couldn’t copy the diagnostics': '診断情報をコピーできませんでした',
+  'Diagnostics saved: {file}': '診断情報を保存しました: {file}',
   'Something went wrong': '問題が発生しました',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'アプリで予期しないエラーが起きました。ライブラリには影響していません。再読み込みして続けてください。繰り返し起きる場合は、診断情報を不具合報告にコピーしてください。',
   'Reload': '再読み込み',

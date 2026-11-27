@@ -1765,6 +1765,7 @@ const hi: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'वर्शन, ज़रूरी सेटिंग और हाल की त्रुटियाँ, बग रिपोर्ट के लिए टेक्स्ट के रूप में। कुछ भी भेजा नहीं जाता: लॉग इसी PC पर रहता है। “विवरण शामिल करें” गानों के शीर्षक, अकाउंट के नाम और फ़ाइल पाथ जोड़ देता है।',
   'Include details': 'विवरण शामिल करें',
   'Couldn’t copy the diagnostics': 'डायग्नोस्टिक्स कॉपी नहीं हो सके',
+  'Diagnostics saved: {file}': 'डायग्नोस्टिक्स सहेजे गए: {file}',
   'Something went wrong': 'कुछ गड़बड़ हो गई',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'ऐप में एक अनपेक्षित त्रुटि आई। आपकी लाइब्रेरी को कुछ नहीं हुआ: आगे बढ़ने के लिए रीलोड करें। अगर यह बार-बार हो, तो डायग्नोस्टिक्स को बग रिपोर्ट में कॉपी करें।',
   'Reload': 'रीलोड करें',

@@ -538,4 +538,6 @@ export const api = {
   diagLog: (level: 'info' | 'warn' | 'error', area: string, message: string, detail?: string) => invoke<void>('diag_log', { level, area, message, detail }),
   /** Settings › About › Copy diagnostics: the text for a bug report. details = song titles, account names and paths too. */
   diagReport: (details: boolean) => invoke<string>('diag_report', { details }),
+  /** The whole log to a file the user picked. */
+  diagSave: (path: string, details: boolean) => invoke<void>('diag_save', { path, details }),
 }

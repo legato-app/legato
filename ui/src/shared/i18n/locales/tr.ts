@@ -1765,6 +1765,7 @@ const tr: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Sürümler, önemli ayarlar ve son hatalar, bir hata bildirimi için metin olarak. Hiçbir şey gönderilmez: günlük bu bilgisayarda kalır. “Ayrıntıları ekle” şarkı adlarını, hesap adlarını ve dosya yollarını ekler.',
   'Include details': 'Ayrıntıları ekle',
   'Couldn’t copy the diagnostics': 'Tanılama kopyalanamadı',
+  'Diagnostics saved: {file}': 'Tanılama bilgileri kaydedildi: {file}',
   'Something went wrong': 'Bir şeyler ters gitti',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'Uygulama beklenmeyen bir hatayla karşılaştı. Kitaplığına dokunulmadı: devam etmek için yeniden yükle. Tekrar olursa tanılamayı bir hata bildirimine kopyala.',
   'Reload': 'Yeniden yükle',

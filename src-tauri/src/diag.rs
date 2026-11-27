@@ -6,8 +6,9 @@
 use crate::AppState;
 use music_core::diag::{self as log, Level, Log, Who};
 use music_core::model::Connector;
-use std::io::Write;
-use std::path::Path;
+use std::fs::File;
+use std::io::{BufWriter, Write};
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::sync::mpsc::{Sender, channel};
 use std::time::{Duration, SystemTime};
@@ -159,6 +160,33 @@ fn labels(os: &str) -> (&'static str, &'static str) {
 /// no song title, account name or path holding the user's name does.
 #[tauri::command]
 pub async fn diag_report(state: State<'_, AppState>, details: bool) -> Result<String, String> {
+    let (facts, dir) = facts(&state, details);
+    tauri::async_runtime::spawn_blocking(move || {
+        flush();
+        let problems = log::recent(&dir, |e| e.level >= Level::Warn, 20);
+        log::report(SystemTime::now(), &facts, &problems, &dir, details, &Who::from_env())
+    })
+    .await
+    .map_err(|e| format!("The report failed: {e}"))
+}
+
+/// Settings › About › Save: the whole log to the file the user picked (`diag::write_all`).
+#[tauri::command]
+pub async fn diag_save(state: State<'_, AppState>, path: String, details: bool) -> Result<(), String> {
+    let (facts, dir) = facts(&state, details);
+    tauri::async_runtime::spawn_blocking(move || {
+        flush();
+        let mut file = BufWriter::new(File::create(path)?);
+        log::write_all(&mut file, SystemTime::now(), &facts, &dir, details, &Who::from_env())
+    })
+    .await
+    .map_err(|e| e.to_string())
+    .and_then(|written| written.map_err(|e| e.to_string()))
+    .map_err(|e| format!("The log couldn't be saved: {e}"))
+}
+
+/// What the report says before the log: versions, the settings that matter, who is signed in. And where the log is.
+fn facts(state: &AppState, details: bool) -> (Vec<(String, String)>, PathBuf) {
     let app = state.app.clone();
     let ui = state.lib().setting("ui").ok().flatten().unwrap_or_default();
     let mut signed_in = Vec::new();
@@ -180,13 +208,7 @@ pub async fn diag_report(state: State<'_, AppState>, details: bool) -> Result<St
     if details {
         facts.push(("Data folder".to_string(), dir.display().to_string()));
     }
-    tauri::async_runtime::spawn_blocking(move || {
-        flush();
-        let problems = log::recent(&dir, |e| e.level >= Level::Warn, 20);
-        log::report(SystemTime::now(), &facts, &problems, &dir, details, &Who::from_env())
-    })
-    .await
-    .map_err(|e| format!("The report failed: {e}"))
+    (facts, dir)
 }
 
 #[cfg(test)]

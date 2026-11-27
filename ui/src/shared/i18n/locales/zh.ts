@@ -1765,6 +1765,7 @@ const zh: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': '版本、重要设置和最近的错误，以文本形式用于错误报告。不会发送任何内容：日志只保存在这台电脑上。“包含详细信息”会加入歌曲标题、账号名称和文件路径。',
   'Include details': '包含详细信息',
   'Couldn’t copy the diagnostics': '无法复制诊断信息',
+  'Diagnostics saved: {file}': '诊断信息已保存：{file}',
   'Something went wrong': '出了点问题',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': '应用遇到了意外错误。你的音乐库没有受到影响：请重新加载以继续。如果问题反复出现，请把诊断信息复制到错误报告中。',
   'Reload': '重新加载',

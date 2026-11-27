@@ -1765,6 +1765,7 @@ const ru: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Версии, важные настройки и последние ошибки в виде текста для отчёта об ошибке. Ничего не отправляется: журнал остаётся на этом компьютере. «Включить подробности» добавляет названия песен, имена аккаунтов и пути к файлам.',
   'Include details': 'Включить подробности',
   'Couldn’t copy the diagnostics': 'Не удалось скопировать диагностику',
+  'Diagnostics saved: {file}': 'Диагностика сохранена: {file}',
   'Something went wrong': 'Что-то пошло не так',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'В приложении произошла непредвиденная ошибка. Твоя медиатека не затронута: перезагрузи, чтобы продолжить. Если это повторится, скопируй диагностику в отчёт об ошибке.',
   'Reload': 'Перезагрузить',

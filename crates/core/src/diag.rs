@@ -417,16 +417,34 @@ const REPORT_MAX: usize = 200_000;
 /// Room kept for the title of the report's last section.
 const TITLE_ROOM: usize = 160;
 
-/// The text Settings › About › Copy diagnostics puts in the clipboard. `facts` = "Version", "Windows"… rows from the
-/// shell; `problems` = the latest warnings and errors; then as many of the log's latest lines as still fit, from `dir`.
-/// Without `details`, what an error said (after the bar) stays out and the user's folder and name are hidden.
-pub fn report(now: SystemTime, facts: &[(String, String)], problems: &[Entry], dir: &Path, details: bool, who: &Who) -> String {
+/// What a report and a saved log start with.
+fn head(now: SystemTime, facts: &[(String, String)], details: bool) -> String {
     let mut out = format!("Legato diagnostics, {}\n", timestamp(now));
     out.push_str(if details { "Details: included (song titles, account names and file paths can appear)\n" } else { "Details: left out (song titles, account names and file paths)\n" });
     out.push('\n');
     for (name, value) in facts {
         out.push_str(&format!("{name}: {value}\n"));
     }
+    out
+}
+
+/// Settings › About › Save: the report's head, then every line the log holds (5 MB at most), oldest first, shown as
+/// the report shows it. One file read at a time.
+pub fn write_all(out: &mut impl Write, now: SystemTime, facts: &[(String, String)], dir: &Path, details: bool, who: &Who) -> io::Result<()> {
+    write!(out, "{}\nEvery line kept\n", head(now, facts, details))?;
+    for bytes in (0..FILES).rev().filter_map(|n| fs::read(file_path(dir, n)).ok()) {
+        for entry in String::from_utf8_lossy(&bytes).lines().filter_map(parse_line) {
+            writeln!(out, "{}", show(&entry, details, who))?;
+        }
+    }
+    out.flush()
+}
+
+/// The text Settings › About › Copy diagnostics puts in the clipboard. `facts` = "Version", "Windows"… rows from the
+/// shell; `problems` = the latest warnings and errors; then as many of the log's latest lines as still fit, from `dir`.
+/// Without `details`, what an error said (after the bar) stays out and the user's folder and name are hidden.
+pub fn report(now: SystemTime, facts: &[(String, String)], problems: &[Entry], dir: &Path, details: bool, who: &Who) -> String {
+    let mut out = head(now, facts, details);
     let problems: Vec<String> = problems.iter().map(|e| show(e, details, who)).collect();
     section(&mut out, &format!("Errors and warnings ({} latest)", problems.len()), &problems);
     let (lines, cut) = tail(dir, REPORT_MAX.saturating_sub(out.len() + TITLE_ROOM), |e| show(e, details, who));
@@ -725,6 +743,22 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let text = report(at(1_700_000_000, 0), &[], &[], dir.path(), true, &who());
         assert!(text.ends_with("Recent lines (0)\nnone\n"), "{text}");
+    }
+
+    #[test]
+    fn a_saved_log_holds_every_file_oldest_first() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut log = Log::with_limits(dir.path(), 300, 3);
+        for i in 0..40 {
+            log.append(&format_line("2026-10-30T12:00:00.000Z", Level::Info, "n", &i.to_string(), "a detail")).unwrap();
+        }
+        let mut saved = Vec::new();
+        write_all(&mut saved, at(1_700_000_000, 0), &[("Version".into(), "1.0.0".into())], dir.path(), false, &who()).unwrap();
+        let saved = String::from_utf8(saved).unwrap();
+        assert!(saved.starts_with("Legato diagnostics, ") && saved.contains("Version: 1.0.0\n\nEvery line kept\n") && !saved.contains("a detail"), "{saved}");
+        let numbers: Vec<u32> = saved.lines().filter_map(|l| l.split(' ').nth(3).filter(|_| l.starts_with("2026"))?.parse().ok()).collect();
+        assert!(numbers.len() > 4 && numbers.windows(2).all(|w| w[1] == w[0] + 1) && numbers.last() == Some(&39), "{numbers:?}");
+        assert_eq!(numbers.len(), recent(dir.path(), |_| true, usize::MAX).len());
     }
 
     #[test]

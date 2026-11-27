@@ -1707,6 +1707,7 @@ const ar: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'الإصدارات والإعدادات المهمة وآخر الأخطاء، كنص لتقرير خلل. لا يُرسل شيء: يبقى السجل على هذا الحاسوب. «تضمين التفاصيل» يضيف عناوين الأغاني وأسماء الحسابات ومسارات الملفات.',
   'Include details': 'تضمين التفاصيل',
   'Couldn’t copy the diagnostics': 'تعذّر نسخ التشخيصات',
+  'Diagnostics saved: {file}': 'حُفظت بيانات التشخيص: {file}',
   'Something went wrong': 'حدث خطأ ما',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'واجه التطبيق خطأ غير متوقع. مكتبتك لم تُمَسّ: أعد التحميل للمتابعة. إن تكرّر ذلك، انسخ التشخيصات إلى تقرير خلل.',
   'Reload': 'إعادة التحميل',

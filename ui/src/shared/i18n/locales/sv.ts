@@ -1765,6 +1765,7 @@ const sv: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Versioner, de viktiga inställningarna och de senaste felen, som text för en felrapport. Inget skickas: loggen stannar på den här datorn. ”Ta med detaljer” lägger till låttitlar, kontonamn och filsökvägar.',
   'Include details': 'Ta med detaljer',
   'Couldn’t copy the diagnostics': 'Det gick inte att kopiera diagnostiken',
+  'Diagnostics saved: {file}': 'Diagnostiken sparad: {file}',
   'Something went wrong': 'Något gick fel',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'Appen stötte på ett oväntat fel. Ditt bibliotek är orört: ladda om för att fortsätta. Händer det igen, kopiera diagnostiken till en felrapport.',
   'Reload': 'Ladda om',

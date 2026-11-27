@@ -1765,6 +1765,7 @@ const pt: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Versões, as configurações importantes e os últimos erros, como texto para um relatório de bug. Nada é enviado: o registro fica neste PC. “Incluir detalhes” adiciona títulos de músicas, nomes de contas e caminhos de arquivos.',
   'Include details': 'Incluir detalhes',
   'Couldn’t copy the diagnostics': 'Não foi possível copiar o diagnóstico',
+  'Diagnostics saved: {file}': 'Diagnóstico salvo: {file}',
   'Something went wrong': 'Algo deu errado',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'O app encontrou um erro inesperado. Sua biblioteca não foi afetada: recarregue para continuar. Se acontecer de novo, copie o diagnóstico em um relatório de bug.',
   'Reload': 'Recarregar',

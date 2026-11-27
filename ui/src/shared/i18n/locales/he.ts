@@ -1707,6 +1707,7 @@ const he: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'גרסאות, ההגדרות החשובות והשגיאות האחרונות, כטקסט לדיווח על באג. שום דבר לא נשלח: היומן נשאר במחשב הזה. ״הכללת פרטים״ מוסיפה שמות שירים, שמות חשבונות ונתיבי קבצים.',
   'Include details': 'הכללת פרטים',
   'Couldn’t copy the diagnostics': 'לא ניתן להעתיק את האבחון',
+  'Diagnostics saved: {file}': 'האבחון נשמר: {file}',
   'Something went wrong': 'משהו השתבש',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'האפליקציה נתקלה בשגיאה לא צפויה. הספרייה שלכם לא נפגעה: טענו מחדש כדי להמשיך. אם זה חוזר, העתיקו את האבחון לדיווח על באג.',
   'Reload': 'טעינה מחדש',

@@ -17,6 +17,8 @@ import { phoneApp } from '../../shared/platform'
 import { DESKTOP_ONLY } from './desktopOnly'
 import { ROW, ROW_TEXT } from './rowStyle'
 import { DISCUSSIONS, PRIVACY_PAGE, REPO } from '../../shared/links'
+import { notifyError } from '../../app/notifyError'
+import { saveFile } from '../../shared/files'
 
 // Status colors keep their meaning whatever the theme.
 const pill: Record<UpdateStatus['state'], { color: string; pulse?: boolean }> = {
@@ -104,6 +106,11 @@ export function AboutSection() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  const save = () =>
+    void saveFile({ defaultPath: `Legato diagnostics ${new Date().toISOString().slice(0, 10)}.txt`, filters: [{ name: tr('Diagnostics log'), extensions: ['txt'] }] }, (path) => api.diagSave(path, details)).then(
+      (file) => void (file && notify(tr('Diagnostics saved: {file}', { file }))),
+      notifyError,
+    )
   const state = status?.state ?? 'idle'
   const busy = state === 'checking' || state === 'downloading' || state === 'installing'
   const { color, pulse } = pill[state]
@@ -205,6 +212,9 @@ export function AboutSection() {
             </label>
             <Button variant="ghost" onClick={copy}>
               <Copy size={14} /> {copied ? tr('Copied') : tr('Copy')}
+            </Button>
+            <Button variant="ghost" onClick={save}>
+              <DownloadSimple size={14} /> {tr('Save')}
             </Button>
           </Row>
         </div>

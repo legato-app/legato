@@ -1765,6 +1765,7 @@ const vi: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Phiên bản, các cài đặt quan trọng và những lỗi gần nhất, dưới dạng văn bản cho báo cáo lỗi. Không có gì được gửi đi: nhật ký nằm lại trên PC này. “Bao gồm chi tiết” thêm tên bài hát, tên tài khoản và đường dẫn tệp.',
   'Include details': 'Bao gồm chi tiết',
   'Couldn’t copy the diagnostics': 'Không thể sao chép chẩn đoán',
+  'Diagnostics saved: {file}': 'Đã lưu chẩn đoán: {file}',
   'Something went wrong': 'Đã xảy ra sự cố',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'Ứng dụng gặp lỗi bất ngờ. Thư viện của bạn không bị ảnh hưởng: hãy tải lại để tiếp tục. Nếu lỗi cứ lặp lại, hãy sao chép chẩn đoán vào báo cáo lỗi.',
   'Reload': 'Tải lại',

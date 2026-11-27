@@ -186,6 +186,10 @@ the order; a line leaves only when it ships or the user drops it.
     whole lines, the oldest left out. Tests only, not tried for real (Android’s clipboard included).
     - Decided alone (2026-11-27): the 12 “Recent events” gave way to these lines, errors repeated among them; the
       report says where the older ones are only when some were left out.
+  - [x] Slice 2 (2026-11-27): Settings › About › Save writes the whole log (head, then every line kept, oldest first)
+    to the picked file, phone included (`diag_save`). Tests in core; neither button nor phone tried for real.
+    - Decided alone (2026-11-27): the button says “Save” beside Copy and shares its “Include details” box; the file
+      is named “Legato diagnostics <date>.txt” (UTC date).
 - [x] `M` Screen off on the phone: our extras rest (the visualizer's analysis, our own animation and polling loops), YouTube's player untouched (the owner, 2026-11-19). Sonnet: `9dce33b9`, `306de9a3`, `cbec7f0c`. Not seen on a phone yet.
 - [x] `M` The update between two songs does not seem to happen: find why (the owner, 2026-11-19: "le fameux truc de update entre deux song a pas l'air de marcher"). Opus, `f164d866`. The PC already worked; the phone now waits for the song's end; INFO lines in the log. Not tried on the phone.
 - [x] `S` One « More… » per right-click menu, never two (`5ae44406`).

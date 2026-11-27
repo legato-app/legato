@@ -1765,6 +1765,7 @@ const id: Record<string, string> = {
   'Versions, the settings that matter and the latest errors, as text for a bug report. Nothing is sent: the log stays on this PC. “Include details” adds song titles, account names and file paths.': 'Versi, pengaturan yang penting, dan kesalahan terbaru, sebagai teks untuk laporan bug. Tidak ada yang dikirim: log tetap di PC ini. “Sertakan detail” menambahkan judul lagu, nama akun, dan jalur file.',
   'Include details': 'Sertakan detail',
   'Couldn’t copy the diagnostics': 'Diagnostik tidak bisa disalin',
+  'Diagnostics saved: {file}': 'Diagnostik disimpan: {file}',
   'Something went wrong': 'Terjadi masalah',
   'The app hit an unexpected error. Your library isn’t touched: reload to carry on. If it keeps happening, copy the diagnostics into a bug report.': 'Aplikasi mengalami kesalahan tak terduga. Koleksimu tidak tersentuh: muat ulang untuk melanjutkan. Jika terus terjadi, salin diagnostik ke laporan bug.',
   'Reload': 'Muat ulang',
