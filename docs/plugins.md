@@ -47,7 +47,8 @@ no `legato.manifest`, and it still works:
 - `main`: a `.js` file next to the manifest, 2 MB at most.
 - `tags`: optional, 5 words at most (20 characters each), shown on the plugin's card.
 - `icon`: optional, a PNG next to the manifest, 256 KB and 512 × 512 pixels at most, shown on the plugin's card and in
-  its details once installed. One over the limits (or not a PNG) is not shown. Older versions of Legato pass over it.
+  its details once installed. A wrong name, a file over the limits or not a PNG: the plugin runs without a picture.
+  Older versions of Legato pass over it.
 - `homepage`, `repository`: https links, optional: the buttons at the bottom of the plugin's details (a repository on
   GitHub also gets a star button).
 

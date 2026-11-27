@@ -62,7 +62,7 @@ impl Manifest {
 
     /// Parsed and checked: fields in bounds, known permissions, main file a plain name.
     pub fn parse(json: &str) -> Result<Self> {
-        let m: Manifest = serde_json::from_str(json).map_err(|e| anyhow::anyhow!("manifest: {e}"))?;
+        let mut m: Manifest = serde_json::from_str(json).map_err(|e| anyhow::anyhow!("manifest: {e}"))?;
         ensure!(id_ok(&m.id), "manifest: id must be 3-64 characters: a-z, 0-9, dots and dashes");
         ensure!(!m.name.trim().is_empty() && m.name.chars().count() <= 60, "manifest: name must be 1-60 characters");
         ensure!(!m.author.trim().is_empty() && m.author.chars().count() <= 60, "manifest: author must be 1-60 characters");
@@ -73,9 +73,8 @@ impl Manifest {
             bail!("This plugin needs a newer version of Legato (plugin API {}, this app has {API})", m.api);
         }
         ensure!(m.main.ends_with(".js") && !m.main.contains(['/', '\\']) && !m.main.starts_with('.') && m.main.len() <= 64, "manifest: main must be a .js file next to the manifest");
-        if let Some(icon) = &m.icon {
-            ensure!(icon.to_ascii_lowercase().ends_with(".png") && !icon.contains(['/', '\\', ':']) && !icon.starts_with('.') && icon.len() <= 64, "manifest: icon must be a .png file next to the manifest");
-        }
+        // A .png next to the manifest, else no picture.
+        m.icon = m.icon.filter(|icon| icon.to_ascii_lowercase().ends_with(".png") && !icon.contains(['/', '\\', ':']) && !icon.starts_with('.') && icon.len() <= 64);
         ensure!(m.tags.len() <= 5 && m.tags.iter().all(|tag| !tag.trim().is_empty() && tag.chars().count() <= 20), "manifest: tags must be 5 at most, 1-20 characters each");
         ensure!(m.permissions.len() <= 32, "manifest: too many permissions");
         for p in &m.permissions {
@@ -133,8 +132,9 @@ mod tests {
     #[test]
     fn an_icon_is_a_png_next_to_the_manifest_and_unknown_fields_pass() {
         assert_eq!(Manifest::parse(&json(r#","icon":"My Icon.PNG""#)).unwrap().icon.as_deref(), Some("My Icon.PNG"));
+        // A picture the app can't take is passed over: the plugin stays.
         for bad in ["icon.svg", "../icon.png", "art/icon.png", "C:icon.png", ".png"] {
-            assert!(Manifest::parse(&json(&format!(r#","icon":"{bad}""#))).is_err(), "{bad}");
+            assert_eq!(Manifest::parse(&json(&format!(r#","icon":"{bad}""#))).unwrap().icon, None, "{bad}");
         }
         // How an older app reads a newer manifest: what it doesn't know, it passes over.
         assert!(Manifest::parse(&json(r#","mascot":"cat.png""#)).is_ok());
