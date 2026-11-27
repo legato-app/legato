@@ -60,7 +60,9 @@ export function withNotes(text, version, notes, name = 'latest.json') {
   const file = JSON.parse(text)
   const platforms = Object.values(file.platforms ?? {})
   if (String(file.version).replace(/^v/, '') !== version || !platforms.length || platforms.some((p) => !p?.url || !p?.signature)) {
-    throw new Error(`${name} of v${version} is not a complete updater file`)
+    // A broken Lite file holds the full app back too: say the way out (the full app then promotes, the Lite stays put).
+    const wayOut = name === 'latest-lite.json' ? `; to promote the full app without the Lite, delete latest-lite.json from v${version}'s assets and run again` : ''
+    throw new Error(`${name} of v${version} is not a complete updater file${wayOut}`)
   }
   return `${JSON.stringify({ ...file, notes }, null, 2)}\n`
 }

@@ -65,6 +65,11 @@ describe('promote', () => {
     expect(() => withNotes('{}', '1.0.11', 'x', 'latest-lite.json')).toThrow('latest-lite.json of v1.0.11 is not a complete')
   })
 
+  it("names the way out of a broken Lite file, which also holds the full app back", () => {
+    expect(() => withNotes('{}', '1.0.11', 'x', 'latest-lite.json')).toThrow("delete latest-lite.json from v1.0.11's assets")
+    expect(() => withNotes('{}', '1.0.11', 'x')).not.toThrow('delete')
+  })
+
   it("promotes the Lite's updater file beside the full app's, when the release has one", () => {
     expect(updaterFiles(['Legato_1.2.5_x64-setup.exe', 'latest.json', 'Legato.Lite_1.2.5_x64-setup.exe', 'latest-lite.json'])).toEqual(['latest.json', 'latest-lite.json'])
     // A beta from before the Lite, or whose Lite build failed.
