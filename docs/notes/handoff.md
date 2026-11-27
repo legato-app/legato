@@ -5,32 +5,39 @@ you need. Private notes are `docs/notes/report*.md`, on the PC that wrote them o
 
 Where the work stands, for a session with no history here. Read this first, then only the parts of
 [plan-v2.md](plan-v2.md) you need. Rewrite it, short, when a branch, a release or the next step changes; older
-versions are in git. Updated 2026-11-27 (after night window 2).
+versions are in git. Updated 2026-11-27 (after night window 3).
 
 ## Where things stand
 - **Repository**: `legato-app/legato`. **master** on origin = `4de9fe17`, the Beta v1.2.333 (2026-11-26). **platforms** is
-  57 commits ahead of origin/master; **origin/platforms** = `bb706e79` (pushed, lot 14 included; `check` runs on each push).
-  The local `master` checkout lags: use `origin/master`.
-  Work goes to master by push only, on the owner's word.
+  81 commits ahead of origin/master; **origin/platforms** = `21dd300d` (pushed; `check` runs on each push). The local
+  `master` checkout lags: use `origin/master`. Work goes to master by push only, on the owner's word.
 - **Last Beta**: v1.2.333 = `4de9fe17`. Before it, v1.2.298 = `a4412ea1`. Stable **1.2.10** (2026-11-14).
-- **Beta rule**: a Beta every 30 points (S = 1, M = 2, L = 3). Since v1.2.333: **22 points** (ticked lines in
-  `plan-v2.md`; the theme `L` counts once, its slices inside it).
-- **Themes**: the layout is in v1; the `L` line is ticked (`bed4beab`). Slices 1-13 landed (`75ce0116` to `491572ed`):
-  a theme's named plugin is a panel surface `plugin:<id>`, at most two, only for an installed plugin granted `ui`.
-- **Library**: Songs, Albums, Artists and Playlist load on demand (`afc5d6f3`); the launch JS is 320 of 340 kB gzip.
-  The start screen is Home until the settings are in, then the chosen view, only while nothing was visited (`ecc854b7`).
-- **Episodes**: a numbered episode is not music, and a doubt never seeds a Like mix (`16590b39`, `83432244`).
-- **Diagnostics**: Copy carries up to 200 KB of recent lines; Settings › About › Save writes the whole log. Stalls,
-  update sizes, sync merges and output changes are logged (`82cf5a5b`, `c08b6de8`, `36c5d373`, `37eddb41`, `fafbe844`).
-- **Equalizer per output**: built (`8fc31212`), its tests in `329a89f5`. AutoEQ profiles are a separate open line.
-- **Spotify disconnect**: one question, a backup first; removes the imported playlists and the songs only Spotify
-  holds; an older Liked Songs list stays (`ae9f7a42`, `dd0e5682`, `f062be31`). A synced PC still brings the songs back:
-  a new open line.
-- **Duplicates**: the audit's clusters 1-6, 8, 10 and 11 are done. Clusters 7, 9, 12, 13 and 14 are left on purpose
-  (tried and left, or not worth the lines).
-- **Signing**: done. The bundled Discord Presence is signed (`8e3115f5`), and `legato-app/discord-presence` is 1.0.1
-  signed (`fc82a16`). The card shows "Verified" in the next Beta.
-- **pnpm**: one version, 11.9.0, pinned by `packageManager` (`9d480d25`).
+- **Beta rule**: a Beta every 30 points (S = 1, M = 2, L = 3). Since v1.2.333: **33 points**, so the Beta is ready on the
+  owner's word. Counted from the ticked lines in `plan-v2.md`; the theme `L` counts once, its slices inside it.
+- **Audiobooks** (`crates/core/src/audiobooks.rs`): with Audiobooks on, a `.m4b`, a marked folder, a file of 2 h or more,
+  or a tagged file of 10 min or more is a book, out of Songs, mixes, radio, blind test, Like seeds and stats. A `.m4a`
+  with two or more chapters and 10 min is a book too (schema v26, `tracks.chapters`, counted at the scan). A `.m4b`
+  stays out of the music with Audiobooks off. Albums, Artists, Home and search leave books out.
+- **Sync Mode and Spotify disconnect**: a disconnect records each song that left (`import-left`); another PC's
+  disconnect takes its songs here. A Spotify re-import, an add by hand or a like writes `import-back`, which brings
+  the song back. No schema or `FORMAT` bump; an older peer keeps and resends the new kinds (`docs/sync-mode.md`).
+- **Blind test**: the time to answer is 10, 20, 30 or 60 s, restarts with each game; a playlist too small for a game says
+  so; plural forms per language.
+- **Crossfade**: a refused embed and a stopped tail no longer keep sounding once the watch page takes over (`8ec371cc`,
+  `1f7b3669`).
+- **Plugin icons**: a manifest `icon` (a PNG in the plugin's folder, 256 KB, 512 px at most), checked in Rust, served
+  through the `art` scheme; no icon means the card is unchanged.
+- **Site**: `motion` is `^14.14.0`, one copy with `fumadocs-ui`; `pages.yml` rebuilds the site only for the documents it
+  includes and `package.json` / `pnpm-lock.yaml`.
+- **Library**: Songs, Albums, Artists and Playlist load on demand; the launch JS is 321 of 340 kB gzip.
+- **Themes**: layout v1, slices 1-13 landed, the `L` line ticked; a theme's named plugin is a panel surface
+  `plugin:<id>`, at most two, only for an installed plugin granted `ui`.
+- **Spotify disconnect**: one question, a backup first; removes the imported playlists and the songs only Spotify holds;
+  an older Liked Songs list stays.
+- **Signing**: done. The bundled Discord Presence is signed, and `legato-app/discord-presence` is 1.0.1 signed. The card
+  shows "Verified" in the next Beta.
+- **pnpm**: one version, 11.9.0, pinned by `packageManager`.
+- **Duplicates**: the audit's clusters 1-6, 8, 10 and 11 are done. Clusters 7, 9, 12, 13 and 14 are left on purpose.
 - **Discord presence** is a plugin: the bundled copy in `examples/plugins/discord-presence` and the public repo
   `legato-app/discord-presence` (MIT, API 2).
 - **Docs site**: Fumadocs, static search at `/legato/api/search`. A `site` job in `check.yml` builds it on every check.
@@ -39,37 +46,40 @@ versions are in git. Updated 2026-11-27 (after night window 2).
 - **Stable**: only on the owner's word, never on a Beta's green CI.
 
 ## Not tried for real
-- A theme with a plugin panel in the installed app (only a demo with an invented plugin).
-- A real YouTube video with a moved player bar; right-to-left; the installed app.
-- Episodes on a real library (a web series may now disappear from it).
-- Copy and Save diagnostics on a phone (the clipboard's 200 KB limit is a lead).
-- A stall or a phone leaving the screen on a phone; the Windows default-output change; headphones with EQ per output.
-- The settings search with accents (NFKD folding); the copy field of the Spotify wizard and of a room's link.
-- Android is not compiled by `check.yml` on platforms; the owner decides whether to add it (CI time).
-- The first `check` and `release.yml` runs with pnpm 11.9.0.
+- Two PCs in Sync Mode with a Spotify disconnect, and an `import-back` on the second PC.
+- The blind test's timer in the installed app.
+- A folder of `.m4b` and `.m4a` books, with Audiobooks on and off (the folder chip is not seen on screen; the demo has no
+  folders). `.mp4` chapters are not read: scans take no video container.
+- A plugin with an icon, in the installed app.
+- A crossfade with real YouTube embeds.
+- The site build with `motion` 14.14.0 (the next `pages` run is the proof).
+- Android: `check.yml` does not compile it on platforms; the owner decides whether to add it (CI time).
+
+## Known limits
+- Sync: a PC whose clock is slower than an earlier `import-back` still loses to it; not changed.
+- Sync: after an update (a restart), every file is merged again once, so the sweep runs then.
 
 ## Next, in order
-1. **The owner's Beta push**, once 30 points are reached (22 now): `git push origin platforms:master`, after a `pnpm dev`
-   check of the default layout (a YouTube video through the player bar, the sidebar's resize, an album, an artist, a
-   playlist, the right-click menus). On the owner's word only.
+1. **The owner's Beta push**, now that 33 points are reached: `git push origin platforms:master`, after a `pnpm dev`
+   check (the default layout, a YouTube video through the player bar, an album, an artist, the right-click menus, a
+   book folder with Audiobooks on and off, the blind test timer). On the owner's word only. **The head must not carry
+   `[skip release]`**: the current head is the `[skip release]` handoff commit, so a fresh commit on top comes first.
 2. **Lite build**: plan-v2's `L` line "A Lite build next to the full one". Its design waits for the owner's yes before
    any slice. CLAUDE.md's "identifier exactly `app.legato.desktop`" changes with it: the owner's wording.
-3. **Sync Mode carries the Spotify-disconnect removal** (`M`, new): a record kind of its own, so the removed songs stay
-   removed on synced PCs without deleting their unsynced history.
-4. **AutoEQ profiles** (`S`): check the measurement data's licence first.
-5. **Plugin pictures**, after the 2 Dec reset: an optional manifest `icon`, verified authors only (`M`).
-6. **Open plan lines**, by title (numbers move): "Songs old mixes dropped" (`S`, a "Clean up songs" with undo),
-   "Reordering a music server's playlist" (`S`), "Plex album gain" (`S`, to check on a real server), "The remaining JSX moved into one component",
-   and "Code quality" (`L`, clusters 7, 9, 12, 13 and 14 left).
-7. **Profiles on one PC**: plan-v2's `M-L` line, design first; the owner reconfirms the launch picker.
-8. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
-9. **Small leftovers from the reviews** (LOW, not planned yet): episode doubts on "Stories" bands and "lofi beats mix ep. 3"
-   (`musicness.rs:86-87`); a theme saved by an older Legato loses its `plugin:` panel; the Hindi settings search loosens;
-   the Windows default-output row text.
+3. **Plugin author's picture** (`S`, open): verified authors only; no picture file exists yet, the owner gives it.
+4. **Blind test on several devices, LAN** (`M`, open): rounds, turns and scores in step; a sync design first.
+5. **Crossfade**: a video refused before and reached by an overlap plays another upload (`S`, open, not reproduced).
+6. **Plex album gain** (`S`, open): check on a real server whether `gain` ≈ −18 − `loudness`.
+7. **Open plan lines**, by title: "Songs old mixes dropped" (`S`), "Reordering a music server's playlist" (`S`), "AutoEQ
+   profiles for known headphones" (`S`, licence first), "Hide explicit songs" (`S`, untried), "Share page: no covers and
+   no player yet" (`S`), "The remaining JSX moved into one component", and "Code quality" (`L`, clusters 7, 9, 12, 13 and
+   14 left).
+8. **Profiles on one PC**: plan-v2's `M-L` line, design first; the owner reconfirms the launch picker.
+9. **Site and docs follow-ups** (plan-v2, after "The website made beautiful").
 
 ## Waiting on the owner
-Waiting on the owner's answer: the Spotify legal questions, keeping the profiles launch picker, the Lite design, the
-AutoEQ data licence, and whether Android joins `check.yml` on platforms.
+The Spotify legal questions, keeping the profiles launch picker, the Lite design, the AutoEQ data licence, whether Android
+joins `check.yml` on platforms, and the plugin author's picture file.
 
 ## Facts to keep
 - **Playback**: external music plays through YouTube only; Spotify only reads playlists (`6a1c285e`). Local files and
