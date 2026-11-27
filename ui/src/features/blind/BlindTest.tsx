@@ -35,6 +35,8 @@ export function BlindTest() {
   const [scores, setScores] = useState([0])
   // Time to answer each round, kept while the game is open.
   const [answerSeconds, setAnswerSeconds] = useState(DEFAULT_ANSWER_SECONDS)
+  // Games of this opening: a new one restarts the answer clock, even on the same song.
+  const [gameNumber, setGameNumber] = useState(0)
   const done = round >= game.length
   const current = game[round]
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -77,6 +79,7 @@ export function BlindTest() {
   }
   const again = (by = artists, n = players) => {
     setGame(make(by))
+    setGameNumber((games) => games + 1)
     setRound(0)
     setAnswer(null)
     setScores(Array<number>(n).fill(0))
@@ -158,7 +161,7 @@ export function BlindTest() {
             )}
           </div>
           <h2 className="text-2xl font-black">{answer === null ? (artists ? tr('Which artist is playing?') : tr('Which song is playing?')) : answer === right ? tr('Correct!') : tr('It was “{title}” by {artist}', { title: current.song.title, artist: current.song.artist })}</h2>
-          {answer === null && <span aria-hidden key={`${current.song.id}-${answerSeconds}`} className="h-0.5 w-full max-w-xl origin-left rounded-full bg-accent" style={{ animation: `blind-clock ${answerSeconds}s linear forwards` }} />}
+          {answer === null && <span aria-hidden key={`${gameNumber}-${round}`} className="h-0.5 w-full max-w-xl origin-left rounded-full bg-accent" style={{ animation: `blind-clock ${answerSeconds}s linear forwards` }} />}
           <ul className="flex w-full max-w-xl flex-col gap-2">
             {current.choices.map((c, i) => (
               <li key={c.id}>
