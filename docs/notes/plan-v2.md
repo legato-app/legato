@@ -38,6 +38,9 @@ the order; a line leaves only when it ships or the user drops it.
       them as removed, as Remove from library does, was left: it would delete them from the other PCs with their plays and
       playlists there, and a later Spotify import would skip them; doing it right needs a new kind of record in the sync
       files.
+- [ ] `M` Sync Mode carries the Spotify-disconnect removal: a synced PC brings the removed songs back today. Recording them
+      as `removed` would also delete the other PCs’ unsynced history and playlists, so it needs a record kind of its own
+      (night window 2, 2026-11-27).
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et
