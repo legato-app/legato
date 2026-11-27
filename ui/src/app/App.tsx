@@ -50,7 +50,7 @@ import { isShareCode } from '../features/share/shareCode'
 import { Logo } from '../shared/ui/Logo'
 import { searchShift } from './searchShift'
 import { useSettings } from './settings'
-import { dropLayout, useShellLayout } from './shellLayout'
+import { dropLayout, useNowPlayingPages, useShellLayout } from './shellLayout'
 import { LayoutBoundary } from './LayoutBoundary'
 import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, type PartsChoice, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
@@ -377,6 +377,7 @@ export function App() {
 
   // Where the theme puts the shell's parts (its own arrangement without a layout).
   const placement = useShellLayout()
+  const nowPlayingPages = useNowPlayingPages(placement.pages)
   const shell = layoutRegions(placement, full)
   // Open wide, the library stands in for the page: only with a sidebar to hold it.
   const sidebarShown = shell.regions.left.includes('sidebar') || shell.regions.right.includes('sidebar')
@@ -456,7 +457,7 @@ export function App() {
       <VolumeHud />
       {full && (
         <PageBoundary fallback={null}>
-          <PageLayout.Provider value={placement.pages}>
+          <PageLayout.Provider value={nowPlayingPages}>
             <NowPlaying />
           </PageLayout.Provider>
         </PageBoundary>
