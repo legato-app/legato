@@ -37,6 +37,11 @@ const NOTHING_OF_THE_USERS: &str = "t.id NOT IN (SELECT track_id FROM plays)
     AND coalesce(t.musicness, '') NOT LIKE 'user:%'
     AND t.explicit != 2";
 
+/// A Spotify song's key in the sync records of a disconnect.
+fn left_key(spotify_id: &str) -> String {
+    format!("spotify:{spotify_id}")
+}
+
 /// Removes the copies made before a cleanup that are `older_than` or more: they hold the listening history too.
 /// Returns how many.
 pub fn remove_cleanup_backups(library: &Path, older_than: std::time::Duration) -> Result<usize> {
@@ -117,8 +122,8 @@ impl Library {
     }
 
     /// Spotify's account disconnected, on the user's word: its imported playlists go, recorded as gone so Sync Mode
-    /// removes them from the other PCs too, with the songs only Spotify knows that nothing else holds. The songs aren't
-    /// recorded as removed: a later import brings them back.
+    /// removes them from the other PCs too, with the songs only Spotify knows that nothing else holds. Those songs are
+    /// recorded as left, not as removed: a later import brings them back.
     pub fn remove_spotify_imports(&self) -> Result<CleanedUp> {
         self.tx(|| {
             let theirs: Vec<(i64, String)> = {
@@ -131,6 +136,13 @@ impl Library {
             for (id, source_id) in &theirs {
                 self.db.execute("DELETE FROM playlists WHERE id = ?1", [id])?;
                 self.gone("playlist", &format!("spotify:{source_id}"))?;
+            }
+            let left: Vec<String> = {
+                let mut stmt = self.db.prepare("SELECT source_id FROM track_ids WHERE source = 'spotify' AND track_id IN (SELECT value FROM json_each(?1))")?;
+                stmt.query_map([ids_json(songs.iter().copied())], |row| row.get(0))?.collect::<rusqlite::Result<_>>()?
+            };
+            for spotify_id in left {
+                self.gone("import-left", &left_key(&spotify_id))?;
             }
             Ok(CleanedUp { playlists: theirs.len(), songs: self.delete_songs(songs)? })
         })
@@ -204,6 +216,10 @@ mod tests {
         assert_eq!(left, ["favourite", "kept", "liked", "matched", "played", "video only"]);
         let lists: Vec<i64> = lib.playlists()?.into_iter().map(|p| p.id).collect();
         assert!(!lists.contains(&imported) && lists.contains(&mine) && lists.contains(&favourites) && lists.len() == 3);
+        // Recorded for Sync Mode: the list, and a row for each song that left, none for the ones that stay.
+        let recorded: Vec<(String, String)> = lib.db.prepare("SELECT kind, key FROM sync_gone ORDER BY key")?.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
+        let expected = [("import-left", "spotify:listed"), ("import-left", "spotify:loose"), ("playlist", "spotify:p1")];
+        assert_eq!(recorded, expected.map(|(kind, key)| (kind.to_string(), key.to_string())));
         assert_eq!(lib.remove_spotify_imports()?, CleanedUp::default());
         Ok(())
     }

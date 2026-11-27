@@ -1220,7 +1220,7 @@ const zh: Record<string, string> = {
   'Imported from Spotify': '从 Spotify 导入',
   'Open Spotify': '打开 Spotify',
   'This PC is also signed out of Spotify’s page.': '此电脑也会退出 Spotify 网页的登录。',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': '它们会从这台电脑上移除；仍连接 Spotify 的电脑会带回播放列表，与这台电脑同步的电脑会带回歌曲。',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': '它们会从这台电脑以及与之同步的电脑上移除。仍连接 Spotify 的电脑会把它们带回来；另一台电脑上的旧版 Legato 会保留歌曲，直到更新为止。',
   'Also remove what Spotify brought?': '同时移除来自 Spotify 的内容？',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': '从 Spotify 导入的播放列表（“Liked Songs”除外）会被移除，连同只有 Spotify 收录、且你从未喜欢、播放、评分或加入其他播放列表的歌曲。移除前会先备份你的音乐库。',
   'Discord presence: your plugin is in Add-ons': 'Discord 状态：你的插件在附加组件中',

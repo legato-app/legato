@@ -1220,7 +1220,7 @@ const hi: Record<string, string> = {
   'Imported from Spotify': 'Spotify से इंपोर्ट की गई',
   'Open Spotify': 'Spotify खोलें',
   'This PC is also signed out of Spotify’s page.': 'यह PC Spotify के पेज से भी साइन आउट हो गया है।',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'ये इस PC से हटते हैं; Spotify से जुड़ा कोई PC प्लेलिस्ट वापस लाता है, और इस PC से सिंक होने वाला PC गाने वापस लाता है।',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': 'ये इस PC से और इसके साथ सिंक होने वाले PC से हटते हैं। Spotify से अभी भी जुड़ा PC इन्हें वापस ले आता है; किसी दूसरे PC पर पुराना Legato अपडेट होने तक गाने रखता है।',
   'Also remove what Spotify brought?': 'Spotify से आई चीज़ें भी हटाएं?',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify से आयात की गई प्लेलिस्ट हटेंगी (Liked Songs को छोड़कर), साथ में वे गाने भी जिन्हें सिर्फ़ Spotify जानता है और जिन्हें आपने कभी पसंद, चलाया, रेट या किसी दूसरी प्लेलिस्ट में नहीं डाला। पहले आपकी लाइब्रेरी की एक प्रति बनती है।',
   'Discord presence: your plugin is in Add-ons': 'Discord प्रेज़ेंस: आपका प्लगइन ऐड-ऑन में है',

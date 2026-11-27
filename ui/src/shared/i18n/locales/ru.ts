@@ -1220,7 +1220,7 @@ const ru: Record<string, string> = {
   'Imported from Spotify': 'Импортировано из Spotify',
   'Open Spotify': 'Открыть Spotify',
   'This PC is also signed out of Spotify’s page.': 'Этот компьютер также выходит из аккаунта на странице Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Они удаляются на этом ПК; ПК, всё ещё подключённый к Spotify, вернёт плейлисты, а ПК, синхронизированный с этим, вернёт песни.',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': 'Они удаляются с этого ПК и с ПК, синхронизированных с ним. ПК, всё ещё подключённый к Spotify, вернёт их; старая версия Legato на другом ПК сохранит песни до обновления.',
   'Also remove what Spotify brought?': 'Удалить и то, что добавил Spotify?',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Удаляются плейлисты, импортированные из Spotify (кроме Liked Songs), и песни, известные только Spotify, которые вы никогда не лайкали, не слушали, не оценивали и не добавляли в другой плейлист. Сначала создаётся копия медиатеки.',
   'Discord presence: your plugin is in Add-ons': 'Статус в Discord: ваш плагин в разделе «Дополнения»',

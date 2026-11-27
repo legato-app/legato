@@ -1220,7 +1220,7 @@ const sv: Record<string, string> = {
   'Imported from Spotify': 'Importerad från Spotify',
   'Open Spotify': 'Öppna Spotify',
   'This PC is also signed out of Spotify’s page.': 'Den här datorn loggas också ut från Spotifys sida.',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'De tas bort på den här datorn; en dator som fortfarande är ansluten till Spotify tar tillbaka spellistorna, och en dator som synkas med den här tar tillbaka låtarna.',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': 'De tas bort från den här datorn och datorerna som synkas med den. En dator som fortfarande är ansluten till Spotify tar tillbaka dem; ett äldre Legato på en annan dator behåller låtarna tills det uppdateras.',
   'Also remove what Spotify brought?': 'Ta även bort det som kom från Spotify?',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spellistorna som importerats från Spotify tas bort, utom Liked Songs, med de låtar som bara Spotify känner till och som du aldrig gillat, spelat, betygsatt eller lagt i en annan spellista. Först görs en kopia av ditt bibliotek.',
   'Discord presence: your plugin is in Add-ons': 'Discord-närvaro: ditt tillägg finns under Tillägg',

@@ -128,7 +128,7 @@ impl Snapshot {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Gone {
-    /// playlist / removed / edit / history.
+    /// playlist / removed / edit / history / import-left (`library::cleanup`). Unknown kinds are kept and sent on.
     pub kind: String,
     pub key: String,
     pub at: i64,

@@ -1220,7 +1220,7 @@ const ja: Record<string, string> = {
   'Imported from Spotify': 'Spotify から読み込み',
   'Open Spotify': 'Spotify を開く',
   'This PC is also signed out of Spotify’s page.': 'この PC は Spotify のページからもサインアウトします。',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'この PC から削除されます。Spotify に接続したままの PC はプレイリストを、この PC と同期している PC は曲を元に戻します。',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': 'この PC と、この PC と同期している PC から削除されます。Spotify に接続したままの PC があると元に戻ります。別の PC の古い Legato は、更新するまで曲を残します。',
   'Also remove what Spotify brought?': 'Spotify から取り込んだものも削除しますか？',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify から取り込んだプレイリスト（Liked Songs を除く）と、Spotify にしかなく、一度もお気に入り・再生・評価・他のプレイリストへの追加をしていない曲が削除されます。先にライブラリのコピーを作成します。',
   'Discord presence: your plugin is in Add-ons': 'Discord の表示：お使いのプラグインはアドオンにあります',

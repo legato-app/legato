@@ -1185,7 +1185,7 @@ const ar: Record<string, string> = {
   'Imported from Spotify': 'مستوردة من Spotify',
   'Open Spotify': 'فتح Spotify',
   'This PC is also signed out of Spotify’s page.': 'تم أيضًا تسجيل خروج هذا الكمبيوتر من صفحة Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'تُزال من هذا الكمبيوتر؛ أي كمبيوتر لا يزال متصلًا بـ Spotify يعيد قوائم التشغيل، وأي كمبيوتر متزامن مع هذا يعيد الأغاني.',
+  'They’re removed from this PC and the PCs synced with it. A PC still connected to Spotify brings them back; an older Legato on another PC keeps the songs until it updates.': 'تُزال من هذا الكمبيوتر ومن أجهزة الكمبيوتر المتزامنة معه. أي كمبيوتر لا يزال متصلًا بـ Spotify يعيدها؛ وإصدار أقدم من Legato على كمبيوتر آخر يحتفظ بالأغاني حتى يُحدَّث.',
   'Also remove what Spotify brought?': 'هل تريد أيضًا إزالة ما جاء من Spotify؟',
   'The playlists imported from Spotify go, except Liked Songs, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'تُزال قوائم التشغيل المستوردة من Spotify، ما عدا «Liked Songs»، ومعها الأغاني التي لا يعرفها سوى Spotify ولم تُعجب بها ولم تشغّلها ولم تقيّمها ولم تضعها في قائمة أخرى. تُحفظ نسخة من مكتبتك أولًا.',
   'Discord presence: your plugin is in Add-ons': 'حضور Discord: الإضافة الخاصة بك في الإضافات',
