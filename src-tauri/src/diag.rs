@@ -155,7 +155,7 @@ fn labels(os: &str) -> (&'static str, &'static str) {
 }
 
 /// The text Settings › About › Copy diagnostics copies: versions, the settings that matter, who is signed in, the latest
-/// warnings and errors, the latest events. With `details` the errors' own text and the data folder come too; without it
+/// warnings and errors, the latest lines. With `details` the errors' own text and the data folder come too; without it
 /// no song title, account name or path holding the user's name does.
 #[tauri::command]
 pub async fn diag_report(state: State<'_, AppState>, details: bool) -> Result<String, String> {
@@ -183,8 +183,7 @@ pub async fn diag_report(state: State<'_, AppState>, details: bool) -> Result<St
     tauri::async_runtime::spawn_blocking(move || {
         flush();
         let problems = log::recent(&dir, |e| e.level >= Level::Warn, 20);
-        let events = log::recent(&dir, |e| e.level == Level::Info, 12);
-        log::report(SystemTime::now(), &facts, &problems, &events, details, &Who::from_env())
+        log::report(SystemTime::now(), &facts, &problems, &dir, details, &Who::from_env())
     })
     .await
     .map_err(|e| format!("The report failed: {e}"))

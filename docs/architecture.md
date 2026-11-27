@@ -193,7 +193,8 @@ A line is a message and an optional detail. The message is our own words in Engl
 song title, account name or path); the detail is what the error said, and is copied out only with "Include details".
 Secrets (URL queries, tokens, cookies, emails) are cut before a line reaches the file; without details a copied report
 also hides the user's folder and name in paths. Settings › About › Copy diagnostics builds the text: version, Windows
-build, WebView2 version, the settings that matter, who is signed in, the latest warnings and errors, the latest events.
+build, WebView2 version, the settings that matter, who is signed in, the latest warnings and errors, then every recent
+line that fits in 200,000 bytes (whole lines, the oldest left out).
 The interface forwards uncaught errors, unhandled rejections, errors shown in its alert and a top-level error boundary
 (`app/ErrorBoundary.tsx`: a calm page with Reload and Copy diagnostics).
 

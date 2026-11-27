@@ -327,22 +327,38 @@ pub fn bytes(dir: &Path) -> u64 {
     (0..FILES).map(|n| fs::metadata(file_path(dir, n)).map_or(0, |m| m.len())).sum()
 }
 
-/// The newest `n` entries that `want` accepts, oldest first. Files are read newest first, so a long log costs what was asked.
+/// Every entry, newest first. A file is read only once the newer ones are used up.
+fn newest_first(dir: &Path) -> impl Iterator<Item = Entry> + '_ {
+    (0..FILES).filter_map(move |n| fs::read(file_path(dir, n)).ok()).flat_map(|bytes| String::from_utf8_lossy(&bytes).lines().rev().filter_map(parse_line).collect::<Vec<_>>())
+}
+
+/// The newest `n` entries that `want` accepts, oldest first. A long log costs what was asked.
 pub fn recent(dir: &Path, want: impl Fn(&Entry) -> bool, n: usize) -> Vec<Entry> {
+    let mut out: Vec<Entry> = newest_first(dir).filter(|entry| want(entry)).take(n).collect();
+    out.reverse();
+    out
+}
+
+/// The newest lines as `render` shows them, oldest first, whole, within `budget` bytes (their newlines included);
+/// true when some were left out. A line too long on its own is left out, the older ones still come.
+pub fn tail(dir: &Path, budget: usize, render: impl Fn(&Entry) -> String) -> (Vec<String>, bool) {
     let mut out = Vec::new();
-    'files: for k in 0..FILES {
-        let Ok(bytes) = fs::read(file_path(dir, k)) else { continue };
-        for line in String::from_utf8_lossy(&bytes).lines().rev() {
-            if let Some(entry) = parse_line(line).filter(&want) {
-                out.push(entry);
-                if out.len() >= n {
-                    break 'files;
-                }
-            }
+    let (mut left, mut cut) = (budget, false);
+    for entry in newest_first(dir) {
+        let line = render(&entry);
+        let size = line.len() + 1;
+        if size <= left {
+            left -= size;
+            out.push(line);
+            continue;
+        }
+        cut = true;
+        if size <= budget {
+            break;
         }
     }
     out.reverse();
-    out
+    (out, cut)
 }
 
 // ---- The report ----
@@ -396,27 +412,38 @@ fn show(e: &Entry, details: bool, who: &Who) -> String {
     }
 }
 
+/// The most a report holds, bytes: Android's clipboard takes no more than about this.
+const REPORT_MAX: usize = 200_000;
+/// Room kept for the title of the report's last section.
+const TITLE_ROOM: usize = 160;
+
 /// The text Settings › About › Copy diagnostics puts in the clipboard. `facts` = "Version", "Windows"… rows from the
-/// shell; `problems` = the latest warnings and errors, `events` = the latest plain lines (starts, playback switches).
+/// shell; `problems` = the latest warnings and errors; then as many of the log's latest lines as still fit, from `dir`.
 /// Without `details`, what an error said (after the bar) stays out and the user's folder and name are hidden.
-pub fn report(now: SystemTime, facts: &[(String, String)], problems: &[Entry], events: &[Entry], details: bool, who: &Who) -> String {
+pub fn report(now: SystemTime, facts: &[(String, String)], problems: &[Entry], dir: &Path, details: bool, who: &Who) -> String {
     let mut out = format!("Legato diagnostics, {}\n", timestamp(now));
     out.push_str(if details { "Details: included (song titles, account names and file paths can appear)\n" } else { "Details: left out (song titles, account names and file paths)\n" });
     out.push('\n');
     for (name, value) in facts {
         out.push_str(&format!("{name}: {value}\n"));
     }
-    for (title, list) in [("Errors and warnings", problems), ("Recent events", events)] {
-        out.push_str(&format!("\n{title} ({} latest)\n", list.len()));
-        if list.is_empty() {
-            out.push_str("none\n");
-        }
-        for e in list {
-            out.push_str(&show(e, details, who));
-            out.push('\n');
-        }
-    }
+    let problems: Vec<String> = problems.iter().map(|e| show(e, details, who)).collect();
+    section(&mut out, &format!("Errors and warnings ({} latest)", problems.len()), &problems);
+    let (lines, cut) = tail(dir, REPORT_MAX.saturating_sub(out.len() + TITLE_ROOM), |e| show(e, details, who));
+    let older = if cut { ", older ones left out: Settings › About › Copy diagnostics › Save" } else { "" };
+    section(&mut out, &format!("Recent lines ({}{older})", lines.len()), &lines);
     out
+}
+
+fn section(out: &mut String, title: &str, lines: &[String]) {
+    out.push_str(&format!("\n{title}\n"));
+    if lines.is_empty() {
+        out.push_str("none\n");
+    }
+    for line in lines {
+        out.push_str(line);
+        out.push('\n');
+    }
 }
 
 /// Left in the app data folder while the app runs, gone at a clean exit: found at the next start, the last run ended
@@ -661,10 +688,9 @@ mod tests {
         add(&mut log, Level::Warn, "update", "check failed", "");
 
         let problems = recent(dir.path(), |e| e.level >= Level::Warn, 20);
-        let events = recent(dir.path(), |e| e.level == Level::Info, 10);
         let facts = [("Version".to_string(), "1.0.0".to_string()), ("Windows".to_string(), "11 build 26300".to_string())];
 
-        let safe = report(at(1_700_000_000, 0), &facts, &problems, &events, false, &who());
+        let safe = report(at(1_700_000_000, 0), &facts, &problems, dir.path(), false, &who());
         assert!(safe.contains("Version: 1.0.0") && safe.contains("Windows: 11 build 26300"), "{safe}");
         assert!(safe.contains("ERROR forced test error [details left out]") && safe.contains("WARN update check failed"), "{safe}");
         assert!(safe.contains("embed refused: watch page") && safe.contains("started 1.0.0"), "{safe}");
@@ -672,9 +698,33 @@ mod tests {
             assert!(!safe.contains(hidden), "{hidden} in {safe}");
         }
 
-        let full = report(at(1_700_000_000, 0), &facts, &problems, &events, true, &who());
+        let full = report(at(1_700_000_000, 0), &facts, &problems, dir.path(), true, &who());
         assert!(full.contains(r"C:\Users\Jane Doe\Music\Secret Song.mp3"), "{full}");
         assert!(!full.contains("SECRETTOKEN") && !full.contains("me@mail.com"), "secrets stay out even with details: {full}");
+    }
+
+    #[test]
+    fn a_flood_is_cut_to_the_clipboards_size_whole_lines_newest_kept() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut log = Log::new(dir.path());
+        for i in 0..4000 {
+            log.append(&format_line("2026-10-30T12:00:00.000Z", Level::Info, "n", &format!("line {i} {}", "x".repeat(200)), "a detail")).unwrap();
+        }
+        let text = report(at(1_700_000_000, 0), &[], &[], dir.path(), false, &who());
+        assert!(text.len() <= REPORT_MAX && text.len() > REPORT_MAX - 1000, "{}", text.len());
+        assert!(text.contains("Errors and warnings (0 latest)\nnone\n") && text.contains("older ones left out"));
+        assert!(text.contains("line 3999 ") && !text.contains("line 0 ") && !text.contains("a detail"));
+        assert!(text.lines().skip_while(|l| !l.starts_with("Recent lines")).skip(1).all(|l| l.starts_with("2026-10-30T") && l.ends_with("[details left out]")), "whole lines only");
+        // A line too long on its own is left out; the older ones still come.
+        let (lines, cut) = tail(dir.path(), 400, |e| if e.message.starts_with("line 3999 ") { "y".repeat(500) } else { e.message[..9].to_string() });
+        assert!(cut && lines.last().unwrap() == "line 3998" && lines.len() == 40, "{lines:?}");
+    }
+
+    #[test]
+    fn an_empty_log_says_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let text = report(at(1_700_000_000, 0), &[], &[], dir.path(), true, &who());
+        assert!(text.ends_with("Recent lines (0)\nnone\n"), "{text}");
     }
 
     #[test]
