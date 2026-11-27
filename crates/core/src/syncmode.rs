@@ -596,6 +596,10 @@ impl Library {
         // come back.
         let only_in_mixes = s.only_in_made_up_mixes();
         for i in s.library.iter().filter(|i| !only_in_mixes.contains(i)) {
+            // Nor what left with a Spotify disconnect (a playlist or a play still brings it).
+            if self.left_with_spotify(&track_ref(*i)?.ids)? {
+                continue;
+            }
             row(*i, &mut m)?;
         }
 
@@ -753,6 +757,8 @@ impl Library {
         if m.settings > 0 || times.len() != stamps {
             self.set_setting(TIMES, &Value::Object(times))?;
         }
+        // Last: what this file brought of the user's (plays, ratings, lists) holds its songs.
+        m.deleted += self.drop_left_imports()?;
         Ok(m)
     }
 
@@ -1195,6 +1201,79 @@ mod tests {
         let mut titles: Vec<String> = b.tracks()?.into_iter().map(|t| t.track.title).collect();
         titles.sort();
         assert_eq!(titles, ["Edited", "Two"]);
+        Ok(())
+    }
+
+    fn from_spotify(name: &str) -> Track {
+        Track { ids: BTreeMap::from([(Source::Spotify, name.into())]), ..song(name, name) }
+    }
+
+    fn titles_sorted(lib: &Library) -> Result<Vec<String>> {
+        let mut titles: Vec<String> = lib.tracks()?.into_iter().map(|t| t.track.title).collect();
+        titles.sort();
+        Ok(titles)
+    }
+
+    #[test]
+    fn another_pc_s_disconnect_takes_its_songs_here_not_yours() -> Result<()> {
+        let (a, b) = (Library::in_memory()?, Library::in_memory()?);
+        let imported = ["gone 1", "gone 2", "gone 3", "listed", "played", "rated"].map(from_spotify);
+        a.save_playlist(Source::Spotify, "p1", "From Spotify", &imported)?;
+        b.merge(&snap(&a))?;
+        // B's own use of three of them.
+        let id = |name: &str| b.find(&from_spotify(name)).map(|found| found.unwrap());
+        let mine = b.edit_playlist(PlaylistEdit::Create { name: "Mine".into() })?.unwrap();
+        b.edit_playlist(PlaylistEdit::Add { id: mine, track_ids: vec![id("listed")?] })?;
+        b.record_play(&Play { track_id: id("played")?, started_at: 2_000, listened_ms: 1, completed: true })?;
+        b.set_rating(id("rated")?, 8)?;
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        a.remove_spotify_imports()?;
+        // The playlist and three songs.
+        assert_eq!(b.merge(&snap(&a))?.deleted, 4);
+        assert_eq!(titles_sorted(&b)?, ["listed", "played", "rated"]);
+        assert_eq!(names(&b), ["Mine"]);
+        // Nothing marked as removed: a later import brings them back.
+        assert!(snap(&b).removed.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn an_older_pc_s_library_does_not_bring_them_back() -> Result<()> {
+        let (a, b, old) = (Library::in_memory()?, Library::in_memory()?, Library::in_memory()?);
+        a.save_playlist(Source::Spotify, "p1", "From Spotify", &[from_spotify("gone")])?;
+        b.merge(&snap(&a))?;
+        // An older version removes the playlist and keeps the song, listed in its library.
+        old.upsert_track(&from_spotify("gone"))?;
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        a.remove_spotify_imports()?;
+        b.merge(&snap(&a))?;
+        for pc in [&a, &b] {
+            assert!(!pc.merge(&snap(&old))?.any());
+            assert!(pc.tracks()?.is_empty());
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn records_stored_before_an_update_clean_up_at_the_next_merge() -> Result<()> {
+        let b = Library::in_memory()?;
+        b.upsert_track(&from_spotify("gone"))?;
+        // As an older version stored it: kept, never applied, and never merged again.
+        b.db.execute("INSERT INTO sync_gone (kind, key, at) VALUES ('import-left', 'spotify:gone', 1)", [])?;
+        assert_eq!(b.merge(&snap(&Library::in_memory()?))?.deleted, 1);
+        assert!(b.tracks()?.is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn an_unknown_gone_kind_is_kept_and_sent_on() -> Result<()> {
+        // A file in today's format, with a kind this version doesn't know.
+        let file = r#"{"format":1,"device":"d","deviceName":"PC","at":1,"tracks":[],"library":[],"playlists":[],
+            "gone":[{"kind":"future","key":"k","at":5}],"removed":[],"prefs":[],"plays":[],"edits":[],"settings":{},
+            "accounts":{"spotify":false,"youtube":false}}"#;
+        let lib = Library::in_memory()?;
+        lib.merge(&serde_json::from_str(file)?)?;
+        assert_eq!(snap(&lib).gone, [Gone { kind: "future".into(), key: "k".into(), at: 5 }]);
         Ok(())
     }
 

@@ -37,6 +37,10 @@ const NOTHING_OF_THE_USERS: &str = "t.id NOT IN (SELECT track_id FROM plays)
     AND coalesce(t.musicness, '') NOT LIKE 'user:%'
     AND t.explicit != 2";
 
+/// A disconnect's record on a Spotify song, not cancelled by a later import. On `sync_gone g`.
+const LEFT_LIVE: &str = "g.kind = 'import-left'
+    AND NOT EXISTS (SELECT 1 FROM sync_gone b WHERE b.kind = 'import-back' AND b.key = g.key AND b.at >= g.at)";
+
 /// A Spotify song's key in the sync records of a disconnect.
 fn left_key(spotify_id: &str) -> String {
     format!("spotify:{spotify_id}")
@@ -146,6 +150,20 @@ impl Library {
             }
             Ok(CleanedUp { playlists: theirs.len(), songs: self.delete_songs(songs)? })
         })
+    }
+
+    /// Only Spotify knows it and it left with a disconnect: another PC's library doesn't bring it back.
+    pub(crate) fn left_with_spotify(&self, ids: &BTreeMap<Source, String>) -> Result<bool> {
+        let Some(spotify_id) = ids.get(&Source::Spotify).filter(|_| ids.len() == 1) else { return Ok(false) };
+        let mut stmt = self.db.prepare_cached(&format!("SELECT 1 FROM sync_gone g WHERE g.key = ?1 AND {LEFT_LIVE}"))?;
+        Ok(stmt.exists([left_key(spotify_id)])?)
+    }
+
+    /// Songs another PC's disconnect took leave this one too, unless something here holds them (the disconnect's own
+    /// rule). Run at every merge: records an older version stored are never merged again.
+    pub(crate) fn drop_left_imports(&self) -> Result<usize> {
+        let left = format!("t.id IN (SELECT i.track_id FROM track_ids i JOIN sync_gone g ON g.key = 'spotify:' || i.source_id WHERE i.source = ?2 AND {LEFT_LIVE})");
+        self.delete_songs(self.songs_leaving(&left, "spotify", "[]")?)
     }
 }
 
