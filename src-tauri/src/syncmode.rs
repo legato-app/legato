@@ -28,6 +28,7 @@ const EVERY: Duration = Duration::from_secs(60);
 
 /// Sync files' folder inside the chosen one. The first name's folder is carried over first (`rename.rs`, installed app only).
 fn sync_dir(folder: &Path) -> PathBuf {
+    #[cfg(not(feature = "lite"))]
     crate::rename::sync_folder(folder);
     folder.join(DIR)
 }

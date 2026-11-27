@@ -12,6 +12,9 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 # The smoke test's build (`pnpm e2e`, e2e/smoke.mjs), off in every other: network calls to a loopback mock (hosts.rs),
 # no audio device (crates/player output.rs).
 e2e = ["music-player/null-output"]
+# Legato Lite (`pnpm build:lite`, plan-v2 "A Lite build"): its own identifier and update feed, with
+# `tauri.lite.conf.json`; the rename catch-up compiled out.
+lite = []
 
 [dependencies]
 anyhow = "1.0.104"

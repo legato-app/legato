@@ -75,6 +75,8 @@ mod viz;
 mod speech;
 mod syncmode;
 mod push;
+// Lite never had the old name: nothing to move.
+#[cfg(not(feature = "lite"))]
 mod rename;
 mod songlist;
 mod tags;
@@ -718,6 +720,7 @@ pub fn run() {
     #[cfg(desktop)]
     jumplist::note(&std::env::args().collect::<Vec<_>>());
     // Before anything opens the app's folders (window place, WebView2, library): Music App's move to Legato's name.
+    #[cfg(not(feature = "lite"))]
     if let Err(e) = rename::migrate(&context.config().identifier) {
         stop_with(&format!("Legato can't move your library and settings to its new folder ({e}). Close Music App if it still runs, then start Legato again."));
     }

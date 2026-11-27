@@ -52,6 +52,8 @@ pub fn register() {
     #[cfg(windows)]
     if !cfg!(debug_assertions)
         && crate::identity::installed()
+        // Nov 2026: Lite never takes `legato://`. Registered first, it would keep it from a full app installed later.
+        && !cfg!(feature = "lite")
         && let Ok(exe) = std::env::current_exe()
     {
         let _ = win::register(&exe);

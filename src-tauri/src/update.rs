@@ -21,7 +21,12 @@ const KEY: &str = "update";
 /// Beta's file: the rolling `beta` release, whose latest.json `release.yml` replaces at every release. Stable's is
 /// `tauri.conf.json`'s endpoint (`releases/latest/download/latest.json`, which skips prereleases): every installed
 /// version reads it, so it stays.
+#[cfg(not(feature = "lite"))]
 const BETA_ENDPOINT: &str = "https://github.com/legato-app/legato/releases/download/beta/latest.json";
+/// Lite's own files beside the full app's, same release (`tauri.lite.conf.json` has Stable's): neither edition installs
+/// the other.
+#[cfg(feature = "lite")]
+const BETA_ENDPOINT: &str = "https://github.com/legato-app/legato/releases/download/beta/latest-lite.json";
 
 /// Which releases this PC follows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -368,6 +373,17 @@ mod tests {
     }
 
     #[test]
+    fn lite_reads_its_own_files_of_the_same_releases() {
+        let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.lite.conf.json")).unwrap();
+        assert_eq!(conf["plugins"]["updater"]["endpoints"], serde_json::json!(["https://github.com/legato-app/legato/releases/latest/download/latest-lite.json"]));
+        // The full app's key: one signature for both editions.
+        assert!(conf["plugins"]["updater"].get("pubkey").is_none());
+        #[cfg(feature = "lite")]
+        assert_eq!(Channel::Beta.endpoint(), Some("https://github.com/legato-app/legato/releases/download/beta/latest-lite.json"));
+    }
+
+    #[test]
+    #[cfg(not(feature = "lite"))]
     fn beta_reads_the_rolling_beta_release_that_the_workflow_feeds() {
         let url = Channel::Beta.endpoint().unwrap();
         assert_eq!(url, "https://github.com/legato-app/legato/releases/download/beta/latest.json");

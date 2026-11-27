@@ -2,10 +2,13 @@
 //! Task Manager's own switch lives in StartupApproved: read here, and turned back on with ours. Elsewhere: not offered.
 
 /// Run value name (Task Manager falls back to it when the exe has no description).
-#[cfg(windows)]
+#[cfg(all(windows, not(feature = "lite")))]
 const NAME: &str = "Legato";
-/// The same entry under the app's first name: `follow` renames it.
-#[cfg(windows)]
+/// Lite's own entry: both editions may open at sign-in, neither changes the other's.
+#[cfg(all(windows, feature = "lite"))]
+const NAME: &str = "Legato Lite";
+/// The same entry under the app's first name: `follow` renames it. The full app's only (rename catch-up).
+#[cfg(all(windows, not(feature = "lite")))]
 const OLD_NAME: &str = "Music App";
 
 /// Some(on) on Windows: this exe registered and not turned off in Task Manager. None elsewhere.
@@ -40,6 +43,7 @@ pub fn follow() {
         && crate::identity::installed()
         && let Ok(exe) = std::env::current_exe()
     {
+        #[cfg(not(feature = "lite"))]
         let _ = win::rename(OLD_NAME, NAME);
         let _ = win::follow(NAME, &exe);
     }
@@ -85,6 +89,7 @@ mod win {
     }
 
     /// Entry made under `old`: now under `new`, Task Manager's switch with it.
+    #[cfg(not(feature = "lite"))]
     pub fn rename(old: &str, new: &str) -> Result<()> {
         let Ok(command) = CURRENT_USER.open(RUN).and_then(|k| k.get_string(old)) else { return Ok(()) };
         CURRENT_USER.create(RUN)?.set_string(new, &command)?;
@@ -145,6 +150,7 @@ mod win {
         /// Same, by hand: an entry left on a removed install follows this exe; one on an exe that exists stays.
         #[test]
         #[ignore = "writes the user's registry"]
+        #[cfg(not(feature = "lite"))]
         fn follows_a_moved_install() {
             let (old, name, gone, here) = ("Legato test old entry", "Legato test entry 2", Path::new(r"C:\Nowhere\Music App\music-app.exe"), std::env::current_exe().unwrap());
             set(old, gone, true).unwrap();
