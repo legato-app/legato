@@ -1,7 +1,6 @@
 import { ArrowClockwise, QrCode, UsersThree } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../app/settings'
-import { useStore } from '../../app/store'
 import { api, type RoomHeard, type RoomReaction, type RoomStatus } from '../../shared/api'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
@@ -12,6 +11,7 @@ import { scanWebcam } from '../share/webcam'
 import { closeRoom, REACTIONS, ROOM_LINK, useRoom } from './room'
 import { RoomFloats } from './RoomPill'
 import { catchUp, endRoom, joinRoom, leaveRoom, openRoomToInternet, react, roomError, startRoom } from './rooms'
+import { copyText } from '../../app/copyText'
 
 /** Each reaction's name, for screen readers and tooltips. */
 function reactionName(r: RoomReaction): string {
@@ -95,18 +95,13 @@ function Invite({ link }: { link: string | null }) {
     setBusy(true)
     void openRoomToInternet().finally(() => setBusy(false))
   }
-  const copy = (text: string) =>
-    navigator.clipboard.writeText(text).then(
-      () => useStore.getState().notify(tr('Link copied')),
-      (e: unknown) => useStore.setState({ error: String(e) }),
-    )
   return (
     <div className="flex flex-col gap-2 border-t border-line pt-4">
       <span className="kicker">{tr('Over the internet')}</span>
       {link ? (
         <div className="flex items-center gap-2">
           <input readOnly value={link} aria-label={tr('Invite link')} onFocus={(e) => e.target.select()} className="h-10 min-w-0 flex-1 rounded-[9px] border border-line bg-raised px-3 text-xs outline-none focus:border-ink" />
-          <Button variant="ghost" onClick={() => void copy(link)}>
+          <Button variant="ghost" onClick={() => void copyText(link, tr('Link copied'))}>
             {tr('Copy link')}
           </Button>
         </div>

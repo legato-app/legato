@@ -1,4 +1,4 @@
-import { Check, Copy, UsersThree, WifiHigh } from '@phosphor-icons/react'
+import { UsersThree, WifiHigh } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useStore } from '../../app/store'
 import { api, type NearbyState, type ShareCode } from '../../shared/api'
@@ -8,6 +8,7 @@ import { qrPath } from './qr'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { usePlayer } from '../player/store'
 import { inRoom, openRoom, useRoom } from '../rooms/room'
+import { CopyField } from '../../app/CopyField'
 
 /** Listen together: this playlist plays here in a room friends on the network follow. */
 function Together({ id, onClose }: { id: number; onClose: () => void }) {
@@ -82,7 +83,6 @@ function Nearby({ id }: { id: number }) {
 /** Share a playlist: QR code (scan or screenshot) and link (messages). */
 export function SharePanel({ id, name, onClose }: { id: number; name: string; onClose: () => void }) {
   const [code, setCode] = useState<ShareCode>()
-  const [copied, setCopied] = useState(false)
   useEffect(() => {
     api
       .sharePlaylist(id)
@@ -92,12 +92,6 @@ export function SharePanel({ id, name, onClose }: { id: number; name: string; on
         onClose()
       })
   }, [id, onClose])
-  const copy = () =>
-    code &&
-    navigator.clipboard.writeText(code.link).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
 
   return (
     <Dialog title={tr('Share “{name}”', { name })} kicker={code ? `${trn(code.tracks, '{n} track', '{n} tracks')} · ${trn(code.bytes, '{n} byte', '{n} bytes')}` : tr('Share')} onClose={onClose}>
@@ -117,12 +111,7 @@ export function SharePanel({ id, name, onClose }: { id: number; name: string; on
           )}
           <div className="flex flex-col gap-1.5">
             <span className="kicker">{tr('Link · opens in any browser, or paste it anywhere in Legato (Ctrl+V)')}</span>
-            <div className="flex h-10.5 items-center gap-2.5 rounded-[9px] border border-line bg-raised pe-1.5 ps-3">
-              <code className="flex-1 truncate font-mono text-[0.6875rem]">{code.link}</code>
-              <Button variant="ghost" className="px-2.5! py-1! text-[0.6875rem]" onClick={copy}>
-                {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? tr('Copied') : tr('Copy')}
-              </Button>
-            </div>
+            <CopyField value={code.link} />
           </div>
           <Nearby id={id} />
           <Together id={id} onClose={onClose} />

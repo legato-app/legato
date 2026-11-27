@@ -1,6 +1,6 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useShallow } from 'zustand/react/shallow'
-import { ArrowSquareOut, Check, Copy, Info, X } from '@phosphor-icons/react'
+import { ArrowSquareOut, Check, Info, X } from '@phosphor-icons/react'
 import { ArrowRight } from '../../shared/ui/directional'
 import { useState } from 'react'
 import { useStore } from '../../app/store'
@@ -9,22 +9,7 @@ import { Button } from '../../shared/ui/Button'
 import { SourceIcon, sourceLabel } from '../../shared/ui/SourceIcon'
 import { guides } from './guides'
 import { tr } from '../../shared/i18n/i18n'
-
-function CopyField({ value }: { value: string }) {
-  const [done, setDone] = useState(false)
-  return (
-    <div className="flex h-10.5 items-center gap-2.5 rounded-[9px] border border-line bg-raised pe-1.5 ps-3">
-      <code className="flex-1 truncate font-mono text-[0.6875rem]">{value}</code>
-      <button
-        type="button"
-        className="flex items-center gap-1.5 rounded-md border border-line px-2 py-1 text-[0.6875rem] font-medium hover:bg-bg"
-        onClick={() => navigator.clipboard.writeText(value).then(() => setDone(true))}
-      >
-        {done ? <Check size={13} /> : <Copy size={13} />} {done ? tr('Copied') : tr('Copy')}
-      </button>
-    </div>
-  )
-}
+import { CopyField } from '../../app/CopyField'
 
 export function ConnectWizard({ service, onClose }: { service: 'spotify'; onClose: () => void }) {
   const { connect, busy, error } = useStore(useShallow(({ connect, busy, error }) => ({ connect, busy, error })))

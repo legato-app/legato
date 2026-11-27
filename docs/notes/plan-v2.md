@@ -929,6 +929,11 @@ colours, mirror, reflection.
     folding gone (2026-11-27, tests only).
     - Decided alone (2026-11-27): the settings search folds as the other searches do (NFKD, marks dropped), so a
       full-width letter typed there now matches too.
+  - [x] 11. The "Copied" button: `app/CopyField.tsx` for sharing and the Spotify wizard, Rooms through `copyText`
+    (2026-11-27, tests only).
+    - Decided alone (2026-11-27): the wizard’s button now comes back to "Copy" after 1.5 s and takes the app’s button
+      look; a refused clipboard is a toast in the three places (Rooms showed its banner); the theme and diagnostics
+      copy buttons keep their own.
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md
