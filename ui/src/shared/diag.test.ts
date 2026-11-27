@@ -81,17 +81,24 @@ suite('describe', () => {
 })
 
 suite('placeOf', () => {
-  it('gives the file and position of the first frame, nothing of the message', () => {
+  const places = /^ at [\w.-]+:\d+:\d+( < [\w.-]+:\d+:\d+){0,2}$/
+
+  it('gives the file and position of the first frames, nothing of the message', () => {
     const e = new TypeError("Cannot create property 'x' on string 'Stairway to Heaven'")
-    expect(placeOf(e)).toMatch(/^ at [\w.-]+:\d+:\d+$/)
+    expect(placeOf(e)).toMatch(places)
     expect(placeOf(e)).not.toMatch(/Stairway|[\\/]/)
-    expect(placeOf(new Error(''))).toMatch(/^ at [\w.-]+:\d+:\d+$/)
+    expect(placeOf(new Error(''))).toMatch(places)
+  })
+
+  it('stops at three frames, passing over those with no file', () => {
+    const stack = ['Error: boom', '    at a (a.js:1:1)', '    at async Promise.all (index 0)', '    at b (http://tauri.localhost/assets/b.js:2:2)', '    at c.js:3:3', '    at d (d.js:4:4)'].join('\n')
+    expect(placeOf(Object.assign(new Error('boom'), { stack }))).toBe(' at a.js:1:1 < b.js:2:2 < c.js:3:3')
   })
 
   it('does not take a frame from a message that imitates one', () => {
     const e = new TypeError('bad value\n    at Evil (C:\\Users\\jane\\Music\\Secret Song.mp3:1:1)')
     expect(placeOf(e)).not.toMatch(/Secret|jane|Evil/)
-    expect(placeOf(e)).toMatch(/^ at [\w.-]+:\d+:\d+$/)
+    expect(placeOf(e)).toMatch(places)
   })
 
   it('reads a frame with a path, a bare one, and none', () => {

@@ -60,16 +60,18 @@ export function describe(error: unknown, fallback: string): { message: string; d
   return { message: plainKind(error) ?? fallback, detail: rawOf(error) || undefined }
 }
 
-/** " at index-abc.js:1:2": where an Error was thrown, from its stack's first frame: file name and position, no path. The
- * stack opens with "Name: message", where a value can sit, even a line that looks like a frame: that header is cut off
- * first, and a stack that doesn't open with it (message changed since, other engine) gives no place. */
+/** " at index-abc.js:1:2 < index-abc.js:3:4": where an Error was thrown, from its stack's first frames: file names and
+ * positions, no path. The stack opens with "Name: message", where a value can sit, even a line that looks like a frame:
+ * that header is cut off first, and a stack that doesn't open with it (message changed since, other engine) gives no place. */
 export function placeOf(error: unknown): string {
   if (!(error instanceof Error) || typeof error.stack !== 'string') return ''
   const header = error.message ? `${error.name}: ${error.message}` : error.name
   if (!error.stack.startsWith(header)) return ''
-  const frame = /^[ \t]*at (?:[^\n]*? \()?([^\s()]+):(\d+):(\d+)\)?[ \t]*$/m.exec(error.stack.slice(header.length))
-  const file = frame?.[1].split(/[/\\]/).pop()?.split('?')[0]
-  return frame && file ? ` at ${file}:${frame[2]}:${frame[3]}` : ''
+  const places = [...error.stack.slice(header.length).matchAll(/^[ \t]*at (?:[^\n]*? \()?([^\s()]+):(\d+):(\d+)\)?[ \t]*$/gm)].flatMap(([, path, line, column]) => {
+    const file = path.split(/[/\\]/).pop()?.split('?')[0]
+    return file ? [`${file}:${line}:${column}`] : []
+  })
+  return places.length ? ` at ${places.slice(0, 3).join(' < ')}` : ''
 }
 
 /** `error` in the log under `area`; `fallback` = what to call it when its own text can't be trusted to be free of names. */

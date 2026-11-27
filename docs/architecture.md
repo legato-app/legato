@@ -196,7 +196,8 @@ Secrets (URL queries, tokens, cookies, emails) are cut before a line reaches the
 also hides the user's folder and name in paths. Settings › About › Copy diagnostics builds the text: version, Windows
 build, WebView2 version, the settings that matter, who is signed in, the latest warnings and errors, then every recent
 line that fits in 200,000 bytes (whole lines, the oldest left out). Save, beside it, writes every line kept to a file the user picks.
-The interface forwards uncaught errors, unhandled rejections, errors shown in its alert and a top-level error boundary
+The interface forwards uncaught errors, unhandled rejections (with up to three stack frames), stalls of a second or
+more, a phone leaving and coming back, errors shown in its alert and a top-level error boundary
 (`app/ErrorBoundary.tsx`: a calm page with Reload and Copy diagnostics).
 
 ## Background (tray)
