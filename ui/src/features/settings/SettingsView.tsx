@@ -46,7 +46,7 @@ import { LanguagePicker } from './LanguagePicker'
 import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
 import { notifyError } from '../../app/notifyError'
-import { isCutSetting } from '../../shared/liteCuts'
+import { isCutSetting, offered } from '../../shared/liteCuts'
 
 const ICONS: Record<Category, ReactNode> = {
   general: <GearSix size={15} />,
@@ -948,7 +948,7 @@ function PlaybackSection() {
           <Row setting="skipSilence" label={msg('Skip silence')} sub={tr('Songs start on the music and end where it ends, when they open or close with more than a moment of silence. Off by default: some silences are meant (hidden tracks, gapless albums)')} toggle />
           <Row setting="skipNonMusic" label={msg('Skip non-music parts')} sub={tr('Intros, skits and talking in music videos are skipped, from SponsorBlock’s community marks. For each YouTube video, 4 characters of its id’s hash go to sponsor.ajay.app, never the id. Off by default')} toggle />
         </div>
-        {s.fade.advanced && <FadeEditor />}
+        {s.fade.advanced && offered('crossfade') && <FadeEditor />}
       </Group>
       <Group title={msg('Clicks')}>
         <div className="rounded-xl border border-line bg-raised">

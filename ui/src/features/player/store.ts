@@ -10,6 +10,7 @@ import { sweetFade } from './sweet'
 import { endsOf } from './sweetData'
 import { insertAt, keepQueued, moveInOrder, nextIndex, playOrder, queued, tooLong, type Repeat } from './queue'
 import { moveToSlot } from '../../shared/order'
+import { offered } from '../../shared/liteCuts'
 import { keepParts, partIn, partOf, partRows } from './videoParts'
 import { contextOf, type FromKind } from './fromLabel'
 import { lowRated, type Variety } from './score'
@@ -435,10 +436,11 @@ let soundFrom: { playId: number; at: number; auto: boolean } | null = null
 let cuedFor = -1
 
 /** 5 s into a YouTube song: the next one (Next's) loaded in the other embed, stopped (the one kept from the last
- *  overlap, or one made for it); Next then swaps to it (step), an overlap takes it as usual. Not during a fade out. */
+ *  overlap, or one made for it); Next then swaps to it (step), an overlap takes it as usual. Not during a fade out, nor in
+ *  Lite (one embed). */
 function cueNext() {
   const p = usePlayer.getState()
-  if (cuedFor === p.playId || !p.now?.youtubeId || (p.tail && !p.tail.done)) return
+  if (!offered('crossfade') || cuedFor === p.playId || !p.now?.youtubeId || (p.tail && !p.tail.done)) return
   cuedFor = p.playId
   const i = nextIndex(p.order, p.index, 1, p.repeat, false, (j) => passOver(p.list[j], p.skipLong))
   const next = i === null ? undefined : fresh(p.list[i])

@@ -617,6 +617,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       tasks (`deferred.rs` / `deferred.ts` start only what Lite shows; the hidden page suspended sooner than
       `background.rs`'s 5 minutes); 10 a smaller cover cache (`ArtCache::new(…, 500 << 20)` and `coverCacheMb`'s
       default: 250 MB in Lite). Lite's defaults apply only where the user never chose, as with `DEFAULTS_VERSION`.
+    - [x] Slice 7, 2026-11-27: built, not measured yet (the bench waits for the owner). Lite cues no next song and
+      fades none into the next (local files too), so `PlayerBar` only ever draws one `YouTubeFrame`; the Fades rows
+      about song changes are gone from Lite's settings, saved values kept; Sweet fades' analysis never starts. Not
+      tried in a Lite.
+      - Decided alone (2026-11-27): the fade on pause a full app saved still applies, its row hidden with the rest.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
       item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
       word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).

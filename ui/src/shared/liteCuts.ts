@@ -29,6 +29,9 @@ export const LITE_CUTS = {
     settings: ['Moving cover', 'Visualizer', 'Visualizer style', 'Meter face', 'Spectrogram colors', 'Visualizer preset', 'Preset colors', 'Visualizer weighting', 'Visualizer color', 'Visualizer gradient', 'Visualizer bands', 'Visualizer reflection', 'Visualizer behind Now Playing', 'Visualizer in the mini player'],
     menuKinds: ['visualizer'],
   },
+  // One YouTube embed at a time: no second one to fade into or to cue the next song in (store.ts `cueNext`), and no
+  // fade between songs for local files either (fade.ts `effectiveFade`).
+  crossfade: { settings: ['Fade between songs', 'Sweet fades', 'No fade within an album', 'Advanced fade', 'Fade in after a skip', 'Fade on pause and play'], starters: ['Sweet fades'] },
   musicDetector: { settings: ['Music Detector', 'Ask this PC’s media players first', 'Name songs with AcoustID (free)'] },
   discord: { settings: ['Sharing', 'Discord sign-in'], starters: ['Discord plugin'] },
   // Stream Deck talks to the phone remote's server: gone with these two.
