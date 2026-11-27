@@ -6,6 +6,7 @@ import { tr } from '../../shared/i18n/i18n'
 import { remoteTrack, usePlayer } from '../player/store'
 import { applyPreset, useEditor } from './editor'
 import { notifyError } from '../../app/notifyError'
+import { copyText } from '../../app/copyText'
 
 /** The remix file (`.lmix`, music_dsp::lmix): a YouTube video and the Live Editor's settings for it, never audio. */
 const fail = (error: unknown) => void notifyError(error)
@@ -45,8 +46,7 @@ export async function copyRemixLink(effects?: Effects) {
   const mix = nowRemix(effects)
   if (!mix) return useStore.getState().notify(tr('Only a song playing from YouTube can be shared as a remix file'))
   try {
-    await navigator.clipboard.writeText(await api.lmixLink(mix))
-    useStore.getState().notify(tr('Remix link copied'))
+    await copyText(await api.lmixLink(mix), tr('Remix link copied'))
   } catch (e) {
     fail(e)
   }

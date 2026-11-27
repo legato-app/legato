@@ -22,6 +22,7 @@ import { tr, trn } from '../../shared/i18n/i18n'
 import { api } from '../../shared/api'
 import { askText } from '../../shared/ui/Ask'
 import { notifyError } from '../../app/notifyError'
+import { copyText } from '../../app/copyText'
 
 const ROW = 60
 /** Block headers: Now playing, Next added by you, Then from … */
@@ -76,7 +77,7 @@ function queueMenu(onHide: () => void): MenuEntry[] {
     queue && { id: 'shuffle', label: tr('Shuffle'), checked: shuffle, onSelect: toggleShuffle },
     ahead.length > 0 && { id: 'removeRepeats', label: trn(ahead.length, 'Remove {n} repeat', 'Remove {n} repeats'), icon: <MinusCircle size={16} />, onSelect: () => ahead.forEach(dequeue) },
     queue && order.indexOf(index) < order.length - 1 && { id: 'clearNext', label: tr('Clear what’s next'), icon: <X size={16} />, onSelect: clearNext },
-    songs.length > 1 && { id: 'copyList', label: tr('Copy song list'), icon: <ClipboardText size={16} />, onSelect: () => void navigator.clipboard.writeText(songs.map((t) => `${t.artist} – ${t.title}`).join('\n')).then(() => useStore.getState().notify(trn(songs.length, '{n} song copied', '{n} songs copied'))) },
+    songs.length > 1 && { id: 'copyList', label: tr('Copy song list'), icon: <ClipboardText size={16} />, onSelect: () => void copyText(songs.map((t) => `${t.artist} – ${t.title}`).join('\n'), trn(songs.length, '{n} song copied', '{n} songs copied')) },
     '-',
     { id: 'hideUpNext', label: tr('Hide up next'), icon: <CaretRight size={16} />, onSelect: onHide },
   ])

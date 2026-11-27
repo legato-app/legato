@@ -12,6 +12,7 @@ import { mergedText } from './merged'
 import { passphrase, strength, type Hint } from './strength'
 import { phoneApp } from '../../shared/platform'
 import { notifyError } from '../../app/notifyError'
+import { copyText } from '../../app/copyText'
 
 const MIN_PASSWORD = 10
 
@@ -131,7 +132,7 @@ function Setup({ folder, onClose, onDone }: { folder: string; onClose: () => voi
     setAgain(p)
     setShown(true)
   }
-  const copy = () => void navigator.clipboard.writeText(password).then(() => useStore.getState().notify(tr('Copied to clipboard'), { kind: 'ok' }))
+  const copy = () => void copyText(password, tr('Copied to clipboard'))
   const choice = (on: boolean, title: string, sub: string, icon: ReactNode) => (
     <button role="radio" aria-checked={protect === on} onClick={() => setProtect(on)} className={`flex gap-3 rounded-lg border p-3 text-start transition ${protect === on ? 'border-ink bg-bg' : 'border-line hover:bg-bg'}`}>
       <span className="mt-0.5">{icon}</span>

@@ -58,16 +58,13 @@ import { phoneApp } from '../shared/platform'
 import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, useBookmarks } from './player/bookmarks'
 import { artistBlocked } from './player/blockedArtists'
 import { notifyError } from '../app/notifyError'
+import { copyText } from '../app/copyText'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
 
-function copy(text: string, done: string) {
-  navigator.clipboard.writeText(text).then(() => app().notify(done), notifyError)
-}
-
 /** A text the page shows (an artist's About): copy it. */
-export const textMenu = (text: string): MenuEntry[] => [{ label: tr('Copy'), icon: <Copy size={16} />, onSelect: () => copy(text, tr('Copied')) }]
+export const textMenu = (text: string): MenuEntry[] => [{ label: tr('Copy'), icon: <Copy size={16} />, onSelect: () => copyText(text, tr('Copied')) }]
 
 /** Biggest cover that loads, bars cut like the big cover, to a file the user picks. */
 async function saveCover(t: LibraryTrack) {
@@ -125,7 +122,7 @@ function pages(t: LibraryTrack): { label: string; url: string }[] {
 }
 
 /** "Artist – Title" lines, for pasting a list anywhere. */
-const copyList = (tracks: LibraryTrack[]) => copy(tracks.map((t) => `${t.artist} – ${t.title}`).join('\n'), trn(tracks.length, '{n} song copied', '{n} songs copied'))
+const copyList = (tracks: LibraryTrack[]) => copyText(tracks.map((t) => `${t.artist} – ${t.title}`).join('\n'), trn(tracks.length, '{n} song copied', '{n} songs copied'))
 
 /** Finder and copy for any list of songs (user's request 2026-10-23: duplicate finder from every right-click). */
 function listTools(tracks: LibraryTrack[], scope: { name?: string; playlistId?: number } = {}): MenuEntry[] {
@@ -341,8 +338,8 @@ function remoteMenu(t: LibraryTrack, list: LibraryTrack[], index: number): MenuE
     '-',
     // A song a mix discovered has no library row to hold "never": it is remembered by title and artist.
     !isStation(t) && { label: tr('Never in mixes'), icon: <Prohibit size={16} />, onSelect: () => api.blockFind(t.title, t.artist).then(() => app().notify(tr('Left out of your mixes'), { action: { label: tr('Undo'), run: () => void api.blockFind(t.title, t.artist, false).catch(notifyError) } }), notifyError) },
-    pages(t).length > 0 && { label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(pages(t)[0].url, tr('Link copied')) },
-    { label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
+    pages(t).length > 0 && { label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copyText(pages(t)[0].url, tr('Link copied')) },
+    { label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copyText(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
     ...pages(t).map((p) => ({ label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
   ]
 }
@@ -502,8 +499,8 @@ export function trackMenu(t: LibraryTrack, ctx: { list?: LibraryTrack[]; index?:
       ? { id: 'music', label: tr('It’s music'), icon: <MusicNotesSimple size={16} />, onSelect: () => void markMusic([t.id], true) }
       : { id: 'music', label: tr('Not music: hide it'), icon: <EyeSlash size={16} />, onSelect: () => void markMusic([t.id], false) },
     '-',
-    pages(t).length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(pages(t)[0].url, tr('Link copied')) },
-    { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
+    pages(t).length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copyText(pages(t)[0].url, tr('Link copied')) },
+    { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copyText(`${t.artist} – ${t.title}`, tr('Title and artist copied')) },
     tag('saveCover', saveCoverItem(t)),
     ...pages(t).map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
     { id: 'credits', label: tr('Credits…'), icon: <Users size={16} />, onSelect: () => showCredits(t) },
@@ -562,8 +559,8 @@ export function hitMenu(hit: SearchHit, add: () => void, busy: boolean, play: ()
     { id: 'addToLibrary', label: tr('Add to library'), icon: <Plus size={16} />, disabled: busy, onSelect: add },
     tag('addTo', addRemoteTo(item)),
     '-',
-    links.length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(links[0].url, tr('Link copied')) },
-    { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copy(`${hit.artist} – ${hit.title}`, tr('Title and artist copied')) },
+    links.length > 0 && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copyText(links[0].url, tr('Link copied')) },
+    { id: 'copyTitle', label: tr('Copy title and artist'), icon: <Copy size={16} />, onSelect: () => copyText(`${hit.artist} – ${hit.title}`, tr('Title and artist copied')) },
     ...links.map((p) => ({ id: 'openIn', label: tr('Open in {service}', { service: p.label }), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(p.url).catch(notifyError) })),
   ])
 }
@@ -653,7 +650,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
       icon: <Devices size={16} />,
       onSelect: () => void sendToServer(p, s).catch(notifyError),
     })),
-    { id: 'copyName', label: tr('Copy name'), icon: <Copy size={16} />, onSelect: () => copy(p.name, tr('Name copied')) },
+    { id: 'copyName', label: tr('Copy name'), icon: <Copy size={16} />, onSelect: () => copyText(p.name, tr('Name copied')) },
     // A Subsonic server's playlist too: renamed there in the background, its old name back here if it refuses.
     (p.custom || takesEdits(p)) && {
       id: 'rename',
@@ -699,7 +696,7 @@ export function playlistMenu(p: LibraryPlaylist): MenuEntry[] {
         { label: tr('Newest songs at the bottom'), checked: p.orderManual && !p.newestFirst, onSelect: () => void editPlaylist({ type: 'setOrder', id: p.id, newestFirst: false }) },
       ],
     },
-    remote && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copy(remote, tr('Link copied')) },
+    remote && { id: 'copyLink', label: tr('Copy link'), icon: <Link size={16} />, onSelect: () => copyText(remote, tr('Link copied')) },
     remote && { id: 'openYtm', label: tr('Open in YouTube Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(remote).catch(notifyError) },
     '-',
     { id: 'hide', label: tr('Hide playlist'), icon: <EyeSlash size={16} />, onSelect: () => (setHidden(playlistKey(p), true), app().notify(tr('{name} hidden · right-click Playlists to show it again', { name: p.name }))) },
@@ -812,8 +809,8 @@ export function playerMenu({ controls = true }: { controls?: boolean } = {}): Me
     lib && isRemote(lib) && tag('addToLibrary', addToLibraryItem(lib)),
     lib && isRemote(lib) && tag('addTo', addRemoteTo(lib)),
     '-',
-    video && { id: 'copyVideoUrl', label: tr('Copy video URL'), icon: <Link size={16} />, onSelect: () => copy(`https://youtu.be/${video}`, tr('Video URL copied')) },
-    video && { id: 'copyVideoUrlAt', label: tr('Copy video URL at current time'), icon: <Link size={16} />, onSelect: () => copy(`https://youtu.be/${video}?t=${Math.floor(positionMs / 1000)}`, tr('Video URL copied')) },
+    video && { id: 'copyVideoUrl', label: tr('Copy video URL'), icon: <Link size={16} />, onSelect: () => copyText(`https://youtu.be/${video}`, tr('Video URL copied')) },
+    video && { id: 'copyVideoUrlAt', label: tr('Copy video URL at current time'), icon: <Link size={16} />, onSelect: () => copyText(`https://youtu.be/${video}?t=${Math.floor(positionMs / 1000)}`, tr('Video URL copied')) },
     video && { id: 'openYoutube', label: tr('Open on YouTube'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(`https://www.youtube.com/watch?v=${video}&t=${Math.floor(positionMs / 1000)}s`).catch(notifyError) },
     now.page && { id: 'listenApple', label: tr('Listen on Apple Music'), icon: <ArrowSquareOut size={16} />, onSelect: () => openUrl(now.page!).catch(notifyError) },
     now.path && { id: 'showInFolder', label: tr('Show in folder'), icon: <FolderOpen size={16} />, onSelect: () => revealItemInDir(now.path!).catch(notifyError) },

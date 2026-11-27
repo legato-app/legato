@@ -1,6 +1,5 @@
 import { Heart, Microphone, Play } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { useStore } from '../../app/store'
 import { api, type PodcastFeed } from '../../shared/api'
 import { remoteArt } from '../../shared/art'
 import { formatDuration } from '../../shared/format'
@@ -12,6 +11,7 @@ import { usePlayer } from '../player/store'
 import { episodeQueue } from './episode'
 import { fresh, load, save, seen, toggle, type Marks } from './played'
 import { notifyError } from '../../app/notifyError'
+import { copyText } from '../../app/copyText'
 
 /**
  * Podcasts: the shows are open RSS feeds whose address you type (only that address is asked for; the episodes' audio comes
@@ -123,7 +123,7 @@ export function PodcastsView() {
             )}
             {kept.length > 0 && (
               <div className="pt-4">
-                <Button variant="ghost" onClick={() => void api.podcastExport().then((t) => navigator.clipboard.writeText(t)).then(() => useStore.getState().notify(tr('Copied to clipboard')), notifyError)}>
+                <Button variant="ghost" onClick={() => void api.podcastExport().then((t) => copyText(t, tr('Copied to clipboard')), notifyError)}>
                   {tr('Copy the list as OPML')}
                 </Button>
               </div>
