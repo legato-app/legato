@@ -12,7 +12,7 @@ let pending: Promise<Latest> | null = null
 const latest = () =>
   (pending ??= fetch('https://api.github.com/repos/legato-app/legato/releases/latest')
     .then((r) => (r.ok ? (r.json() as Promise<Release>) : Promise.reject(new Error(String(r.status)))))
-    .then((r) => ({ href: r.assets.find((a) => a.name.endsWith('-setup.exe'))?.browser_download_url ?? RELEASES, version: r.tag_name.replace(/^v/, '') }))
+    .then((r) => ({ href: r.assets.find((a) => a.name.startsWith('Legato_') && a.name.endsWith('-setup.exe'))?.browser_download_url ?? RELEASES, version: r.tag_name.replace(/^v/, '') }))
     .catch(() => ({ href: RELEASES, version: null })))
 
 type Android = { href: string; version: string | null }
