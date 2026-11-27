@@ -4,7 +4,8 @@ import { api } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
 import { sanitizeTheme, undoAddedTheme } from '../../shared/theme/theme'
 import { ask } from '../../shared/ui/Ask'
-import { askAboutLayout, joinThemes } from '../settings/themeLayoutImport'
+import { joinThemes } from '../settings/themeJoin'
+import { askAboutLayout } from '../settings/themeLayoutImport'
 import { nameOfFile, type DropKind } from './dropKinds'
 import { notifyError } from '../../app/notifyError'
 
@@ -31,7 +32,7 @@ export async function openDropped(kind: Exclude<DropKind, 'remix'>, path: string
       if (!joined) return
       const undo = () => useSettings.getState().update(undoAddedTheme(useSettings.getState().settings, before, joined))
       const name = joined.theme.name
-      notify(joined.added ? tr('Theme “{name}” added', { name }) : tr('Applied: {name}', { name }), { action: { label: tr('Undo'), run: undo } })
+      notify(joined.added ? tr('Theme “{name}” added', { name }) : tr('Applied: {name}', { name }), { action: { label: tr('Undo'), run: undo }, guarded: true })
     } else if (await ask({ title: tr('Replace your library with this backup?'), body: tr('Your playlists, likes, history and settings become the backup’s, then Legato restarts.'), ok: tr('Restore') })) {
       await api.libraryRestore(path)
     }

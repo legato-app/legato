@@ -7,9 +7,10 @@ import { pickFile, saveFile } from '../../shared/files'
 import { coverImage } from '../../shared/art'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
-import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, pickTheme, PRESETS, RADII, sanitizeTheme, type Background, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
+import { contrastReport, duplicateTheme, FITS, FONTS, isVideo, LOOK_KEYS, lookOf, MAX_THEME_CSS, paletteFrom, PALETTE_KEYS, pickTheme, PRESETS, RADII, sanitizeTheme, type Background, type JoinOptions, type Palette, type PaletteKey, type Theme } from '../../shared/theme/theme'
 import { LAYOUT_API } from '../../shared/theme/layout'
-import { askAboutLayout, joinThemes } from './themeLayoutImport'
+import { joinThemes } from './themeJoin'
+import { askAboutLayout } from './themeLayoutImport'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
 import { notifyError } from '../../app/notifyError'
@@ -317,6 +318,9 @@ function ThemeEditor({ id, onClose }: { id: string; onClose: () => void }) {
   )
 }
 
+// A copy made here of what is on screen (shared/theme: `withAddedTheme`).
+const AS_COPY: JoinOptions = { look: false, dedupe: false }
+
 /** Appearance › Theme: pick, make, import and edit themes (custom ones open in the editor). */
 export function ThemeStudio() {
   const { settings, update, current } = useSettings()
@@ -325,8 +329,8 @@ export function ThemeStudio() {
   const [paste, setPaste] = useState('')
   const [bad, setBad] = useState(false)
   const system: Theme = { ...current('system'), name: tr('System') }
-  // The theme joins (or the same one already there is picked) and opens in the editor. False: the list is full.
-  const add = (t: Theme, options?: { look?: boolean }) => {
+  // The theme joins (from outside: the same one already there is picked) and opens in the editor. False: the list is full.
+  const add = (t: Theme, options?: JoinOptions) => {
     const joined = joinThemes(t, options)
     if (joined) setEditing(joined.theme.id)
     return !!joined
@@ -352,7 +356,7 @@ export function ThemeStudio() {
   // A preset can't be edited: one gesture copies it into the custom themes and opens the editor on the copy.
   const dup = (t: Theme, patch: Partial<Theme> = {}) => {
     const c = duplicateTheme(t, tr('{name} custom', { name: t.name }), patch)
-    if (c) add(c, { look: false })
+    if (c) add(c, AS_COPY)
   }
   const custom = settings.customThemes.some((x) => x.id === settings.theme)
   const corners = (radius: Theme['radius']) => {
@@ -428,7 +432,7 @@ export function ThemeStudio() {
         <Button
           onClick={() => {
             const t = fresh({ name: tr('{name} custom', { name: current().name }) })
-            if (t) add(t, { look: false })
+            if (t) add(t, AS_COPY)
           }}
         >
           <Plus size={14} /> {tr('New theme (copy of current)')}

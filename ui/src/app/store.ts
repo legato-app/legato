@@ -44,6 +44,8 @@ export interface Toast {
   text: string
   kind: 'ok' | 'removed' | 'info' | 'error'
   action?: { label: string; run: () => void }
+  /** A theme's CSS can't hide it (`data-brand`): the way back from a theme just applied. */
+  guarded?: boolean
 }
 
 /** Albums / Artists page: source filter, size, sort. */
@@ -58,6 +60,8 @@ export interface ToastOptions {
   action?: Toast['action']
   /** Stays until dismissed: a job still running. */
   sticky?: boolean
+  /** Out of a theme's reach, and up for 15 s. */
+  guarded?: boolean
   /** Says it again in the toast with this id (kept, with its button) instead of adding one; gone by now: nothing. */
   id?: number
 }
@@ -463,7 +467,7 @@ export const useStore = create<State>((set, get) => {
       get().dismissToast(importToast)
     },
     endImport: () => set({ importRun: undefined }),
-    notify(said, { kind = 'ok', action, sticky, id: again } = {}) {
+    notify(said, { kind = 'ok', action, sticky, guarded, id: again } = {}) {
       const { important, scale } = get().toastPrefs
       if (important && kind !== 'error' && !action && again === undefined) return 0
       // Errors often come raw from Rust (notify(String(e))): said in plain words when it's a network failure.
@@ -475,8 +479,8 @@ export const useStore = create<State>((set, get) => {
       const id = ++toastId
       // Same text again: replace, don't stack.
       const rest = get().toasts.filter((t) => t.text !== text)
-      set({ toasts: [...rest, { id, text, kind, action }].slice(-MAX_TOASTS) })
-      if (!sticky) setTimeout(() => get().dismissToast(id), (kind === 'error' ? 8000 : action ? 6000 : 4000) * scale)
+      set({ toasts: [...rest, { id, text, kind, action, guarded }].slice(-MAX_TOASTS) })
+      if (!sticky) setTimeout(() => get().dismissToast(id), (guarded ? 15_000 : kind === 'error' ? 8000 : action ? 6000 : 4000) * scale)
       return id
     },
     dismissToast: (id) => set({ toasts: get().toasts.filter((t) => t.id !== id) }),

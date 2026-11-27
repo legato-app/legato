@@ -31,6 +31,20 @@ describe('withAddedTheme', () => {
     expect(other.changes.customThemes).toHaveLength(2)
   })
 
+  it('knows the same file again when a newer layout’s keys come back in another order', () => {
+    const own = theme('Later', { layout: { v: 99, regions: { left: ['sidebar'], right: [] } } as unknown as Theme['layout'] })
+    const reordered = theme('Later', { layout: { regions: { right: [], left: ['sidebar'] }, v: 99 } as unknown as Theme['layout'] })
+    expect(JSON.stringify(reordered.layout)).not.toBe(JSON.stringify(own.layout))
+    expect(withAddedTheme(settings({ customThemes: [own] }), reordered)!.added).toBe(false)
+  })
+
+  it('makes a second copy of a copy made here', () => {
+    const own = theme('Night')
+    const second = withAddedTheme(settings({ customThemes: [own] }), theme('Night'), { dedupe: false })!
+    expect(second.added).toBe(true)
+    expect(second.changes.customThemes).toHaveLength(2)
+  })
+
   it('refuses one past the cap, never losing one at sanitize, and still picks one already there', () => {
     const full = Array.from({ length: MAX_CUSTOM_THEMES }, (_, index) => theme(`Theme ${index}`))
     expect(withAddedTheme(settings({ customThemes: full }), theme('One more'))).toBeNull()

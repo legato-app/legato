@@ -1,19 +1,9 @@
-import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { layoutSummary, withoutLayout } from '../../shared/theme/layout'
-import { withAddedTheme, type JoinedTheme, type Theme } from '../../shared/theme/theme'
+import type { Theme } from '../../shared/theme/theme'
 import { askChoice } from '../../shared/ui/Ask'
-
-/** `withAddedTheme` written into the settings, whatever door the theme came through; a full list is said. Null: nothing changed. */
-export function joinThemes(theme: Theme, options?: { look?: boolean }): JoinedTheme | null {
-  const { settings, update } = useSettings.getState()
-  const joined = withAddedTheme(settings, theme, options)
-  if (!joined) void notifyError(new Error(tr('24 themes at most: remove one first.')))
-  else update(joined.changes)
-  return joined
-}
 
 /**
  * A theme about to join, whatever door it came through: when it rearranges the app and themes may, the user picks.

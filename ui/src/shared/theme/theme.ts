@@ -875,15 +875,24 @@ export interface JoinedTheme {
   changes: Partial<Settings>
 }
 
-// Two themes are the same one when all but the id is: dropping a file twice adds nothing.
-const contentOf = (theme: Theme) => JSON.stringify({ ...theme, id: undefined })
+// Two themes are the same one when all but the id is, whatever order their keys come in (a newer app's layout is kept as it
+// came, and a round trip through Rust may reorder it).
+const sortedKeys = (_key: string, value: unknown) => (value && typeof value === 'object' && !Array.isArray(value) ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => (a < b ? -1 : 1))) : value)
+const contentOf = (theme: Theme) => JSON.stringify({ ...theme, id: undefined }, sortedKeys)
+
+/** For a theme from outside, the defaults. A copy made here: `look` false (the user's own look choices stay on screen) and
+ *  `dedupe` false (a second copy is a second theme). */
+export interface JoinOptions {
+  look?: boolean
+  dedupe?: boolean
+}
 
 /**
- * A theme (checked: `sanitizeTheme`) joins My themes and is picked, its look applied like any picked theme's (`look`
- * false: a copy of what is on screen, the user's own look choices stay). Null: the list is full.
+ * A theme (checked: `sanitizeTheme`) joins My themes and is picked, its look applied like any picked theme's. The same theme
+ * already there is picked instead and nothing added. Null: the list is full.
  */
-export function withAddedTheme(settings: Pick<Settings, 'customThemes' | 'homeSections'>, theme: Theme, { look = true } = {}): JoinedTheme | null {
-  const same = settings.customThemes.find((own) => contentOf(own) === contentOf(theme))
+export function withAddedTheme(settings: Pick<Settings, 'customThemes' | 'homeSections'>, theme: Theme, { look = true, dedupe = true }: JoinOptions = {}): JoinedTheme | null {
+  const same = dedupe ? settings.customThemes.find((own) => contentOf(own) === contentOf(theme)) : undefined
   if (!same && settings.customThemes.length >= MAX_CUSTOM_THEMES) return null
   const picked = same ?? theme
   const choice = look ? pickTheme(picked, settings) : { theme: picked.id }

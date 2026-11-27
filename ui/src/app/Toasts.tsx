@@ -29,12 +29,14 @@ export function Toasts() {
   // Picture-in-picture: nothing over the video (YouTube's rule); they show again with the full window.
   const pip = usePip((s) => s.on)
   if (!toasts.length || pip) return null
+  // The box too: a theme hiding it would take the guarded toast with it.
+  const guardedBox = toasts.some((t) => t.guarded) || undefined
   return (
-    <div aria-live="polite" className={`pointer-events-none fixed z-[60] flex flex-col gap-2 px-4 ${places[place]}`}>
+    <div data-brand={guardedBox} aria-live="polite" className={`pointer-events-none fixed z-[60] flex flex-col gap-2 px-4 ${places[place]}`}>
       {toasts.map((t) => {
         const { Icon, color } = icons[t.kind]
         return (
-          <div key={t.id} role={t.kind === 'error' ? 'alert' : 'status'} className="toast pointer-events-auto flex max-w-[min(560px,100%)] items-center gap-3 rounded-lg border border-line bg-raised py-2 pe-2 ps-3.5 text-[0.8125rem] text-ink shadow-[0_12px_32px_var(--shadow)]">
+          <div key={t.id} data-brand={t.guarded || undefined} role={t.kind === 'error' ? 'alert' : 'status'} className="toast pointer-events-auto flex max-w-[min(560px,100%)] items-center gap-3 rounded-lg border border-line bg-raised py-2 pe-2 ps-3.5 text-[0.8125rem] text-ink shadow-[0_12px_32px_var(--shadow)]">
             <Icon size={18} weight="fill" style={{ color }} className="shrink-0" />
             <span className="min-w-0 flex-1 py-0.5">{t.text}</span>
             {t.action && (
