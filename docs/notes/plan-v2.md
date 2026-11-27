@@ -620,9 +620,75 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       `background.rs`'s 5 minutes); 10 a smaller cover cache (`ArtCache::new(…, 500 << 20)` and `coverCacheMb`'s
       default: 250 MB in Lite). Lite's defaults apply only where the user never chose, as with `DEFAULTS_VERSION`.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. For Opus: the design
-      first, later. WebKitGTK instead of WebView2: check the YouTube embed there first (codecs, autoplay, the shield's
-      hooks and `live.js`), then the keychain (Secret Service), the tray, Open at startup, packaging (AppImage or .deb)
-      and its update feeds.
+      Designed 2026-11-27 (Opus), not built (below). WebKitGTK instead of WebView2: check the YouTube embed there first
+      (codecs, autoplay, the shield's hooks and `live.js`), then the keychain (Secret Service), the tray, Open at startup,
+      packaging (AppImage or .deb) and its update feeds.
+      - Base: item 18 (line 487). The CI already compiles the non-Windows paths (macOS job), so Linux = those paths plus
+        GTK. Both editions are one job (Lite = the same cfgs minus its cuts). Targets: WebKitGTK 4.1 (Ubuntu 22.04+,
+        Debian 12+), x86_64 and aarch64 (small Linux machines, Raspberry Pi and the like).
+      - Risk 1, to clear before anything: the YouTube embed on WebKitGTK.
+        - Codecs: YouTube goes through MSE (VP9/AV1/H.264 with Opus/AAC); WebKitGTK decodes through GStreamer, with the
+          distribution's plugins (Fedora ships without H.264 by default). The AppImage needs `bundleMediaFramework: true`
+          (GStreamer inside, a bigger image); the .deb depends on `gstreamer1.0-plugins-good`, `-bad` and `gstreamer1.0-libav`.
+        - Origin: the page comes from `tauri://localhost`, and YouTube refuses an embed without a valid origin or referrer
+          (errors 150/153). Measure first; any workaround stays within the rules (the official embed, never extracted audio).
+        - Autoplay: WebKit's policy (`WebKitWebsitePolicies`, autoplay allowed for the main view). `live.js`: WebAudio
+          inside the YouTube frame, scripts in every frame (wry injects them with `WebKitUserScript`): to check.
+          Rendering: on Nvidia/Wayland `WEBKIT_DISABLE_DMABUF_RENDERER` may be needed; hardware decoding varies (CPU cost
+          on small machines: measure for the Lite).
+      - Windows-only today, so a Linux twin or absence (no fake buttons: a table of what is missing in `shared/platform.ts`,
+        the UI hides it):
+        - `media.rs` (SMTC, media keys) → MPRIS (`mpris-server` on zbus, already in Cargo.lock through keyring). Media keys
+          go through MPRIS, never registered, as on Windows. `session.rs` (other apps' players, the Detector's first
+          layer) → an MPRIS list over D-Bus; cut in the Lite anyway.
+        - `secrets.rs` keyring → Secret Service (gnome-keyring, KWallet; the keyring feature already pulls it in). Without
+          a daemon: never a plain-text file. Settings says so; connections are not kept (a session keyutils fallback to
+          study, lost at reboot).
+        - `shield.rs` (WebView2's `WebResourceRequested`) → `WebKitUserContentFilter` (compiled rules) to block, and the
+          `resource-load-started` signal to note each host (CLAUDE.md: every window noted; Settings › Privacy). Required
+          before any release: the privacy lines must stay true. `cookies_for_url` (ytm, spotify_web, web_reader): wry
+          handles it on Linux (WebKitCookieManager); a real test is needed.
+        - Absent: `background.rs` `browser_args`, `webview_watch.rs`, `ytwatch.rs`, `thumbbar.rs`, `jumplist.rs`,
+          `speech.rs` (WinRT: voice search disappears; no Web Speech in WebKitGTK), `unplug.rs`, `window_place.rs`
+          (Wayland forbids placement: size only), `rename.rs` (Linux never had the old name).
+        - `mixer.rs` (mixer label) → `PULSE_PROP="application.name=Legato[ Lite]"` set before the window; web processes
+          inherit it, PipeWire reads it.
+        - `autostart.rs` (HKCU Run) → `~/.config/autostart/<id>.desktop` (the `$APPIMAGE` path for the AppImage).
+          `protocol.rs` (`legato://` in the registry) → `MimeType=x-scheme-handler/legato` in the .desktop (the .deb
+          installs it; the AppImage registers it at first launch via `xdg-mime`). Both for the installed app only
+          (`identity::installed()`).
+        - Global shortcuts: the plugin works under X11 only; under Wayland they are absent and Settings says so. Tray:
+          libayatana-appindicator, menu only (no left click on Linux). GNOME without an extension has no tray, so
+          `closeToTray` is off by default when no tray is seen; otherwise closing would hide the app with no way back.
+        - Native player: cpal → ALSA (PipeWire through its ALSA layer), already tested in CI (ALSA headers). Discord IPC →
+          the Unix socket `$XDG_RUNTIME_DIR/discord-ipc-0` (cut in the Lite). Device name (`devices.rs`) → host name.
+      - Packages and updates: AppImage (the only format Tauri's updater updates) + .deb (no apt repository of ours, no
+        server: the app says "new version, download it" instead of installing; `update.rs` knows the install type). No
+        .rpm or Flatpak in v1 (Flathub builds by a third party: decide later). `latest.json` gains `linux-x86_64` and
+        `linux-aarch64` (tauri-action adds them; older Windows versions ignore them). `latest-lite.json`: the `lite` job's
+        script merges the platforms. `promote.mjs` unchanged (`withNotes` already requires url and signature everywhere).
+        Same signing key.
+      - CI: check.yml's Linux job builds only the crates today (apt WebKitGTK is too slow). Add `cargo clippy -p legato`
+        (full and Lite) on Linux with an apt cache, only when Rust changes (the existing `scope`). release.yml: a `linux`
+        job as a matrix (ubuntu-22.04 and ubuntu-22.04-arm, the base glibc), full and Lite, attached to the same release
+        as the APK; a failure does not block Windows.
+      - Slices (S = 1, M = 2, L = 3), 15 points. Order: 0, then 1, then 2-3-4 in any order, then 5-6-7. After the Windows
+        and Android Lite (the owner's decision).
+        0 `M` Trial: the shell built in CI, a debug AppImage as an artifact. The owner runs it (WSLg or a VM, their own
+          setup): the embed plays, `live.js` runs, the Google sign-in, `cookies_for_url`. Go on or stop there.
+        1 `M` Linux cfgs, the table of what is missing in the UI, clippy Linux in CI.
+        2 `M` MPRIS + `session.rs` on Linux.
+        3 `M` Secret Service (a message when there is no daemon), tray / `closeToTray`, XDG autostart, `legato://`,
+          single instance (D-Bus), `PULSE_PROP`.
+        4 `L` WebKitGTK shield (filter + host list) and its rule tests.
+        5 `M` Linux release job x86_64 + aarch64, AppImage + .deb, both editions, the feed and the .deb case in `update.rs`.
+        6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs
+          (architecture, development: apt dependencies, CONTRIBUTING › Releasing).
+        7 `S` Measure the Lite on a small aarch64 machine (RAM, CPU while playing) against the Windows target.
+      - Decided alone (2026-11-27, Opus): AppImage + .deb only; no plain text without a keyring; no global shortcuts under
+        Wayland; aarch64 from the first release.
+      - Not tried for real: everything. There is no Linux on the PC used for the design; the embed, codecs, MPRIS, tray and
+        Secret Service are seen only in slice 0, on the owner's machine.
 - [ ] `L+` Mobile version, well optimised, the Rust code reused (the owner's ask 2026-11-02): Tauri 2's Android target
       with the same crates and `ui/`, Android first, iPhone after. Spec, seven phases, what stays desktop-only and the
       owner's calls (Android SDK / NDK on this PC, a phone, GitHub or Play Store, YouTube sign-in in a WebView):
@@ -1122,6 +1188,58 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       `--profile`, the restart switch; 3 `SHARED_KEYS` + `shared.json` with a test; 4 Sync `uid` (field, refusal, pairing)
       with tests; 5 the avatar menu + optional code; 6 the launch picker if reconfirmed, docs (`architecture.md`,
       `sync-mode.md`, `PRIVACY`: nothing new leaves the PC).
+    - Designed 2026-11-27 (Opus), not built. Replaces the slices above; the owner's choices of 2026-11-25 and 2026-11-27 hold.
+      Facts from the code: settings live in the library (`lib.setting("ui")`, `lib.rs:805`, `load_settings:361`), so they
+      follow the profile. Eight calls read the folders (`app_data_dir()` / `app_local_data_dir()`: lib.rs, backup x3,
+      storage x2, art, diag, plugins); secrets go through `secrets::store(service, dir)` (`secrets.rs:12`); every web
+      window (main `lib.rs:810`, ytm x2, spotify_export, web_reader) must take the same `data_directory`.
+      - Disk: Main = today's paths, byte for byte, no migration. Another profile lives in `profiles/<id>/` (library.db,
+        its daily copies, plugins, session), WebView2 in `app_local_data_dir/profiles/<id>/EBWebView`, keychain under
+        `<identifier>.p.<id>`. A root `profiles.json` holds `{id, uid, name, color, code?}` and `last`. Reads are
+        tolerant: unknown keys kept; a damaged file means Main plus one diag line with the id, never the name. Shared at
+        the root: the diag log, the image cache, `shared.json`.
+      - Shared: theme and own themes, EQ, playback settings, `localFolders`, servers, through one `SHARED_KEYS` table
+        (Rust, next to `save_settings`). `shared.json` is laid over the settings at load; on save the shared keys go to
+        `shared.json` *and* to the profile's settings, so each library stays complete and an older version, or a
+        rollback, opens Main intact. Server secrets are read under Main's service (`SharedSecrets` routes `server:*`).
+        Each profile scans its own shared local folders (tracks are rows of its library).
+      - Launch: `--profile <id>`, else `last`, else Main (unknown id = Main). One helper `profile::dirs(app)` replaces
+        the eight calls; a test reading the sources forbids `app_data_dir()` and `WebviewWindowBuilder::new` outside the
+        helpers, so no forgotten window opens another person's Google session (the one real risk of mixing). The
+        single-instance guard (`lib.rs:748`): a second launch for another profile asks the running one to switch. The
+        Run entry and updates are unchanged (they start on `last`). The `rename.rs` catch-up concerns Main only.
+      - 4-digit code: salted sha256 in `profiles.json`, checked in Rust (`profile_unlock`). A lock screen in the app's
+        look shows first; library commands refuse until unlocked. The UI calls it "a lock against mistakes, not protection".
+      - UI: an avatar (initial + colour) at the end of the top bar, after Settings (`App.tsx:202`). Hidden while there is
+        one profile; then only "Add a profile" exists, in the account menu and in Settings › General. Its menu: the
+        current profile (rename, colour, code), the others (switch: toast "Switching to X…", playback stops, restart),
+        Add, Manage. Remove asks, backs up the library, then deletes the folder, the known keychain keys
+        (`KNOWN_SECRET_KEYS`, since keyring cannot list) and the WebView2 folder. Main and the open profile are never removed.
+      - Sync Mode: the snapshot carries `profile` = uid (`serde(default)` = Main's uid, so older files go to Main); the
+        merge refuses another uid with a notice. Profiles other than Main sync in `Legato Sync/<uid>/`, so an older
+        version sees only Main's files at the root. Pairing over the network binds the open profile.
+      - Bound to a profile (say so in the docs): the remote, the overlay, Last.fm, ListenBrainz, Discord, Google,
+        installed plugins. A paired phone is paired to one profile.
+      - Lite: the same design under its own identifier (`app.legato.lite`: its own profiles, never the full app's).
+        Plugins are off there. Cost: one JSON read at launch. Android (full and Lite): Main only, no avatar or menu,
+        `profiles.json` never read (`#[cfg(desktop)]`).
+      - Slices (S = 1, M = 2; each with tests and i18n in 17 locales), 11 points, order 1 to 6; 1 and 3 can run in parallel:
+        1 `M` `crates/core/src/profiles.rs`, pure: tolerant read and write of `Profiles`, `ProfilePaths` (Main = today),
+          `hash_code` / `check_code`. Tests: no file gives Main, a damaged fixture, unknown keys kept, Main's paths unchanged.
+        2 `M` Launch: `profile::dirs` at the eight calls, one helper for every web window, `--profile`, `profile_switch`
+          (writes `last`, then `app.restart()`), single-instance, the source-reading test. First check: WebView2 accepts
+          another folder at each launch, and all windows of one launch share it.
+        3 `M` `SHARED_KEYS`, `shared.json`, `SharedSecrets`. Tests: the overlay, the round trip, and a full profile
+          library that an older version would read.
+        4 `M` Sync: uid, refusal, subfolder, pairing. Tests: an old fixture without uid gives Main; another uid is refused.
+        5 `M` Avatar and menu, add and manage, the code lock (`profile_unlock`, command guard). Tests: menu entries (pure),
+          the code in Rust, commands refused while locked.
+        6 `S` Removal (a pure plan of what gets deleted, tested); docs: architecture, `sync-mode.md`, design (Figma light
+          and dark), the site's `PRIVACY` (nothing new leaves the PC).
+      - To decide alone when built: plugins per profile (their storage may be personal); Main never removable; avatar
+        without a photo; Main's default name "Me" through `tr`, renamable.
+      - Not verified: nothing run. The WebView2 rule "one folder per launch" and `app.restart()` with an argument are to
+        confirm in slice 2.
 - [ ] `L` Exclusive WASAPI output / bit-perfect for local files (foobar's audiophiles).
 - [ ] `L` Podcasts by RSS (open feeds only: no platform audio taken), resume per episode, speed.
       2026-11-13, the first slice: Settings › Playback › Podcasts (off) adds Podcasts to the app menu: type an open feed's address, keep
