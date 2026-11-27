@@ -27,6 +27,12 @@ export function versionOf(majorMinor, n) {
   return `${major}.${minor + Math.floor(n / 1000)}.${n % 1000}`
 }
 
+/**
+ * `git describe` arguments for the tag the notes start from: the last v* tag, never the run's own (a re-run of an older
+ * run's jobs sees `v<version>` on HEAD, and notes since it would be empty).
+ */
+export const previousTagArgs = (version) => ['describe', '--tags', '--abbrev=0', '--match', 'v*', '--exclude', `v${version}`]
+
 const CONF = 'src-tauri/tauri.conf.json'
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
 
@@ -44,7 +50,7 @@ function release() {
 
   let previous = ''
   try {
-    previous = git('describe', '--tags', '--abbrev=0', '--match', 'v*')
+    previous = git(...previousTagArgs(version))
   } catch {
     // First release.
   }

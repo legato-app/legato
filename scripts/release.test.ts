@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { compareTags } from './promote.mjs'
-import { BASES, versionOf } from './release.mjs'
+import { BASES, previousTagArgs, versionOf } from './release.mjs'
 
 // Android's versionCode, as Tauri makes it from the version.
 const code = (v: string) => v.split('.').map(Number).reduce((n, p, i) => n + p * [1_000_000, 1_000, 1][i], 0)
@@ -23,5 +23,11 @@ describe('release version', () => {
   it('refuses a MAJOR.MINOR without a base', () => {
     expect(Object.keys(BASES)).toContain('1.2')
     expect(() => versionOf('1.3', 1)).toThrow('No base commit')
+  })
+})
+
+describe('release notes start', () => {
+  it("skips the run's own tag, so a re-run still gets the notes since the previous beta", () => {
+    expect(previousTagArgs('1.2.40')).toEqual(['describe', '--tags', '--abbrev=0', '--match', 'v*', '--exclude', 'v1.2.40'])
   })
 })

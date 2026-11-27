@@ -317,7 +317,15 @@ jobs:
           VERSION: ${{ needs.release.outputs.version }}
         run: |
           gh release upload "v$VERSION" lite/Legato.Lite_* lite/latest-lite.json --clobber
-          gh release upload beta lite/latest-lite.json --clobber
+          # A re-run of an older run's Lite jobs never takes Beta back: beta's file is left when it names a higher version.
+          mkdir -p current
+          gh release download beta --pattern latest-lite.json --dir current --clobber 2> /dev/null || true
+          current=$(jq -r '.version // empty' current/latest-lite.json 2> /dev/null || true)
+          if [ -n "$current" ] && [ "$(printf '%s\n%s\n' "$current" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+            echo "::notice::Beta's latest-lite.json is already v$current, newer than v$VERSION: left as is"
+          else
+            gh release upload beta lite/latest-lite.json --clobber
+          fi
 
   # The APK onto the versioned release, once the Windows job has made it.
   apk:
