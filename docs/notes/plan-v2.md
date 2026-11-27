@@ -934,6 +934,10 @@ colours, mirror, reflection.
     - Decided alone (2026-11-27): the wizard’s button now comes back to "Copy" after 1.5 s and takes the app’s button
       look; a refused clipboard is a toast in the three places (Rooms showed its banner); the theme and diagnostics
       copy buttons keep their own.
+  - [ ] 12. The small equality helpers: left (2026-11-27): the same one-line list comparison exists twice
+    (`libraryPatch.ts`, the player store); a shared one with its test adds more than it removes.
+  - [ ] 13. The FNV hashing: left (2026-11-27): three copies of 1 to 4 lines (`banner.ts`, `filter.ts`,
+    `smart/rules.ts`), `connectors/src/art.rs` the only Rust one; a helper with its test adds more than it removes.
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md
