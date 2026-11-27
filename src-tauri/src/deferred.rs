@@ -58,6 +58,7 @@ fn start(app: &AppHandle, cause: Cause) {
         tauri::async_runtime::spawn_blocking(move || {
             crate::backup::remove_old_mixes(&app);
             crate::backup::drop_spotify_art(&app);
+            crate::backup::turn_backwards_titles(&app);
             crate::backup::drop_old_cleanup_backups(&app);
         });
     }

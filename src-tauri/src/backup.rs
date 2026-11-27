@@ -38,6 +38,20 @@ pub fn drop_spotify_art(app: &AppHandle) {
     }
 }
 
+/// Once, after the first screen: songs saved with title and artist swapped are put right, where the library proves it.
+pub fn turn_backwards_titles(app: &AppHandle) {
+    let Some(state) = app.try_state::<AppState>() else { return };
+    let turned = state.lib().turn_backwards_titles();
+    match turned {
+        Ok(0) => {}
+        Ok(turned) => {
+            crate::diag::info("library", "swapped titles put right", &format!("{turned} songs"));
+            let _ = app.emit_to("main", "local-changed", 0);
+        }
+        Err(e) => crate::diag::warn("library", "swapped titles not put right", &format!("{e:#}")),
+    }
+}
+
 /// A copy of the library next to it before a cleanup (`copy` = which).
 pub fn back_up_before(app: &AppHandle, copy: &str) -> anyhow::Result<()> {
     music_core::library::back_up_before_cleanup(&app.path().app_data_dir()?.join("library.db"), copy)?;

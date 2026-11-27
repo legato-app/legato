@@ -150,6 +150,35 @@ impl Library {
         })
     }
 
+    /// Once: a song older versions saved backwards ("doja cat *slowed*" by "like that") is turned round when the
+    /// library holds the proof, that artist's song of that name from elsewhere. The video's raw title isn't kept, so
+    /// nothing less tells it from a channel's own upload. Only what a video alone named (its id, its frame, no album)
+    /// changes. A sync never renames a song a PC has: two versions don't undo each other. How many were turned.
+    pub fn turn_backwards_titles(&self) -> Result<usize> {
+        const DONE: &str = "backwardsTitles1";
+        if self.setting(DONE)?.is_some() {
+            return Ok(0);
+        }
+        self.tx(|| {
+            let (videos, others): (Vec<LibraryTrack>, Vec<LibraryTrack>) = self.track_rows(None)?.into_iter().partition(|row| {
+                let video = row.track.ids.get(&Source::Youtube).filter(|_| row.track.ids.len() == 1 && row.track.album.is_none());
+                video.is_some_and(|video| row.track.art.as_deref() == Some(crate::model::youtube_art(video).as_str()))
+            });
+            let songs: HashSet<(String, String)> = others.iter().map(|row| (primary_artist(&row.track.artist), normalize(&row.track.title))).collect();
+            let mut turned = 0;
+            for row in videos {
+                let name = normalize(&row.track.artist);
+                let proven = |artist: &str| !name.is_empty() && songs.contains(&(artist.to_string(), name.clone()));
+                if let Some((artist, title)) = reversed_credit(&row.track.artist, &row.track.title, proven) {
+                    self.set_details(row.id, &title, &artist, None)?;
+                    turned += 1;
+                }
+            }
+            self.set_setting(DONE, &serde_json::json!(true))?;
+            Ok(turned)
+        })
+    }
+
     pub fn upsert_track(&self, t: &Track) -> Result<i64> {
         self.tx(|| {
             let mut found = self.lookup(t)?;

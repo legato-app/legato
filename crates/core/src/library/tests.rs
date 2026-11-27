@@ -1630,3 +1630,31 @@ fn a_setting_is_read_and_written_as_its_type() -> Result<()> {
     assert_eq!(library.setting_as::<u32>("folders"), None);
     Ok(())
 }
+
+#[test]
+fn songs_saved_backwards_are_turned_once_where_the_library_proves_it() -> Result<()> {
+    let lib = Library::in_memory()?;
+    // As a pasted link or the video search saved it: the video's id and frame, no album.
+    let video = |id: &str, title: &str, artist: &str| Track { title: title.into(), artist: artist.into(), ids: BTreeMap::from([(Source::Youtube, id.into())]), art: Some(crate::model::youtube_art(id)), ..Default::default() };
+    let swapped = lib.upsert_track(&video("v1", "doja cat *slowed*", "like that"))?;
+    // A channel's own upload reads the same without proof; so does a video nothing else knows.
+    let upload = lib.upsert_track(&video("v2", "Doja Cat *slowed*", "Vinyl Music"))?;
+    let unproven = lib.upsert_track(&video("v3", "Someone", "A Song"))?;
+    // A song with an album names itself, backwards or not.
+    let named = lib.upsert_track(&Track { album: Some("Mix".into()), ..video("v4", "Doja Cat", "Say So") })?;
+    let catalog = |id: &str, title: &str| Track { art: Some("https://lh3.googleusercontent.com/a".into()), album: Some("Hot Pink".into()), ..video(id, title, "Doja Cat") };
+    lib.upsert_track(&catalog("c1", "Like That (feat. Gucci Mane)"))?;
+    lib.upsert_track(&catalog("c2", "Say So"))?;
+    let names = |id: i64| -> Result<(String, String)> { Ok(lib.track(id)?.map(|row| (row.track.artist, row.track.title)).unwrap()) };
+    let pair = |artist: &str, title: &str| (artist.to_string(), title.to_string());
+    assert_eq!(lib.turn_backwards_titles()?, 1);
+    assert_eq!(names(swapped)?, pair("doja cat", "like that *slowed*"));
+    assert_eq!(names(upload)?, pair("Vinyl Music", "Doja Cat *slowed*"));
+    assert_eq!(names(unproven)?, pair("A Song", "Someone"));
+    assert_eq!(names(named)?, pair("Say So", "Doja Cat"));
+    // Once: what comes later is left as it is.
+    let later = lib.upsert_track(&video("v5", "Doja Cat", "Say So"))?;
+    assert_eq!(lib.turn_backwards_titles()?, 0);
+    assert_eq!(names(later)?, pair("Say So", "Doja Cat"));
+    Ok(())
+}

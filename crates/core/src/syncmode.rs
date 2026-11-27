@@ -1066,6 +1066,21 @@ mod tests {
     }
 
     #[test]
+    fn a_title_turned_on_one_pc_and_not_the_other_stays_as_each_has_it() -> Result<()> {
+        let (turned, old) = (Library::in_memory()?, Library::in_memory()?);
+        let list = |lib: &Library, title: &str, artist: &str| lib.save_playlist(Source::Youtube, "p1", "Edits", &[Track { artist: artist.into(), ..song(title, "v1") }]);
+        list(&turned, "like that *slowed*", "doja cat")?;
+        list(&old, "doja cat *slowed*", "like that")?;
+        for _ in 0..2 {
+            turned.merge(&snap(&old))?;
+            old.merge(&snap(&turned))?;
+        }
+        assert_eq!(titles_sorted(&turned)?, ["like that *slowed*"]);
+        assert_eq!(titles_sorted(&old)?, ["doja cat *slowed*"]);
+        Ok(())
+    }
+
+    #[test]
     fn a_song_added_to_an_imported_playlist_travels_and_outlives_the_other_pcs_import() -> Result<()> {
         let a = Library::in_memory()?;
         let b = Library::in_memory()?;

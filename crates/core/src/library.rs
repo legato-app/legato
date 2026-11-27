@@ -1,12 +1,12 @@
 use crate::local::LocalSong;
 use crate::lyrics::{self, LyricHit, Lyrics};
-use crate::matching::{is_count, match_key, same_track};
+use crate::matching::{is_count, match_key, normalize, primary_artist, reversed_credit, same_track};
 use crate::model::{Source, Track};
 use crate::musicness::Musicness;
 use anyhow::{Context, Result};
 use rusqlite::{Connection, OptionalExtension, Row, params};
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::Path;
 
 // WAL + synchronous NORMAL: one disk flush per checkpoint, not per write (each play, like, edit); safe from
