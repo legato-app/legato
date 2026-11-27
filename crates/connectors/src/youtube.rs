@@ -129,8 +129,14 @@ mod tests {
         assert_eq!(read("lanterns - quill reuploads"), pair("lanterns", "quill reuploads"));
         // A band named "Yellow" seen while browsing: a pasted "Coldplay - Yellow" stays as written.
         let mut server = Server::new_async().await;
-        server.mock("GET", "/oembed").match_query(Matcher::Any).with_body(r#"{"title":"Coldplay - Yellow","author_name":"Some Channel"}"#).create_async().await;
-        let pasted = track_from_link("https://youtu.be/aaaaaaaaaaa", &format!("{}/oembed", server.url()), |_| false).await.unwrap();
+        server.mock("GET", "/oembed").match_query(Matcher::Any).with_body(r#"{"title":"Coldplay - Yellow","author_name":"Some Channel"}"#).expect(2).create_async().await;
+        let oembed = format!("{}/oembed", server.url());
+        let link = "https://youtu.be/aaaaaaaaaaa";
+        // Handed the catalog's names, as a search is, it would turn.
+        let searched = track_from_link(link, &oembed, crate::ytmusic::catalog_artist).await.unwrap();
+        assert_eq!((searched.artist, searched.title), pair("Yellow", "Coldplay"));
+        // A link is handed the library's artists, and nothing adds the catalog's to them.
+        let pasted = track_from_link(link, &oembed, |key| key == "lanterns").await.unwrap();
         assert_eq!((pasted.artist, pasted.title), pair("Coldplay", "Yellow"));
     }
 
