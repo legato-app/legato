@@ -15,8 +15,9 @@ import { scanWebcam } from '../share/webcam'
 import { DeviceIcon } from './DeviceIcon'
 import { kindLabel, left, rowNote, typedCode } from './devicesView'
 import { mergedText } from './merged'
+import { notifyError } from '../../app/notifyError'
 
-const fail = (e: unknown) => useStore.getState().notify(String(e), { kind: 'error' })
+const fail = notifyError
 
 /** Nothing new from it: said here. Changes are told by the `sync` event. */
 function done(m: Merged, text: string) {

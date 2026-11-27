@@ -15,8 +15,9 @@ import { pluginMenu } from '../menus'
 import { loadPlugins, permissionText, usePlugins } from './host'
 import { pluginLinks } from './pluginLinks'
 import { PluginPanel } from './PluginPanel'
+import { notifyError } from '../../app/notifyError'
 
-const fail = (e: unknown) => useStore.getState().notify(String(e), { kind: 'error' })
+const fail = notifyError
 
 function Permissions({ list, fresh }: { list: string[]; fresh?: string[] }) {
   if (!list.length) return <p className="text-[0.8125rem] text-ink-2">{tr('Nothing beyond its own storage.')}</p>

@@ -35,6 +35,7 @@ import { BASE_DIM, homeVeil, parseColor } from './homeVeil'
 import { jumpLists, useOpenedLists, type OpenedList } from './recentLists'
 import { weekOf } from './week'
 import { phoneApp } from '../../shared/platform'
+import { notifyError } from '../../app/notifyError'
 
 const ROW = 12
 
@@ -266,7 +267,7 @@ export function YouTubeShelf({ shelf, menu }: { shelf: Shelf; menu?: () => MenuE
     try {
       return (await api.ytmList(list)).map(remoteTrack)
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
       return []
     } finally {
       setBusy(null)

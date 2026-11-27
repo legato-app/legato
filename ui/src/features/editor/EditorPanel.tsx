@@ -14,6 +14,7 @@ import { EQ_FREQS, EQ_PRESETS, NEUTRAL, neutral, PRESETS } from '../player/effec
 import { useLive } from '../player/live'
 import { usePlayer } from '../player/store'
 import { applyPreset, bypass, playVersion, presetEffects, renameVersion, reset, savePreset, saveVersion, setEffects, updateVersion, useEditor } from './editor'
+import { notifyError } from '../../app/notifyError'
 
 /** Range with a resting value (double-click goes back to it). Filled from the start, or from the rest when `center` (bipolar). */
 function Slider({ label, value, min, max, step, rest, center = false, show, onChange }: { label: string; value: number; min: number; max: number; step: number; rest: number; center?: boolean; show: (v: number) => string; onChange: (v: number) => void }) {
@@ -206,7 +207,7 @@ export function EditorPanel({ onHide }: { onHide: () => void }) {
   const current = versions.find((v) => v.id === versionId)
   const sub = <K extends 'reverb' | 'echo' | 'space'>(k: K, p: Partial<Effects[K]>) => setEffects({ [k]: { ...e[k], ...p } } as Partial<Effects>)
   const eq = (i: number, g: number) => setEffects({ eq: e.eq.map((x, j) => (j === i ? g : x)) as Effects['eq'] })
-  const fail = (err: unknown) => useStore.getState().notify(String(err), { kind: 'error' })
+  const fail = notifyError
 
   return (
     <aside aria-label={tr('Live Editor')} onContextMenu={onMenu(() => editorMenu(onHide))} className="flex min-h-0 flex-col gap-2 rounded-2xl border border-line-soft bg-[color-mix(in_srgb,var(--panel)_55%,transparent)] p-3">

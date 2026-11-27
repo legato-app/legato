@@ -21,6 +21,7 @@ import { canPlay, fileTitle, isRemote, useNowTrack, usePlayer } from './store'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { api } from '../../shared/api'
 import { askText } from '../../shared/ui/Ask'
+import { notifyError } from '../../app/notifyError'
 
 const ROW = 60
 /** Block headers: Now playing, Next added by you, Then from … */
@@ -60,7 +61,7 @@ async function saveQueue() {
     await refreshChanged()
     notify(tr('Saved as the playlist “{name}”', { name }), { action: { label: tr('Open'), run: () => go({ name: 'playlist', id }) } })
   } catch (e) {
-    notify(String(e), { kind: 'error' })
+    notifyError(e)
   }
 }
 

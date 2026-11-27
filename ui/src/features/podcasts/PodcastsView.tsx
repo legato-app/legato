@@ -11,6 +11,7 @@ import { PageHeader } from '../../shared/ui/PageHeader'
 import { usePlayer } from '../player/store'
 import { episodeQueue } from './episode'
 import { fresh, load, save, seen, toggle, type Marks } from './played'
+import { notifyError } from '../../app/notifyError'
 
 /**
  * Podcasts: the shows are open RSS feeds whose address you type (only that address is asked for; the episodes' audio comes
@@ -26,7 +27,7 @@ export function PodcastsView() {
   const [news, setNews] = useState<string[]>([])
   const [paste, setPaste] = useState('')
   const change = (m: Marks) => (setMarks(m), save(m))
-  const fail = (e: unknown) => useStore.getState().notify(String(e), { kind: 'error' })
+  const fail = notifyError
   useEffect(() => {
     api.podcastKept().then(setKept, fail)
   }, [])

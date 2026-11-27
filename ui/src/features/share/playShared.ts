@@ -2,6 +2,7 @@ import { useStore } from '../../app/store'
 import { api, type LibraryTrack, type SharedSong } from '../../shared/api'
 import { region } from '../../shared/format'
 import { remoteTrack, usePlayer } from '../player/store'
+import { notifyError } from '../../app/notifyError'
 
 /** What `playSharedSong` leans on, replaceable in tests. */
 export interface PlayDeps {
@@ -15,7 +16,7 @@ const live: PlayDeps = {
   song: (code) => api.shareSong(code, region()),
   library: () => useStore.getState().tracks,
   play: (list) => usePlayer.getState().playTracks(list, 0),
-  fail: (e) => useStore.getState().notify(String(e), { kind: 'error' }),
+  fail: (e) => notifyError(e),
 }
 
 /**

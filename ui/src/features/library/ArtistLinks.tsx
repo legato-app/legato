@@ -1,13 +1,13 @@
 import { ArrowSquareOut } from '@phosphor-icons/react'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { useState } from 'react'
-import { useStore } from '../../app/store'
 import { api, type Bio } from '../../shared/api'
 import { artistName } from '../../shared/artistName'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { Button } from '../../shared/ui/Button'
 import { Section } from '../../shared/ui/Section'
 import { type Found, linksFor } from './linksFor'
+import { notifyError } from '../../app/notifyError'
 
 /** What a link is, in words: MusicBrainz's relation names. */
 const LABEL: Record<string, string> = { 'official homepage': msg('Official website'), wikipedia: 'Wikipedia', bandcamp: 'Bandcamp', discogs: 'Discogs', allmusic: 'AllMusic', 'social network': msg('Social network'), streaming: msg('Streaming'), youtube: 'YouTube' }
@@ -32,7 +32,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
     setAsking(asked)
     api
       .artistLinks(asked)
-      .then((l) => setFound({ artist: asked, links: l }), (e) => useStore.getState().notify(String(e), { kind: 'error' }))
+      .then((l) => setFound({ artist: asked, links: l }), (e) => notifyError(e))
       .finally(() => setAsking((a) => (a === asked ? null : a)))
   }
   const readBio = () => {
@@ -41,7 +41,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
     setAsking(asked)
     api
       .artistBio(wiki.url)
-      .then((b) => setBioOf({ artist: asked, bio: b }), (e) => useStore.getState().notify(String(e), { kind: 'error' }))
+      .then((b) => setBioOf({ artist: asked, bio: b }), (e) => notifyError(e))
       .finally(() => setAsking((a) => (a === asked ? null : a)))
   }
   return (
@@ -56,7 +56,7 @@ export function ArtistLinks({ artist }: { artist: string }) {
         <ul className="flex flex-wrap gap-2">
           {links.map((l) => (
             <li key={l.url}>
-              <Button variant="ghost" onClick={() => void openUrl(l.url).catch((e) => useStore.getState().notify(String(e), { kind: 'error' }))} title={l.url}>
+              <Button variant="ghost" onClick={() => void openUrl(l.url).catch((e) => notifyError(e))} title={l.url}>
                 {tr(linkLabel(l.kind))} <ArrowSquareOut size={14} />
               </Button>
             </li>

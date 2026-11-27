@@ -6,6 +6,7 @@ import { tr } from '../../shared/i18n/i18n'
 import { ask } from '../../shared/ui/Ask'
 import { type MenuEntry } from '../../shared/ui/ContextMenu'
 import { type SmartList } from '../../shared/theme/theme'
+import { notifyError } from '../../app/notifyError'
 
 // Smart list actions, apart from the page: the sidebar needs them at launch, the page loads on its first visit.
 export function useSmartList(id: string) {
@@ -34,7 +35,7 @@ async function saveAsPlaylist(list: SmartList, ids: number[]) {
     await refreshChanged()
     notify(tr('Saved as the playlist “{name}”', { name: list.name }), { action: { label: tr('Open'), run: () => go({ name: 'playlist', id }) } })
   } catch (e) {
-    notify(String(e), { kind: 'error' })
+    notifyError(e)
   }
 }
 

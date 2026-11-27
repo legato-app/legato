@@ -4,6 +4,7 @@ import { api, type LibraryPlaylist, type LibraryTrack } from '../../shared/api'
 import { LIKED as NAME, ownLiked, youtubeLiked } from '../library/likedMusic'
 import { tr } from '../../shared/i18n/i18n'
 import { isRemote, usePlayer } from './store'
+import { notifyError } from '../../app/notifyError'
 
 // Like button (user's request 2026-10-26): song into the library and Liked Music. Signed in to YouTube Music = the
 // account's own Liked Music (a real like there); else, or no YouTube version, a playlist of yours by that name.
@@ -42,7 +43,7 @@ export function useLikedIds(): Set<number> {
 
 /** Thumbs down: ranked lower in mixes (Undo = back to normal), and on to the next song. */
 export function lessLikeThis(t: LibraryTrack) {
-  const fail = (e: unknown) => app().notify(String(e), { kind: 'error' })
+  const fail = notifyError
   api
     .setTrackPref(t.id, 'less')
     .then(() => app().notify(tr('Less of this in your mixes'), { action: { label: tr('Undo'), run: () => void api.setTrackPref(t.id, null).catch(fail) } }), fail)
@@ -52,7 +53,7 @@ export function lessLikeThis(t: LibraryTrack) {
 /** Your music server's song: liked = starred there too (Settings › Accounts' direction decides, in Rust). */
 function starOnServer(t: LibraryTrack, on: boolean) {
   const id = t.ids.server ?? app().tracks.find((x) => x.id === t.id)?.ids.server
-  if (id && !id.startsWith('radio:')) api.serverStar(id, on).catch((e: unknown) => app().notify(String(e), { kind: 'error' }))
+  if (id && !id.startsWith('radio:')) api.serverStar(id, on).catch((e: unknown) => notifyError(e))
 }
 
 export async function toggleLike(t: LibraryTrack) {
@@ -87,8 +88,8 @@ export async function toggleLike(t: LibraryTrack) {
     await app().refreshChanged()
     starOnServer(t, true)
     app().notify(tr('Added to {name}: {songs}', { name: NAME, songs: tr('“{title}”', { title: t.title }) }))
-    if (refused) app().notify(String(refused), { kind: 'error' })
+    if (refused) notifyError(refused)
   } catch (e) {
-    app().notify(String(e), { kind: 'error' })
+    notifyError(e)
   }
 }

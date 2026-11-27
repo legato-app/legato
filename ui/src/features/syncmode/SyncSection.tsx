@@ -11,6 +11,7 @@ import { Devices } from './Devices'
 import { mergedText } from './merged'
 import { passphrase, strength, type Hint } from './strength'
 import { phoneApp } from '../../shared/platform'
+import { notifyError } from '../../app/notifyError'
 
 const MIN_PASSWORD = 10
 
@@ -214,7 +215,7 @@ export function SyncSection() {
     try {
       done(await api.syncNow())
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setBusy(false)
       refresh()

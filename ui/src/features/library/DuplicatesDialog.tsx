@@ -12,6 +12,7 @@ import { SourceIcon } from '../../shared/ui/SourceIcon'
 import { bestCopy, duplicateGroups, repeatedRows } from './duplicates'
 import type { DupeScope } from './dialogs'
 import { removePositions } from './edits'
+import { notifyError } from '../../app/notifyError'
 
 /** One group: pick the copy to keep (the best one already picked), merge the others into it. */
 function Group({ group, keep, onKeep, onMerge, busy }: { group: LibraryTrack[]; keep: number; onKeep: (id: number) => void; onMerge: () => void; busy: boolean }) {
@@ -72,7 +73,7 @@ export function DuplicatesDialog({ scope, onClose }: { scope: DupeScope; onClose
       await refreshChanged()
       notify(trn(list.length, 'Merged {n} song', 'Merged {n} songs'))
     } catch (e) {
-      notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setBusy(false)
     }

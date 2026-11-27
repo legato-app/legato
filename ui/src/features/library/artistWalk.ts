@@ -3,6 +3,7 @@ import { api } from '../../shared/api'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { askText } from '../../shared/ui/Ask'
 import { usePlayer } from '../player/store'
+import { notifyError } from '../../app/notifyError'
 
 /**
  * Artist page › "Walk to another artist…": asks for a library artist and plays a walk from this one to it, through the
@@ -21,6 +22,6 @@ export async function walkFrom(artist: string) {
     if (usePlayer.getState().list === list) usePlayer.setState({ from: walk.artists.join(' → '), fromKind: 'walk', fromId: undefined })
     notify(trn(walk.artists.length, 'Walking through {n} artist', 'Walking through {n} artists'))
   } catch (e) {
-    notify(String(e), { kind: 'error' })
+    notifyError(e)
   }
 }

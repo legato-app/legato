@@ -1,12 +1,12 @@
 import { DiscordLogo } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useSettings } from '../../app/settings'
-import { useStore } from '../../app/store'
 import { api, type DiscordCard } from '../../shared/api'
 import { tr } from '../../shared/i18n/i18n'
 import { Button } from '../../shared/ui/Button'
 import { Led } from '../../shared/ui/controls'
 import { Picture } from '../../shared/ui/Picture'
+import { notifyError } from '../../app/notifyError'
 
 /** The accent Discord keeps for an account with no banner, as CSS. */
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`
@@ -48,7 +48,7 @@ export function DiscordAccount() {
   }, [on])
   const signIn = () => {
     setBusy(true)
-    api.discordLoginConnect().then(setCard, (e) => useStore.getState().notify(String(e), { kind: 'error' })).finally(() => setBusy(false))
+    api.discordLoginConnect().then(setCard, (e) => notifyError(e)).finally(() => setBusy(false))
   }
   const signOut = () => void api.discordLoginDisconnect().then(() => setCard(null), () => {})
   return (

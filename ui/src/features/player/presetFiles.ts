@@ -7,10 +7,11 @@ import { MAX_SAVED_PRESETS } from '../../shared/theme/theme'
 import { createPreset } from './vizPreset'
 import { newPresetId, presetFromFile, presetJson } from './vizPresetList'
 import { FIRST_PRESET, presetOf } from './vizPresets'
+import { notifyError } from '../../app/notifyError'
 
 /** The Presets look's files (Settings › Playback, the visualizer's menu): a .milk or .json preset in, the one shown out. */
 
-const fail = (e: unknown) => void useStore.getState().notify(String(e), { kind: 'error' })
+const fail = (error: unknown) => void notifyError(error)
 
 /** A preset file picked, kept and shown (the look switched to Presets). */
 export async function importPreset() {

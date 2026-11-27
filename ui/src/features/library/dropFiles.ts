@@ -6,6 +6,7 @@ import { sanitizeTheme } from '../../shared/theme/theme'
 import { ask } from '../../shared/ui/Ask'
 import { askAboutLayout } from '../settings/themeLayoutImport'
 import { nameOfFile, type DropKind } from './dropKinds'
+import { notifyError } from '../../app/notifyError'
 
 /**
  * Legato's own files dropped on the window, each opened the way its page opens it: a song list becomes a playlist
@@ -15,7 +16,7 @@ import { nameOfFile, type DropKind } from './dropKinds'
  */
 export async function openDropped(kind: Exclude<DropKind, 'remix'>, path: string) {
   const { notify } = useStore.getState()
-  const fail = (e: unknown) => void notify(String(e), { kind: 'error' })
+  const fail = (error: unknown) => void notifyError(error)
   try {
     if (kind === 'songlist') {
       await useStore.getState().importSongList(nameOfFile(path), null, path)

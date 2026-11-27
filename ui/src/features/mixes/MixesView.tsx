@@ -26,6 +26,7 @@ import { mixReason, mixTitle, monthName, weekdayName } from './words'
 import { ResetHistory } from '../history/ResetHistory'
 import { phoneApp } from '../../shared/platform'
 import { usePhone } from '../../shared/phone'
+import { notifyError } from '../../app/notifyError'
 
 /** A mix's songs in order: library songs, songs new to you slotted at their place. */
 export function mixSongs(mix: Mix, byId: Map<number, LibraryTrack>): LibraryTrack[] {
@@ -133,7 +134,7 @@ function DiscoveriesButton() {
         api
           .lastfmDiscoveries()
           .then((songs) => play(songs.map(remoteTrack), 0))
-          .catch((e) => useStore.getState().notify(String(e), { kind: 'error' }))
+          .catch((e) => notifyError(e))
           .finally(() => setBusy(false))
       }}
     >

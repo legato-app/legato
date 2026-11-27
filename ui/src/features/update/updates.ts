@@ -9,6 +9,7 @@ import { onSongEnd, usePlayer } from '../player/store'
 import { tr } from '../../shared/i18n/i18n'
 import { note } from '../../shared/diag'
 import { phoneApp } from '../../shared/platform'
+import { notifyError } from '../../app/notifyError'
 
 /** What the background updater is doing (Settings › About). */
 export const useUpdate = create<{ status: UpdateStatus | null }>(() => ({ status: null }))
@@ -75,13 +76,13 @@ export async function installUpdate(next?: number) {
     wanted = false
     await saveSessionNow()
     thawSession()
-    return api.updateInstall().catch((e) => void useStore.getState().notify(String(e), { kind: 'error' }))
+    return api.updateInstall().catch((e) => void notifyError(e))
   }
   useStore.getState().notify(tr('Updating to {version}… back in a few seconds', { version: s.version }), { kind: 'info' })
   await (next === undefined ? saveSessionNow() : saveSessionAtNext(next))
   await api.updateInstall().catch((e) => {
     thawSession()
-    useStore.getState().notify(String(e), { kind: 'error' })
+    notifyError(e)
   })
 }
 

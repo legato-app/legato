@@ -57,10 +57,11 @@ import { ask, askText } from '../shared/ui/Ask'
 import { phoneApp } from '../shared/platform'
 import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, useBookmarks } from './player/bookmarks'
 import { artistBlocked } from './player/blockedArtists'
+import { notifyError } from '../app/notifyError'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
-const fail = (e: unknown) => app().notify(String(e), { kind: 'error' })
+const fail = notifyError
 
 function copy(text: string, done: string) {
   navigator.clipboard.writeText(text).then(() => app().notify(done), fail)

@@ -1,8 +1,8 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { useStore } from '../../app/store'
 import { tr } from '../../shared/i18n/i18n'
 import { SourceIcon } from '../../shared/ui/SourceIcon'
 import { spotifyPage } from './spotifyPage'
+import { notifyError } from '../../app/notifyError'
 
 /** Under an imported Spotify playlist's title: where it comes from (Spotify's policy: its mark, 21 px at least, in one color) and the way back there. */
 export function SpotifyAttribution({ sourceId }: { sourceId: string }) {
@@ -14,7 +14,7 @@ export function SpotifyAttribution({ sourceId }: { sourceId: string }) {
         {tr('Imported from Spotify')}
       </span>
       {page && (
-        <button type="button" onClick={() => void openUrl(page).catch((e: unknown) => useStore.getState().notify(String(e), { kind: 'error' }))} className="text-xs font-bold tracking-wide uppercase underline-offset-4 hover:underline">
+        <button type="button" onClick={() => void openUrl(page).catch((e: unknown) => notifyError(e))} className="text-xs font-bold tracking-wide uppercase underline-offset-4 hover:underline">
           {tr('Open Spotify')}
         </button>
       )}

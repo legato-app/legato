@@ -44,6 +44,7 @@ import { usePhone } from '../../shared/phone'
 import { LanguagePicker } from './LanguagePicker'
 import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
+import { notifyError } from '../../app/notifyError'
 
 const ICONS: Record<Category, ReactNode> = {
   general: <GearSix size={15} />,
@@ -510,7 +511,7 @@ function OpenAtStartup() {
     setOn(v)
     api.setAutostart(v).catch((e) => {
       setOn(!v)
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     })
   }
   return (

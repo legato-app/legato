@@ -9,6 +9,7 @@ import { Button } from '../../shared/ui/Button'
 import { Cover } from '../../shared/ui/Cover'
 import { Dialog } from '../../shared/ui/Dialog'
 import { canSave, formOf, numberOk, startOf, tagsToWrite, type TagField, type TagForm, type TagStart, withRelease } from './tagForm'
+import { notifyError } from '../../app/notifyError'
 
 const field = 'w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-ink-3 aria-invalid:border-danger'
 
@@ -56,7 +57,7 @@ export function EditInfo({ tracks, onClose }: { tracks: LibraryTrack[]; onClose:
     try {
       setReleases(await api.songReleases(form.title, form.artist, form.album, first.durationMs))
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setLooking(false)
     }
@@ -78,7 +79,7 @@ export function EditInfo({ tracks, onClose }: { tracks: LibraryTrack[]; onClose:
         notify(tr('Not saved: {files}', { files }) + (r.reason ? ` (${r.reason})` : ''), { kind: 'error' })
       } else onClose()
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setBusy(false)
     }

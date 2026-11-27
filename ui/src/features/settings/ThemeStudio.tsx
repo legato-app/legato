@@ -12,8 +12,9 @@ import { LAYOUT_API } from '../../shared/theme/layout'
 import { askAboutLayout } from './themeLayoutImport'
 import { Button } from '../../shared/ui/Button'
 import { Led, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
+import { notifyError } from '../../app/notifyError'
 
-const fail = (e: unknown) => useStore.getState().notify(String(e), { kind: 'error' })
+const fail = notifyError
 
 /** Mini window drawn in the theme's own colors (and picture). */
 function ThemeThumb({ t, tall = false }: { t: Palette & Partial<Pick<Theme, 'background' | 'radius'>>; tall?: boolean }) {

@@ -5,6 +5,7 @@ import { scrobbles, toScrobble } from './lastfmRules'
 import { useBlind } from '../blind/blindOpen'
 import { onListenEnd } from '../player/listens'
 import { usePlayer } from '../player/store'
+import { notifyError } from '../../app/notifyError'
 
 /** Last.fm account state (Settings › Accounts). */
 export const useLastfm = create<LastfmStatus & { refresh: () => Promise<void> }>((set) => ({
@@ -24,7 +25,7 @@ export function startLastfm() {
     if (!on() || !t || !scrobbles(durationMs ?? t.durationMs, play.listenedMs)) return
     api.lastfmScrobble(toScrobble(t, play.startedAt)).then(
       (waiting) => useLastfm.setState({ waiting }),
-      (e) => (useStore.getState().notify(String(e), { kind: 'error' }), void useLastfm.getState().refresh()),
+      (e) => (notifyError(e), void useLastfm.getState().refresh()),
     )
   })
   let last: number | undefined

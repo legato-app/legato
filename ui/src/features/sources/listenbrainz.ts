@@ -5,6 +5,7 @@ import { counts, toListen, type PlayedFrom } from './listenbrainzRules'
 import { useBlind } from '../blind/blindOpen'
 import { onListenEnd } from '../player/listens'
 import { usePlayer } from '../player/store'
+import { notifyError } from '../../app/notifyError'
 
 /** ListenBrainz account state (Settings › Accounts). */
 export const useListenbrainz = create<ListenbrainzStatus & { refresh: () => Promise<void> }>((set) => ({
@@ -26,7 +27,7 @@ export function startListenbrainz() {
     if (!on() || !t || !counts(length, play.listenedMs)) return
     api.listenbrainzSubmit(toListen(t, play.startedAt, from.get(play.trackId), length)).then(
       (waiting) => useListenbrainz.setState({ waiting }),
-      (e) => (useStore.getState().notify(String(e), { kind: 'error' }), void useListenbrainz.getState().refresh()),
+      (e) => (notifyError(e), void useListenbrainz.getState().refresh()),
     )
   })
   let last: number | undefined

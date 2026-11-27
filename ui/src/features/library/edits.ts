@@ -1,6 +1,7 @@
 import { useStore } from '../../app/store'
 import { api } from '../../shared/api'
 import { tr, trn } from '../../shared/i18n/i18n'
+import { notifyError } from '../../app/notifyError'
 
 // Playlist edits with a toast each: added (Open), already there (Add anyway), removed (Undo).
 const app = () => useStore.getState()
@@ -88,7 +89,7 @@ export async function markNotExplicit(ids: number[], ok: boolean) {
     await api.setExplicit(ids, ok)
     await app().refreshChanged()
   } catch (e) {
-    return app().notify(String(e), { kind: 'error' })
+    return notifyError(e)
   }
   if (ok) app().notify(tr('{songs} no longer marked explicit', { songs: songs(ids) }), { action: { label: tr('Undo'), run: () => void markNotExplicit(ids, false) } })
 }
@@ -98,7 +99,7 @@ export async function markMusic(ids: number[], music: boolean | null) {
     await api.setMusic(ids, music)
     await app().refreshChanged()
   } catch (e) {
-    return app().notify(String(e), { kind: 'error' })
+    return notifyError(e)
   }
   if (music === false) app().notify(tr('{songs} hidden: not music', { songs: songs(ids) }), { action: { label: tr('Undo'), run: () => void markMusic(ids, null) } })
   else if (music) app().notify(tr('{songs} back with your music', { songs: songs(ids) }))

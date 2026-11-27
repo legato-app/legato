@@ -11,6 +11,7 @@ import { PageHeader } from '../../shared/ui/PageHeader'
 import { usePlayer } from '../player/store'
 import { stationQueue } from './station'
 import { topGenres } from './suggest'
+import { notifyError } from '../../app/notifyError'
 
 /**
  * Internet radio: search Radio Browser's open directory (the words typed go there, nothing else), play a station, keep
@@ -21,7 +22,7 @@ export function RadioView() {
   const [found, setFound] = useState<RadioStation[] | null>(null)
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
-  const fail = (e: unknown) => useStore.getState().notify(String(e), { kind: 'error' })
+  const fail = notifyError
   // Starter stations, while none is kept: the user's region (the interface's language, never an IP lookup) and the genres of
   // their own library. Only a country code and up to two genre words go to the directory.
   const [starters, setStarters] = useState<RadioStation[]>([])

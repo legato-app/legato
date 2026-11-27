@@ -5,9 +5,10 @@ import { saveFile } from '../../shared/files'
 import { tr } from '../../shared/i18n/i18n'
 import { remoteTrack, usePlayer } from '../player/store'
 import { applyPreset, useEditor } from './editor'
+import { notifyError } from '../../app/notifyError'
 
 /** The remix file (`.lmix`, music_dsp::lmix): a YouTube video and the Live Editor's settings for it, never audio. */
-const fail = (e: unknown) => void useStore.getState().notify(String(e), { kind: 'error' })
+const fail = (error: unknown) => void notifyError(error)
 
 /** Waits (5 s at most) until the editor has loaded this song: its own load would overwrite settings applied sooner. */
 function editorOn(song: string): Promise<boolean> {

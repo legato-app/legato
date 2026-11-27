@@ -20,6 +20,7 @@ import { allowsMotion, useSystemReduced } from '../../shared/motion'
 import { TranslateLyrics } from './TranslateLyrics'
 import { useTranslated } from './translated'
 import { underFor } from './translateWords'
+import { notifyError } from '../../app/notifyError'
 
 /** A hand on the scroll wins for this long. */
 const HAND_MS = 4000
@@ -256,7 +257,7 @@ export function LyricsPanel({ onHide, onUpNext, className = CARD, heading }: { o
       const choices = await api.lyricsChoices(ask)
       if (!choices.length) return notify(tr('No other lyrics found for this song.'))
       const pct = new Intl.NumberFormat(locale(), { style: 'percent', maximumFractionDigits: 0 })
-      const keep = (picked: Lyrics | null) => void api.lyricsPick(ask, picked).then(retry, (e) => notify(String(e), { kind: 'error' }))
+      const keep = (picked: Lyrics | null) => void api.lyricsPick(ask, picked).then(retry, (e) => notifyError(e))
       openMenuAt(
         el,
         [
@@ -271,7 +272,7 @@ export function LyricsPanel({ onHide, onUpNext, className = CARD, heading }: { o
         'above',
       )
     } catch (e) {
-      notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setLooking(false)
     }
@@ -308,7 +309,7 @@ export function LyricsPanel({ onHide, onUpNext, className = CARD, heading }: { o
       retry()
       return true
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
       return false
     }
   }

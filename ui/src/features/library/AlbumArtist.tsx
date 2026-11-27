@@ -37,6 +37,7 @@ import { useExplicit } from './useExplicit'
 import { usePageParts } from '../../shared/ui/usePageParts'
 import { PlayAll, ShuffleRound, totalTime } from './LibraryView'
 import { TrackTable } from './TrackTable'
+import { notifyError } from '../../app/notifyError'
 
 /** Titled block (Title L) with an optional link on the right (Show all's look). */
 function Section({ title, side, children }: { title: ReactNode; side?: ReactNode; children: ReactNode }) {
@@ -167,7 +168,7 @@ function MissingRow({ track, number }: { track: Track; number: number }) {
       await api.addTrack(await api.resolveTrack(track).catch(() => track))
       await useStore.getState().refreshChanged()
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     } finally {
       setBusy(false)
     }
@@ -363,7 +364,7 @@ export function ArtistView({ artist }: { artist: string }) {
     setEverySong(null)
     api.ytmList(list).then(
       (t) => setEverySong(t.map(remoteTrack)),
-      (e) => (useStore.getState().notify(String(e), { kind: 'error' }), setAll(null)),
+      (e) => (notifyError(e), setAll(null)),
     )
   }
   // The same picture as the round one beside the name on the big title; else the first song's cover, or YouTube Music's own.

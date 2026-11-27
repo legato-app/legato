@@ -6,6 +6,7 @@ import { artistName } from '../../shared/artistName'
 import { formatDuration } from '../../shared/format'
 import { tr, trn } from '../../shared/i18n/i18n'
 import { Button } from '../../shared/ui/Button'
+import { notifyError } from '../../app/notifyError'
 
 /** The library song an import made of `song`: the one sharing a service id with it (YouTube's is the one in doubt). */
 const libraryId = (song: Track) => useStore.getState().tracks.find((t) => Object.entries(song.ids).some(([s, id]) => s !== 'youtube' && t.ids[s as keyof typeof t.ids] === id))?.id
@@ -26,7 +27,7 @@ export function ImportDoubts({ doubts }: { doubts: ImportDoubt[] }) {
       await api.pickVersion(id, video)
       settle(i)
     } catch (e) {
-      useStore.getState().notify(String(e), { kind: 'error' })
+      notifyError(e)
     }
   }
   return (
