@@ -792,8 +792,10 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     site language); no file exported or imported in the app, the website not built.
     - Decided alone (2026-11-27): the website says it now (the feature is on by default): one clause, "and where the
       parts of the app go"; no in-app theme help exists, the format is documented in the design doc.
-  - [ ] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
+  - [x] `M` 13. After v1: a theme's named plugin as surface `plugin:<id>`, placed only if that plugin is installed,
     enabled and has `ui`, drawn with the existing `PluginPanel`. Tests: placement drop rules.
+    2026-11-27: done (`withPluginPanels`, `features/plugins/PluginColumn.tsx`, loaded on demand); tests, seen in the browser demo with an invented plugin, not tried for real.
+    - Decided alone (2026-11-27): left or right only, two panels at most, 300 px wide, away in a narrow window; "enabled" is the plugin turned on with `ui` granted, running or not; the layout stays version 1 (an older Legato ignores the surface and drops it when it rewrites the themes); the warning says one line, without the plugin’s name; right-click on the column: the plugin’s menu and Default layout.
   - Not tried for real anywhere: right-to-left with regions and parts, a moved sidebar with the library open wide.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.

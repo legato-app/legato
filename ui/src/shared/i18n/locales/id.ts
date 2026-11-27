@@ -866,6 +866,7 @@ const id: Record<string, string> = {
   'The logo at the bottom': 'Logo di bawah',
   'The logo on the left': 'Logo di kiri',
   'The logo on the right': 'Logo di kanan',
+  'A plugin’s panel beside the page': 'Panel plugin di samping halaman',
   'The sidebar {n} px wide': 'Bilah samping selebar {n} px',
   'The side panel {n} px wide': 'Panel samping selebar {n} px',
   'And more': 'Dan lainnya',

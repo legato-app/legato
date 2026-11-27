@@ -866,6 +866,7 @@ const ko: Record<string, string> = {
   'The logo at the bottom': '로고를 아래에',
   'The logo on the left': '로고를 왼쪽에',
   'The logo on the right': '로고를 오른쪽에',
+  'A plugin’s panel beside the page': '페이지 옆에 플러그인 패널',
   'The sidebar {n} px wide': '사이드바 너비 {n} px',
   'The side panel {n} px wide': '사이드 패널 너비 {n} px',
   'And more': '그 외',

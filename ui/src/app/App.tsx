@@ -3,7 +3,7 @@ import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import { AddonsView, AddView, AlbumView, ArtistView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
+import { AddonsView, AddView, AlbumView, ArtistView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, PluginColumn, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
 import '../features/player/autoplay'
 import { AlbumsView, ArtistsView, PlaylistView, SongsView } from '../features/library/LibraryView'
@@ -52,7 +52,7 @@ import { searchShift } from './searchShift'
 import { useSettings } from './settings'
 import { dropLayout, useNowPlayingPages, useShellLayout } from './shellLayout'
 import { LayoutBoundary } from './LayoutBoundary'
-import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, type PartsChoice, type Surface } from '../shared/theme/layout'
+import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, pluginOf, type PartsChoice, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
 import { startShortcuts } from './shortcuts'
 import { useStore, type View } from './store'
@@ -397,6 +397,15 @@ export function App() {
   const nothingUnder = !shell.regions.bottom.some((surface) => surface !== 'playerBar' || !shell.playerBarHidden)
   const column = (surface: Surface, side: 'left' | 'right') => {
     if (surface === 'sidebar') return part(surface, <Sidebar side={side} fixedWidth={placement.sizes.sidebar} choice={placement.parts.sidebar} />)
+    const plugin = pluginOf(surface)
+    if (plugin) {
+      return part(
+        surface,
+        <PageBoundary fallback={null}>
+          <PluginColumn plugin={plugin} />
+        </PageBoundary>,
+      )
+    }
     return part(surface, surface === 'brand' ? <Brand className="shrink-0 self-start" /> : <SidePanel width={placement.sizes.sidePanel} />)
   }
 

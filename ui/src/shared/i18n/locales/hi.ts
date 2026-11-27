@@ -866,6 +866,7 @@ const hi: Record<string, string> = {
   'The logo at the bottom': 'लोगो नीचे',
   'The logo on the left': 'लोगो बाईं ओर',
   'The logo on the right': 'लोगो दाईं ओर',
+  'A plugin’s panel beside the page': 'पेज के बगल में किसी प्लगइन का पैनल',
   'The sidebar {n} px wide': 'साइडबार {n} px चौड़ा',
   'The side panel {n} px wide': 'साइड पैनल {n} px चौड़ा',
   'And more': 'और भी',

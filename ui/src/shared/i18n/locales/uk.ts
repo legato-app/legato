@@ -866,6 +866,7 @@ const uk: Record<string, string> = {
   'The logo at the bottom': 'Логотип унизу',
   'The logo on the left': 'Логотип ліворуч',
   'The logo on the right': 'Логотип праворуч',
+  'A plugin’s panel beside the page': 'Панель плагіна поруч зі сторінкою',
   'The sidebar {n} px wide': 'Бічна панель завширшки {n} px',
   'The side panel {n} px wide': 'Права панель завширшки {n} px',
   'And more': 'Та інше',

@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
+import { usePlugins } from '../features/plugins/host'
 import { useShallow } from 'zustand/react/shallow'
 import { tr } from '../shared/i18n/i18n'
 import { useNarrow, usePhone } from '../shared/phone'
 import { phoneApp } from '../shared/platform'
-import { layoutOn, resolveLayout, withHiddenParts, type Pages, type Placement } from '../shared/theme/layout'
+import { layoutOn, resolveLayout, withHiddenParts, withPluginPanels, type Pages, type Placement } from '../shared/theme/layout'
 import { useSettings } from './settings'
 import { useStore } from './store'
 
@@ -22,8 +23,9 @@ export function useShellLayout(): Placement {
   const layout = useSettings((s) => s.current().layout)
   const failed = useLayoutFailure((s) => s.failed)
   const phone = usePhone()
+  const plugins = usePlugins((s) => s.list)
   // The app's own arrangement stays `DEFAULT_LAYOUT` itself: a copy would pass for a theme's (LayoutBoundary).
-  return useMemo(() => resolveLayout(allowed && !failed ? layout : undefined, phone), [allowed, failed, layout, phone])
+  return useMemo(() => withPluginPanels(resolveLayout(allowed && !failed ? layout : undefined, phone), plugins), [allowed, failed, layout, phone, plugins])
 }
 
 /** Now Playing's pages: the arrangement's, with the parts the user hid. */

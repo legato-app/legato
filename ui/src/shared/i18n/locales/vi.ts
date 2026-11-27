@@ -866,6 +866,7 @@ const vi: Record<string, string> = {
   'The logo at the bottom': 'Logo ở dưới cùng',
   'The logo on the left': 'Logo ở bên trái',
   'The logo on the right': 'Logo ở bên phải',
+  'A plugin’s panel beside the page': 'Bảng của một plugin bên cạnh trang',
   'The sidebar {n} px wide': 'Thanh bên rộng {n} px',
   'The side panel {n} px wide': 'Bảng bên rộng {n} px',
   'And more': 'Và hơn nữa',

@@ -866,6 +866,7 @@ const tr: Record<string, string> = {
   'The logo at the bottom': 'Logo altta',
   'The logo on the left': 'Logo solda',
   'The logo on the right': 'Logo sağda',
+  'A plugin’s panel beside the page': 'Sayfanın yanında bir eklenti paneli',
   'The sidebar {n} px wide': 'Kenar çubuğu {n} px genişliğinde',
   'The side panel {n} px wide': 'Yan panel {n} px genişliğinde',
   'And more': 'Ve dahası',

@@ -527,6 +527,12 @@ function pluginItems(where: 'track' | 'playlist' | 'player', context: Record<str
   return ['-', ...items.map(({ plugin, command }) => ({ label: command.title, icon: <PuzzlePiece size={16} />, onSelect: () => runCommand(plugin, command.id, context) }))]
 }
 
+/** The way back from a theme's layout: no id, so no menu setting hides it. */
+const defaultLayoutItem = (): MenuEntry => shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: turnLayoutsOff }
+
+/** A plugin's panel placed by a theme: the plugin's own menu, and the way back from the layout. */
+export const pluginPanelMenu = (p: PluginInfo): MenuEntry[] => [...pluginMenu(p, () => app().go({ name: 'addons' })), '-', defaultLayoutItem()]
+
 /** A third-party plugin's card (Add-ons). */
 export function pluginMenu(p: PluginInfo, about: () => void): MenuEntry[] {
   const name = p.manifest?.name ?? p.id
@@ -1057,8 +1063,7 @@ export function appMenu(): MenuEntry[] {
     '-',
     player().now && { id: 'nowPlaying', label: tr('Now playing'), icon: <ArrowsOutSimple size={16} />, onSelect: () => player().setFull(true) },
     tag('room', roomItem()),
-    // The way back from a theme's layout: no id, so no menu setting hides it.
-    shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: turnLayoutsOff },
+    defaultLayoutItem(),
     { id: 'settings', label: tr('Settings'), icon: <Gear size={16} />, onSelect: () => go({ name: 'settings', section: 'general' }) },
   ])
 }

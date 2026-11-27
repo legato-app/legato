@@ -29,6 +29,7 @@ const load = {
   vizScreen: () => import('../features/player/VizScreen').then((m) => ({ default: m.VizScreen })),
   coverScreen: () => import('../features/player/CoverScreen').then((m) => ({ default: m.CoverScreen })),
   pipScreen: () => import('../features/player/PipScreen').then((m) => ({ default: m.PipScreen })),
+  pluginColumn: () => import('../features/plugins/PluginColumn').then((m) => ({ default: m.PluginColumn })),
   share: () => import('../features/share/ShareDialog').then((m) => ({ default: m.ShareDialog })),
   room: () => import('../features/rooms/RoomDialog').then((m) => ({ default: m.RoomDialog })),
   welcome: () => import('../features/welcome/Welcome').then((m) => ({ default: m.Welcome })),
@@ -94,6 +95,7 @@ export const Karaoke = page(load.karaoke)
 export const VizScreen = page(load.vizScreen)
 export const CoverScreen = page(load.coverScreen)
 export const PipScreen = page(load.pipScreen)
+export const PluginColumn = page(load.pluginColumn)
 export const ShareDialog = page(load.share)
 export const RoomDialog = page(load.room)
 export const Welcome = page(load.welcome)

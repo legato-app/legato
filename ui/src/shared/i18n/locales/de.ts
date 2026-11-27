@@ -866,6 +866,7 @@ const de: Record<string, string> = {
   'The logo at the bottom': 'Das Logo unten',
   'The logo on the left': 'Das Logo links',
   'The logo on the right': 'Das Logo rechts',
+  'A plugin’s panel beside the page': 'Das Panel eines Plugins neben der Seite',
   'The sidebar {n} px wide': 'Die Seitenleiste {n} px breit',
   'The side panel {n} px wide': 'Der Seitenbereich {n} px breit',
   'And more': 'Und mehr',

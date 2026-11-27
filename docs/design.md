@@ -127,6 +127,8 @@ asks first: its layout, colors only, or cancel.
 
 - `regions`: `top`, `left`, `right`, `bottom` around the page. `sidebar` and `sidePanel` go left or right, `playerBar`
   top or bottom, `topbar` stays on top, `brand` (the logo) anywhere. A surface not named keeps its place.
+  `plugin:<id>` (two at most, left or right) puts that plugin's panel in a column, only while the plugin is installed,
+  on and allowed the interface (`ui`); an older Legato rewriting the themes drops it.
 - `sizes`, px: `sidebar` 220 to 420, `sidePanel` 260 to 420; a size given fixes the width.
 - `hidden`: any surface but the logo (never both the sidebar and the top bar). A hidden top bar keeps the logo, the
   search, Settings and the window's buttons.

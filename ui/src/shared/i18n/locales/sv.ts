@@ -866,6 +866,7 @@ const sv: Record<string, string> = {
   'The logo at the bottom': 'Logotypen längst ned',
   'The logo on the left': 'Logotypen till vänster',
   'The logo on the right': 'Logotypen till höger',
+  'A plugin’s panel beside the page': 'Panelen för ett plugin bredvid sidan',
   'The sidebar {n} px wide': 'Sidofältet {n} px brett',
   'The side panel {n} px wide': 'Sidopanelen {n} px bred',
   'And more': 'Med mera',

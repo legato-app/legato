@@ -837,6 +837,7 @@ const ar: Record<string, string> = {
   'The logo at the bottom': 'الشعار في الأسفل',
   'The logo on the left': 'الشعار على اليسار',
   'The logo on the right': 'الشعار على اليمين',
+  'A plugin’s panel beside the page': 'لوحة إضافة بجانب الصفحة',
   'The sidebar {n} px wide': 'الشريط الجانبي بعرض {n} px',
   'The side panel {n} px wide': 'اللوحة الجانبية بعرض {n} px',
   'And more': 'والمزيد',

@@ -837,6 +837,7 @@ const he: Record<string, string> = {
   'The logo at the bottom': 'הלוגו למטה',
   'The logo on the left': 'הלוגו משמאל',
   'The logo on the right': 'הלוגו מימין',
+  'A plugin’s panel beside the page': 'חלונית של תוסף לצד העמוד',
   'The sidebar {n} px wide': 'סרגל צד ברוחב {n} px',
   'The side panel {n} px wide': 'חלונית צד ברוחב {n} px',
   'And more': 'ועוד',

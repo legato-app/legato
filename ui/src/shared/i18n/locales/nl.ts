@@ -866,6 +866,7 @@ const nl: Record<string, string> = {
   'The logo at the bottom': 'Het logo onderaan',
   'The logo on the left': 'Het logo links',
   'The logo on the right': 'Het logo rechts',
+  'A plugin’s panel beside the page': 'Het paneel van een plugin naast de pagina',
   'The sidebar {n} px wide': 'De zijbalk {n} px breed',
   'The side panel {n} px wide': 'Het zijpaneel {n} px breed',
   'And more': 'En meer',

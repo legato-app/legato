@@ -866,6 +866,7 @@ const it: Record<string, string> = {
   'The logo at the bottom': 'Il logo in basso',
   'The logo on the left': 'Il logo a sinistra',
   'The logo on the right': 'Il logo a destra',
+  'A plugin’s panel beside the page': 'Il pannello di un plugin accanto alla pagina',
   'The sidebar {n} px wide': 'La barra laterale larga {n} px',
   'The side panel {n} px wide': 'Il pannello laterale largo {n} px',
   'And more': 'E altro',

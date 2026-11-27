@@ -2,6 +2,7 @@
  * A theme's arrangement of the app's shell. Data only, checked here: a layout grants nothing, it only moves the shell's
  * own parts. Pure: no window, no settings.
  */
+import type { PluginInfo } from '../generated/PluginInfo'
 import { tr } from '../i18n/i18n'
 
 /** The layouts this app draws. Within a version only additions; a newer one is kept as it came and not applied. */
@@ -13,7 +14,14 @@ const MAX_NEWER_LAYOUT = 8_000
 export const REGIONS = ['top', 'left', 'right', 'bottom'] as const
 export type Region = (typeof REGIONS)[number]
 export const SURFACES = ['brand', 'topbar', 'sidebar', 'sidePanel', 'playerBar'] as const
-export type Surface = (typeof SURFACES)[number]
+type BuiltinSurface = (typeof SURFACES)[number]
+/** One of the app's own parts, or a plugin's panel by the plugin's id (the manifest's rules for an id). */
+export type Surface = BuiltinSurface | `plugin:${string}`
+const PLUGIN_SURFACE = /^plugin:(?![.-])(?!.*\.\.)[a-z0-9.-]{3,64}$/
+/** Plugin panels a layout may name: each takes a column from the page. */
+const MAX_PLUGIN_PANELS = 2
+/** The plugin whose panel a surface is; undefined for the app's own parts. */
+export const pluginOf = (surface: string): string | undefined => (surface.startsWith('plugin:') ? surface.slice('plugin:'.length) : undefined)
 
 /** Sidebar width bounds: its chips fit at the least, the page keeps room at the most. */
 export const SIDEBAR_MIN = 220
@@ -26,7 +34,9 @@ export type SizedSurface = keyof typeof SIZE_LIMITS
 
 /** Where each surface can go: a bar runs across, a column down. The top bar holds the window's buttons and the search's
  *  list opens under it, so it stays on top. */
-const PLACES: Record<Surface, readonly Region[]> = { brand: REGIONS, topbar: ['top'], sidebar: ['left', 'right'], sidePanel: ['left', 'right'], playerBar: ['top', 'bottom'] }
+const PLACES: Record<BuiltinSurface, readonly Region[]> = { brand: REGIONS, topbar: ['top'], sidebar: ['left', 'right'], sidePanel: ['left', 'right'], playerBar: ['top', 'bottom'] }
+/** A plugin's panel is a column. */
+const placesOf = (surface: Surface): readonly Region[] => (pluginOf(surface) ? ['left', 'right'] : PLACES[surface as BuiltinSurface])
 
 /** The parts a layout can reorder, per bar, one list per container in the app's order. */
 export const PART_GROUPS = {
@@ -123,7 +133,9 @@ const record = (value: unknown): Record<string, unknown> | null => (value && typ
 
 /** The known ids of a list, each once. */
 const knownList = <Id extends string>(raw: unknown, known: readonly Id[]): Id[] => [...new Set(Array.isArray(raw) ? raw.filter((id): id is Id => known.includes(id as Id)) : [])]
-const surfaceList = (raw: unknown) => knownList(raw, SURFACES)
+const surfaceList = (raw: unknown): Surface[] => knownList(raw, SURFACES)
+/** A region's list: the app's parts and plugins' panels, each once. */
+const regionList = (raw: unknown): Surface[] => [...new Set(Array.isArray(raw) ? raw.filter((id): id is Surface => typeof id === 'string' && ((SURFACES as readonly string[]).includes(id) || PLUGIN_SURFACE.test(id))) : [])]
 
 /** Known ids to order, hideable ones to hide; undefined when neither. */
 function partsChoice(raw: unknown, known: readonly string[], hideable: readonly string[]): PartsChoice | undefined {
@@ -147,8 +159,9 @@ function sanitizeRegions(raw: unknown): Layout['regions'] {
   const named = record(raw)
   const taken = new Set<Surface>()
   const regions: Partial<Record<Region, Surface[]>> = {}
+  let panels = 0
   for (const region of REGIONS) {
-    const surfaces = surfaceList(named?.[region]).filter((surface) => PLACES[surface].includes(region) && !taken.has(surface))
+    const surfaces = regionList(named?.[region]).filter((surface) => placesOf(surface).includes(region) && !taken.has(surface) && (!pluginOf(surface) || ++panels <= MAX_PLUGIN_PANELS))
     for (const surface of surfaces) taken.add(surface)
     if (surfaces.length) regions[region] = surfaces
   }
@@ -297,6 +310,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     logoMoved && on('bottom', 'brand') && tr('The logo at the bottom'),
     logoMoved && on('left', 'brand') && tr('The logo on the left'),
     logoMoved && on('right', 'brand') && tr('The logo on the right'),
+    Object.values(regions).flat().some(pluginOf) && tr('A plugin’s panel beside the page'),
     !!sizes.sidebar && !hides('sidebar') && tr('The sidebar {n} px wide', { n: sizes.sidebar }),
     !!sizes.sidePanel && !hides('sidePanel') && tr('The side panel {n} px wide', { n: sizes.sidePanel }),
     partsChanged && tr('Parts of the bars moved or hidden'),
@@ -319,6 +333,18 @@ export function withoutLayout<T extends { layout?: Layout }>(theme: T): T {
   const copy = { ...theme }
   delete copy.layout
   return copy
+}
+
+/** The placement without the panels of plugins that can't show one: not installed, off, or never allowed to (`ui`).
+ *  The same placement when there is nothing to leave out. */
+export function withPluginPanels(placement: Placement, plugins: readonly Pick<PluginInfo, 'id' | 'on' | 'granted'>[]): Placement {
+  const ready = new Set(plugins.filter((plugin) => plugin.on && plugin.granted.includes('ui')).map((plugin) => plugin.id))
+  const shown = (surface: Surface) => {
+    const plugin = pluginOf(surface)
+    return plugin === undefined || ready.has(plugin)
+  }
+  if (Object.values(placement.regions).flat().every(shown)) return placement
+  return { ...placement, regions: Object.fromEntries(REGIONS.map((region) => [region, placement.regions[region].filter(shown)])) as Placement['regions'] }
 }
 
 /** The theme's pages, with the Now Playing parts the user hid by hand hidden too. */

@@ -866,6 +866,7 @@ const ja: Record<string, string> = {
   'The logo at the bottom': 'ロゴを下に',
   'The logo on the left': 'ロゴを左に',
   'The logo on the right': 'ロゴを右に',
+  'A plugin’s panel beside the page': 'ページの横にプラグインのパネル',
   'The sidebar {n} px wide': 'サイドバーの幅 {n} px',
   'The side panel {n} px wide': 'サイドパネルの幅 {n} px',
   'And more': 'ほかにも',

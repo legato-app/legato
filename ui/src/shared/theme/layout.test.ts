@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { arrangeParts, DEFAULT_LAYOUT, COLUMNS, headerLayout, orderColumns, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withHiddenParts, withoutLayout, type Layout } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, COLUMNS, headerLayout, orderColumns, PAGE_PARTS, pagePartIds, PART_GROUPS, layoutOn, layoutRegions, layoutSummary, resolveLayout, sanitizeLayout, withHiddenParts, withoutLayout, withPluginPanels, type Layout } from './layout'
 
 const resolve = (raw: unknown) => resolveLayout(sanitizeLayout(raw) ?? undefined)
 const draw = (raw: unknown, playerOpen = false) => layoutRegions(resolve(raw), playerOpen)
@@ -143,6 +143,27 @@ describe('Now Playing’s parts', () => {
     expect(pages.home).toBe(theme.home)
     expect(withHiddenParts({}, ['from']).nowPlaying).toEqual({ hidden: ['from'] })
     expect(withHiddenParts(theme, [])).toBe(theme)
+  })
+})
+
+describe('plugins’ panels', () => {
+  const theme = sanitizeLayout({ v: 1, regions: { top: ['plugin:top-bar'], left: ['sidebar', 'plugin:sleep-timer'], right: ['plugin:com.example.off', 'plugin:third', 'plugin:../x', 'plugin:', 'sidePanel'] }, hidden: ['plugin:sleep-timer'] })!
+
+  it('keeps two, on the sides only, under an id a plugin could have', () => {
+    expect(theme).toEqual({ v: 1, regions: { left: ['sidebar', 'plugin:sleep-timer'], right: ['plugin:com.example.off', 'sidePanel'] } })
+    expect(layoutSummary(theme)).toContain('A plugin’s panel beside the page')
+  })
+
+  it('places one only for an installed plugin, on, and allowed the interface', () => {
+    const plugin = (id: string, on = true, granted = ['ui']) => ({ id, on, granted })
+    const regions = (plugins: ReturnType<typeof plugin>[]) => withPluginPanels(resolveLayout(theme), plugins).regions
+    expect(regions([plugin('sleep-timer'), plugin('com.example.off', false)]).left).toEqual(['sidebar', 'plugin:sleep-timer'])
+    expect(regions([plugin('sleep-timer'), plugin('com.example.off', false)]).right).toEqual(['sidePanel'])
+    for (const unfit of [[], [plugin('sleep-timer', false)], [plugin('sleep-timer', true, ['player:read'])]]) expect(regions(unfit).left).toEqual(['sidebar'])
+  })
+
+  it('leaves a placement without one as it is', () => {
+    expect(withPluginPanels(DEFAULT_LAYOUT, [])).toBe(DEFAULT_LAYOUT)
   })
 })
 

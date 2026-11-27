@@ -866,6 +866,7 @@ const ru: Record<string, string> = {
   'The logo at the bottom': 'Логотип снизу',
   'The logo on the left': 'Логотип слева',
   'The logo on the right': 'Логотип справа',
+  'A plugin’s panel beside the page': 'Панель плагина рядом со страницей',
   'The sidebar {n} px wide': 'Боковая панель шириной {n} px',
   'The side panel {n} px wide': 'Правая панель шириной {n} px',
   'And more': 'И другое',

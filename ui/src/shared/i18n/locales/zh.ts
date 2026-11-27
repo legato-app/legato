@@ -866,6 +866,7 @@ const zh: Record<string, string> = {
   'The logo at the bottom': '徽标在底部',
   'The logo on the left': '徽标在左侧',
   'The logo on the right': '徽标在右侧',
+  'A plugin’s panel beside the page': '页面旁显示插件面板',
   'The sidebar {n} px wide': '侧边栏宽 {n} px',
   'The side panel {n} px wide': '侧面板宽 {n} px',
   'And more': '还有其他',
