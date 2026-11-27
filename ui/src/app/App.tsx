@@ -148,6 +148,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
   // Left last, Add-ons sits close to Settings, as in the app's own order.
   const addonsBySettings = shown.at(-1) === 'addons'
   const hidesSome = !shown.includes('history') || !shown.includes('addons')
+  const inSettings = !full && page === 'settings'
   const hiddenEntries = (): MenuEntry[] => [
     !shown.includes('history') && { label: tr('Back'), icon: <CaretLeft size={16} />, disabled: !canBack, onSelect: goBack },
     !shown.includes('history') && { label: tr('Forward'), icon: <CaretRight size={16} />, disabled: !canForward, onSelect: goForward },
@@ -193,19 +194,19 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
       {shown.map((part) => (
         <Fragment key={part}>{blocks[part]}</Fragment>
       ))}
-      {!full && (
-        <span className="flex items-center gap-1 pe-2">
-          {addonsBySettings && addons}
-          {hidesSome && (
-            <button className={`${winBtn} rounded-full! phone:hidden`} aria-label={tr('More')} title={tr('More')} onClick={(e) => openMenu(e, hiddenEntries(), { place: 'below' })}>
-              <DotsThree size={18} weight="bold" />
-            </button>
-          )}
-          <button className={`${winBtn} turn rounded-full! ${page === 'settings' ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
-            <Gear size={18} weight={page === 'settings' ? 'fill' : 'regular'} />
+      {/* Over Now Playing: the gear alone (Add-ons and More stay out, the player stays calm), on glass like the
+          window's buttons; the page under the player doesn't light it. */}
+      <span className="flex items-center gap-1 pe-2">
+        {addonsBySettings && addons}
+        {!full && hidesSome && (
+          <button className={`${winBtn} rounded-full! phone:hidden`} aria-label={tr('More')} title={tr('More')} onClick={(e) => openMenu(e, hiddenEntries(), { place: 'below' })}>
+            <DotsThree size={18} weight="bold" />
           </button>
-        </span>
-      )}
+        )}
+        <button className={`${winBtn} turn rounded-full! ${full ? 'glass' : inSettings ? 'bg-raised' : ''}`} aria-label={tr('Settings')} title={tr('Settings')} onClick={() => go({ name: 'settings', section: 'general' })} onContextMenu={onMenu(() => navMenu({ name: 'settings', section: 'general' }))}>
+          <Gear size={18} weight={inSettings ? 'fill' : 'regular'} />
+        </button>
+      </span>
       <span className={`flex items-center phone:hidden ${full ? 'glass rounded-lg' : ''}`}>
         <button className={winBtn} aria-label={fullscreen ? tr('Exit full screen (F11)') : tr('Full screen (F11)')} title={fullscreen ? tr('Exit full screen (F11)') : tr('Full screen (F11)')} onClick={() => void toggleFullscreen()}>
           {fullscreen ? <ArrowsIn size={15} /> : <ArrowsOut size={15} />}
