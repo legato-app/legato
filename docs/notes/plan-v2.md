@@ -484,11 +484,9 @@ copies, downloads for offline), their accounts, limits and paid plan.
         row and Settings › Privacy name the relays and STUN. Desktop only. Decided alone (2026-11-26): an opened invite
         never joins by itself; the guest asks through the first relay that answers. Never seen, never tried across two
         networks.
-- [ ] 18. `L` A Linux build (AppImage, deb): WebKitGTK, the MPRIS media panel, the tray, PipeWire for the detector.
-      Built by GitHub's Actions (the owner's word, 2026-11-07); local tries in WSL or a VM once the owner sets one up
-      (a system change, theirs). 19 the same, on a macOS runner.
 - [ ] 19. `L` A macOS build, unsigned first as Liner's (signing: the owner's Apple Developer Program): WKWebView, Now
-      Playing, the menu bar. 18 and 19 take in Features › High's macOS and Linux line.
+      Playing, the menu bar. Built by GitHub's Actions on a macOS runner (the owner's word, 2026-11-07). Features › High's
+      macOS and Linux line takes it; Linux is the `L` line "Linux for both versions" below (the former item 18, folded in 2026-11-27).
 
 ### Platforms (milestone 3, user's ask 2026-10-31)
 
@@ -619,11 +617,13 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       tasks (`deferred.rs` / `deferred.ts` start only what Lite shows; the hidden page suspended sooner than
       `background.rs`'s 5 minutes); 10 a smaller cover cache (`ArtCache::new(…, 500 << 20)` and `coverCacheMb`'s
       default: 250 MB in Lite). Lite's defaults apply only where the user never chose, as with `DEFAULTS_VERSION`.
-- [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. For Opus: the design
+- [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
+      item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
+      word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).
       Designed 2026-11-27 (Opus), not built (below). WebKitGTK instead of WebView2: check the YouTube embed there first
       (codecs, autoplay, the shield's hooks and `live.js`), then the keychain (Secret Service), the tray, Open at startup,
       packaging (AppImage or .deb) and its update feeds.
-      - Base: item 18 (line 487). The CI already compiles the non-Windows paths (macOS job), so Linux = those paths plus
+      - Base: the former item 18 (folded in above). The CI already compiles the non-Windows paths (macOS job), so Linux = those paths plus
         GTK. Both editions are one job (Lite = the same cfgs minus its cuts). Targets: WebKitGTK 4.1 (Ubuntu 22.04+,
         Debian 12+), x86_64 and aarch64 (small Linux machines, Raspberry Pi and the like).
       - Risk 1, to clear before anything: the YouTube embed on WebKitGTK.
@@ -685,7 +685,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs
           (architecture, development: apt dependencies, CONTRIBUTING › Releasing).
         7 `S` Measure the Lite on a small aarch64 machine (RAM, CPU while playing) against the Windows target.
-      - Decided alone (2026-11-27, Opus): AppImage + .deb only; no plain text without a keyring; no global shortcuts under
+      - To decide alone (2026-11-27, Opus): AppImage + .deb only; no plain text without a keyring; no global shortcuts under
         Wayland; aarch64 from the first release.
       - Not tried for real: everything. There is no Linux on the PC used for the design; the embed, codecs, MPRIS, tray and
         Secret Service are seen only in slice 0, on the owner's machine.
