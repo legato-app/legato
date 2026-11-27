@@ -1267,6 +1267,7 @@ const ar: Record<string, string> = {
   'Library lists arranged their own way': 'قوائم المكتبة مرتّبة بطريقتها',
   'List columns in another order': 'أعمدة القائمة بترتيب آخر',
   'Home arranged its own way': 'الصفحة الرئيسية مرتّبة بطريقتها',
+  'Now Playing arranged its own way': 'شاشة التشغيل الحالي مرتّبة بطريقتها',
   'Home sections': 'أقسام الصفحة الرئيسية',
   'Default layout': 'التخطيط الافتراضي',
   'Themes no longer arrange the app': 'لم تعد السمات ترتّب التطبيق',

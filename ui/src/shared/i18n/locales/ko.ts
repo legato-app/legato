@@ -1303,6 +1303,7 @@ const ko: Record<string, string> = {
   'Library lists arranged their own way': '보관함 목록의 자체 배치',
   'List columns in another order': '목록 열의 순서 변경',
   'Home arranged its own way': '홈의 자체 배치',
+  'Now Playing arranged its own way': '지금 재생 중 화면의 자체 배치',
   'Home sections': '홈 섹션',
   'Default layout': '기본 배치',
   'Themes no longer arrange the app': '이제 테마가 앱 배치를 바꾸지 않습니다',

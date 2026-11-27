@@ -1303,6 +1303,7 @@ const vi: Record<string, string> = {
   'Library lists arranged their own way': 'Danh sách thư viện được sắp xếp theo cách riêng',
   'List columns in another order': 'Các cột danh sách theo thứ tự khác',
   'Home arranged its own way': 'Trang chủ được sắp xếp theo cách riêng',
+  'Now Playing arranged its own way': 'Màn hình Đang phát được sắp xếp theo cách riêng',
   'Home sections': 'Các mục trang chủ',
   'Default layout': 'Bố cục mặc định',
   'Themes no longer arrange the app': 'Chủ đề không còn sắp xếp ứng dụng',

@@ -1303,6 +1303,7 @@ const zh: Record<string, string> = {
   'Library lists arranged their own way': '资料库列表使用自己的排列',
   'List columns in another order': '列表列的顺序不同',
   'Home arranged its own way': '主页使用自己的排列',
+  'Now Playing arranged its own way': '正在播放页面使用自己的排列',
   'Home sections': '主页版块',
   'Default layout': '默认布局',
   'Themes no longer arrange the app': '主题不再调整应用布局',

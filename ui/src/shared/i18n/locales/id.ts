@@ -1303,6 +1303,7 @@ const id: Record<string, string> = {
   'Library lists arranged their own way': 'Daftar pustaka ditata sendiri',
   'List columns in another order': 'Kolom daftar dalam urutan lain',
   'Home arranged its own way': 'Beranda ditata sendiri',
+  'Now Playing arranged its own way': 'Sedang Diputar ditata sendiri',
   'Home sections': 'Bagian Beranda',
   'Default layout': 'Tata letak bawaan',
   'Themes no longer arrange the app': 'Tema tidak lagi menata aplikasi',

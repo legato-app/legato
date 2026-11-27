@@ -1303,6 +1303,7 @@ const pl: Record<string, string> = {
   'Library lists arranged their own way': 'Listy biblioteki ułożone po swojemu',
   'List columns in another order': 'Kolumny list w innej kolejności',
   'Home arranged its own way': 'Strona główna ułożona po swojemu',
+  'Now Playing arranged its own way': 'Ekran „Teraz odtwarzane” ułożony po swojemu',
   'Home sections': 'Sekcje strony głównej',
   'Default layout': 'Domyślny układ',
   'Themes no longer arrange the app': 'Motywy nie układają już aplikacji',

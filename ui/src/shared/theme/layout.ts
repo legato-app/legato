@@ -76,6 +76,10 @@ export const PAGE_PARTS = {
   artists: [{ id: 'toolbar', fixed: true }, { id: 'list', fixed: true }],
   // Home's sections have their own order (the theme's `look`, then the user's).
   home: [{ id: 'chips', fixed: true }, { id: 'sections', fixed: true }],
+  // Now Playing on the PC: the cover's side, the title block, the buttons right of the transport.
+  nowPlayingColumns: [{ id: 'cover', fixed: true }, { id: 'words', fixed: true }],
+  nowPlaying: [{ id: 'from' }, { id: 'title', fixed: true }, { id: 'artists', fixed: true }, { id: 'album' }, { id: 'readout' }, { id: 'lyrics' }, { id: 'next' }],
+  nowPlayingControls: [{ id: 'room', fixed: true }, { id: 'lyrics', fixed: true }, { id: 'upNext', fixed: true }, { id: 'sound', fixed: true }, { id: 'more', fixed: true }, { id: 'volume', fixed: true }],
 } as const
 export type PartedPage = keyof typeof PAGE_PARTS
 export const pagePartIds = (page: PartedPage): string[] => PAGE_PARTS[page].map((part) => part.id)
@@ -299,6 +303,7 @@ export function layoutSummary(layout: Layout | undefined): string[] {
     pageChanged('artist') && tr('Artist pages arranged their own way'),
     (pageChanged('songs') || pageChanged('albums') || pageChanged('artists')) && tr('Library lists arranged their own way'),
     pageChanged('home') && tr('Home arranged its own way'),
+    (pageChanged('nowPlayingColumns') || pageChanged('nowPlaying') || pageChanged('nowPlayingControls')) && tr('Now Playing arranged its own way'),
     orderColumns(placement.pages.lists?.columns, COLUMNS).join() !== COLUMNS.join() && tr('List columns in another order'),
   ].filter((line) => typeof line === 'string')
   return lines.length > MAX_SUMMARY_LINES ? [...lines.slice(0, MAX_SUMMARY_LINES), tr('And more')] : lines

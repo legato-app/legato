@@ -1303,6 +1303,7 @@ const hi: Record<string, string> = {
   'Library lists arranged their own way': 'लाइब्रेरी की सूचियाँ अपने ढंग से लगाई गईं',
   'List columns in another order': 'सूची के स्तंभ दूसरे क्रम में',
   'Home arranged its own way': 'होम अपने ढंग से लगाया गया',
+  'Now Playing arranged its own way': 'अभी चल रहा स्क्रीन अपने ढंग से लगाई गई',
   'Home sections': 'होम के अनुभाग',
   'Default layout': 'डिफ़ॉल्ट व्यवस्था',
   'Themes no longer arrange the app': 'थीम अब ऐप की व्यवस्था नहीं बदलती',

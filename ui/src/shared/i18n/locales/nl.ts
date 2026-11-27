@@ -1303,6 +1303,7 @@ const nl: Record<string, string> = {
   'Library lists arranged their own way': 'Bibliotheeklijsten op hun eigen manier ingedeeld',
   'List columns in another order': 'Lijstkolommen in een andere volgorde',
   'Home arranged its own way': 'Startpagina op eigen manier ingedeeld',
+  'Now Playing arranged its own way': 'Nu afgespeeld op eigen manier ingedeeld',
   'Home sections': 'Onderdelen van de startpagina',
   'Default layout': 'Standaardindeling',
   'Themes no longer arrange the app': 'Thema’s delen de app niet meer in',

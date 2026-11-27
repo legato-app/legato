@@ -1303,6 +1303,7 @@ const uk: Record<string, string> = {
   'Library lists arranged their own way': 'Списки медіатеки розташовано по-своєму',
   'List columns in another order': 'Стовпці списку в іншому порядку',
   'Home arranged its own way': 'Головну розташовано по-своєму',
+  'Now Playing arranged its own way': 'Екран «Зараз грає» розташовано по-своєму',
   'Home sections': 'Розділи головної',
   'Default layout': 'Типове розташування',
   'Themes no longer arrange the app': 'Теми більше не змінюють розташування елементів',

@@ -95,7 +95,7 @@ describe('a page’s parts', () => {
     const got = sanitizeLayout({ v: 1, pages: { album: { order: ['more', 'credits'], hidden: ['tracks', 'more'] }, artist: { hidden: ['mostPlayed', 'topSongs', 'links', 'about'] }, home: { hidden: ['more'] } } })!
     expect(got.pages).toEqual({ album: { order: ['more'], hidden: ['more'] }, artist: { hidden: ['about'] } })
     expect(arrangeParts({ order: ['shelves', 'mostPlayed'] }, pagePartIds('artist'))).toEqual(['shelves', 'mostPlayed', 'topSongs', 'discography', 'about', 'links'])
-    for (const page of ['album', 'artist', 'songs', 'albums', 'artists', 'home'] as const) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
+    for (const page of Object.keys(PAGE_PARTS) as (keyof typeof PAGE_PARTS)[]) expect(arrangeParts(undefined, pagePartIds(page))).toEqual(PAGE_PARTS[page].map((part) => part.id))
   })
 
   it('says which pages change', () => {
@@ -124,6 +124,15 @@ describe('Home’s frame', () => {
     const layout = sanitizeLayout({ v: 1, pages: { home: { order: ['sections', 'chips'], hidden: ['chips'] } } })!
     expect(layout.pages).toEqual({ home: { order: ['sections', 'chips'] } })
     expect(layoutSummary(layout)).toEqual(['Home arranged its own way'])
+  })
+})
+
+describe('Now Playing’s parts', () => {
+  it('swaps the cover’s side, orders the title block and the buttons, hides only what stays reachable', () => {
+    const layout = sanitizeLayout({ v: 1, pages: { nowPlayingColumns: { order: ['words', 'cover'], hidden: ['cover'] }, nowPlaying: { order: ['artists', 'title'], hidden: ['title', 'artists', 'next', 'readout'] }, nowPlayingControls: { order: ['volume'], hidden: ['more', 'volume'] } } })!
+    expect(layout.pages).toEqual({ nowPlayingColumns: { order: ['words', 'cover'] }, nowPlaying: { order: ['artists', 'title'], hidden: ['next', 'readout'] }, nowPlayingControls: { order: ['volume'] } })
+    expect(arrangeParts(layout.pages!.nowPlaying, pagePartIds('nowPlaying'))).toEqual(['from', 'artists', 'album', 'lyrics', 'title'])
+    expect(layoutSummary(layout)).toEqual(['Now Playing arranged its own way'])
   })
 })
 

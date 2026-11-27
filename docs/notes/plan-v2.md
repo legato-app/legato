@@ -773,8 +773,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-27): Home's frame is the chips and the sections, both only moving; a theme's Home order
       is written when the theme is picked, except the switch of a section that sends something (new releases): the
       user's stays, a theme never turns it on; an older Legato drops a theme's `homeSections` when it saves it.
-  - [ ] `M` 11. Now Playing's parts on the PC (cover side, the title block's order, the controls row). Tests: parts
+  - [x] `M` 11. Now Playing's parts on the PC (cover side, the title block's order, the controls row). Tests: parts
     resolve for its blocks.
+    2026-11-27: done; seen in the browser demo (invented data), never in the app.
+    - Decided alone (2026-11-27): `pages.nowPlayingColumns` (cover, words: the cover's side), `pages.nowPlaying` (the
+      title block: only from, album, source line, lyrics peek and next hide, each reachable otherwise) and
+      `pages.nowPlayingControls` (the buttons right of the transport, order only); the phone keeps its own screen.
   - [ ] `S` 12. `.theme` export and import keep `layout`; docs (`docs/design.md`, the theme help, the parts per page);
     the website copy ("Make it look like yours", `site/components/content.tsx` and its locales). Tests: a
     `themefile.rs` round-trip with a `layout` key. Review of 1-4: the docs say that a layout from a newer version, or

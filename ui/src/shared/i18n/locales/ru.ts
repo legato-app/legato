@@ -1303,6 +1303,7 @@ const ru: Record<string, string> = {
   'Library lists arranged their own way': 'Списки медиатеки расположены по-своему',
   'List columns in another order': 'Столбцы списка в другом порядке',
   'Home arranged its own way': 'Главная расположена по-своему',
+  'Now Playing arranged its own way': 'Экран «Сейчас играет» расположен по-своему',
   'Home sections': 'Разделы главной',
   'Default layout': 'Расположение по умолчанию',
   'Themes no longer arrange the app': 'Темы больше не меняют расположение элементов',

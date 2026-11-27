@@ -1303,6 +1303,7 @@ const it: Record<string, string> = {
   'Library lists arranged their own way': 'Elenchi della libreria disposti a modo loro',
   'List columns in another order': 'Colonne degli elenchi in un altro ordine',
   'Home arranged its own way': 'Home disposta a modo suo',
+  'Now Playing arranged its own way': 'In riproduzione disposta a modo suo',
   'Home sections': 'Sezioni della Home',
   'Default layout': 'Disposizione predefinita',
   'Themes no longer arrange the app': 'I temi non dispongono più l’app',

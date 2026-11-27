@@ -1303,6 +1303,7 @@ const ja: Record<string, string> = {
   'Library lists arranged their own way': 'ライブラリの一覧は独自の配置',
   'List columns in another order': '一覧の列の順番を変更',
   'Home arranged its own way': 'ホームは独自の配置',
+  'Now Playing arranged its own way': '再生中画面は独自の配置',
   'Home sections': 'ホームのセクション',
   'Default layout': '標準の配置',
   'Themes no longer arrange the app': 'テーマはアプリを配置しなくなりました',

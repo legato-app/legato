@@ -2,7 +2,7 @@ import { ArrowSquareOut, CaretDown, DotsThree, Heart, ImageSquare, MagicWand, Mo
 import { artistName } from '../../shared/artistName'
 import { pop } from '../../shared/motion'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
@@ -39,6 +39,7 @@ import { LyricsPanel, useNowLyrics } from './LyricsPanel'
 import { songKey } from './effects'
 import { applyFix, NO_FIX, peekLine } from './lyricsAt'
 import { PageBoundary } from '../../app/PageBoundary'
+import { usePageParts } from '../../shared/ui/usePageParts'
 import { EditorPanel } from '../../app/pages'
 import { useVideoBox } from './videoBox'
 import { VideoSlot } from './VideoSlot'
@@ -253,6 +254,9 @@ export function NowPlaying() {
   const still = useStill(now?.via === 'youtube' ? now.youtubeId : undefined)
   const backdrop = useBackdrop(immersive && track ? trackArt(track)[0] : undefined, backdropBlur)
   const phone = usePhone()
+  const columns = usePageParts('nowPlayingColumns')
+  const titleParts = usePageParts('nowPlaying')
+  const controlParts = usePageParts('nowPlayingControls')
 
   useEffect(() => {
     // A dialog or a menu on top (share card, add to playlist…) takes this Esc: Now Playing stays.
@@ -294,6 +298,98 @@ export function NowPlaying() {
       {tr('Playing from {source}', { source: tr(viaLabel[now.via]) })}
     </span>
   )
+  // The theme's order of the title block (PC).
+  const titleBlocks: Record<string, ReactNode> = {
+    from: from && <FromTag />,
+    title: <FitTitle title={now.title} floor={28} className="pb-1 text-[clamp(2.5rem,5.5vw,5.5rem)] leading-[1.05] font-black tracking-[-0.02em]" />,
+    artists: <ArtistLine now={now} className="text-[1.375rem] leading-7 font-bold" />,
+    album: track?.album && <AlbumLine track={track} album={track.album} />,
+    readout: readout && source,
+    lyrics: <LyricsPeek />,
+    next: <NextLine />,
+  }
+  const controls: Record<string, ReactNode> = {
+    room: <RoomPill className="mr-1 max-w-40 phone:hidden" />,
+    lyrics: <PanelToggle id="lyrics" label={tr('Lyrics')} icon={Quotes} active={panel} />,
+    upNext: <PanelToggle id="upNext" label={tr('Up next')} icon={Queue} active={panel} />,
+    sound: <PanelToggle id="editor" label={tr('Sound')} icon={SlidersHorizontal} active={panel} />,
+    // Karaoke (K), Cover display (C), Less like this and the rest: one More (a calm player, plan-v2 › U2). The phone
+    // has its own in its top bar.
+    more: (
+      <RoundButton label={tr('More')} kind="plain" size="md" className="phone:hidden" onClick={(e) => openMenu(e, more(), { place: 'above' })}>
+        <DotsThree size={22} weight="bold" />
+      </RoundButton>
+    ),
+    volume: (
+      <span className="flex min-w-0 flex-col items-end gap-1 phone:hidden">
+        <VolumeControl big />
+        {volumeMode === 'knob' && <span className="kicker">{tr('Volume')}</span>}
+      </span>
+    ),
+  }
+  // The cover left (the app's way) or right: the panel's fixed width follows it.
+  const coverRight = columns[0] === 'words'
+  const panelWidth = panel === 'editor' ? '400px' : panel === 'upNext' ? '360px' : 'minmax(0,1fr)'
+  const gridColumns = coverRight ? `${panelWidth} minmax(0,1fr)` : `minmax(0,1fr) ${panelWidth}`
+
+  const stageColumn = (
+    <section className={`flex min-h-0 min-w-0 flex-col items-center gap-4 ${panel ? 'phone:hidden' : ''}`}>
+      {/* The phone: in More (one main thing on screen, the cover). The PC: only with a video to pick (a file with no
+          YouTube version has Auto and Cover alike); always in More too. */}
+      {!phone && (video || ytVersion) && <Segmented quiet className="glass" label={tr('Show')} value={show} onChange={pickShow} options={showOptions} />}
+      <Stage video={video} cover={stage === 'cover' || (stage === 'auto' && still === true)} track={track} title={now.title} youtubeId={now.youtubeId} pulse={coverPulse && motion} wantRing={visualizer && motion && look === 'radial'} onRing={setRing} />
+      {visualizer && motion && !ring && <Visualizer />}
+      {now.via === 'preview' && (
+        <div className="flex items-center justify-center gap-4">
+          <span className="kicker">{tr('30-second preview')}</span>
+          {now.page && (
+            <Button variant="link" className="text-xs" onClick={() => openUrl(now.page!)}>
+              {tr('Listen on Apple Music')} <ArrowSquareOut size={13} />
+            </Button>
+          )}
+        </div>
+      )}
+    </section>
+  )
+  const wordsColumn = panel === 'editor' ? (
+    <PageBoundary>
+      <EditorPanel onHide={() => update({ editor: false })} />
+    </PageBoundary>
+  ) : panel === 'lyrics' ? (
+    // No card here: the lines on the backdrop, as the title is (the owner's ask 2026-11-07: a box read as a menu).
+    <LyricsPanel className="py-1" onHide={() => update({ lyrics: false })} onUpNext={() => update({ lyrics: false, upNext: true })} />
+  ) : panel === 'upNext' ? (
+    <UpNext bare onHide={() => update({ upNext: false })} />
+  ) : (
+    // Display XL (docs/design.md), smaller in a small window or for a long video title (`FitTitle`).
+    phone ? (
+      // The phone: title and artist on the left, the heart beside them; album, lyrics and Up next one tap away.
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <FitTitle title={now.title} floor={18} className="text-2xl leading-tight font-black tracking-[-0.02em]" />
+          <div className="flex min-w-0 items-center gap-2 pt-1 text-base font-bold">
+            <ArtistLine now={now} className="min-w-0" />
+            {readout && (
+              <span className="flex text-ink-2">
+                <SourceIcon source={viaSource[now.via]} size={14} />
+              </span>
+            )}
+          </div>
+        </div>
+        {track && (
+          <RoundButton label={liked ? tr('Remove from Liked Music') : tr('Add to Liked Music')} aria-pressed={liked} kind="plain" size="md" onClick={(e) => (void toggleLike(track), pop(e.currentTarget))} className={liked ? 'text-ink!' : ''}>
+            <Heart size={24} weight={liked ? 'fill' : 'regular'} />
+          </RoundButton>
+        )}
+      </div>
+    ) : (
+      <div className="flex min-w-0 flex-col justify-center gap-4 pb-8">
+        {titleParts.map((part) => (
+          <Fragment key={part}>{titleBlocks[part]}</Fragment>
+        ))}
+      </div>
+    )
+  )
 
   return (
     // Whole window, under the see-through top bar (logo, Close player and window buttons stay on top, z-30).
@@ -321,68 +417,10 @@ export function NowPlaying() {
       )}
 
       {/* Phone layout: one column, the cover over the song; an open panel (lyrics, Up next, sound) takes the cover's place. */}
-      <div className={`grid min-h-0 flex-1 gap-12 phone:grid-cols-1 phone:gap-4 ${panel ? 'phone:grid-rows-1' : 'phone:grid-rows-[minmax(0,1fr)_auto]'} ${panel === 'editor' ? 'grid-cols-[minmax(0,1fr)_400px]' : panel === 'upNext' ? 'grid-cols-[minmax(0,1fr)_360px]' : 'grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'}`}>
-        <section className={`flex min-h-0 min-w-0 flex-col items-center gap-4 ${panel ? 'phone:hidden' : ''}`}>
-          {/* The phone: in More (one main thing on screen, the cover). The PC: only with a video to pick (a file with no
-              YouTube version has Auto and Cover alike); always in More too. */}
-          {!phone && (video || ytVersion) && <Segmented quiet className="glass" label={tr('Show')} value={show} onChange={pickShow} options={showOptions} />}
-          <Stage video={video} cover={stage === 'cover' || (stage === 'auto' && still === true)} track={track} title={now.title} youtubeId={now.youtubeId} pulse={coverPulse && motion} wantRing={visualizer && motion && look === 'radial'} onRing={setRing} />
-          {visualizer && motion && !ring && <Visualizer />}
-          {now.via === 'preview' && (
-            <div className="flex items-center justify-center gap-4">
-              <span className="kicker">{tr('30-second preview')}</span>
-              {now.page && (
-                <Button variant="link" className="text-xs" onClick={() => openUrl(now.page!)}>
-                  {tr('Listen on Apple Music')} <ArrowSquareOut size={13} />
-                </Button>
-              )}
-            </div>
-          )}
-        </section>
-
-        {panel === 'editor' ? (
-          <PageBoundary>
-            <EditorPanel onHide={() => update({ editor: false })} />
-          </PageBoundary>
-        ) : panel === 'lyrics' ? (
-          // No card here: the lines on the backdrop, as the title is (the owner's ask 2026-11-07: a box read as a menu).
-          <LyricsPanel className="py-1" onHide={() => update({ lyrics: false })} onUpNext={() => update({ lyrics: false, upNext: true })} />
-        ) : panel === 'upNext' ? (
-          <UpNext bare onHide={() => update({ upNext: false })} />
-        ) : (
-          // Display XL (docs/design.md), smaller in a small window or for a long video title (`FitTitle`).
-          phone ? (
-            // The phone: title and artist on the left, the heart beside them; album, lyrics and Up next one tap away.
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <FitTitle title={now.title} floor={18} className="text-2xl leading-tight font-black tracking-[-0.02em]" />
-                <div className="flex min-w-0 items-center gap-2 pt-1 text-base font-bold">
-                  <ArtistLine now={now} className="min-w-0" />
-                  {readout && (
-                    <span className="flex text-ink-2">
-                      <SourceIcon source={viaSource[now.via]} size={14} />
-                    </span>
-                  )}
-                </div>
-              </div>
-              {track && (
-                <RoundButton label={liked ? tr('Remove from Liked Music') : tr('Add to Liked Music')} aria-pressed={liked} kind="plain" size="md" onClick={(e) => (void toggleLike(track), pop(e.currentTarget))} className={liked ? 'text-ink!' : ''}>
-                  <Heart size={24} weight={liked ? 'fill' : 'regular'} />
-                </RoundButton>
-              )}
-            </div>
-          ) : (
-            <div className="flex min-w-0 flex-col justify-center gap-4 pb-8">
-              {from && <FromTag />}
-              <FitTitle title={now.title} floor={28} className="pb-1 text-[clamp(2.5rem,5.5vw,5.5rem)] leading-[1.05] font-black tracking-[-0.02em]" />
-              <ArtistLine now={now} className="text-[1.375rem] leading-7 font-bold" />
-              {track?.album && <AlbumLine track={track} album={track.album} />}
-              {readout && source}
-              <LyricsPeek />
-              <NextLine />
-            </div>
-          )
-        )}
+      <div className={`grid min-h-0 flex-1 grid-cols-(--columns) gap-12 phone:grid-cols-1 phone:gap-4 ${panel ? 'phone:grid-rows-1' : 'phone:grid-rows-[minmax(0,1fr)_auto]'}`} style={{ ['--columns' as string]: gridColumns }}>
+        {columns.map((column) => (
+          <Fragment key={column}>{column === 'cover' ? stageColumn : wordsColumn}</Fragment>
+        ))}
       </div>
 
       <div ref={volumeWheelRef} className="flex shrink-0 flex-col gap-3 pt-6">
@@ -414,19 +452,9 @@ export function NowPlaying() {
             <Transport size="lg" />
           </span>
           <div className="flex min-w-0 items-center justify-end gap-1 phone:justify-around">
-            <RoomPill className="mr-1 max-w-40 phone:hidden" />
-            <PanelToggle id="lyrics" label={tr('Lyrics')} icon={Quotes} active={panel} />
-            <PanelToggle id="upNext" label={tr('Up next')} icon={Queue} active={panel} />
-            <PanelToggle id="editor" label={tr('Sound')} icon={SlidersHorizontal} active={panel} />
-            {/* Karaoke (K), Cover display (C), Less like this and the rest: one More (a calm player, plan-v2 › U2). The
-                phone has its own in its top bar. */}
-            <RoundButton label={tr('More')} kind="plain" size="md" className="phone:hidden" onClick={(e) => openMenu(e, more(), { place: 'above' })}>
-              <DotsThree size={22} weight="bold" />
-            </RoundButton>
-            <span className="flex min-w-0 flex-col items-end gap-1 phone:hidden">
-              <VolumeControl big />
-              {volumeMode === 'knob' && <span className="kicker">{tr('Volume')}</span>}
-            </span>
+            {controlParts.map((part) => (
+              <Fragment key={part}>{controls[part]}</Fragment>
+            ))}
           </div>
         </div>
       </div>

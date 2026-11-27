@@ -1303,6 +1303,7 @@ const tr: Record<string, string> = {
   'Library lists arranged their own way': 'Kitaplık listeleri kendine göre düzenlendi',
   'List columns in another order': 'Liste sütunları farklı sırada',
   'Home arranged its own way': 'Ana sayfa kendine göre düzenlendi',
+  'Now Playing arranged its own way': 'Şimdi Çalınıyor ekranı kendine göre düzenlendi',
   'Home sections': 'Ana sayfa bölümleri',
   'Default layout': 'Varsayılan düzen',
   'Themes no longer arrange the app': 'Temalar artık uygulamayı düzenlemiyor',

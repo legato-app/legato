@@ -456,7 +456,9 @@ export function App() {
       <VolumeHud />
       {full && (
         <PageBoundary fallback={null}>
-          <NowPlaying />
+          <PageLayout.Provider value={placement.pages}>
+            <NowPlaying />
+          </PageLayout.Provider>
         </PageBoundary>
       )}
       {karaoke && (

@@ -1303,6 +1303,7 @@ const sv: Record<string, string> = {
   'Library lists arranged their own way': 'Bibliotekets listor ordnade på eget sätt',
   'List columns in another order': 'Listkolumnerna i annan ordning',
   'Home arranged its own way': 'Hem ordnat på eget sätt',
+  'Now Playing arranged its own way': 'Spelas nu ordnat på eget sätt',
   'Home sections': 'Hems avsnitt',
   'Default layout': 'Standardlayout',
   'Themes no longer arrange the app': 'Teman ordnar inte längre om appen',
