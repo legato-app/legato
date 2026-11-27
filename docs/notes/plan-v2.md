@@ -263,14 +263,17 @@ the order; a line leaves only when it ships or the user drops it.
 - [x] `M` A listening history page, local only (plays already feed the mixes). 2026-11-26: sidebar › History, by day, skipped marked, Reset history there too; no search. Never seen.
 - [x] `M` Titles written "Title - Artist" still showed swapped ("like that - doja cat *slowed*", the owner again,
       2026-11-27).
-  2026-11-27: an artist YouTube Music's catalog named since the start now counts beside the library's
-  (`ytmusic::catalog_artist`, no request of its own); a search reads its videos once its song results are in; links
-  from song lists and share codes go the same way. Songs saved swapped are turned once
-  (`Library::turn_backwards_titles`) where the library holds that artist's song of that name. Tests; not tried for real.
+  2026-11-27: the library's artists no longer count what only a video named (a row saved swapped vouched for itself).
+  Links from song lists and share codes go the same way, an older version's code too (`turn_video_only`). In a search,
+  an artist YouTube Music's catalog named since the start counts as well (`ytmusic::catalog_artist`, 20,000 at most, no
+  request of its own), read once its song results are in. Saved songs only a video named, 10 minutes at most, are
+  turned once (`backwardsTitles2`). Tests; not tried for real.
   - Decided alone (2026-11-27): mixes, radio, autoplay and playlist imports take YouTube Music's own artist field (no
-    split, nothing to turn); a saved song without that proof stays swapped (the video's raw title isn't kept, so it
-    can't be told from a channel's own upload); an artist neither saved nor seen stays read as before; a sync renames
-    no song a PC has.
+    split, nothing to turn); a pasted link goes by the library only; an unknown channel posting "Doja Cat *slowed*"
+    reads like a swapped title and turns too (the raw title isn't kept); a song of unknown length is turned; a sync
+    renames no song a PC has.
+- [ ] `S` Mixes' artist key for a YouTube Music upload titled "Title - Artist" (`mixes::credit` splits it on the dash
+      and takes the left side): grouping and Like seeds only, no name shown wrong on a song.
 
 ## The owner's asks of 2026-11-07, evening
 
