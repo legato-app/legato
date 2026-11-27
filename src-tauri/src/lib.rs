@@ -705,7 +705,7 @@ fn stop_with(text: &str) -> ! {
         use windows::core::HSTRING;
         // SAFETY: plain modal box, no owner window, strings live through the call.
         unsafe {
-            MessageBoxW(None, &HSTRING::from(text), &HSTRING::from("Legato"), MB_OK | MB_ICONERROR);
+            MessageBoxW(None, &HSTRING::from(text), &HSTRING::from(identity::PRODUCT), MB_OK | MB_ICONERROR);
         }
     }
     std::process::exit(1);
@@ -790,7 +790,8 @@ pub fn run() {
             // Starts with built-in rules; cached / fresh lists swapped in below without blocking startup.
             let shield = Arc::new(Shield::new("", shield_on));
 
-            let mut window = tauri::WebviewWindowBuilder::from_config(app.handle(), &app.config().app.windows[0])?.additional_browser_args(&background::browser_args());
+            // The title by hand: an overlay can't patch one entry of the `windows` array.
+            let mut window = tauri::WebviewWindowBuilder::from_config(app.handle(), &app.config().app.windows[0])?.title(identity::PRODUCT).additional_browser_args(&background::browser_args());
             if let Some((r, g, b)) = window_bg::parse(&window_bg::resolve(ui.as_ref(), window_bg::system_dark())) {
                 window = window.background_color(tauri::window::Color(r, g, b, 255));
             }

@@ -32,9 +32,12 @@ mod imp {
     use windows::Win32::System::Com::{CoCreateInstance, CoInitializeEx, CoTaskMemFree, CLSCTX_ALL, COINIT_MULTITHREADED};
     use windows::Win32::System::Diagnostics::ToolHelp::{CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS};
 
-    const NAME: &str = "Legato";
-    /// Same value on every Legato session: the mixer shows them as one app.
+    const NAME: &str = crate::identity::PRODUCT;
+    /// Same value on every session of this edition: the mixer shows them as one app (the two editions as two).
+    #[cfg(not(feature = "lite"))]
     const GROUP: GUID = GUID::from_u128(0x6d75_7369_6361_7070_6d69_7865_7200_0001);
+    #[cfg(feature = "lite")]
+    const GROUP: GUID = GUID::from_u128(0x6d75_7369_6361_7070_6d69_7865_7200_0002);
 
     fn wide(s: &str) -> Vec<u16> {
         s.encode_utf16().chain([0]).collect()

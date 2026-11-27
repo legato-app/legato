@@ -1,12 +1,10 @@
 //! Opens at sign-in (Settings › Advanced). Windows: the HKCU Run entry Task Manager › Startup apps lists.
 //! Task Manager's own switch lives in StartupApproved: read here, and turned back on with ours. Elsewhere: not offered.
 
-/// Run value name (Task Manager falls back to it when the exe has no description).
-#[cfg(all(windows, not(feature = "lite")))]
-const NAME: &str = "Legato";
-/// Lite's own entry: both editions may open at sign-in, neither changes the other's.
-#[cfg(all(windows, feature = "lite"))]
-const NAME: &str = "Legato Lite";
+/// Run value name (Task Manager falls back to it when the exe has no description): the edition's product name, the one
+/// its uninstaller deletes. Lite's own entry: both editions may open at sign-in, neither changes the other's.
+#[cfg(windows)]
+const NAME: &str = crate::identity::PRODUCT;
 /// The same entry under the app's first name: `follow` renames it. The full app's only (rename catch-up).
 #[cfg(all(windows, not(feature = "lite")))]
 const OLD_NAME: &str = "Music App";

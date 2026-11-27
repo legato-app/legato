@@ -46,7 +46,7 @@ impl Tray {
         let quit = MenuItem::with_id(app, "quit", lang::tr("Quit"), true, None::<&str>)?;
         let menu = Menu::with_items(app, &[&now, &PredefinedMenuItem::separator(app)?, &toggle, &next, &prev, &PredefinedMenuItem::separator(app)?, &show, &quit])?;
         let mut builder = TrayIconBuilder::with_id("main")
-            .tooltip("Legato")
+            .tooltip(crate::identity::PRODUCT)
             .menu(&menu)
             .show_menu_on_left_click(false)
             .on_menu_event(|app, e| match e.id.as_ref() {
