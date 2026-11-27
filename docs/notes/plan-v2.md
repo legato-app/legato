@@ -608,6 +608,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       an exe in a "Legato Lite" folder (`protocol::keeps`), Lite's `windows/hooks-lite.nsh` deletes the key only when it
       names `$INSTDIR`; `identity::PRODUCT` names the Run entry, tray, mixer (its own group), window title and error box;
       feature-free tests hold the Lite config's nulls, hooks and identifier. Not tried for real.
+    - [x] Slice 6, 2026-11-27: the site's download section links Legato Lite's installer beside the full one, with what
+      it leaves out (18 languages), only when the latest release carries it; README and `docs/development.md` say it.
+      Privacy rows unchanged (Lite reaches nothing new). Not tried for real (no Lite installed, the site not built).
+      - Decided alone (2026-11-27): the Stable release only, like the full download, so the link shows once a Stable
+        has the Lite (not before); no memory or speed claim in its text, nothing measured yet.
     - Android slice, still open: its own overlay over `tauri.android.conf.json` (`app.legato.lite.mobile`, not the
       `app.legato.lite` this one would give) and an APK feed per edition (`crates/connectors/src/apk.rs` `BETA` is the
       full app's `latest.json`: a Lite phone would be offered the full APK).

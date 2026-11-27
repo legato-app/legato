@@ -111,6 +111,8 @@ export const zh: Copy = {
       ['连接你用的服务', '设置 › 账号：YouTube Music、Spotify、Apple Music 和你的音乐文件夹。'],
       ['播放', '搜一次，从哪里都能加进队列，每台电脑上都有你的音乐库。'],
     ],
+    lite: '下载 Legato Lite',
+    liteAbout: '面向配置较低的电脑：只保留 Legato 的核心功能，不含 Live Editor、可视化、交叉淡入淡出、歌曲识别、插件、收听房间、手机遥控、直播叠加层、Discord、客厅模式、卡拉OK、盲听测试、播客和有声书。与 Legato 并排安装，使用独立的资料库。',
   },
   next: {
     title: '接下来',

@@ -111,6 +111,8 @@ export const nl: Copy = {
       ['Koppel wat je gebruikt', 'Instellingen › Accounts: YouTube Music, Spotify, Apple Music en je muziekmappen.'],
       ['Afspelen', 'Eén keer zoeken, overal vandaan in de wachtrij zetten, je bibliotheek op elke pc.'],
     ],
+    lite: 'Legato Lite downloaden',
+    liteAbout: 'Voor kleine pc’s: het belangrijkste van Legato, zonder Live Editor, visualisatie, crossfade, nummerherkenning, plugins, luisterkamers, telefoonafstandsbediening, streamingoverlay, Discord, huiskamermodus, karaoke, blindtest, podcasts en luisterboeken. Wordt naast Legato geïnstalleerd, met een eigen bibliotheek.',
   },
   next: {
     title: 'Wat er nog komt',

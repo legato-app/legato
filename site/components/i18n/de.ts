@@ -111,6 +111,8 @@ export const de: Copy = {
       ['Verbinde, was du nutzt', 'Einstellungen › Konten: YouTube Music, Spotify, Apple Music und deine Musikordner.'],
       ['Abspielen', 'Einmal suchen, von überall einreihen, deine Bibliothek auf jedem PC.'],
     ],
+    lite: 'Legato Lite herunterladen',
+    liteAbout: 'Für kleine PCs: das Wesentliche von Legato, ohne Live Editor, Visualisierung, Überblenden, Titelerkennung, Plugins, Hörräume, Handy-Fernbedienung, Streaming-Overlay, Discord, Wohnzimmermodus, Karaoke, Blindtest, Podcasts und Hörbücher. Wird neben Legato installiert, mit eigener Bibliothek.',
   },
   next: {
     title: 'Was als Nächstes kommt',

@@ -111,6 +111,8 @@ export const ko: Copy = {
       ['쓰는 서비스 연결', '설정 › 계정: YouTube Music, Spotify, Apple Music, 음악 폴더.'],
       ['재생', '검색은 한 번, 어디서든 대기열에 추가, 모든 PC에 내 보관함을.'],
     ],
+    lite: 'Legato Lite 다운로드',
+    liteAbout: '사양이 낮은 PC용: Legato의 핵심만 담았습니다. Live Editor, 비주얼라이저, 크로스페이드, 곡 인식, 플러그인, 같이 듣기 방, 휴대폰 리모컨, 방송용 오버레이, Discord, 거실 모드, 노래방, 블라인드 테스트, 팟캐스트, 오디오북은 없습니다. Legato 옆에 따로 설치되며 라이브러리도 별도입니다.',
   },
   next: {
     title: '다음 계획',

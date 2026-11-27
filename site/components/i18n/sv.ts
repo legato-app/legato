@@ -111,6 +111,8 @@ export const sv: Copy = {
       ['Anslut det du använder', 'Inställningar › Konton: YouTube Music, Spotify, Apple Music och dina musikmappar.'],
       ['Spela', 'Sök en gång, köa var som helst ifrån, ha ditt bibliotek på varje dator.'],
     ],
+    lite: 'Ladda ned Legato Lite',
+    liteAbout: 'För enklare datorer: det viktigaste i Legato, utan Live Editor, visualisering, övertoning, låtigenkänning, plugins, lyssningsrum, fjärrkontroll i mobilen, streamingöverlägg, Discord, vardagsrumsläge, karaoke, blindtest, poddar och ljudböcker. Installeras bredvid Legato, med ett eget bibliotek.',
   },
   next: {
     title: 'Det som kommer',

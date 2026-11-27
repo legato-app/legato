@@ -111,6 +111,8 @@ export const es: Copy = {
       ['Conecta lo que usas', 'Ajustes › Cuentas: YouTube Music, Spotify, Apple Music y tus carpetas de música.'],
       ['Escucha', 'Busca una vez, añade a la cola desde cualquier sitio, ten tu biblioteca en cada PC.'],
     ],
+    lite: 'Descargar Legato Lite',
+    liteAbout: 'Para PC modestos: lo esencial de Legato, sin Live Editor, visualizador, fundido encadenado, reconocimiento de canciones, plugins, salas de escucha, mando en el móvil, superposición para streaming, Discord, modo salón, karaoke, prueba a ciegas, pódcasts ni audiolibros. Se instala junto a Legato, con su propia biblioteca.',
   },
   next: {
     title: 'Lo próximo',

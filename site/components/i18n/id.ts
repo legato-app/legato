@@ -111,6 +111,8 @@ export const id: Copy = {
       ['Hubungkan yang kamu pakai', 'Pengaturan › Akun: YouTube Music, Spotify, Apple Music, dan folder musikmu.'],
       ['Putar', 'Cari sekali, antrekan dari mana saja, simpan koleksimu di setiap PC.'],
     ],
+    lite: 'Unduh Legato Lite',
+    liteAbout: 'Untuk PC kecil: inti Legato, tanpa Live Editor, visualisasi, crossfade, pengenalan lagu, plugin, ruang dengar, remote ponsel, overlay streaming, Discord, mode ruang tamu, karaoke, tes buta, podcast, dan buku audio. Terpasang di samping Legato, dengan pustakanya sendiri.',
   },
   next: {
     title: 'Yang akan datang',

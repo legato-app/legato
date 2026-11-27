@@ -111,6 +111,8 @@ export const vi: Copy = {
       ['Kết nối thứ bạn dùng', 'Cài đặt › Tài khoản: YouTube Music, Spotify, Apple Music và thư mục nhạc của bạn.'],
       ['Phát', 'Tìm một lần, thêm vào hàng đợi từ bất cứ đâu, giữ thư viện trên mọi PC.'],
     ],
+    lite: 'Tải Legato Lite',
+    liteAbout: 'Cho máy tính yếu: những phần cốt lõi của Legato, không có Live Editor, hình ảnh âm thanh, chuyển bài chồng mờ, nhận diện bài hát, plugin, phòng nghe chung, điều khiển bằng điện thoại, lớp phủ phát trực tiếp, Discord, chế độ phòng khách, karaoke, thử nghe đoán, podcast và sách nói. Cài song song với Legato, với thư viện riêng.',
   },
   next: {
     title: 'Sắp có gì',

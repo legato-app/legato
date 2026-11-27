@@ -216,7 +216,7 @@ export function Privacy({ rows, english }: { rows: [string, string][]; english?:
 /** Three steps, numbered in the playback blue, then the one way in. */
 export function Start() {
   const c = useCopy()
-  const { href } = useLatest()
+  const { href, lite } = useLatest()
   return (
     <>
       <motion.ol {...inView} variants={group} className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -236,6 +236,15 @@ export function Start() {
         </a>
         <span className="text-sm text-ink-2">{c.hero.free}</span>
       </Reveal>
+      {/* Only once the latest release carries it: no button without a file behind. */}
+      {lite && (
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-2">
+          <a href={lite} className="font-semibold text-ink underline decoration-line underline-offset-4">
+            {c.start.lite}
+          </a>{' '}
+          · {c.start.liteAbout}
+        </p>
+      )}
     </>
   )
 }

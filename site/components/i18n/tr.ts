@@ -111,6 +111,8 @@ export const tr: Copy = {
       ['Kullandıklarını bağla', 'Ayarlar › Hesaplar: YouTube Music, Spotify, Apple Music ve müzik klasörlerin.'],
       ['Çal', 'Bir kez ara, her yerden sıraya ekle, kitaplığın her bilgisayarda.'],
     ],
+    lite: 'Legato Lite’ı indir',
+    liteAbout: 'Mütevazı bilgisayarlar için: Legato’nun temel özellikleri; Live Editor, görselleştirici, geçişli çalma, şarkı tanıma, eklentiler, dinleme odaları, telefondan kumanda, yayın katmanı, Discord, oturma odası modu, karaoke, kör test, podcast’ler ve sesli kitaplar olmadan. Legato’nun yanına, kendi kitaplığıyla kurulur.',
   },
   next: {
     title: 'Sırada ne var',

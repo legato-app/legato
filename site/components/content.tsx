@@ -37,7 +37,8 @@ export type Copy = {
   playback: { title: string; intro: string; head: Row; rows: Row[] }
   /** english: said under the intro when PRIVACY isn't in the page's language. */
   privacy: { title: string; intro: string; head: Row; english: string; services: string; rows: Row[] }
-  start: { title: string; intro: string; steps: Row[] }
+  /** lite, liteAbout: the second download's link and what it leaves out. */
+  start: { title: string; intro: string; steps: Row[]; lite: string; liteAbout: string }
   next: { title: string; intro: string; head: Row; rows: Row[] }
   /** href: where an answer's `[label]` leads. */
   faq: { title: string; intro: string; items: { q: string; a: string; href?: string }[] }
@@ -233,6 +234,8 @@ export const en: Copy = {
       ['Connect what you use', 'Settings › Accounts: YouTube Music, Spotify, Apple Music and your music folders.'],
       ['Play', 'Search once, queue from anywhere, keep your library on every PC.'],
     ],
+    lite: 'Download Legato Lite',
+    liteAbout: 'For small PCs: Legato’s essentials, without the Live Editor, the visualizer, crossfade, song recognition, plugins, listening rooms, the phone remote, the streaming overlay, Discord, living-room mode, karaoke, the blind test, podcasts and audiobooks. It installs beside Legato, with its own library.',
   },
   // Unlike every other list here, what isn't out yet: docs/notes/plan-v2.md › Roadmap, in its order, minus what shipped.
   next: {

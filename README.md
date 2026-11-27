@@ -20,6 +20,7 @@ Windows 10 and 11 · free · no account of ours
 ## Get it
 
 Download `Legato_…_x64-setup.exe` from the [latest release](https://github.com/legato-app/legato/releases/latest) and run it.
+For a small PC, releases that carry `Legato.Lite_…_x64-setup.exe` offer Legato Lite: the essentials, installed beside Legato.
 
 ## Everything else is on the website
 
