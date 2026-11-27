@@ -380,6 +380,8 @@ mod tests {
         assert!(conf["plugins"]["updater"].get("pubkey").is_none());
         let release = include_str!("../../.github/workflows/release.yml");
         assert!(release.contains("gh release upload beta lite/latest-lite.json"), "nothing feeds the Lite's Beta file");
+        // The full app's latest.json names no Lite file: a second tauri-action run would write its own over it.
+        assert_eq!(release.matches("uses: tauri-apps/tauri-action").count(), 1, "tauri-action runs once, for the full app");
         #[cfg(feature = "lite")]
         assert_eq!(Channel::Beta.endpoint(), Some("https://github.com/legato-app/legato/releases/download/beta/latest-lite.json"));
     }
