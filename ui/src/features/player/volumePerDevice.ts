@@ -1,5 +1,6 @@
 import { refreshOutputs, useOutputs } from './outputs'
 import { usePlayer } from './store'
+import { isObject, readStored, writeStored } from '../../shared/stored'
 
 /** The volume last set on each output device (its name; the system's default is `default`), this PC's. */
 export type Memory = Record<string, number>
@@ -32,21 +33,8 @@ export function step(m: Memory, key: string, prevKey: string, volume: number, pr
   return volume !== prevVolume ? { memory: remember(m, key, volume) } : { memory: m }
 }
 
-function load(): Memory {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORE) ?? '{}')
-    return raw && typeof raw === 'object' ? raw : {}
-  } catch {
-    return {}
-  }
-}
-function save(m: Memory) {
-  try {
-    localStorage.setItem(STORE, JSON.stringify(m))
-  } catch {
-    // Private window or full: the volumes are not kept, nothing else is lost.
-  }
-}
+const load = () => readStored<Memory>(STORE, {}, isObject)
+const save = (memory: Memory) => writeStored(STORE, memory)
 
 /**
  * Settings › Playback › Volume per output device (`enabled`, off by default): the volume set while a device is in use is

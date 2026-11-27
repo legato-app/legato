@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { JumpPlaylist, LibraryPlaylist, LibraryTrack } from '../../shared/api'
 import type { View } from '../../app/store'
 import { primaryArtist } from '../library/filter'
+import { readStored, writeStored } from '../../shared/stored'
 
 /** A list page opened lately: Home's Jump back in. This PC only (localStorage), newest first. */
 export type OpenedList = { kind: 'playlist'; id: number } | { kind: 'album'; album: string; artist: string } | { kind: 'artist'; artist: string } | { kind: 'mix'; id: string }
@@ -35,14 +36,7 @@ function valid(x: unknown): x is OpenedList {
   return o.kind === 'artist' && typeof o.artist === 'string'
 }
 
-function load(): OpenedList[] {
-  try {
-    const v: unknown = JSON.parse(localStorage.getItem(KEY) ?? '[]')
-    return Array.isArray(v) ? v.filter(valid).slice(0, MAX_LISTS) : []
-  } catch {
-    return []
-  }
-}
+const load = () => readStored<unknown[]>(KEY, [], Array.isArray).filter(valid).slice(0, MAX_LISTS)
 
 export const useOpenedLists = create<{ list: OpenedList[] }>(() => ({ list: load() }))
 
@@ -68,11 +62,7 @@ export function noteList(v: View) {
   if (!l) return
   const list = pushList(useOpenedLists.getState().list, l)
   useOpenedLists.setState({ list })
-  try {
-    localStorage.setItem(KEY, JSON.stringify(list))
-  } catch {
-    // Storage blocked: remembered until the app closes.
-  }
+  writeStored(KEY, list)
 }
 
 /**

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { remoteArt } from '../../shared/art'
 import { type Box, contentBox, FULL } from '../../shared/artbox'
 import { sourceRect } from '../../shared/artfit'
+import { isObject, readStored, removeStored, writeStored } from '../../shared/stored'
 
 /** Mean absolute difference between two RGBA frames of the same size, 0 (same) to 1. */
 export function frameDiff(a: Uint8ClampedArray, b: Uint8ClampedArray): number {
@@ -15,23 +16,14 @@ export const isStill = (frames: Uint8ClampedArray[], threshold = 0.035) => frame
 
 // v2: decided on the picture only (bars excluded), older answers asked again.
 const KEY = 'still-videos-2'
-let known: Record<string, boolean> = {}
-try {
-  known = JSON.parse(localStorage.getItem(KEY) ?? '{}')
-  localStorage.removeItem('still-videos')
-} catch {
-  // No cache: checked again.
-}
+const known = readStored<Record<string, boolean>>(KEY, {}, isObject)
+removeStored('still-videos')
 
 function remember(id: string, still: boolean) {
   known[id] = still
   const ids = Object.keys(known)
   if (ids.length > 3000) for (const old of ids.slice(0, ids.length - 3000)) delete known[old]
-  try {
-    localStorage.setItem(KEY, JSON.stringify(known))
-  } catch {
-    // Storage off: per session only.
-  }
+  writeStored(KEY, known)
 }
 
 const W = 32

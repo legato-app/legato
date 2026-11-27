@@ -2,6 +2,7 @@ import { type Levelling } from '../../shared/api'
 import { setKnownLoudness, setLevel, useLive } from './live'
 import { usePlayer } from './store'
 import { createLoudness } from './vizLoud'
+import { isObject, readStored, writeStored } from '../../shared/stored'
 
 /**
  * Same loudness across sources (Volume levelling, 2026-11-11): a YouTube song's integrated loudness as heard (live.js'
@@ -17,12 +18,7 @@ const TARGET = -14
 export const MEASURE_MS = 30_000
 
 // Video id → integrated LUFS.
-let known: Record<string, number> = {}
-try {
-  known = JSON.parse(localStorage.getItem(KEY) ?? '{}')
-} catch {
-  // No cache: measured again.
-}
+const known = readStored<Record<string, number>>(KEY, {}, isObject)
 
 /**
  * The gain for `video` in this mode, dB: 0 when off or never measured. Boosts only, up to Adaptive Sound's +9 (the
@@ -42,11 +38,7 @@ export function rememberLoudness(video: string, lufs: number) {
   known[video] = Math.round(lufs * 10) / 10
   const ids = Object.keys(known)
   if (ids.length > MAX) for (const old of ids.slice(0, ids.length - MAX)) delete known[old]
-  try {
-    localStorage.setItem(KEY, JSON.stringify(known))
-  } catch {
-    // Storage off: this session only.
-  }
+  writeStored(KEY, known)
 }
 
 /**

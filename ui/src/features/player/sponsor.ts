@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { readStored, writeStored } from '../../shared/stored'
 
 /**
  * Skip non-music parts of music videos (user's choice 2026-10-31, Settings › Playback, off by default): SponsorBlock's
@@ -47,12 +48,7 @@ export function endCut(segs: readonly Seg[], durationS: number): number | null {
 
 const KEY = 'sponsor-undone'
 const MAX = 500
-let undone = new Set<string>()
-try {
-  undone = new Set(JSON.parse(localStorage.getItem(KEY) ?? '[]') as string[])
-} catch {
-  // No memory: asked again.
-}
+const undone = new Set(readStored<string[]>(KEY, [], Array.isArray))
 
 /** Undo was pressed on this video: its parts are not skipped any more (this PC). */
 export function isUndone(video: string): boolean {
@@ -63,9 +59,5 @@ export function rememberUndone(video: string) {
   undone.delete(video)
   undone.add(video)
   if (undone.size > MAX) undone.delete(undone.values().next().value!)
-  try {
-    localStorage.setItem(KEY, JSON.stringify([...undone]))
-  } catch {
-    // Storage off: this session only.
-  }
+  writeStored(KEY, [...undone])
 }

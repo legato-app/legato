@@ -1,6 +1,7 @@
 import { usePlayer } from '../features/player/store'
 import { MAX_BACK } from './navHistory'
 import { useStore, type View } from './store'
+import { readStored, writeStored } from '../shared/stored'
 
 /** Where the app was: screen and Now Playing open. Per device (window state), localStorage. */
 interface Screen {
@@ -11,13 +12,7 @@ interface Screen {
 const KEY = 'screen'
 
 // Read once at import, before anything saves: the start screen applied on settings load used to overwrite it.
-const atLaunch: unknown = (() => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? 'null')
-  } catch {
-    return null
-  }
-})()
+const atLaunch: unknown = readStored<unknown>(KEY, null)
 const VIEWS = ['home', 'add', 'addons', 'mixes', 'mix', 'radio', 'podcasts', 'tv', 'books', 'stats', 'history', 'smart', 'notFound', 'health', 'songs', 'albums', 'album', 'artists', 'artist', 'playlist', 'settings'] as const
 
 /** Stored screen → view still valid today (playlist deleted since: no). */
@@ -62,13 +57,8 @@ export function startClosingPlayerOnNavigate(): () => void {
 
 /** Keeps the stored screen current. Returns cleanup. */
 export function startScreenSaving(): () => void {
-  const save = () => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ view: useStore.getState().view, full: usePlayer.getState().full, back: useStore.getState().back.slice(-MAX_BACK) }))
-    } catch {
-      // Storage off: opens on the start screen.
-    }
-  }
+  // Not kept: opens on the start screen.
+  const save = () => writeStored(KEY, { view: useStore.getState().view, full: usePlayer.getState().full, back: useStore.getState().back.slice(-MAX_BACK) })
   const a = useStore.subscribe((s, p) => s.view !== p.view && save())
   const b = usePlayer.subscribe((s, p) => s.full !== p.full && save())
   return () => {

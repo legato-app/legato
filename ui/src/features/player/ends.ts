@@ -6,15 +6,11 @@
  * every end-of-song rule (fade, hand-over to the next song) reads it from `songEnd`, as for a video. The start of a
  * video (silence before the music, heard live) is learned the same way, kept as `song-starts`.
  */
+import { isObject, readStored, writeStored } from '../../shared/stored'
 const KEY = 'song-ends'
 const MAX = 3000
 // Video id → seconds where its song ends.
-let known: Record<string, number> = {}
-try {
-  known = JSON.parse(localStorage.getItem(KEY) ?? '{}')
-} catch {
-  // No cache: learned again.
-}
+const known = readStored<Record<string, number>>(KEY, {}, isObject)
 
 // Local file key → seconds where its music ends, from the engine (measured there, cached in SQLite): this session only.
 const offered = new Map<string, number>()
@@ -40,21 +36,12 @@ export function rememberEnd(video: string, seconds: number) {
   known[video] = Math.round(seconds * 10) / 10
   const ids = Object.keys(known)
   if (ids.length > MAX) for (const old of ids.slice(0, ids.length - MAX)) delete known[old]
-  try {
-    localStorage.setItem(KEY, JSON.stringify(known))
-  } catch {
-    // Storage off: this session only.
-  }
+  writeStored(KEY, known)
 }
 
 const START_KEY = 'song-starts'
 // Video id → seconds where its music starts (silence before it, 2 s or more).
-let starts: Record<string, number> = {}
-try {
-  starts = JSON.parse(localStorage.getItem(START_KEY) ?? '{}')
-} catch {
-  // No cache: learned again.
-}
+const starts = readStored<Record<string, number>>(START_KEY, {}, isObject)
 
 /** Where the music of `video` starts, s (0 = at the start, or not known). */
 export function songStart(video: string | undefined): number {
@@ -69,9 +56,5 @@ export function rememberStart(video: string, seconds: number) {
   starts[video] = Math.round(seconds * 10) / 10
   const ids = Object.keys(starts)
   if (ids.length > MAX) for (const old of ids.slice(0, ids.length - MAX)) delete starts[old]
-  try {
-    localStorage.setItem(START_KEY, JSON.stringify(starts))
-  } catch {
-    // Storage off: this session only.
-  }
+  writeStored(START_KEY, starts)
 }

@@ -5,24 +5,12 @@ import { songKey } from './effects'
 import { positionNow } from './Progress'
 import { pointFor, withPoint, type Points } from './resumePoints'
 import { usePlayer } from './store'
+import { isObject, readStored, writeStored } from '../../shared/stored'
 
 const STORE = 'legato.resume'
 /** This PC's places (not synced: a file path means nothing on another PC). */
-export function load(): Points {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORE) ?? '{}')
-    return raw && typeof raw === 'object' ? raw : {}
-  } catch {
-    return {}
-  }
-}
-function save(points: Points) {
-  try {
-    localStorage.setItem(STORE, JSON.stringify(points))
-  } catch {
-    // Private window or full: the place is not kept, nothing else is lost.
-  }
-}
+export const load = () => readStored<Points>(STORE, {}, isObject)
+const save = (points: Points) => writeStored(STORE, points)
 
 /** The song playing is a file of this PC or a personal server's: the only ones with a stable place to come back to. */
 const mine = () => {

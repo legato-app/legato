@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { fold } from '../../shared/format'
+import { readStored, removeStored, writeStored } from '../../shared/stored'
 
 /** Recent searches of the top bar: this PC only (localStorage; settings travel with Sync Mode, these don't). */
 const KEY = 'recentSearches'
@@ -12,25 +13,14 @@ export function remember(list: string[], q: string): string[] {
   return [text, ...list.filter((x) => fold(x) !== fold(text))].slice(0, MAX_RECENT)
 }
 
-function load(): string[] {
-  try {
-    const v: unknown = JSON.parse(localStorage.getItem(KEY) ?? '[]')
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string').slice(0, MAX_RECENT) : []
-  } catch {
-    return []
-  }
-}
+const load = () => readStored<unknown[]>(KEY, [], Array.isArray).filter((x): x is string => typeof x === 'string').slice(0, MAX_RECENT)
 
 export const useRecent = create<{ list: string[] }>(() => ({ list: load() }))
 
 function save(list: string[]) {
   useRecent.setState({ list })
-  try {
-    if (list.length) localStorage.setItem(KEY, JSON.stringify(list))
-    else localStorage.removeItem(KEY)
-  } catch {
-    // Storage blocked: the list lives until the app closes.
-  }
+  if (list.length) writeStored(KEY, list)
+  else removeStored(KEY)
 }
 
 export const addRecent = (q: string) => save(remember(useRecent.getState().list, q))

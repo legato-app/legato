@@ -28,6 +28,7 @@ import { note, report } from '../../shared/diag'
 import { phoneApp } from '../../shared/platform'
 import type { PickWhy } from './pickWhy'
 import { usePickWhy } from './pickWhyStore'
+import { readStored, writeStored } from '../../shared/stored'
 
 /** via youtube = embed plays it, else Rust engine (local file, or Apple preview held in memory). */
 export interface NowPlaying {
@@ -367,24 +368,11 @@ function ramp(gain: (t: number) => number, ms: number, done?: () => void) {
 // Videos the embed refuses (they play from their watch page; kept between launches, newest 500), videos that can't
 // play at all here, and the other uploads still to try for the current track.
 const BLOCKED = 'embedBlocked'
-const blocked = new Set<string>(
-  (() => {
-    try {
-      const v: unknown = JSON.parse(localStorage.getItem(BLOCKED) ?? '[]')
-      return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.length === 11) : []
-    } catch {
-      return []
-    }
-  })(),
-)
+const blocked = new Set(readStored<unknown[]>(BLOCKED, [], Array.isArray).filter((x): x is string => typeof x === 'string' && x.length === 11))
 function block(video: string) {
   blocked.delete(video)
   blocked.add(video)
-  try {
-    localStorage.setItem(BLOCKED, JSON.stringify([...blocked].slice(-500)))
-  } catch {
-    // Storage off: this session still knows.
-  }
+  writeStored(BLOCKED, [...blocked].slice(-500))
 }
 const unplayable = new Set<string>()
 let others: { trackId: number; ids: string[] } | null = null

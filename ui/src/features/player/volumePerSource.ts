@@ -1,5 +1,6 @@
 import { usePlayer } from './store'
 import type { Via } from './sources'
+import { isObject, readStored, writeStored } from '../../shared/stored'
 
 /** The volume last set on each source, this PC's (not synced: it follows this PC's speakers). */
 export type Memory = Partial<Record<Via, number>>
@@ -9,21 +10,8 @@ const STORE = 'legato.volumeBySource'
 /** Mute is not a volume to come back to. */
 export const remember = (m: Memory, via: Via, volume: number): Memory => (volume > 0.02 ? { ...m, [via]: Math.round(volume * 100) / 100 } : m)
 
-function load(): Memory {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STORE) ?? '{}')
-    return raw && typeof raw === 'object' ? raw : {}
-  } catch {
-    return {}
-  }
-}
-function save(m: Memory) {
-  try {
-    localStorage.setItem(STORE, JSON.stringify(m))
-  } catch {
-    // Private window or full: the volumes are not kept, nothing else is lost.
-  }
-}
+const load = () => readStored<Memory>(STORE, {}, isObject)
+const save = (memory: Memory) => writeStored(STORE, memory)
 
 /**
  * Settings › Playback › Volume per source (`enabled`, off by default): the volume set while a source plays is kept for that
