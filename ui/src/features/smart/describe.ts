@@ -1,5 +1,5 @@
 import type { LibraryTrack } from '../../shared/api'
-import { fold } from '../../shared/format'
+import { escapeRegExp, fold } from '../../shared/format'
 import type { SmartList, SmartRule } from '../../shared/theme/theme'
 
 /** Words that carry no rule ("some calm jazz songs from the 90s": calm, jazz and 90s do). */
@@ -42,7 +42,7 @@ export function describePlaylist(text: string, tracks: LibraryTrack[]): Describe
   }
   const phrase = fold(text)
   // Artists named whole, longest first so "Daft Punk" wins over "Punk"; their words are used up.
-  const named = [...artists.keys()].filter((a) => new RegExp(`(?:^|[^\\p{L}\\p{N}])${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|[^\\p{L}\\p{N}])`, 'u').test(phrase)).sort((a, b) => b.length - a.length)
+  const named = [...artists.keys()].filter((a) => new RegExp(`(?:^|[^\\p{L}\\p{N}])${escapeRegExp(a)}(?:$|[^\\p{L}\\p{N}])`, 'u').test(phrase)).sort((a, b) => b.length - a.length)
   const used = new Set<string>()
   const picked: string[] = []
   for (const a of named) {

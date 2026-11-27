@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fileName, formatBytes, spotifyList, timeAgo } from './format'
+import { escapeRegExp, fileName, formatBytes, spotifyList, timeAgo } from './format'
 
 describe('spotifyList', () => {
   it('spots playlist and album links only', () => {
@@ -28,3 +28,5 @@ describe('timeAgo and formatBytes', () => {
     expect(formatBytes(5 * 1024 * 1024)).toBe('5.0 MB')
   })
 })
+
+it('escapeRegExp matches a text as it is', () => expect(new RegExp(`^${escapeRegExp('a.b*(c)? [d]')}$`).test('a.b*(c)? [d]')).toBe(true))

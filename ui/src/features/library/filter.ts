@@ -1,5 +1,5 @@
 import type { LibraryTrack, Source, Track } from '../../shared/api'
-import { fold } from '../../shared/format'
+import { escapeRegExp, fold } from '../../shared/format'
 import { formOf, hasWords, wordsOf } from '../search/match'
 
 export type Filter = 'all' | Source | 'unlinked'
@@ -88,9 +88,8 @@ const ARTIST_SPLIT = /\s*(?:,|\bfeat\.?|\bft\.?|\bfeaturing)\s+|\s+x\s+/i
  * `crates/core/src/matching.rs` (a test keeps the two alike): add a name to both. Report others as they turn up.
  */
 export const COMMA_NAMES = ['Crosby, Stills, Nash & Young', 'Emerson, Lake & Palmer', 'Crosby, Stills & Nash', 'Earth, Wind & Fire', 'Tyler, The Creator'] as const
-const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 // A name's commas and spaces match loosely ("Tyler,The  Creator"); longer names first ("Crosby, Stills, Nash & Young" before "Crosby, Stills & Nash").
-const loose = (name: string) => name.split(/,\s*/).map((part) => part.split(' ').map(escape).join(String.raw`\s+`)).join(String.raw`,\s*`)
+const loose = (name: string) => name.split(/,\s*/).map((part) => part.split(' ').map(escapeRegExp).join(String.raw`\s+`)).join(String.raw`,\s*`)
 const PROTECTED = new RegExp(String.raw`(?<![\p{L}\p{N}])(?:` + [...COMMA_NAMES].sort((a, b) => b.length - a.length).map(loose).join('|') + String.raw`)(?![\p{L}\p{N}])`, 'giu')
 /** A mark that stands for a protected comma while the credit is split (never in a real name). */
 const KEEP = '\u0001'

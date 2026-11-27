@@ -923,6 +923,12 @@ colours, mirror, reflection.
   - [x] 8. `app/copyText.ts` for the clipboard: 6 files (2026-11-27; 25 lines out, 24 in, one helper); a refused
     clipboard now says why in the remote, Sync Mode and Up next, which were silent. Rooms keeps its banner error,
     the "Copied" buttons their own state.
+  - [ ] 9. The sidebar entries: tried and left (2026-11-27): one table of words and icons added 39 lines for 25
+    removed (`Sidebar.tsx`, `PhoneTabs.tsx`).
+  - [x] 10. `escapeRegExp` and `fold` in `shared/format.ts`: three regex escapes and the settings search's own
+    folding gone (2026-11-27, tests only).
+    - Decided alone (2026-11-27): the settings search folds as the other searches do (NFKD, marks dropped), so a
+      full-width letter typed there now matches too.
 
 Today: every green push to master is a Beta prerelease (479 commits so far, check 5-11 min then release 10-16 min) and
 Stable goes out by hand (`promote`); the smoke test runs on every push; `src-tauri/src/lib.rs` 2149 lines; CLAUDE.md

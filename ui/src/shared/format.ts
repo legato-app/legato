@@ -56,3 +56,5 @@ export const fileName = (s: string) =>
     .replace(/[. ]+$/, '') || 'cover'
 
 export const fold = (s: string) => s.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase()
+/** `s` as itself inside a RegExp. */
+export const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

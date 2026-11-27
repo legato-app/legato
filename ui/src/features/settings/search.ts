@@ -2,6 +2,7 @@ import type { SettingsSection } from '../../app/store'
 import { ACTIONS, comboLabel } from '../../app/keys'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { categoryOf, labelOf, SETTINGS } from './catalog'
+import { fold } from '../../shared/format'
 
 /**
  * One searchable setting. label = its id (catalog.ts: its data-setting, found and highlighted on open), name = the text
@@ -24,12 +25,6 @@ export const SETTINGS_INDEX: SettingEntry[] = [
   ...SETTINGS.map((e): SettingEntry => ({ section: categoryOf(e.id) ?? 'general', label: e.id, name: labelOf(e.id) === e.id ? undefined : labelOf(e.id), keywords: e.keywords, was: e.was })),
   ...ACTIONS.map((a): SettingEntry => ({ section: 'shortcuts', label: a.label, keywords: msg('keyboard shortcut hotkey global background'), extra: a.keys ? comboLabel(a.keys) : undefined })),
 ]
-
-const fold = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
 
 /** Entries where every word typed appears in the label or keywords (English or the interface's language); label matches first. */
 export function searchSettings(query: string, index = SETTINGS_INDEX): SettingEntry[] {

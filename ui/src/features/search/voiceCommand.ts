@@ -1,4 +1,4 @@
-import { fold } from '../../shared/format'
+import { escapeRegExp, fold } from '../../shared/format'
 import { msg } from '../../shared/i18n/i18n'
 
 /** What a phrase said into voice search does instead of searching. */
@@ -27,8 +27,7 @@ const clean = (s: string) => fold(s).replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
 const list = (s: string) => s.split('|').map(clean).filter(Boolean)
 // Chinese and Japanese write no spaces: their words are found anywhere, the others' as whole words.
 const NO_SPACES = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u
-const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const word = (w: string) => new RegExp(NO_SPACES.test(w) ? escape(w) : `(?<![\\p{L}\\p{N}])${escape(w)}(?![\\p{L}\\p{N}])`, 'gu')
+const word = (w: string) => new RegExp(NO_SPACES.test(w) ? escapeRegExp(w) : `(?<![\\p{L}\\p{N}])${escapeRegExp(w)}(?![\\p{L}\\p{N}])`, 'gu')
 
 /**
  * A command in what was said, or null: then it's a search. `t`: the interface language's phrases (`tr`). `playlists`:
