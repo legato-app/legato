@@ -56,6 +56,11 @@ pub fn open(app: &AppHandle, add_account: bool) -> tauri::Result<()> {
     Ok(())
 }
 
+/// The hidden refresh page never asks for a passkey: Google's sign-in page started one on a PC with Windows Hello, and
+/// closing the window under that request killed WebView2's browser process, the app's window frozen with it (Nov 2026).
+#[cfg(desktop)]
+const NO_PASSKEY: &str = "(() => { try { delete window.PublicKeyCredential; } catch {} const credentials = navigator.credentials; if (!credentials) return; const refuse = () => Promise.reject(new DOMException('No passkey here', 'NotAllowedError')); for (const method of ['get', 'create']) { try { Object.defineProperty(credentials, method, { value: refuse }); } catch {} } })();";
+
 /// Google renews its session cookies from its own pages, which the app never shows after sign-in: twelve days on they
 /// were still the sign-in's, and Google refused likes as signed out (401, 2026-10-28). Its sign-in page, hidden: a live
 /// session goes straight back to YouTube Music with fresh cookies. False: signed out, or Google wants the user.
@@ -67,7 +72,7 @@ pub async fn refresh(app: &AppHandle) -> bool {
     let url = Url::parse(SIGN_IN).expect("valid url");
     // Never focused: by default the new webview takes the keyboard focus even hidden (wry's MoveFocus), and the app's
     // window went inactive under the user 90 s after launch (Nov 2026 report, with a window-styling mod).
-    let Ok(w) = WebviewWindowBuilder::new(app, REFRESH, WebviewUrl::External(url)).additional_browser_args(&crate::background::browser_args()).visible(false).focused(false).focusable(false).skip_taskbar(true).build() else { return false };
+    let Ok(w) = WebviewWindowBuilder::new(app, REFRESH, WebviewUrl::External(url)).additional_browser_args(&crate::background::browser_args()).visible(false).focused(false).focusable(false).skip_taskbar(true).initialization_script_for_all_frames(NO_PASSKEY).build() else { return false };
     #[cfg(windows)]
     let _ = crate::shield::watch(w.as_ref());
     let mut back = false;
@@ -77,6 +82,11 @@ pub async fn refresh(app: &AppHandle) -> bool {
         if back {
             break;
         }
+    }
+    // Page left before the window goes: anything it still waits on ends with a navigation, not a destroyed webview.
+    if !back && let Ok(blank) = Url::parse("about:blank") {
+        let _ = w.navigate(blank);
+        tokio::time::sleep(Duration::from_secs(1)).await;
     }
     let _ = w.close();
     let fresh = back && session(app).is_some();

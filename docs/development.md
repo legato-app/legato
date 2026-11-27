@@ -164,6 +164,9 @@ after days Google answered 401 "You must be signed in" (likes failed, 2026-10-28
 sign-in page hidden; a live session goes straight back to music.youtube.com with fresh cookies. It runs 90 s after
 launch, then every 12 h, and on a 401 before one more try (likes, unlikes, sync). A like YouTube still refuses waits
 in your own "Liked Music" list; the next sync likes it on the account and moves it there.
+The hidden page can't ask for a passkey (an initialization script takes `navigator.credentials` away): on a PC with
+Windows Hello, Google's page started one, and closing the window under that request killed WebView2's browser process,
+the app's window frozen with it (2026-11-27). A refresh that doesn't come back leaves for `about:blank` before closing.
 
 Artist pages (`ytm_artist`) and the albums and playlists opened from them are public: asked without the account
 (`YouTubeMusic::anonymous`), so they work signed out too. So do song searches signed out (`AppState::ytm_or_public`):
