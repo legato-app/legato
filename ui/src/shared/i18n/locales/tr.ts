@@ -1220,7 +1220,7 @@ const tr: Record<string, string> = {
   'Imported from Spotify': 'Spotify’dan içe aktarıldı',
   'Open Spotify': 'Spotify’ı aç',
   'This PC is also signed out of Spotify’s page.': 'Bu bilgisayarda Spotify sayfasındaki oturum da kapatılır.',
-  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Bu bilgisayarda kaldırılır; Spotify’a hâlâ bağlı bir bilgisayar onları geri getirir.',
+  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Bu bilgisayardan kaldırılır; Spotify’a hâlâ bağlı bir bilgisayar çalma listelerini, bu bilgisayarla eşitlenen bir bilgisayar da şarkıları geri getirir.',
   'Also remove what Spotify brought?': 'Spotify’dan gelenler de kaldırılsın mı?',
   'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Spotify’dan içe aktarılan çalma listeleri, yalnızca Spotify’ın bildiği ve hiç beğenmediğiniz, çalmadığınız, puanlamadığınız ya da başka bir listeye eklemediğiniz şarkılarla birlikte kaldırılır. Önce kitaplığınızın bir kopyası alınır.',
   'Discord presence: your plugin is in Add-ons': 'Discord durumu: eklentin Eklentiler’de',

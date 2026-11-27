@@ -33,8 +33,11 @@ the order; a line leaves only when it ships or the user drops it.
       stays, no like, play, rating, preference, bookmark, edit or word of the user’s); the copy leaves after 30 days.
       Tests in core, not tried for real.
       Decided alone (2026-11-27): one question (the playlists-only one is gone); a song already matched to a YouTube video
-      has another source and stays; Spotify’s own Liked Songs list does not keep a song (likes are Liked Music’s); Sync
-      Mode removes the playlists on the other PCs, not the songs.
+      has another source and stays; Spotify’s own Liked Songs list does not keep a song (likes are Liked Music’s); Limit: Sync Mode removes the
+      playlists on the other PCs, not the songs, so a synced PC brings the songs back (the question says it). Recording
+      them as removed, as Remove from library does, was left: it would delete them from the other PCs with their plays and
+      playlists there, and a later Spotify import would skip them; doing it right needs a new kind of record in the sync
+      files.
 - [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et

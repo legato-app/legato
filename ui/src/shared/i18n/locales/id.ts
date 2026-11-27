@@ -1220,7 +1220,7 @@ const id: Record<string, string> = {
   'Imported from Spotify': 'Diimpor dari Spotify',
   'Open Spotify': 'Buka Spotify',
   'This PC is also signed out of Spotify’s page.': 'PC ini juga keluar dari halaman Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Dihapus di PC ini; PC yang masih terhubung ke Spotify akan membawanya kembali.',
+  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Semuanya dihapus di PC ini; PC yang masih terhubung ke Spotify mengembalikan playlist, dan PC yang disinkronkan dengan PC ini mengembalikan lagunya.',
   'Also remove what Spotify brought?': 'Hapus juga yang berasal dari Spotify?',
   'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Playlist yang diimpor dari Spotify dihapus, beserta lagu yang hanya dikenal Spotify dan tidak pernah Anda sukai, putar, nilai, atau masukkan ke playlist lain. Salinan perpustakaan Anda dibuat dulu.',
   'Discord presence: your plugin is in Add-ons': 'Kehadiran Discord: plugin-mu ada di Add-on',

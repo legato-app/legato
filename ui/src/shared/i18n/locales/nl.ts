@@ -1220,7 +1220,7 @@ const nl: Record<string, string> = {
   'Imported from Spotify': 'Geïmporteerd uit Spotify',
   'Open Spotify': 'Spotify openen',
   'This PC is also signed out of Spotify’s page.': 'Deze pc wordt ook afgemeld op de pagina van Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Ze worden op deze pc verwijderd; een pc die nog met Spotify verbonden is, haalt ze terug.',
+  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Ze worden op deze pc verwijderd; een pc die nog met Spotify verbonden is, brengt de afspeellijsten terug, en een met deze pc gesynchroniseerde pc de nummers.',
   'Also remove what Spotify brought?': 'Ook verwijderen wat Spotify heeft meegebracht?',
   'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'De uit Spotify geïmporteerde afspeellijsten gaan weg, met de nummers die alleen Spotify kent en die je nooit hebt geliket, afgespeeld, beoordeeld of in een andere afspeellijst gezet. Eerst wordt een kopie van je bibliotheek gemaakt.',
   'Discord presence: your plugin is in Add-ons': 'Discord-status: je plug-in staat bij Add-ons',

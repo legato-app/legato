@@ -1185,7 +1185,7 @@ const he: Record<string, string> = {
   'Imported from Spotify': 'יובא מ-Spotify',
   'Open Spotify': 'פתיחת Spotify',
   'This PC is also signed out of Spotify’s page.': 'המחשב הזה גם מנותק מדף Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'הם יוסרו במחשב הזה; מחשב שעדיין מחובר ל-Spotify יחזיר אותם.',
+  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'הם מוסרים במחשב הזה; מחשב שעדיין מחובר ל-Spotify יחזיר את הפלייליסטים, ומחשב המסונכרן עם המחשב הזה יחזיר את השירים.',
   'Also remove what Spotify brought?': 'להסיר גם את מה שהגיע מ-Spotify?',
   'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'הפלייליסטים שיובאו מ-Spotify יוסרו, יחד עם השירים שרק Spotify מכיר ושמעולם לא אהבת, ניגנת, דירגת או הוספת לפלייליסט אחר. קודם נשמר עותק של הספרייה.',
   'Discord presence: your plugin is in Add-ons': 'נוכחות ב-Discord: התוסף שלכם נמצא בתוספים',

@@ -1220,7 +1220,7 @@ const es: Record<string, string> = {
   'Imported from Spotify': 'Importada de Spotify',
   'Open Spotify': 'Abrir Spotify',
   'This PC is also signed out of Spotify’s page.': 'Este PC también cierra sesión en la página de Spotify.',
-  'They’re removed on this PC; a PC still connected to Spotify brings them back.': 'Se quitan en este PC; un PC que siga conectado a Spotify las trae de vuelta.',
+  'They’re removed on this PC; a PC still connected to Spotify brings the playlists back, and a PC synced with this one brings the songs back.': 'Se quitan en este PC; un PC aún conectado a Spotify devuelve las listas, y un PC sincronizado con este devuelve las canciones.',
   'Also remove what Spotify brought?': '¿Quitar también lo que vino de Spotify?',
   'The playlists imported from Spotify go, with the songs only Spotify knows that you never liked, played, rated or put in another playlist. A copy of your library is made first.': 'Se quitan las listas importadas de Spotify y las canciones que solo Spotify conoce y que nunca te gustaron, escuchaste, valoraste ni pusiste en otra lista. Antes se hace una copia de tu biblioteca.',
   'Discord presence: your plugin is in Add-ons': 'Presencia en Discord: tu complemento está en Complementos',
