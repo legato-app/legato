@@ -267,7 +267,7 @@ jobs:
             echo "::error::Repository secret TAURI_SIGNING_PRIVATE_KEY is missing: see CONTRIBUTING.md › Releasing"
             exit 1
           fi
-          pnpm tauri build --features lite --config src-tauri/tauri.lite.conf.json --bundles nsis
+          pnpm tauri build --features lite --config src-tauri/tauri.lite.conf.json --bundles nsis -- --no-default-features
           out="$RUNNER_TEMP/lite"
           mkdir -p "$out"
           # GitHub turns the space into a dot anyway: name it so, and latest-lite.json's link is the asset's.

@@ -4,6 +4,9 @@ use music_core::model::SecretStore;
 use std::path::Path;
 use std::sync::Arc;
 
+/// The user's AudD token (Music Detector): kept and synced by both editions.
+pub const AUDD_TOKEN: &str = "audd_token";
+
 /// The app's secrets: the OS keychain, or on Android a private file (`FileStore`).
 #[cfg(not(target_os = "android"))]
 pub fn store(service: &str, _: &Path) -> Arc<dyn SecretStore> {

@@ -79,7 +79,7 @@ pub async fn image(app: &tauri::AppHandle, path: &str, size: Option<u32>) -> Opt
         return cover(app, name);
     }
     // "<id>~<version>": an update's picture is asked anew. Plugins are the desktop's.
-    #[cfg(desktop)]
+    #[cfg(all(desktop, not(feature = "lite")))]
     if let Some(plugin) = path.strip_prefix("plugin/") {
         return Some((crate::plugins::icon(app, plugin.split('~').next()?)?, "image/png".to_string()));
     }

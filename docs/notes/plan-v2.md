@@ -585,6 +585,16 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         Adaptive Sound staying; a dropped or pasted remix is ignored; Stream Deck goes with the phone remote and the
         overlay; the cut pages' chunks are still in the bundle (never loaded); "Process YouTube's sound" still names the
         Live Editor in its text.
+    - [x] Slice 3, 2026-11-27: the full app's own parts are `legato`'s default feature `full` (plugins, the connectors'
+      `rooms`, the player's `detector`); Lite builds `--no-default-features --features lite` (`pnpm dev:lite` /
+      `build:lite`, `release.yml`'s `lite` job), registering none of the cut commands (plugins, rooms, Music Detector,
+      Live Editor exports and edits, remix files, visualizer, remote and overlay, podcasts, Discord sign-in);
+      `check.yml`'s Windows job checks it. `cargo check` and clippy `--all-targets` pass in both editions: 616 crates in
+      the full app, 526 in Lite. Not tried for real (no Lite built, installed or run).
+      - Decided alone (2026-11-27): `default = ["full"]`, since Cargo can't drop a dependency for a feature that is on;
+        the equalizer, levelling and the engine's meters keep their commands; the rooms' local half and the remote's
+        server stay in the code, unregistered (links.rs paces searches through rooms, cast uses the remote's address);
+        the AudD token still syncs in Lite (`secrets::AUDD_TOKEN`).
     - [x] Slice 4, 2026-11-27: `release.yml` jobs `lite` (its own Windows runner beside `release` and `android`:
       `tauri build --features lite --bundles nsis`, the same updater key, `latest-lite.json` written in tauri-action's
       shape) and `lite-attach` (installer, `.sig` and `latest-lite.json` on `vX.Y.Z`, then `latest-lite.json` on `beta`);

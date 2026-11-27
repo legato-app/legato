@@ -11,8 +11,8 @@
   "scripts": {
     "dev": "tauri dev --config src-tauri/tauri.dev.conf.json",
     "build": "pnpm notices && tauri build",
-    "dev:lite": "tauri dev --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite.dev.conf.json",
-    "build:lite": "pnpm notices && tauri build --features lite --config src-tauri/tauri.lite.conf.json",
+    "dev:lite": "tauri dev --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite.dev.conf.json -- --no-default-features",
+    "build:lite": "pnpm notices && tauri build --features lite --config src-tauri/tauri.lite.conf.json -- --no-default-features",
     "tauri": "tauri",
     "vite": "vite",
     "types": "node scripts/types.mjs",

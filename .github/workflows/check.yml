@@ -110,6 +110,12 @@ jobs:
           git add --intent-to-add ui/src/shared/generated
           git diff --exit-code ui/src/shared/generated || { echo '::error::Generated types are stale: run pnpm types and commit ui/src/shared/generated'; exit 1; }
 
+      # Legato Lite as `pnpm build:lite` builds it: the cut commands and their dependencies left out. Windows is enough.
+      - if: (runner.os == 'Windows') && steps.scope.outputs.run != 'false'
+        run: cargo check -p legato --no-default-features --features lite
+        env:
+          CARGO_NET_OFFLINE: true
+
       - if: (runner.os == 'Linux') && steps.scope.outputs.run != 'false'
         run: |
           cargo clippy --workspace --exclude legato --all-targets -- -D warnings

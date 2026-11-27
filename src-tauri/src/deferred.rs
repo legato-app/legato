@@ -63,7 +63,7 @@ fn start(app: &AppHandle, cause: Cause) {
         });
     }
     // Each plugin opens a QuickJS runtime and a thread: off the async workers' way.
-    #[cfg(desktop)]
+    #[cfg(all(desktop, not(feature = "lite")))]
     {
         let app = app.clone();
         tauri::async_runtime::spawn_blocking(move || crate::plugins::start_all(&app));

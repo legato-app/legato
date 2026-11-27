@@ -24,10 +24,11 @@ pub mod plex;
 pub mod podcast;
 pub mod radio_browser;
 pub mod rooms;
-#[cfg(not(target_os = "android"))]
+#[cfg(all(feature = "rooms", not(target_os = "android")))]
 pub mod roomlink;
-#[cfg(not(target_os = "android"))]
+#[cfg(all(feature = "rooms", not(target_os = "android")))]
 pub mod roommeet;
+#[cfg(feature = "rooms")]
 pub mod roomsignal;
 pub mod stun;
 pub mod servers;

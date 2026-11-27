@@ -5,6 +5,7 @@ pub mod http;
 pub mod key;
 pub mod level;
 mod live;
+#[cfg(feature = "detector")]
 pub mod mic;
 mod output;
 mod queue;

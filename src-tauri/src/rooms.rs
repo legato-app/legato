@@ -19,7 +19,7 @@ use tauri::async_runtime::JoinHandle;
 use tauri::{AppHandle, Emitter, Manager, State};
 use tokio::net::TcpListener;
 
-#[cfg(desktop)]
+#[cfg(all(desktop, not(feature = "lite")))]
 mod internet;
 use tokio::sync::mpsc;
 
@@ -199,9 +199,9 @@ pub async fn room_start(app: AppHandle, rooms: State<'_, Rooms>) -> CmdResult<St
                 }
                 HostEvent::NewCode(_) => {
                     // The relays' key comes from the code: listened for again under the new one.
-                    #[cfg(desktop)]
+                    #[cfg(all(desktop, not(feature = "lite")))]
                     let open = matches!(&*rooms_mode(&a), Mode::Host(h) if !h.internet.is_empty());
-                    #[cfg(desktop)]
+                    #[cfg(all(desktop, not(feature = "lite")))]
                     if open
                         && let Err(e) = internet::open(&a).await
                     {
@@ -229,7 +229,7 @@ pub async fn room_start(app: AppHandle, rooms: State<'_, Rooms>) -> CmdResult<St
 }
 
 /// Opens the room led here to the internet: its invite link in the status.
-#[cfg(desktop)]
+#[cfg(all(desktop, not(feature = "lite")))]
 #[tauri::command]
 pub async fn room_open_internet(app: AppHandle) -> CmdResult<Status> {
     internet::open(&app).await?;
@@ -333,9 +333,9 @@ pub async fn room_join(app: AppHandle, rooms: State<'_, Rooms>, id: Option<Strin
     }
     let name = rm_name(&crate::syncmode::device_name());
     let joined = match invited {
-        #[cfg(desktop)]
+        #[cfg(all(desktop, not(feature = "lite")))]
         Some(invite) => internet::join(invite, &name).await,
-        #[cfg(mobile)]
+        #[cfg(any(mobile, feature = "lite"))]
         Some(_) => return Err("Rooms over the internet need Legato on a computer".into()),
         None => wire::join(&addrs, &code, &name).await,
     };

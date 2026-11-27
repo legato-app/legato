@@ -5,6 +5,9 @@ edition.workspace = true
 publish.workspace = true
 
 [features]
+default = ["detector"]
+# The Music Detector's clips (`mic.rs`): off in Legato Lite.
+detector = []
 # The smoke test's build (src-tauri `e2e`): no audio device, a thread drains the mixer at the pace of a real one (output.rs).
 null-output = []
 

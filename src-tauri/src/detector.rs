@@ -1,6 +1,7 @@
 //! Music Detector: 10 s from the microphone or from what the PC plays (`music_player::mic`, memory only), named by
 //! AudD with the user's own token (keychain, never sent back to the interface).
 
+use crate::secrets::AUDD_TOKEN;
 use crate::{AppState, CmdResult, err, session};
 use music_connectors::acoustid::{self, AcoustId};
 use music_connectors::audd::{AudD, Offline, Refused};
@@ -31,7 +32,6 @@ pub fn set_detector_token(state: State<AppState>, token: Option<String>) -> CmdR
     state.store.set(AUDD_TOKEN, token.map(serde_json::Value::String)).map_err(err)
 }
 
-pub const AUDD_TOKEN: &str = "audd_token";
 
 /// Listening this long: enough for AudD, short to wait.
 const DETECT_SECONDS: f32 = 10.0;
