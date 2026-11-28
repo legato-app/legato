@@ -21,9 +21,13 @@ it('links the Beta’s APK before GitHub answers, when it refuses, and never Sta
   expect(BETA_APK.endsWith('/releases/download/beta/Legato_android-arm64.apk')).toBe(true)
 })
 
-it('takes only the version from GitHub’s list: the newest release with a versioned APK, not the rolling `beta`', () => {
-  const list = [release('beta', 'latest.json', 'Legato_android-arm64.apk'), release('v1.2.456', 'Legato_1.2.456_x64-setup.exe'), release('v1.2.455', 'Legato_1.2.455_android-arm64.apk')]
-  expect(androidDownload(list)).toEqual({ href: BETA_APK, version: '1.2.455' })
+it('links the newest listed APK itself: a Beta whose Android job failed is passed over, `beta`’s copy only says nothing', () => {
+  const list = [release('beta', 'latest.json', 'Legato_android-arm64.apk'), release('v1.2.456', 'Legato_1.2.456_x64-setup.exe'), release('v1.2.455', 'Legato_1.2.455_android-arm64.apk'), release('v1.2.416', 'Legato_1.2.416_android-arm64.apk')]
+  expect(androidDownload(list)).toEqual({ href: 'https://example.test/Legato_1.2.455_android-arm64.apk', version: '1.2.455' })
+})
+
+it('falls back on `beta`’s copy when no listed release has an APK', () => {
+  expect(androidDownload([release('beta', 'latest.json', 'Legato_android-arm64.apk'), release('v1.2.456', 'Legato_1.2.456_x64-setup.exe')])).toEqual({ href: BETA_APK, version: null })
 })
 
 it('is the file the release workflow uploads to `beta`', () => {

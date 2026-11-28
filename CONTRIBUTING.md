@@ -104,7 +104,8 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
   PCs stay where they are).
 - **Phones** follow Beta: each Beta's APK is what the Android app offers (Settings › About, a toast), downloaded when
   the user taps Update and installed by Android's installer. Stable carries no APK yet. The website's Android link is
-  `beta`'s `Legato_android-arm64.apk`, the newest Beta's under a name that never changes.
+  the newest release's own APK from GitHub's list (a Beta whose Android job failed is passed over); before the list
+  answers, or if GitHub refuses, `beta`'s `Legato_android-arm64.apk`, the newest Beta's under a name that never changes.
 
 - **Version**: `MAJOR.MINOR` comes from `src-tauri/tauri.conf.json`; n is the number of commits since that
   `MAJOR.MINOR`'s base, the last commit before its bump (`BASES` in `scripts/release.mjs`). The patch is n % 1000 and the

@@ -26,17 +26,26 @@ const latest = () =>
     })
     .catch(() => ({ href: RELEASES, lite: null, version: null })))
 
-/** The newest Beta's APK, under a name that never changes (release.yml's `apk` job). Never the latest release's page: that
- *  is Stable's, whose APK is older than a phone's Beta, and Android refuses the downgrade. */
+/** The newest Beta's APK, under a name that never changes (release.yml's `apk` job): the link while GitHub's list hasn't
+ *  answered, or refuses (60 asks an hour per address). Never the latest release's page: that is Stable's, whose APK is
+ *  older than a phone's Beta, and Android refuses the downgrade. */
 export const BETA_APK = `${GITHUB}/releases/download/beta/Legato_android-arm64.apk`
+
+const VERSIONED_APK = /^Legato_([0-9.]+)_android-arm64\.apk$/
 
 type Android = { href: string; version: string | null }
 
-/** The Android download: always that file. GitHub's list of releases only says its version: the newest release carrying a
- *  versioned APK (none known: no version). */
+/** The Android download: the newest release's own APK (prereleases too: every Beta carries one, a Beta whose Android job
+ *  failed has none and is passed over). Listed means there: never a 404 while `beta`'s copy is still on its way, or was
+ *  never made. None in the list: `beta`'s copy, version unknown. */
 export function androidDownload(releases: Release[]): Android {
-  const versioned = releases.find((release) => release.assets.some((asset) => /^Legato_[0-9.]+_android-arm64\.apk$/.test(asset.name)))
-  return { href: BETA_APK, version: versioned?.tag_name.replace(/^v/, '') ?? null }
+  for (const release of releases) {
+    for (const asset of release.assets) {
+      const version = VERSIONED_APK.exec(asset.name)?.[1]
+      if (version) return { href: asset.browser_download_url, version }
+    }
+  }
+  return { href: BETA_APK, version: null }
 }
 
 let pendingApk: Promise<Android> | null = null
