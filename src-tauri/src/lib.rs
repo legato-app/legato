@@ -74,6 +74,8 @@ mod lmix;
 mod links;
 mod media;
 mod mixer;
+#[cfg(target_os = "linux")]
+pub use mixer::label_audio;
 #[cfg(all(desktop, not(feature = "lite")))]
 mod plugins;
 mod plex;

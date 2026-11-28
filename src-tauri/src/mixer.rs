@@ -2,6 +2,7 @@
 //! it as "Microsoft Edge WebView2". Our WebView2 audio sessions get Legato's name, icon and grouping, joining the
 //! native player's session. Only processes started by this app: other apps' WebView2 (Teams…) are left alone.
 //! Label only: the sound itself still plays in WebView2, never taken out of the player.
+//! Linux: the mixer's name for the app, given to PulseAudio / PipeWire before anything plays (`label_audio`).
 
 use std::collections::HashMap;
 
@@ -16,6 +17,21 @@ fn descends(mut pid: u32, me: u32, parents: &HashMap<u32, u32>) -> bool {
         }
     }
     false
+}
+
+/// `PULSE_PROP`: the mixer's name and kind for every stream of this process and its children (WebKit's web processes).
+#[cfg(any(target_os = "linux", test))]
+fn pulse_prop(product: &str) -> String {
+    format!("application.name=\"{product}\" media.role=music")
+}
+
+/// First thing in `main`: what the user set themself stays.
+#[cfg(target_os = "linux")]
+pub fn label_audio() {
+    if std::env::var_os("PULSE_PROP").is_none() {
+        // SAFETY: no other thread yet (`main`'s first line), so nothing reads the environment meanwhile.
+        unsafe { std::env::set_var("PULSE_PROP", pulse_prop(crate::identity::PRODUCT)) }
+    }
 }
 
 #[cfg(windows)]
@@ -112,6 +128,11 @@ mod imp {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn the_linux_mixer_is_told_the_apps_name() {
+        assert_eq!(super::pulse_prop("Legato Lite"), "application.name=\"Legato Lite\" media.role=music");
+    }
+
     use super::descends;
 
     #[test]
