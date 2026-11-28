@@ -1,116 +1,46 @@
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, DotsSixVertical, EyeSlash } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { DotsSixVertical } from '@phosphor-icons/react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
-import { isRtl, msg, tr, useLang } from '../../shared/i18n/i18n'
+import { isRtl, useLang } from '../../shared/i18n/i18n'
 import { canHideSurface, neverHides, type Direction } from '../../shared/theme/arrange'
-import { placesOf, type Placement, type Surface } from '../../shared/theme/layout'
-import { onMenu } from '../../shared/ui/ContextMenu'
-import { dragSource, useDrag, useDropTarget } from '../../shared/ui/drag'
+import { placesOf, type Surface } from '../../shared/theme/layout'
+import { useDrag } from '../../shared/ui/drag'
 import { usePlugins } from '../plugins/host'
-import { surfaceKey } from './barKeys'
+import { ArrangeParts } from './ArrangeParts'
+import { useDrawnBoxes } from './boxes'
+import { DropZone, handleProps } from './handles'
 import { surfaceName } from './names'
 import { hideSurface, nudgeSurface, placeSurface, useArrange } from './session'
-import { dropZones, type Box, type Zone } from './zones'
+import { dropZones, type Box } from './zones'
 
-/** Surfaces move, appear and grow as the app lives on: measured again this often while arranging. */
-const MEASURE_MS = 300
-
-/** Where each surface is drawn now (`data-surface`); one not on screen has no box. */
-function measure(): Partial<Record<Surface, Box>> {
-  const boxes: Partial<Record<Surface, Box>> = {}
-  for (const element of document.querySelectorAll<HTMLElement>('[data-surface]')) {
-    const { left, top, width, height } = element.getBoundingClientRect()
-    if (width > 0 && height > 0) boxes[element.dataset.surface as Surface] = { left, top, width, height }
-  }
-  return boxes
+/** A bar that holds parts keeps its middle for them: its handle sits on its edge towards the page. */
+function handleTop(surface: Surface, box: Box) {
+  const middle = box.top + box.height / 2
+  if (surface !== 'topbar' && surface !== 'playerBar') return middle
+  return middle < window.innerHeight / 2 ? box.top + box.height : box.top
 }
 
-function useSurfaceBoxes(draft: Placement) {
-  const [boxes, setBoxes] = useState<Partial<Record<Surface, Box>>>({})
-  useEffect(() => {
-    const read = () => {
-      const measured = measure()
-      // Unchanged: the same object, nothing drawn again.
-      setBoxes((now) => (JSON.stringify(now) === JSON.stringify(measured) ? now : measured))
-    }
-    // Once the move is drawn, then now and then.
-    const frame = requestAnimationFrame(read)
-    const timer = setInterval(read, MEASURE_MS)
-    window.addEventListener('resize', read)
-    return () => {
-      cancelAnimationFrame(frame)
-      clearInterval(timer)
-      window.removeEventListener('resize', read)
-    }
-  }, [draft])
-  return boxes
-}
-
-const ARROWS: [Direction, string, typeof ArrowLeft][] = [
-  ['left', msg('Move left'), ArrowLeft],
-  ['right', msg('Move right'), ArrowRight],
-  ['up', msg('Move up'), ArrowUp],
-  ['down', msg('Move down'), ArrowDown],
-]
-
-/** The keyboard's focus follows a hidden surface to its Show button, and back to its handle: each appears a moment later. */
-export function focusOnceDrawn(selector: string, tries = 20) {
-  const element = document.querySelector<HTMLElement>(selector)
-  if (element) element.focus()
-  else if (tries > 0) setTimeout(() => focusOnceDrawn(selector, tries - 1), MEASURE_MS / 5)
-}
-
-/**
- * A surface's handle: dragged by the pointer, or moved with Alt and the arrows, Delete to hide; Enter opens its menu.
- * `underDrag`: a surface is being dragged, the handles let the pointer through to the drop zones under them.
- */
-function Handle({ surface, name, box, underDrag }: { surface: Surface; name: string; box: Box; underDrag: boolean }) {
-  const columns = placesOf(surface).includes('left')
-  const bars = placesOf(surface).includes('bottom')
-  const hides = !neverHides(surface)
-  // Moved or hidden by its keys or its menu: the keyboard's focus stays with the surface.
-  const nudge = (direction: Direction) => {
-    nudgeSurface(surface, name, direction)
-    focusOnceDrawn(`[data-arrange="${surface}"]`)
-  }
-  const hide = () => {
-    hideSurface(surface, name)
-    const gone = useArrangeDraft.getState().draft?.hidden.includes(surface)
-    focusOnceDrawn(gone ? `[data-show="${surface}"]` : `[data-arrange="${surface}"]`)
-  }
-  const menu = onMenu(() => [
-    ...ARROWS.filter(([direction]) => (direction === 'left' || direction === 'right' ? columns : bars)).map(([direction, label, Glyph]) => ({
-      label: tr(label),
-      icon: <Glyph size={16} />,
-      onSelect: () => nudge(direction),
-    })),
-    hides && { label: tr('Hide'), icon: <EyeSlash size={16} />, disabled: !canHideSurface(useArrangeDraft.getState().draft?.hidden ?? [], surface), onSelect: hide },
-  ])
+/** A surface's handle, named. `underDrag`: something is dragged, the handles let the pointer through to the drop zones. */
+function SurfaceHandle({ surface, name, box, underDrag }: { surface: Surface; name: string; box: Box; underDrag: boolean }) {
+  const columns: Direction[] = placesOf(surface).includes('left') ? ['left', 'right'] : []
+  const bars: Direction[] = placesOf(surface).includes('bottom') ? ['up', 'down'] : []
+  const props = handleProps({
+    id: surface,
+    name,
+    drag: { kind: 'arrange', scope: 'surface', id: surface },
+    directions: [...columns, ...bars],
+    move: (direction) => nudgeSurface(surface, name, direction),
+    hiding: neverHides(surface)
+      ? undefined
+      : {
+          allowed: () => canHideSurface(useArrangeDraft.getState().draft?.hidden ?? [], surface),
+          hide: () => hideSurface(surface, name),
+          isHidden: () => !!useArrangeDraft.getState().draft?.hidden.includes(surface),
+        },
+  })
   return (
     <button
-      type="button"
-      data-arrange={surface}
-      aria-label={tr('Move {part}', { part: name })}
-      aria-haspopup="menu"
-      aria-keyshortcuts={`Alt+ArrowLeft Alt+ArrowRight Alt+ArrowUp Alt+ArrowDown${hides ? ' Delete' : ''}`}
-      title={hides ? tr('Drag it, or use Alt and the arrows; Delete hides it') : tr('Drag it, or use Alt and the arrows')}
-      onContextMenu={menu}
-      // A click made by Enter or Space (no pointer press counted); the pointer's own presses drag.
-      onClick={(event) => event.detail === 0 && menu(event)}
-      onPointerDown={dragSource(
-        () => ({ kind: 'arrange', scope: 'surface', id: surface }),
-        () => name,
-      )}
-      onKeyDown={(event) => {
-        const action = surfaceKey(event)
-        if (!action) return
-        // The app's own Alt+← (back) never sees it.
-        event.preventDefault()
-        event.stopPropagation()
-        if (action === 'hide') hide()
-        else nudge(action)
-      }}
-      style={{ left: box.left + box.width / 2, top: box.top + box.height / 2 }}
+      {...props}
+      style={{ left: box.left + box.width / 2, top: handleTop(surface, box) }}
       className={`fixed z-40 flex -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium whitespace-nowrap text-bg shadow-[0_8px_24px_var(--shadow)] ${underDrag ? 'pointer-events-none opacity-50' : ''}`}
     >
       <DotsSixVertical size={14} weight="bold" /> {name}
@@ -118,35 +48,35 @@ function Handle({ surface, name, box, underDrag }: { surface: Surface; name: str
   )
 }
 
-function DropZone({ zone, surface, name }: { zone: Zone; surface: Surface; name: string }) {
-  useDropTarget(zone.key, {
-    accepts: (data) => data.kind === 'arrange',
-    drop: () => placeSurface(surface, name, zone.region, zone.at),
-  })
-  const over = useDrag((state) => state.target === zone.key)
-  return <div data-drop={zone.key} aria-hidden style={zone.box} className={`fixed z-30 rounded-lg border-2 border-dashed ${over ? 'border-accent bg-accent/25' : 'border-transparent'}`} />
-}
-
-/** The surfaces' handles over the app, the drop zones while one is dragged, and each move said to screen readers. */
+/** The handles over the app (the surfaces', the bars' parts'), the drop zones while one is dragged, and each move said
+ *  to screen readers. */
 export function ArrangeSurfaces() {
   const draft = useArrangeDraft((state) => state.draft)!
   const said = useArrange((state) => state.said)
   const saidCount = useArrange((state) => state.saidCount)
   const plugins = usePlugins((state) => state.list)
-  const boxes = useSurfaceBoxes(draft)
-  const dragged = useDrag((state) => (state.data?.kind === 'arrange' ? state.data.id : null))
+  const boxes = useDrawnBoxes(draft)
+  const drag = useDrag((state) => state.data)
+  const dragged = drag?.kind === 'arrange' && drag.scope === 'surface' ? drag.id : null
   const rightToLeft = useLang((state) => isRtl(state.lang))
   const name = (surface: Surface) => surfaceName(surface, plugins)
-  const zones = dragged ? dropZones(draft, dragged, boxes, { width: window.innerWidth, height: window.innerHeight }, rightToLeft) : []
+  const zones = dragged ? dropZones(draft, dragged, boxes.surfaces, { width: window.innerWidth, height: window.innerHeight }, rightToLeft) : []
   return (
     <>
+      <ArrangeParts draft={draft} boxes={boxes.parts} />
       {zones.map((zone) => (
-        <DropZone key={zone.key} zone={zone} surface={dragged!} name={name(dragged!)} />
+        <DropZone
+          key={zone.key}
+          id={zone.key}
+          box={zone.box}
+          accepts={(data) => data.kind === 'arrange' && data.scope === 'surface'}
+          drop={() => placeSurface(dragged!, name(dragged!), zone.region, zone.at)}
+        />
       ))}
-      {(Object.entries(boxes) as [Surface, Box][])
+      {(Object.entries(boxes.surfaces) as [Surface, Box][])
         .filter(([surface]) => !draft.hidden.includes(surface))
         .map(([surface, box]) => (
-          <Handle key={surface} surface={surface} name={name(surface)} box={box} underDrag={!!dragged} />
+          <SurfaceHandle key={surface} surface={surface} name={name(surface)} box={box} underDrag={drag?.kind === 'arrange'} />
         ))}
       <p role="status" aria-live="polite" className="sr-only">
         {/* A new node each time: the same words are read again. */}

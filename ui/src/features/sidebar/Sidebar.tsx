@@ -1,6 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, ChartBar, ClockCounterClockwise, Disc, DotsThree, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { artistName } from '../../shared/artistName'
-import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
 import { useStore, type View } from '../../app/store'
@@ -278,7 +279,9 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
   return (
     <aside data-surface="sidebar" className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} surface="sidebar" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
       {/* Edge: drag (or arrows) to resize, double-click for the default width. */}
       {!wide && fixedWidth === undefined && (

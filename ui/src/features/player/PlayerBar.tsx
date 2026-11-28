@@ -1,6 +1,7 @@
 import { ArrowsOutSimple, DotsThree, Heart, Moon, Queue, Quotes, SpeakerHigh, SpeakerLow, SpeakerSlash } from '@phosphor-icons/react'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { api, type Source } from '../../shared/api'
@@ -494,14 +495,18 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
     center: (
       <div className="flex w-140 min-w-0 flex-col items-center gap-1">
         {centerParts.map((part) => (
-          <Fragment key={part}>{center[part]}</Fragment>
+          <ArrangePart key={part} surface="playerBar" part={part}>
+            {center[part]}
+          </ArrangePart>
         ))}
       </div>
     ),
     actions: (
       <div className="flex w-85 items-center justify-end gap-2">
         {actionParts.map((part) => (
-          <Fragment key={part}>{actions[part]}</Fragment>
+          <ArrangePart key={part} surface="playerBar" part={part}>
+            {actions[part]}
+          </ArrangePart>
         ))}
       </div>
     ),
@@ -526,7 +531,11 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
           <Transport size="sm" mini />
         </>
       ) : (
-        arrangeParts(choice, PART_GROUPS.playerBar[0]).map((block) => <Fragment key={block}>{blocks[block]}</Fragment>)
+        arrangeParts(choice, PART_GROUPS.playerBar[0]).map((block) => (
+          <ArrangePart key={block} surface="playerBar" part={block}>
+            {blocks[block]}
+          </ArrangePart>
+        ))
       )}
         </>
       )}

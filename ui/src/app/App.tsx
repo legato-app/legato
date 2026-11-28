@@ -1,7 +1,7 @@
 import { CaretDown, CopySimple, DotsThree, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
 import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { Fragment, lazy, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AddonsView, AddView, AlbumsView, AlbumView, ArtistsView, ArtistView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, PlaylistView, PluginColumn, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, SongsView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
@@ -51,6 +51,7 @@ import { searchShift } from './searchShift'
 import { useSettings } from './settings'
 import { dropLayout, useNowPlayingPages, useShellLayout } from './shellLayout'
 import { useArrangeDraft } from './arrangeDraft'
+import { ArrangePart } from './ArrangePart'
 import { LayoutBoundary } from './LayoutBoundary'
 import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, pluginOf, type PartsChoice, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
@@ -192,12 +193,18 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
         </button>
       )}
       {shown.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} surface="topbar" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
       {/* Over Now Playing: the gear alone (Add-ons and More stay out, the player stays calm), on glass like the
           window's buttons (on the span: on the button it would hide its hover); the page under the player doesn't light it. */}
       <span className={`flex items-center gap-1 ${full ? 'glass me-2 rounded-full' : 'pe-2'}`}>
-        {addonsBySettings && addons}
+        {addonsBySettings && (
+          <ArrangePart surface="topbar" part="addons">
+            {addons}
+          </ArrangePart>
+        )}
         {!full && hidesSome && (
           <button className={`${winBtn} rounded-full! phone:hidden`} aria-label={tr('More')} title={tr('More')} onClick={(e) => openMenu(e, hiddenEntries(), { place: 'below' })}>
             <DotsThree size={18} weight="bold" />

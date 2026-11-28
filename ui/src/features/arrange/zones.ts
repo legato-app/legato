@@ -1,6 +1,6 @@
 /**
- * Where a dragged surface can be dropped: each side of the window it may go to, and either half of the surfaces already
- * there (before or after them). Pure.
+ * Where what is dragged can be dropped. A surface: each side of the window it may go to, and either half of the
+ * surfaces already there (before or after them). A bar's part: either half of the others in its container. Pure.
  */
 import { placesOf, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 
@@ -30,9 +30,17 @@ function edgeBox(region: Region, view: View): Box {
   return { left: 0, top: view.height - EDGE, width: view.width, height: EDGE }
 }
 
-/** Columns split left and right, bars top and bottom. */
-function halves(region: Region, box: Box): [Box, Box] {
-  if (region === 'left' || region === 'right') {
+/** The one box around all of `boxes`; null without any. */
+export function boxAround(boxes: readonly Box[]): Box | null {
+  if (!boxes.length) return null
+  const left = Math.min(...boxes.map((box) => box.left))
+  const top = Math.min(...boxes.map((box) => box.top))
+  return { left, top, width: Math.max(...boxes.map((box) => box.left + box.width)) - left, height: Math.max(...boxes.map((box) => box.top + box.height)) - top }
+}
+
+/** `box` split in two: side by side (`across`), or one above the other. */
+function halves(across: boolean, box: Box): [Box, Box] {
+  if (across) {
     const width = box.width / 2
     return [{ ...box, width }, { ...box, left: box.left + width, width }]
   }
@@ -67,8 +75,31 @@ function leftToRightZones(placement: Placement, surface: Surface, boxes: Partial
     placement.regions[region].flatMap((other, index) => {
       const box = other === surface ? undefined : boxes[other]
       if (!box) return []
-      return halves(region, box).map((half, side) => ({ key: `arrange:${other}:${side}`, region, at: index + side, box: half }))
+      // Columns split left and right, bars top and bottom.
+      return halves(region === 'left' || region === 'right', box).map((half, side) => ({ key: `arrange:${other}:${side}`, region, at: index + side, box: half }))
     }),
   )
   return [...edges, ...beside]
+}
+
+export interface PartZone {
+  /** Its drop target id (`data-drop`). */
+  key: string
+  /** The slot in the container's list, as `moveInGroup` reads it. */
+  at: number
+  box: Box
+}
+
+/**
+ * The zones for a dragged part: before and after each other part of its container that is on screen. `order`: the
+ * container's, hidden parts included; `mirrored`: drawn right to left, so the half on the left comes after.
+ */
+export function partZones(order: readonly string[], dragged: string, boxOf: (part: string) => Box | undefined, axis: 'across' | 'down', mirrored = false): PartZone[] {
+  return order.flatMap((other, index) => {
+    const box = other === dragged ? undefined : boxOf(other)
+    if (!box) return []
+    const [first, second] = halves(axis === 'across', box)
+    const inOrder = mirrored && axis === 'across' ? [second, first] : [first, second]
+    return inOrder.map((half, side) => ({ key: `arrange:part:${other}:${side}`, at: index + side, box: half }))
+  })
 }

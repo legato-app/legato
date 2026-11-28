@@ -3,8 +3,8 @@ import type { Direction } from '../../shared/theme/arrange'
 
 const ARROWS: Record<string, Direction> = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }
 
-/** A key on a surface's handle: Alt and an arrow moves it, Delete (or H) hides it. */
-export function surfaceKey(event: Pick<KeyboardEvent, 'code' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>): Direction | 'hide' | null {
+/** A key on a handle: Alt and an arrow moves what it holds, Delete (or H) hides it. */
+export function handleKey(event: Pick<KeyboardEvent, 'code' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>): Direction | 'hide' | null {
   if (event.ctrlKey || event.metaKey || event.shiftKey) return null
   if (event.altKey) return ARROWS[event.code] ?? null
   return event.code === 'Delete' || event.code === 'KeyH' ? 'hide' : null

@@ -8,12 +8,12 @@ import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { isRtl, lang, tr } from '../../shared/i18n/i18n'
-import { mirroredSide, moveSurface, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
-import { DEFAULT_LAYOUT, resolveLayout, type Placement, type Region, type Surface } from '../../shared/theme/layout'
+import { mirroredSide, moveInGroup, moveSurface, partStep, stepPart, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
+import { DEFAULT_LAYOUT, resolveLayout, type PartedSurface, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
 import { historyFrom, moved, redone, undone, type History } from './history'
-import { whereIs } from './names'
+import { whereIs, whereIsPart } from './names'
 
 /**
  * `said`: the last move in words, for screen readers (the bar's live region). `saidCount` grows each time, so the same
@@ -21,8 +21,10 @@ import { whereIs } from './names'
  */
 export const useArrange = create<{ history: History; said: string; saidCount: number }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '', saidCount: 0 }))
 
-/** The surface whose move made a placement: Undo and Redo say where it is then. */
-const movedSurfaces = new WeakMap<Placement, { surface: Surface; name: string }>()
+/** Where what was moved is, in any placement. */
+type Whereabouts = (placement: Placement) => string
+/** What each move was about: Undo and Redo say where it is then. */
+const movedThings = new WeakMap<Placement, Whereabouts>()
 
 const announce = (said: string) => useArrange.setState(({ saidCount }) => ({ said, saidCount: saidCount + 1 }))
 
@@ -63,10 +65,9 @@ export function beginArranging() {
 /** A move made on the draft (`shared/theme/arrange.ts`). */
 export const arrange = (next: Placement) => show(moved(useArrange.getState().history, next))
 
-/** After Undo or Redo: where the surface `move` was about is now, or `action` for a move about no single one. */
+/** After Undo or Redo: where what `move` was about is now, or `action` for a move about no single thing. */
 function showTravelled(history: History, move: Placement, action: string) {
-  const about = movedSurfaces.get(move)
-  show(history, about ? whereIs(history.present, about.surface, about.name) : action)
+  show(history, movedThings.get(move)?.(history.present) ?? action)
 }
 
 export function undoMove() {
@@ -84,29 +85,49 @@ export function redoMove() {
 /** The app's own arrangement. */
 export const arrangeDefault = () => arrange(DEFAULT_LAYOUT)
 
-/** A surface moved or hidden, and said: where it is now, or that it can't (`name`: as the user reads it). */
-function say(surface: Surface, name: string, next: Placement, refused: string) {
+/** Something moved or hidden, and said: where it is now, or that it can't (`refused`). */
+function say(next: Placement, whereabouts: Whereabouts, refused: string) {
   const { history } = useArrange.getState()
   if (next === history.present) return announce(refused)
-  movedSurfaces.set(next, { surface, name })
-  show(moved(history, next), whereIs(next, surface, name))
+  movedThings.set(next, whereabouts)
+  show(moved(history, next), whereabouts(next))
 }
+
+// `name`, here and below: as the user reads it.
+const ofSurface = (surface: Surface, name: string): Whereabouts => (placement) => whereIs(placement, surface, name)
+const ofPart = (surface: PartedSurface, part: string, name: string): Whereabouts => (placement) => whereIsPart(placement, surface, part, name)
 
 const present = () => useArrange.getState().history.present
 const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
+const cannotHide = (name: string) => tr('{part} can’t be hidden', { part: name })
 
 /** Dropped by the pointer into `region`, at slot `at`. Zones only offer where it may go: unmoved, it was there already. */
 export function placeSurface(surface: Surface, name: string, region: Region, at: number) {
   const next = moveSurface(present(), surface, region, at)
-  if (next !== present()) say(surface, name, next, '')
+  if (next !== present()) say(next, ofSurface(surface, name), '')
 }
 
 /** Moved by an arrow key. */
 export const nudgeSurface = (surface: Surface, name: string, direction: Direction) =>
-  say(surface, name, stepSurface(present(), surface, mirroredSide(direction, isRtl(lang()))), cannotGo(name))
+  say(stepSurface(present(), surface, mirroredSide(direction, isRtl(lang()))), ofSurface(surface, name), cannotGo(name))
 
 /** Hidden, or shown again. */
-export const hideSurface = (surface: Surface, name: string) => say(surface, name, toggleHidden(present(), { surface }), tr('{part} can’t be hidden', { part: name }))
+export const hideSurface = (surface: Surface, name: string) => say(toggleHidden(present(), { surface }), ofSurface(surface, name), cannotHide(name))
+
+/** A bar's part dropped by the pointer, at slot `at` of its container. */
+export function placePart(surface: PartedSurface, part: string, name: string, at: number) {
+  const next = moveInGroup(present(), surface, part, at)
+  if (next !== present()) say(next, ofPart(surface, part, name), '')
+}
+
+/** A bar's part moved by an arrow key, past the next of the parts `onScreen`. */
+export function nudgePart(surface: PartedSurface, part: string, name: string, direction: Direction, onScreen: readonly string[]) {
+  const step = partStep(surface, part, direction, isRtl(lang()))
+  say(step ? stepPart(present(), surface, part, step, onScreen) : present(), ofPart(surface, part, name), cannotGo(name))
+}
+
+/** A bar's part hidden, or shown again. */
+export const hidePart = (surface: PartedSurface, part: string, name: string) => say(toggleHidden(present(), { surface, part }), ofPart(surface, part, name), cannotHide(name))
 
 /** Leaves the mode, nothing saved. */
 export function discardArrangement() {

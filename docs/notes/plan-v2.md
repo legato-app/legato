@@ -1175,7 +1175,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     to hide, a Show button in the bar, right-click on a handle, each move said in a live region; the entries show. Mirrored in right-to-left languages (`f5fbce08`, the fix that followed).
     - Decided alone (2026-11-28): an arrow steps across the window (past neighbours, then over the page); the top bar
       has a handle for hiding only; handles sit in the middle of their part.
-  - [ ] Slice 4 `M`: the three bars' parts and the eye.
+  - [x] Slice 4 `M` (2026-11-28), not tried for real: a handle over each part on screen (`app/ArrangePart` marks it,
+    only while arranging), dragged or moved with Alt and the arrows within its container, an eye on the ones that can
+    hide, Show buttons in the bar. The player bar's and top bar's own handles sit on their edge towards the page.
+    - Decided alone (2026-11-28): a part with nothing to show (no listening room, say) has no handle and a step passes
+      it; a hidden bar's parts have none.
   - [ ] Slice 5 `M`: page parts, columns by their header, the header's choice (check the virtualized table's headers and
     a drag under Now Playing).
   - [ ] Slice 6 `S`: size handles (`sizes`).

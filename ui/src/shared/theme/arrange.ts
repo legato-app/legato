@@ -62,12 +62,53 @@ function withEntry<Container extends object, Key extends keyof Container>(record
   return copy
 }
 
+/** A bar's containers, each a list of parts in the app's order. */
+const containers = (surface: PartedSurface): readonly (readonly string[])[] => PART_GROUPS[surface]
+
+/** The parts sharing `part`'s container, in the app's order. */
+export const partGroup = (surface: PartedSurface, part: string): readonly string[] => containers(surface).find((group) => group.includes(part)) ?? []
+
+/** A container's parts as the placement orders them, the hidden ones keeping their place. */
+export const orderedParts = (placement: Placement, surface: PartedSurface, group: readonly string[]) => arrangeParts<string>({ order: placement.parts[surface]?.order }, group)
+
+/** Whether a part's container is drawn as a column (the player's middle, the sidebar) or runs across. */
+export function partAxis(surface: PartedSurface, part: string): 'across' | 'down' {
+  const playerMiddle = surface === 'playerBar' && (PART_GROUPS.playerBar[1] as readonly string[]).includes(part)
+  return surface === 'sidebar' || playerMiddle ? 'down' : 'across'
+}
+
+/** Whether a bar is drawn mirrored right to left: the player bar reads left to right in every language. */
+export const mirrorsParts = (surface: PartedSurface) => surface !== 'playerBar'
+
+/** The step an arrow key makes in a part's container, one earlier or later; null for an arrow across the container. */
+export function partStep(surface: PartedSurface, part: string, direction: Direction, rightToLeft: boolean): -1 | 1 | null {
+  const down = partAxis(surface, part) === 'down'
+  const seen = down ? direction : mirroredSide(direction, rightToLeft && mirrorsParts(surface))
+  if (seen === (down ? 'up' : 'left')) return -1
+  return seen === (down ? 'down' : 'right') ? 1 : null
+}
+
+/**
+ * One step in the part's container, past the next of the parts `onScreen` (a hidden one, or one with nothing to show,
+ * counts for nothing). The same placement at the container's end.
+ */
+export function stepPart(placement: Placement, surface: PartedSurface, part: string, step: -1 | 1, onScreen: readonly string[]): Placement {
+  const order = orderedParts(placement, surface, partGroup(surface, part))
+  const seen = order.filter((other) => other === part || onScreen.includes(other))
+  const neighbor = seen[seen.indexOf(part) + step]
+  if (neighbor === undefined) return placement
+  // `moveInGroup`'s slot: before what sits there now, so after the neighbor is one further.
+  return moveInGroup(placement, surface, part, order.indexOf(neighbor) + (step > 0 ? 1 : 0))
+}
+
+export const canHidePart = (surface: PartedSurface, part: string) => HIDEABLE[surface].includes(part)
+
 /** A bar's part at slot `at` of its own container (it never leaves it). */
 export function moveInGroup(placement: Placement, surface: PartedSurface, part: string, at: number): Placement {
-  const groups: readonly (readonly string[])[] = PART_GROUPS[surface]
+  const groups = containers(surface)
   const choice = placement.parts[surface]
-  // Every container's order as drawn, the hidden parts keeping their place.
-  const drawn = groups.map((group) => arrangeParts<string>({ order: choice?.order }, group))
+  // Every container's order as drawn.
+  const drawn = groups.map((group) => orderedParts(placement, surface, group))
   const moved = drawn.map((group) => (group.includes(part) ? moveToSlot(group, part, Math.max(0, Math.min(group.length, at))) : group))
   if (moved.flat().join() === drawn.flat().join()) return placement
   const order = moved.flat().join() === groups.flat().join() ? undefined : moved.flat()
@@ -100,7 +141,7 @@ export function toggleHidden(placement: Placement, target: HideTarget): Placemen
     return { ...placement, pages: withEntry<Pages, PartedPage>(placement.pages, target.page, next) }
   }
   if (target.part !== undefined) {
-    if (!HIDEABLE[target.surface].includes(target.part)) return placement
+    if (!canHidePart(target.surface, target.part)) return placement
     const choice = placement.parts[target.surface]
     const next = trimmed({ order: choice?.order, hidden: toggled(choice?.hidden ?? [], target.part) })
     return { ...placement, parts: withEntry(placement.parts, target.surface, next) }

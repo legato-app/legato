@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
-import { moveSurface } from '../../shared/theme/arrange'
+import { moveInGroup, moveSurface } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
-import { dropZones, EDGE } from './zones'
+import { boxAround, dropZones, EDGE, partZones } from './zones'
 
 const view = { width: 1000, height: 600 }
 const box = (left: number, width: number) => ({ left, top: 50, width, height: 450 })
@@ -40,4 +40,26 @@ it('mirrors the zones right to left, where the layout’s left is seen on the ri
 it('offers nothing a surface can’t take, and no halves of what isn’t drawn', () => {
   expect(dropZones(DEFAULT_LAYOUT, 'sidePanel', {}, view).map((zone) => zone.key)).toEqual(['arrange:left', 'arrange:right'])
   expect(dropZones(DEFAULT_LAYOUT, 'topbar', {}, view).map((zone) => zone.region)).toEqual(['top'])
+})
+
+it('offers a part either half of the others of its container, side by side or one above the other', () => {
+  const order = ['song', 'center', 'actions']
+  const drawn: Record<string, ReturnType<typeof box>> = { song: box(0, 300), center: box(300, 400), actions: box(700, 300) }
+  const across = partZones(order, 'center', (part) => drawn[part], 'across')
+  expect(across.map((zone) => [zone.at, zone.box.left, zone.box.width])).toEqual([[0, 0, 150], [1, 150, 150], [2, 700, 150], [3, 850, 150]])
+  // Each zone's slot does what it shows: dropped after the buttons, it comes last.
+  expect(moveInGroup(DEFAULT_LAYOUT, 'playerBar', 'center', across[3].at).parts.playerBar?.order?.slice(0, 3)).toEqual(['song', 'actions', 'center'])
+  expect(partZones(['nav', 'library'], 'nav', () => box(0, 200), 'down').map((zone) => [zone.at, zone.box.top, zone.box.height])).toEqual([[1, 50, 225], [2, 275, 225]])
+  // Right to left, the half on the left comes after.
+  expect(partZones(order, 'center', (part) => drawn[part], 'across', true).slice(0, 2).map((zone) => [zone.at, zone.box.left])).toEqual([[0, 150], [1, 0]])
+  expect(new Set(across.map((zone) => zone.key)).size).toBe(across.length)
+})
+
+it('offers nothing beside a part that isn’t on screen', () => {
+  expect(partZones(['nav', 'library'], 'nav', () => undefined, 'down')).toEqual([])
+})
+
+it('draws one box around a part drawn in several pieces', () => {
+  expect(boxAround([{ left: 10, top: 20, width: 30, height: 10 }, { left: 50, top: 15, width: 10, height: 30 }])).toEqual({ left: 10, top: 15, width: 50, height: 30 })
+  expect(boxAround([])).toBeNull()
 })

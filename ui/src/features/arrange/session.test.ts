@@ -1,11 +1,11 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { useLang } from '../../shared/i18n/i18n'
 import { moveSurface } from '../../shared/theme/arrange'
-import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
+import { DEFAULT_LAYOUT, PART_GROUPS, type PartedSurface } from '../../shared/theme/layout'
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
 import { useArrangeDraft } from '../../app/arrangeDraft'
-import { surfaceName, whereIs } from './names'
-import { arrange, beginArranging, discardArrangement, finishArranging, hideSurface, nudgeSurface, placeSurface, redoMove, undoMove, useArrange } from './session'
+import { PART_NAMES, surfaceName, whereIs } from './names'
+import { arrange, beginArranging, discardArrangement, finishArranging, hidePart, hideSurface, nudgePart, nudgeSurface, placePart, placeSurface, redoMove, undoMove, useArrange } from './session'
 
 const notify = vi.fn()
 const settings = vi.hoisted(() => ({ now: {} as Settings, listeners: new Set<(state: { settings: Settings }) => void>() }))
@@ -147,4 +147,29 @@ it('keeps the mode open when My themes is full', () => {
   finishArranging()
   expect(draft()).toBe(right)
   expect(notify.mock.calls[0][0]).toContain('24 themes at most')
+})
+
+it('moves and hides a bar’s parts, saying where each is, and saves them into the theme', () => {
+  beginArranging()
+  const said = () => useArrange.getState().said
+  nudgePart('sidebar', 'library', 'Library', 'up', ['nav', 'library'])
+  expect([draft()?.parts.sidebar?.order, said()]).toEqual([['library', 'nav'], 'Library, 1 of 2'])
+  nudgePart('sidebar', 'library', 'Library', 'up', ['library', 'nav'])
+  expect(said()).toBe('Library can’t go there')
+  hidePart('playerBar', 'volume', 'Volume')
+  expect([draft()?.parts.playerBar?.hidden, said()]).toEqual([['volume'], 'Volume hidden'])
+  hidePart('sidebar', 'library', 'Library')
+  expect(said()).toBe('Library can’t be hidden')
+  undoMove()
+  expect([draft()?.parts.playerBar, said()]).toEqual([undefined, 'Volume, 5 of 7'])
+  // Dropped where it already is: nothing to say.
+  const before = useArrange.getState().saidCount
+  placePart('sidebar', 'library', 'Library', 0)
+  expect(useArrange.getState().saidCount).toBe(before)
+  finishArranging()
+  expect(settings.now.customThemes[0].layout?.parts).toEqual({ sidebar: { order: ['library', 'nav'] } })
+})
+
+it('names every part a bar has', () => {
+  for (const surface of Object.keys(PART_GROUPS) as PartedSurface[]) expect(Object.keys(PART_NAMES[surface]).sort()).toEqual([...PART_GROUPS[surface].flat()].sort())
 })

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
+import { canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, orderedParts, partAxis, partGroup, partStep, stepPart, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
 import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
 
 const start = DEFAULT_LAYOUT
@@ -146,5 +146,35 @@ describe('layoutFromPlacement', () => {
         }
       }
     expect(checked).toBeGreaterThan(10_000)
+  })
+})
+
+describe('a bar’s parts', () => {
+  const shownOrder = (placement: Placement, surface: PartedSurface, part: string) => orderedParts(placement, surface, partGroup(surface, part))
+
+  it('runs the player’s middle and the sidebar down, the others across', () => {
+    expect([partAxis('playerBar', 'song'), partAxis('playerBar', 'progress'), partAxis('playerBar', 'volume'), partAxis('topbar', 'search'), partAxis('sidebar', 'nav')]).toEqual(['across', 'down', 'across', 'across', 'down'])
+  })
+
+  it('reads an arrow along the part’s container, mirrored right to left but in the player bar', () => {
+    expect([partStep('topbar', 'search', 'left', false), partStep('topbar', 'search', 'right', false), partStep('topbar', 'search', 'up', false)]).toEqual([-1, 1, null])
+    expect([partStep('topbar', 'search', 'left', true), partStep('playerBar', 'volume', 'left', true)]).toEqual([1, -1])
+    expect([partStep('sidebar', 'library', 'up', true), partStep('sidebar', 'library', 'down', true), partStep('sidebar', 'library', 'left', true)]).toEqual([-1, 1, null])
+  })
+
+  it('steps past the next part on screen, a hidden or empty one counting for nothing', () => {
+    // Hidden `lyrics`, nothing in `sleep`: one step right of `room` is past `upNext`.
+    const hidden = toggleHidden(start, { surface: 'playerBar', part: 'lyrics' })
+    const onScreen = ['room', 'upNext', 'volume']
+    const moved = stepPart(hidden, 'playerBar', 'room', 1, onScreen)
+    expect(shownOrder(moved, 'playerBar', 'room')).toEqual(['sleep', 'lyrics', 'upNext', 'room', 'volume', 'more', 'fullScreen'])
+    expect(moved.parts.playerBar?.hidden).toEqual(['lyrics'])
+    expect(shownOrder(stepPart(moved, 'playerBar', 'room', -1, onScreen), 'playerBar', 'room')).toEqual(['sleep', 'lyrics', 'room', 'upNext', 'volume', 'more', 'fullScreen'])
+  })
+
+  it('stays at its container’s end', () => {
+    expect(stepPart(start, 'sidebar', 'nav', -1, ['nav', 'library'])).toBe(start)
+    expect(stepPart(start, 'sidebar', 'library', 1, ['nav', 'library'])).toBe(start)
+    expect(stepPart(start, 'playerBar', 'transport', 1, ['transport'])).toBe(start)
   })
 })
