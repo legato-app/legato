@@ -37,11 +37,15 @@ export function carriesId(bytes, id) {
   return bytes.includes(Buffer.from(id))
 }
 
-/** Reads background::BROWSER_ARGS: every webview of the app must carry the same flags. */
-export function browserArgs(rustSource) {
-  const found = /pub const BROWSER_ARGS: &str = "([^"]*)";/.exec(rustSource)
-  if (!found) throw new Error('background.rs: BROWSER_ARGS not found')
-  return found[1]
+/** Reads background::BROWSER_ARGS: every webview of the app must carry the same flags. `lite`: without LITE_DROPS. */
+export function browserArgs(rustSource, lite = false) {
+  const constant = (name) => {
+    const found = new RegExp(`const ${name}: &str = "([^"]*)";`).exec(rustSource)
+    if (!found) throw new Error(`background.rs: ${name} not found`)
+    return found[1]
+  }
+  const args = constant('BROWSER_ARGS')
+  return lite ? args.replace(constant('LITE_DROPS'), '') : args
 }
 
 /** A port nothing listens on (asked from the system, then released). */

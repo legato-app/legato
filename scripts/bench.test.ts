@@ -86,7 +86,11 @@ describe('bench safety', () => {
 
 describe('bench reading', () => {
   it('takes the WebView2 flags from the app, whole', () => {
-    const args = browserArgs(readFileSync(new URL('../src-tauri/src/background.rs', import.meta.url), 'utf8'))
+    const source = readFileSync(new URL('../src-tauri/src/background.rs', import.meta.url), 'utf8')
+    const args = browserArgs(source)
+    // Lite measured with its own: one flag fewer.
+    expect(args).toContain('--disable-renderer-backgrounding')
+    expect(browserArgs(source, true)).toBe(args.replace(' --disable-renderer-backgrounding', ''))
     expect(args).toContain('--disable-background-timer-throttling')
     expect(args).not.toContain('"')
     expect(() => browserArgs('const OTHER: &str = "x";')).toThrow('BROWSER_ARGS')

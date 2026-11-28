@@ -1,7 +1,7 @@
 //! Like Discord: closing the window keeps the app in the notification area, music playing. Hidden, the webview is told
 //! so (no painting, throttled timers) and asked to free memory; after a while with nothing playing it is suspended
 //! (scripts stop) and woken before anything reaches it again: show, tray, global shortcut, media key. Quit (tray) is the
-//! only real exit.
+//! only real exit. Legato Lite lets the hidden page take a background priority and suspends it sooner (`SleepRule`).
 
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -13,33 +13,49 @@ use tauri::{AppHandle, Manager};
 /// the tray (review 2026-10-23: switches took seconds in the background). Silent and hidden long = suspended anyway.
 pub const BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection,IntensiveWakeUpThrottling --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows";
 
+/// Lite goes without this one of them: its hidden page gives up CPU, and a song change there may take longer.
+const LITE_DROPS: &str = " --disable-renderer-backgrounding";
+
+fn edition_args(lite: bool) -> String {
+    if lite { BROWSER_ARGS.replace(LITE_DROPS, "") } else { BROWSER_ARGS.to_string() }
+}
+
 /// What every webview is built with. e2e build: the walk's own flags after them (DevTools port, English).
 pub fn browser_args() -> String {
+    let args = edition_args(cfg!(feature = "lite"));
     #[cfg(feature = "e2e")]
     if let Ok(walk) = std::env::var("LEGATO_E2E_BROWSER_ARGS") {
-        return format!("{BROWSER_ARGS} {walk}");
+        return format!("{args} {walk}");
     }
-    BROWSER_ARGS.to_string()
+    args
 }
 
 /// Quit asked: the next close is real.
 static QUITTING: AtomicBool = AtomicBool::new(false);
 /// Something plays (media panel updates): never suspended then.
 static PLAYING: AtomicBool = AtomicBool::new(false);
+/// The last moment something was playing. None: nothing yet.
+static LAST_HEARD: Mutex<Option<Instant>> = Mutex::new(None);
 static SUSPENDED: AtomicBool = AtomicBool::new(false);
 /// Hidden window, page `visible` until the music moves (first position seen while playing).
 static HELD: Mutex<Option<Option<u64>>> = Mutex::new(None);
 /// Since when the window is hidden.
 static HIDDEN: Mutex<Option<Instant>> = Mutex::new(None);
-/// Hidden and silent this long: suspended.
-const SLEEP_AFTER: Duration = Duration::from_secs(5 * 60);
 
 pub fn quitting() -> bool {
     QUITTING.load(Ordering::Relaxed)
 }
 
 pub fn set_playing(playing: bool) {
-    PLAYING.store(playing, Ordering::Relaxed);
+    // While it plays, and the moment it stops.
+    if PLAYING.swap(playing, Ordering::Relaxed) || playing {
+        *LAST_HEARD.lock().unwrap() = Some(Instant::now());
+    }
+}
+
+/// How long nothing has played. None: something does.
+fn quiet_for() -> Option<Duration> {
+    (!PLAYING.load(Ordering::Relaxed)).then(|| LAST_HEARD.lock().unwrap().map_or(Duration::MAX, |heard| heard.elapsed()))
 }
 
 /// Music really moved: playing, over a second past the first position seen.
@@ -79,9 +95,24 @@ pub fn played(app: &AppHandle, playing: bool, position_ms: u64) {
     }
 }
 
+/// When a hidden window goes to sleep.
+struct SleepRule {
+    /// Hidden at least this long.
+    hidden: Duration,
+    /// Nothing playing for at least this long: a song change says "not playing" for a moment, and a page suspended
+    /// then would never start the next song.
+    quiet: Duration,
+    /// Looked at this often.
+    check: Duration,
+}
+
+const FULL_SLEEP: SleepRule = SleepRule { hidden: Duration::from_secs(5 * 60), quiet: Duration::ZERO, check: Duration::from_secs(60) };
+const LITE_SLEEP: SleepRule = SleepRule { hidden: Duration::from_secs(60), quiet: Duration::from_secs(60), check: Duration::from_secs(15) };
+const SLEEP: SleepRule = if cfg!(feature = "lite") { LITE_SLEEP } else { FULL_SLEEP };
+
 /// Should a hidden window go to sleep now?
-pub fn should_sleep(hidden_for: Option<Duration>, playing: bool, suspended: bool) -> bool {
-    !playing && !suspended && hidden_for.is_some_and(|d| d >= SLEEP_AFTER)
+fn should_sleep(rule: &SleepRule, hidden_for: Option<Duration>, quiet_for: Option<Duration>, suspended: bool) -> bool {
+    !suspended && hidden_for.is_some_and(|hidden| hidden >= rule.hidden) && quiet_for.is_some_and(|quiet| quiet >= rule.quiet)
 }
 
 /// Window closed: hidden, webview in low-resource mode. Music goes on.
@@ -165,16 +196,16 @@ fn set_visible(app: &AppHandle, visible: bool) {
     let _ = (app, visible);
 }
 
-/// Checks once a minute: hidden and silent long enough = suspended.
+/// Looks now and then: hidden and silent long enough (`SleepRule`) = suspended.
 pub fn spawn_sleeper(app: AppHandle) {
     // Suspending the webview is WebView2's: elsewhere the app is only checked on.
     #[cfg(not(windows))]
     let _ = app;
     std::thread::spawn(move || {
         loop {
-            std::thread::sleep(Duration::from_secs(60));
+            std::thread::sleep(SLEEP.check);
             let hidden_for = HIDDEN.lock().unwrap().map(|t| t.elapsed());
-            if !should_sleep(hidden_for, PLAYING.load(Ordering::Relaxed), SUSPENDED.load(Ordering::Relaxed)) {
+            if !should_sleep(&SLEEP, hidden_for, quiet_for(), SUSPENDED.load(Ordering::Relaxed)) {
                 continue;
             }
             // Held for a key that started nothing: hidden again (WebView2 only suspends hidden pages).
@@ -216,11 +247,52 @@ mod tests {
 
     #[test]
     fn sleeps_only_hidden_silent_and_long_enough() {
-        let long = Some(SLEEP_AFTER + Duration::from_secs(1));
-        assert!(should_sleep(long, false, false));
-        assert!(!should_sleep(long, true, false), "music playing");
-        assert!(!should_sleep(long, false, true), "already asleep");
-        assert!(!should_sleep(None, false, false), "on screen");
-        assert!(!should_sleep(Some(Duration::from_secs(30)), false, false), "just hidden");
+        for rule in [&FULL_SLEEP, &LITE_SLEEP] {
+            let long = Some(rule.hidden + Duration::from_secs(1));
+            let silent = Some(rule.quiet);
+            assert!(should_sleep(rule, long, silent, false));
+            assert!(!should_sleep(rule, long, None, false), "music playing");
+            assert!(!should_sleep(rule, long, silent, true), "already asleep");
+            assert!(!should_sleep(rule, None, silent, false), "on screen");
+            assert!(!should_sleep(rule, Some(Duration::from_secs(30)), silent, false), "just hidden");
+        }
+        // The full app: five minutes hidden, silent at the moment it looks.
+        assert!(!should_sleep(&FULL_SLEEP, Some(Duration::from_secs(299)), Some(Duration::MAX), false));
+        assert!(should_sleep(&FULL_SLEEP, Some(Duration::from_secs(300)), Some(Duration::ZERO), false));
+    }
+
+    /// Three songs from the tray, hidden for long: "not playing" between two of them never suspends Lite's page.
+    #[test]
+    fn lite_never_sleeps_between_two_songs() {
+        let hidden = Some(Duration::from_secs(600));
+        for gap in [0, 1, 5, 20, 59] {
+            assert!(!should_sleep(&LITE_SLEEP, hidden, Some(Duration::from_secs(gap)), false), "{gap} s between two songs");
+        }
+        assert!(should_sleep(&LITE_SLEEP, hidden, Some(Duration::from_secs(60)), false), "paused for a minute");
+        assert!(should_sleep(&LITE_SLEEP, hidden, Some(Duration::MAX), false), "opened in the tray, never played");
+    }
+
+    #[test]
+    fn music_stopped_counts_from_its_last_moment() {
+        // The one test of the shared state.
+        set_playing(false);
+        assert_eq!(quiet_for(), Some(Duration::MAX), "nothing played yet");
+        set_playing(true);
+        assert_eq!(quiet_for(), None);
+        set_playing(false);
+        let first = quiet_for().expect("silent");
+        set_playing(false);
+        assert!(first < Duration::from_secs(5) && quiet_for().is_some_and(|again| again >= first), "a silent report restarts nothing");
+    }
+
+    #[test]
+    fn only_lite_lets_its_hidden_page_take_a_background_priority() {
+        let (full, lite) = (edition_args(false), edition_args(true));
+        assert!(full.contains("--disable-renderer-backgrounding") && !lite.contains("--disable-renderer-backgrounding"));
+        // The rest stays: timers at full speed, so a song's end is acted on at once.
+        for kept in ["--disable-features=", "--disable-background-timer-throttling", "IntensiveWakeUpThrottling", "--disable-backgrounding-occluded-windows"] {
+            assert!(full.contains(kept) && lite.contains(kept), "{kept}");
+        }
+        assert_eq!(full.replace(LITE_DROPS, ""), lite);
     }
 }

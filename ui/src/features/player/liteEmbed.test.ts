@@ -27,6 +27,21 @@ describe('Lite plays one YouTube embed', () => {
     expect(usePlayer.getState().now?.youtubeId).toBe('video1')
   })
 
+  // In the tray nothing is painted: the embed's reports alone (no frame, no animation clock) must carry the queue on.
+  it('plays three songs in a row on the embed’s reports alone', () => {
+    usePlayer.setState({ fade: effectiveFade({ crossfade: 8, fade: advanced }) })
+    usePlayer.getState().playTracks([song(1), song(2), song(3)], 0)
+    const { frameKey } = usePlayer.getState()
+    for (const id of [1, 2, 3]) {
+      expect(usePlayer.getState()).toMatchObject({ playing: true, frameKey, now: { youtubeId: `video${id}` } })
+      // As the same embed reports a video: not started yet (the moment "not playing" is said), playing, ended.
+      usePlayer.getState().onYoutube({ state: -1 })
+      usePlayer.getState().onYoutube({ state: 1, time: 0.3, duration: 100 })
+      usePlayer.getState().onYoutube({ state: 1, time: 99.5 })
+      usePlayer.getState().onYoutube({ state: 0 })
+    }
+  })
+
   it.each([
     ['at the song’s end', () => usePlayer.getState().onYoutube({ state: 0 })],
     ['on Next', () => usePlayer.getState().step(1)],

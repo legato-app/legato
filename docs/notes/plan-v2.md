@@ -633,6 +633,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       opaque panel without `backdrop-filter`. Home's flowing background reads Background motion. Not tried in a Lite.
       - Decided alone (2026-11-27): the opaque glass hangs on the `.still` class, so it applies in the full app too and
         under Windows' own animations-off.
+    - [x] Slice 9, 2026-11-28: built, not measured, not tried for real. Lite drops `--disable-renderer-backgrounding`
+      (`background::browser_args`, the bench the same with `--lite`) and suspends a hidden page after 60 s without
+      music (looked at every 15 s; the full app keeps 5 min). `deferred.rs` / `deferred.ts` already start only what
+      Lite shows.
+      - Decided alone (2026-11-28): the 60 s count from the last moment something played, so the pause between two
+        songs never suspends the page; a song change in the tray may take longer than in the full app.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
       item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
       word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).

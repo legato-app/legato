@@ -631,7 +631,7 @@ async function main() {
   console.log(shuffle ?? 'shuffle 10000: not measured (the vitest run failed)')
   const t = plan(o.quick)
   const threads = os.cpus().length
-  const args = browserArgs(readFileSync(path.join(ROOT, 'src-tauri', 'src', 'background.rs'), 'utf8'))
+  const args = browserArgs(readFileSync(path.join(ROOT, 'src-tauri', 'src', 'background.rs'), 'utf8'), o.lite)
   const cleanData = freshData(dataDir, localDir, o.keep)
   const helper = await Helper.start()
   const shot = async (app, name) => {
