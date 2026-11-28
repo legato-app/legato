@@ -8,7 +8,7 @@ vi.mock('../../shared/api', () => ({ api: {} }))
 vi.mock('../player/session', () => ({ saveSessionNow: () => {}, saveSessionAtNext: () => {} }))
 vi.mock('../player/store', () => ({ usePlayer: {}, onSongEnd: () => {} }))
 
-const { atSongEnd, betweenSongs, quietNow, phoneStep } = await import('./updates')
+const { atSongEnd, betweenSongs, quietNow, phoneStep, versionToTell } = await import('./updates')
 
 it('installs only when nothing plays and nobody touched the app lately', () => {
   const now = 1_000_000
@@ -42,6 +42,14 @@ it('offers a new version once on the phone, and installs only a download asked f
   expect(phoneStep(failed, true, new Set())).toBe('failed')
   // A background check that failed says nothing.
   expect(phoneStep(failed, false, new Set())).toBe(null)
+})
+
+it('tells of a new version once where the app can’t install it, never where it can', () => {
+  const available = { current: '1.2.3', lastCheck: null, lastUpdate: null, justUpdated: false, state: 'available', version: '1.2.9', notes: null } as UpdateStatus
+  expect(versionToTell(available, false, new Set())).toBe('1.2.9')
+  expect(versionToTell(available, false, new Set(['1.2.9']))).toBeNull()
+  expect(versionToTell(available, true, new Set())).toBeNull()
+  expect(versionToTell({ ...available, state: 'upToDate' } as UpdateStatus, false, new Set())).toBeNull()
 })
 
 it('says what a ready update does as a song ends', () => {

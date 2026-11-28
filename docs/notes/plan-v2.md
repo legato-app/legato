@@ -710,7 +710,10 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
           converted by adblock-rust) and every load noted (`shield_linux.rs`, type-checked against the bindings, never run).
           Blocked requests are neither counted nor listed there (WebKit does not say them). To see at the first run: that
           WebKit compiles the whole list, and the compile time on a small machine (done at each launch).
-        5 `M` Linux release job x86_64 + aarch64, AppImage + .deb, both editions, the feed and the .deb case in `update.rs`.
+        5 `M` [x] Built 2026-11-28, never run (a workflow change runs at the first push to master): release.yml `linux` and
+          `linux-attach`, `scripts/linux-feed.mjs`, the .deb that only says a new version is out. Left: a `.lmix`
+          double-click on Linux (a MIME type of ours, full app only). To see at the first run: the arm runner’s build time,
+          the files’ names, the packages installed.
         6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs
           (architecture, development: apt dependencies, CONTRIBUTING › Releasing).
         7 `S` Measure the Lite on a small aarch64 machine (RAM, CPU while playing) against the Windows target.

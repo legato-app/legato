@@ -5,13 +5,14 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { api, type CacheStat, type CacheStats, type UpdateStatus } from '../../shared/api'
+import { useDesktopSupport } from '../../shared/desktopSupport'
 import { copyDiagnostics } from '../../shared/diag'
 import { formatBytes, formatCount, timeAgo } from '../../shared/format'
 import { Button } from '../../shared/ui/Button'
 import { Toggle } from '../../shared/ui/controls'
 import { groupAlbums, groupArtists } from '../library/filter'
 import { ReleaseNotes } from '../update/ReleaseNotes'
-import { downloadUpdate, installUpdate, useUpdate } from '../update/updates'
+import { downloadUpdate, installUpdate, openReleasePage, useUpdate } from '../update/updates'
 import { msg, tr, trn } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { DESKTOP_ONLY } from './desktopOnly'
@@ -83,6 +84,7 @@ function Stat({ value, name }: { value: string; name: string }) {
 export function AboutSection() {
   const { settings: s, update } = useSettings()
   const status = useUpdate((u) => u.status)
+  const { selfUpdate } = useDesktopSupport()
   const { tracks, playlists, stats, notify } = useStore(useShallow(({ tracks, playlists, stats, notify }) => ({ tracks, playlists, stats, notify })))
   const [cache, setCache] = useState<CacheStats>()
   // Copy diagnostics: with details = song titles, account names and file paths too.
@@ -136,6 +138,10 @@ export function AboutSection() {
           <Button onClick={() => void installUpdate()}>
             <DownloadSimple size={14} /> {phoneApp ? tr('Install update') : tr('Restart and update')}
           </Button>
+        ) : status?.state === 'available' && !selfUpdate ? (
+          <Button onClick={() => openReleasePage(status.version)}>
+            <ArrowSquareOut size={14} /> {tr('Download update')}
+          </Button>
         ) : (
           <Button variant="ghost" disabled={busy} onClick={() => (phoneApp && state === 'available' ? downloadUpdate() : void api.updateCheck())}>
             <ArrowClockwise size={14} className={busy ? 'animate-spin' : ''} /> {state === 'available' ? tr('Download update') : tr('Check now')}
@@ -151,9 +157,12 @@ export function AboutSection() {
       <section data-setting="Updates" className="flex flex-col gap-2.5">
         <h2 className="kicker">{tr('Updates')}</h2>
         <div className="rounded-xl border border-line bg-raised">
-          <Row label={msg('Automatic updates')} sub={tr('Checked at every launch. Downloads in the background and installs between two songs or once nothing plays, then the app picks up where it was')}>
-            <Toggle label={tr('Automatic updates')} checked={s.autoUpdate} onChange={(autoUpdate) => update({ autoUpdate })} />
-          </Row>
+          {/* A .deb installs nothing by itself: no switch for it. */}
+          {selfUpdate && (
+            <Row label={msg('Automatic updates')} sub={tr('Checked at every launch. Downloads in the background and installs between two songs or once nothing plays, then the app picks up where it was')}>
+              <Toggle label={tr('Automatic updates')} checked={s.autoUpdate} onChange={(autoUpdate) => update({ autoUpdate })} />
+            </Row>
+          )}
           <Row label={msg('Last update')} sub={status?.lastUpdate ? `${status.lastUpdate.from} → ${status.lastUpdate.to}, ${timeAgo(status.lastUpdate.at * 1000)}` : tr('None installed yet')} />
           <Row label={msg('Last check')} sub={status?.lastCheck ? timeAgo(status.lastCheck * 1000) : tr('Not this session')} />
           {status?.state === 'error' && <Row label={msg('Error')} sub={<span className="break-words">{status.message}</span>} />}

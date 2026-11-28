@@ -1,3 +1,4 @@
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { create } from 'zustand'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
@@ -10,6 +11,7 @@ import { tr } from '../../shared/i18n/i18n'
 import { note } from '../../shared/diag'
 import { phoneApp } from '../../shared/platform'
 import { notifyError } from '../../app/notifyError'
+import { releasePage } from '../../shared/links'
 
 /** What the background updater is doing (Settings › About). */
 export const useUpdate = create<{ status: UpdateStatus | null }>(() => ({ status: null }))
@@ -66,6 +68,19 @@ function onPhone(s: UpdateStatus) {
   }
 }
 
+/** The new version's page in the browser: a copy that can't install it (a Linux .deb) is updated from there. */
+export const openReleasePage = (version: string) => void openUrl(releasePage(version)).catch(notifyError)
+
+/** Pure: the version such a copy tells of now, each one once. */
+export function versionToTell(status: UpdateStatus, installsItself: boolean, said: ReadonlySet<string>): string | null {
+  return !installsItself && status.state === 'available' && !said.has(status.version) ? status.version : null
+}
+
+function tellOfRelease(version: string) {
+  offered.add(version)
+  useStore.getState().notify(tr('Legato {version} is available', { version }), { kind: 'info', action: { label: tr('Download update'), run: () => openReleasePage(version) } })
+}
+
 /** Install the downloaded update: session saved first (or the next song, between two), the app closes and comes back. */
 export async function installUpdate(next?: number) {
   const s = useUpdate.getState().status
@@ -107,9 +122,18 @@ export function quietNow(now: number, { playing, lastSound, lastInput }: { playi
 /** Follows the updater; with automatic updates on, a ready update installs at the first quiet moment (the PC; the phone
  * offers it). Returns cleanup. */
 export function startUpdates(): () => void {
+  // Asked once; the first check comes seconds after the launch, well after the answer.
+  let installsItself = true
+  if (!phoneApp)
+    void api
+      .desktopSupport()
+      .then((support) => void (installsItself = support.selfUpdate))
+      .catch(() => {})
   const set = (status: UpdateStatus) => {
     useUpdate.setState({ status })
-    if (phoneApp) onPhone(status)
+    if (phoneApp) return onPhone(status)
+    const version = versionToTell(status, installsItself, offered)
+    if (version) tellOfRelease(version)
   }
   void api
     .updateStatus()

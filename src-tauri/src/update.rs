@@ -204,7 +204,8 @@ impl Updater {
             Err(e) => return self.failed(app, "check", e.to_string()),
         };
         let version = update.version.clone();
-        if !download {
+        // A .deb only says a new version is out: the interface offers its page.
+        if !download || !crate::desktop::installs_updates() {
             return self.set(app, State::Available { version, notes: update.body.clone() });
         }
         self.set(app, State::Downloading { version: version.clone(), percent: 0 });
@@ -387,6 +388,17 @@ mod tests {
     }
 
     #[test]
+    fn linux_feeds_both_updater_files_without_holding_the_others_back() {
+        let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
+        let jobs: Vec<&str> = release.lines().filter(|line| line.trim_start().starts_with("needs:") && line.contains("linux")).collect();
+        assert_eq!(jobs, ["    needs: [release, lite-attach, linux]"], "only the attach job waits for Linux");
+        assert!(release.contains(r#""latest.json Legato" "latest-lite.json Legato.Lite""#));
+        // Two .deb packages can't own the same file.
+        let lite: serde_json::Value = serde_json::from_str(include_str!("../tauri.lite-linux.conf.json")).unwrap();
+        assert_eq!(lite["mainBinaryName"], "legato-lite");
+    }
+
+    #[test]
     fn only_the_signing_step_gets_the_android_keystore() {
         let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
         let with_keystore: Vec<&str> = release.split("\n      - ").filter(|step| step.contains("${{ secrets.ANDROID_KEYSTORE }}") || step.contains("${{ secrets.ANDROID_KEYSTORE_PASSWORD }}")).collect();
@@ -400,13 +412,13 @@ mod tests {
     fn only_the_signing_steps_get_the_updater_key() {
         let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
         let with_key: Vec<&str> = release.split("\n      - ").filter(|step| step.contains("${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}")).collect();
-        assert_eq!(with_key.len(), 2, "one signing step for each Windows job");
+        assert_eq!(with_key.len(), 3, "one signing step for the Windows, Lite and Linux jobs");
         for step in with_key {
             assert!(step.contains("pnpm tauri signer sign --app-version") && !step.contains("pnpm tauri build"), "{step}");
         }
-        // Both builds leave the signature to those steps, and tauri-action publishes without building again.
+        // Every build leaves the signature to those steps, and tauri-action publishes without building again.
         let builds: Vec<&str> = release.lines().filter(|line| line.contains("pnpm tauri build")).collect();
-        assert!(builds.len() == 2 && builds.iter().all(|line| line.contains("--no-sign")), "{builds:?}");
+        assert!(builds.len() == 4 && builds.iter().all(|line| line.contains("--no-sign")), "{builds:?}");
         assert!(release.contains("tauriScript: node scripts/already-built.mjs"));
     }
 

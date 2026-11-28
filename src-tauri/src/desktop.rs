@@ -11,11 +11,24 @@ pub struct DesktopSupport {
     pub tray: bool,
     /// Secrets are kept after the app closes (false once a keyring refused one: `secrets.rs`).
     pub keychain: bool,
+    /// This copy installs a new version itself (`installs_updates`).
+    pub self_update: bool,
 }
 
 #[tauri::command]
 pub async fn desktop_support() -> DesktopSupport {
-    DesktopSupport { tray: crate::tray::host_seen(), keychain: crate::secrets::keychain_kept() }
+    DesktopSupport { tray: crate::tray::host_seen(), keychain: crate::secrets::keychain_kept(), self_update: installs_updates() }
+}
+
+/// Every build installs its updates but a Linux one outside an AppImage: a .deb's files are the system packages' own.
+#[cfg(target_os = "linux")]
+pub fn installs_updates() -> bool {
+    crate::desktop_file::appimage().is_some()
+}
+
+#[cfg(not(target_os = "linux"))]
+pub fn installs_updates() -> bool {
+    true
 }
 
 /// Whether closing the window hides it (setting `closeToTray`, on until turned off) rather than quits: never without

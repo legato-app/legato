@@ -4,6 +4,8 @@ name: release
 # the signed Android APK (its own job, attached to the same prerelease once both are done) and Legato Lite's installer +
 # latest-lite.json (`lite`, the same way). Version = MAJOR.MINOR from
 # tauri.conf.json + patch = commits since its bump (scripts/release.mjs BASES): 1.2.0 in the file, 1.2.<commits> released.
+# Linux (`linux`, then `linux-attach`): AppImage and .deb of both editions, x86_64 and aarch64, attached the same way,
+# the AppImages added to both updater files.
 # "[skip release]" in the commit's first line: no release for that push. Run by hand: Actions › release › Run workflow.
 # Two channels (Settings › General › Updates), two files (src-tauri/src/update.rs):
 # - Beta reads releases/download/beta/latest.json: the rolling `beta` release, whose latest.json is copied here from
@@ -372,6 +374,150 @@ jobs:
           else
             gh release upload beta lite/latest-lite.json --clobber
           fi
+
+  # Linux, full and Lite, AppImage and .deb, on the oldest base that has WebKitGTK 4.1: an AppImage runs on that glibc
+  # and newer. Jobs of their own: a failure holds neither Windows nor Android back. No write access: `linux-attach`
+  # publishes.
+  linux:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-22.04
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+    runs-on: ${{ matrix.runner }}
+    # Under `release`'s 60, as `lite`'s: the one `release` concurrency group waits for every job.
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.SHA }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          # No cache in the privileged run (workflow_run, signing secrets): a poisoned one could reach the build.
+          package-manager-cache: false
+
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+
+      # As linux-trial.yml: the shell's libraries, what the AppImage bundler calls, the GStreamer plugins it packs.
+      - name: System libraries
+        timeout-minutes: 20
+        run: |
+          APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+          for i in 1 2 3; do sudo apt-get $APT update && break; sleep 5; done
+          sudo apt-get $APT install -y --no-install-recommends \
+            pkg-config libssl-dev libasound2-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libdbus-1-dev \
+            file wget patchelf \
+            gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Version
+        id: release
+        run: node scripts/release.mjs
+
+      - uses: taiki-e/install-action@073e1fd0bc889c9aee68dbaaa927cde1b5653a83 # v2.90.11
+        with:
+          tool: cargo-about@0.9.2
+
+      - run: pnpm notices
+
+      # Without the updater key, as the Windows builds. The Lite's binary has a name of its own: two .deb packages can't
+      # both own `legato`.
+      - name: Linux packages
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          pnpm tauri build --bundles appimage,deb --no-sign
+          pnpm tauri build --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite-linux.conf.json --bundles appimage,deb --no-sign -- --no-default-features
+          out="$RUNNER_TEMP/linux"
+          mkdir -p "$out"
+          # GitHub turns a space into a dot anyway: name the files so, and the updater files' links are the assets'.
+          for package in target/release/bundle/appimage/*.AppImage target/release/bundle/deb/*.deb; do
+            name=$(basename "$package")
+            cp "$package" "$out/${name// /.}"
+          done
+
+      # The updater installs AppImages only (a .deb's new version is downloaded by hand: desktop.rs).
+      - name: Sign the AppImages
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::Repository secret TAURI_SIGNING_PRIVATE_KEY is missing: see CONTRIBUTING.md › Releasing"
+            exit 1
+          fi
+          for image in "$RUNNER_TEMP"/linux/*.AppImage; do
+            pnpm tauri signer sign --app-version "$VERSION" "$image"
+          done
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux-${{ matrix.arch }}
+          path: ${{ runner.temp }}/linux
+          if-no-files-found: error
+          retention-days: 3
+
+  # What Linux built, onto the versioned release, then into its updater files and Beta's. After `lite-attach`, which
+  # writes latest-lite.json. Runs once the Windows release is there, even if the Lite or one architecture failed.
+  linux-attach:
+    needs: [release, lite-attach, linux]
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: linux-*
+          merge-multiple: true
+          path: linux
+
+      - name: Attach the Linux packages and point the updater files at them
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          shopt -s nullglob
+          packages=(linux/*)
+          if [ ${#packages[@]} -eq 0 ]; then
+            echo "::notice::No Linux package was built"
+            exit 0
+          fi
+          gh release upload "v$VERSION" "${packages[@]}" --clobber
+          mkdir -p release beta
+          for edition in "latest.json Legato" "latest-lite.json Legato.Lite"; do
+            read -r file product <<< "$edition"
+            # No Lite file: its job failed, and Lite PCs find no update until a release that has one.
+            gh release download "v$VERSION" --pattern "$file" --dir release --clobber || continue
+            node scripts/linux-feed.mjs "release/$file" linux "$product"
+            gh release upload "v$VERSION" "release/$file" --clobber
+            # Beta's copy only while it is this release's: a re-run of an older run never takes Beta back.
+            gh release download beta --pattern "$file" --dir beta --clobber 2> /dev/null || true
+            if [ "$(jq -r '.version // empty' "beta/$file" 2> /dev/null || true)" = "$VERSION" ]; then
+              gh release upload beta "release/$file" --clobber
+            fi
+          done
 
   # The APK onto the versioned release, once the Windows job has made it.
   apk:

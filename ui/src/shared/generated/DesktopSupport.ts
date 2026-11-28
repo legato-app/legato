@@ -8,4 +8,8 @@ tray: boolean,
 /**
  * Secrets are kept after the app closes (false once a keyring refused one: `secrets.rs`).
  */
-keychain: boolean, };
+keychain: boolean, 
+/**
+ * This copy installs a new version itself (`installs_updates`).
+ */
+selfUpdate: boolean, };
