@@ -3,8 +3,12 @@ import type { Cut } from './liteCuts'
 /** Phone build (Android's or iOS's WebView): texts that speak of a PC say phone there. The phone layout is `usePhone`. */
 export const phoneApp = typeof navigator !== 'undefined' && /Android|iPhone|iPad/.test(navigator.userAgent)
 
-/** Legato on Linux: WebKitGTK's user agent. Android's says Linux too; a browser (the website's demo) says Chrome or Firefox. */
-export const linuxApp = typeof navigator !== 'undefined' && /Linux/.test(navigator.userAgent) && !/Android|Chrome|Firefox/.test(navigator.userAgent)
+// Set at build time by Vite's define (`vite.config.ts`, from the Tauri CLI's TAURI_ENV_PLATFORM): tests and the site's
+// demo have no define. Not the user agent: GNOME Web (WebKitGTK) would hide the demo's features, a custom one the app's.
+declare const __LINUX__: boolean | undefined
+
+/** Legato on Linux: the interface built by the Tauri CLI there. */
+export const linuxApp: boolean = typeof __LINUX__ !== 'undefined' && __LINUX__
 
 /**
  * What Linux lacks for now (plan-v2 "Linux for both versions"): parts of the shell written for Windows only, hidden rather

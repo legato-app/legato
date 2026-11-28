@@ -122,20 +122,15 @@ describe('Legato on Linux', () => {
     expect(both.cuts.offered('voiceSearch')).toBe(false)
   })
 
-  it('is told by WebKitGTK’s user agent only', async () => {
-    const isLinuxApp = async (userAgent: string) => {
-      vi.stubGlobal('navigator', { userAgent })
-      vi.resetModules()
-      const platform = await vi.importActual<typeof import('./platform')>('./platform')
-      vi.unstubAllGlobals()
-      return platform.linuxApp
-    }
-    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15')).toBe(true)
-    // Linux browsers (the website's demo), Android, Windows.
-    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36')).toBe(false)
-    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0')).toBe(false)
-    expect(await isLinuxApp('Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile')).toBe(false)
-    expect(await isLinuxApp('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Edg/140.0')).toBe(false)
+  it('is told by the build, never by the user agent', async () => {
+    // GNOME Web, a WebKitGTK browser on Linux: the website's demo keeps everything.
+    vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15' })
+    vi.resetModules()
+    const platform = await vi.importActual<typeof import('./platform')>('./platform')
+    vi.unstubAllGlobals()
+    expect(platform.linuxApp).toBe(false)
+    const config = readFileSync(new URL('../../../vite.config.ts', import.meta.url), 'utf8')
+    expect(config).toContain("__LINUX__: JSON.stringify(env.TAURI_ENV_PLATFORM === 'linux')")
   })
 })
 
