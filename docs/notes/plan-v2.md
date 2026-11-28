@@ -1547,6 +1547,7 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
 - [ ] Spotify: ask for the data export (Privacy settings › Download your data); its `Playlist1.json` is the test file:
       open the ZIP in Add music › Connect Spotify › Open Spotify's data export (are private playlists in it?).
 - [ ] A playlist file from foobar2000 / VLC / MusicBee, and an `iTunes Music Library.xml`, through Add music.
+      (to check: a190d0fd reads iTunes and MusicBee library playlists; foobar2000 and VLC not located)
 - [ ] Quit the installed Legato from the tray and open it again: a session closed its hidden single-instance window by
       mistake on 2026-10-31.
 
