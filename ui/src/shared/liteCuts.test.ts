@@ -44,7 +44,9 @@ describe('Legato Lite', () => {
       expect(lite.keys.ACTIONS.some((action) => action.id === id), id).toBe(true)
       expect(offered, id).not.toContain(id)
     }
-    expect(offered).toHaveLength(lite.keys.ACTIONS.length - cut.length)
+    // Lite's cuts, and what no build has whole yet.
+    const unfinished = Object.values<Cut>(lite.cuts.UNFINISHED).flatMap((entry) => entry.shortcuts ?? [])
+    expect(offered).toHaveLength(lite.keys.ACTIONS.length - cut.length - unfinished.length)
   })
 
   it('shows and finds no cut setting', () => {
@@ -135,9 +137,12 @@ describe('Legato on Linux', () => {
 })
 
 describe('Legato, the full app', () => {
-  it('cuts nothing', async () => {
+  it('cuts nothing but what no build has whole yet', async () => {
     const full = await load(false)
-    expect(full.keys.OFFERED_ACTIONS).toEqual(full.keys.ACTIONS)
+    const unfinished = Object.values<Cut>(full.cuts.UNFINISHED)
+    expect(full.keys.OFFERED_ACTIONS).toEqual(full.keys.ACTIONS.filter((action) => !unfinished.some((cut) => cut.shortcuts?.includes(action.id))))
+    for (const id of unfinished.flatMap((cut) => cut.settings ?? [])) expect(full.search.SETTINGS_INDEX.some((entry) => entry.label === id), id).toBe(false)
+    expect(full.cuts.offered('arrange')).toBe(false)
     expect(full.books.withoutBooks([{ audiobook: true, musicness: 'notMusic' }] as Parameters<Edition['books']['withoutBooks']>[0])).toEqual([])
     expect(full.search.SETTINGS_INDEX.map((entry) => entry.label)).toContain('Podcasts')
     for (const page of listed(full, (cut) => cut.pages)) expect(full.cuts.isCutPage(page), page).toBe(false)

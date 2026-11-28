@@ -5,6 +5,7 @@
 import { create } from 'zustand'
 import { tr } from '../shared/i18n/i18n'
 import { isPhone } from '../shared/phone'
+import { offered } from '../shared/liteCuts'
 import { phoneApp } from '../shared/platform'
 import type { Placement } from '../shared/theme/layout'
 import { notifyError } from './notifyError'
@@ -15,7 +16,7 @@ export const useArrangeDraft = create<{ draft: Placement | null }>(() => ({ draf
 
 /** Opens the arranging mode. A phone keeps its own arrangement, and a window as narrow as one draws it too. */
 export function startArranging() {
-  if (phoneApp) return
+  if (phoneApp || !offered('arrange')) return
   if (isPhone()) return void useStore.getState().notify(tr('Arranging needs a wider window'), { kind: 'info' })
   void import('../features/arrange/session').then((session) => session.beginArranging()).catch(notifyError)
 }
