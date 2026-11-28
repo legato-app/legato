@@ -48,6 +48,27 @@ pub async fn picked_temp(app: AppHandle, name: String) -> CmdResult<String> {
     Ok(fresh(&app, OUT)?.join(safe_name(&name)).to_string_lossy().into_owned())
 }
 
+/// The file a command writes or reads, as the system's dialog gave it: a whole path, ending as this kind of file does.
+pub(crate) fn expected_file(path: &str, extensions: &[&str]) -> CmdResult<PathBuf> {
+    let file = PathBuf::from(path);
+    let ends_well = file.extension().and_then(|e| e.to_str()).is_some_and(|e| extensions.iter().any(|wanted| e.eq_ignore_ascii_case(wanted)));
+    if file.is_absolute() && ends_well { Ok(file) } else { Err(format!("A .{} file expected", extensions[0])) }
+}
+
+#[cfg(test)]
+mod expected_file_tests {
+    use super::expected_file;
+
+    #[test]
+    fn takes_a_whole_path_of_the_right_kind_only() {
+        let dir = std::env::temp_dir();
+        assert!(expected_file(&dir.join("Night.THEME").to_string_lossy(), &["theme"]).is_ok());
+        for other in [dir.join("night.cmd"), dir.join("night"), std::path::PathBuf::from("night.theme")] {
+            assert!(expected_file(&other.to_string_lossy(), &["theme"]).is_err(), "{other:?}");
+        }
+    }
+}
+
 /// The file written at `path` (from `picked_temp`) copied out to the address the user picked; its name there.
 #[tauri::command]
 pub async fn picked_out(app: AppHandle, path: String, address: String) -> CmdResult<String> {

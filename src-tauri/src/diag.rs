@@ -178,6 +178,7 @@ pub async fn diag_report(state: State<'_, AppState>, details: bool) -> Result<St
 /// Settings › About › Save: the whole log to the file the user picked (`diag::write_all`).
 #[tauri::command]
 pub async fn diag_save(state: State<'_, AppState>, path: String, details: bool) -> Result<(), String> {
+    let path = crate::picked::expected_file(&path, &["txt"])?;
     let (facts, dir) = facts(&state, details);
     tauri::async_runtime::spawn_blocking(move || {
         flush();

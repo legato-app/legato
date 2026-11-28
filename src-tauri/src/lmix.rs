@@ -7,8 +7,7 @@ use std::path::PathBuf;
 
 /// An absolute path to a `.lmix` file: the OS's drop or dialog, not trusted further.
 fn lmix_path(path: &str) -> Result<PathBuf, String> {
-    let p = PathBuf::from(path);
-    if p.is_absolute() && p.extension().and_then(|e| e.to_str()).is_some_and(|e| e.eq_ignore_ascii_case("lmix")) { Ok(p) } else { Err("A .lmix file expected".into()) }
+    crate::picked::expected_file(path, &["lmix"])
 }
 
 /// A remix file: its video and settings, checked (size first, never read whole when too big).

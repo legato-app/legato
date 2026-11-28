@@ -36,7 +36,8 @@ pub async fn forget_background(app: tauri::AppHandle, name: String) -> CmdResult
 #[tauri::command]
 pub async fn export_theme(app: tauri::AppHandle, path: String, theme: serde_json::Value) -> CmdResult<()> {
     let picture = theme["background"]["image"].as_str().filter(|n| art::valid_cover_name(n)).and_then(|n| std::fs::read(art::covers_dir(&app)?.join(n)).ok());
-    std::fs::write(path, music_core::themefile::pack(&theme, picture.as_deref()).map_err(err)?).map_err(err)
+    let file = crate::picked::expected_file(&path, &["theme"])?;
+    std::fs::write(file, music_core::themefile::pack(&theme, picture.as_deref()).map_err(err)?).map_err(err)
 }
 
 /// A preset file's largest size, bytes (a MilkDrop preset is a few kB; its shaders, left out, make the big ones).
@@ -58,7 +59,7 @@ pub async fn write_preset(path: String, text: String) -> CmdResult<()> {
     if text.len() as u64 > MAX_PRESET {
         return Err("Preset too big".into());
     }
-    std::fs::write(path, text).map_err(err)
+    std::fs::write(crate::picked::expected_file(&path, &["json"])?, text).map_err(err)
 }
 
 /// A `.theme` file read back: its picture stored, the theme returned for the interface to check.
