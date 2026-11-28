@@ -113,6 +113,7 @@ export const sv: Copy = {
     ],
     lite: 'Ladda ned Legato Lite',
     liteAbout: 'För enklare datorer: det viktigaste i Legato, utan Live Editor, visualisering, övertoning, låtigenkänning, plugins, lyssningsrum, fjärrkontroll i mobilen, streamingöverlägg, Discord, vardagsrumsläge, karaoke, blindtest, poddar och ljudböcker. Installeras bredvid Legato, med ett eget bibliotek.',
+    linuxAbout: 'Linux, nytt och lite testat: en AppImage uppdaterar sig själv, en .deb säger till när du ska hämta nästa.',
   },
   next: {
     title: 'Det som kommer',
@@ -135,7 +136,7 @@ export const sv: Copy = {
       { q: 'Behöver jag ett konto?', a: 'Inte hos oss. Du loggar in på tjänsterna du redan använder, på deras egna sidor.' },
       { q: 'Laddar den ned musik?', a: 'Nej. Musiken spelas i varje tjänsts egen spelare eller från dina filer. Inget ljud från någon plattform laddas ned, spelas in eller extraheras; bara Musikdetektorn lyssnar, när du ber den.' },
       { q: 'Behöver jag Spotify Premium?', a: 'Inte för att lyssna: Legato läser bara dina spellistor på Spotify, och låtarna spelas från YouTube när appen hittar dem där. Att läsa dem med din egen appnyckel kräver en gratis nyckel från Spotifys utvecklarpanel, vars ägare behöver Premium så länge appen är i utvecklingsläge. Utan den klistrar du in länken till en offentlig spellista, eller använder Anslut Spotify under Lägg till musik för dina privata listor och Gillade låtar (läs först vad som står där: Spotifys regler förbjuder det).' },
-      { q: 'Mac eller Linux?', a: 'Bara Windows 10 och 11, tills vidare.' },
+      { q: 'Mac eller Linux?', a: 'Windows 10 och 11. En Linuxversion (x86_64 och ARM64) är ny och lite testad: filerna visas under Windows-knappen när den senaste Stable-utgåvan har dem. Mac: inte än.' },
       { q: 'Finns det en Android-version?', a: 'En beta, ja: en APK via nedladdningslänken under Windows-knappen (Android 8 eller senare, 64-bitars). Öppna filen på telefonen och tillåt installationer från webbläsaren när Android frågar; den finns inte i någon butik: appen erbjuder själv varje ny version (tryck på Uppdatera och bekräfta i Androids installationsprogram; första gången ber Android dig att tillåta Legato att installera appar). Den pratar med samma ställen som Windows-appen, sparar sina data på telefonen och synkar med dina datorer över wifi från Inställningar › Synkläge. iPhone: inte än.' },
       { q: 'Hur flyttar jag till en ny dator?', a: 'Synkläge håller flera datorer lika. För en engångsflytt: Inställningar › Allmänt › Säkerhetskopiera ditt bibliotek, sedan Återställ en säkerhetskopia på den nya datorn, och logga in på dina konton igen.' },
       { q: 'Hur fungerar uppdateringar?', a: 'Appen kollar GitHub vid start och installerar en ny version mellan två låtar, eller medan inget spelas. Du får versionerna som provats först (Stabil); Inställningar › Allmänt har en betakanal som får varje ändring först, och kan krångla. På Android följer appen Beta och laddar ned en ny version bara när du trycker på Uppdatera.' },

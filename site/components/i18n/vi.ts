@@ -113,6 +113,7 @@ export const vi: Copy = {
     ],
     lite: 'Tải Legato Lite',
     liteAbout: 'Cho máy tính yếu: những phần cốt lõi của Legato, không có Live Editor, hình ảnh âm thanh, chuyển bài chồng mờ, nhận diện bài hát, plugin, phòng nghe chung, điều khiển bằng điện thoại, lớp phủ phát trực tiếp, Discord, chế độ phòng khách, karaoke, thử nghe đoán, podcast và sách nói. Cài song song với Legato, với thư viện riêng.',
+    linuxAbout: 'Linux, mới và ít được thử: AppImage tự cập nhật, còn .deb báo cho bạn khi nào tải bản tiếp theo.',
   },
   next: {
     title: 'Sắp có gì',
@@ -135,7 +136,7 @@ export const vi: Copy = {
       { q: 'Tôi có cần tài khoản không?', a: 'Không cần tài khoản của chúng tôi. Bạn đăng nhập vào các dịch vụ bạn đang dùng, trên trang của chính họ.' },
       { q: 'Nó có tải nhạc xuống không?', a: 'Không. Nhạc phát trong trình phát của từng dịch vụ hoặc từ tệp của bạn. Không tải xuống, ghi âm hay trích xuất âm thanh của nền tảng nào; chỉ Music Detector nghe, khi bạn yêu cầu.' },
       { q: 'Có cần Spotify Premium không?', a: 'Để nghe thì không: Legato chỉ đọc playlist Spotify của bạn, và bài hát phát từ YouTube khi ứng dụng tìm thấy ở đó. Đọc bằng khóa ứng dụng của bạn cần một khóa miễn phí từ bảng điều khiển nhà phát triển Spotify, chủ khóa cần Premium khi ứng dụng còn ở chế độ phát triển. Không có khóa, hãy dán liên kết playlist công khai, hoặc dùng Kết nối Spotify trong Thêm nhạc cho danh sách riêng tư và Bài hát đã thích (đọc kỹ lời nhắc trước: quy định của Spotify cấm việc này).' },
-      { q: 'Mac hay Linux?', a: 'Hiện chỉ có Windows 10 và 11.' },
+      { q: 'Mac hay Linux?', a: 'Windows 10 và 11. Bản cho Linux (x86_64 và ARM64) còn mới và ít được thử: tệp của nó hiện dưới nút Windows khi bản Stable mới nhất có chúng. Mac: chưa có.' },
       { q: 'Có bản Android không?', a: 'Có bản beta: một tệp APK ở liên kết tải xuống bên dưới nút Windows (Android 8 trở lên, 64-bit). Mở tệp trên điện thoại và cho phép cài từ trình duyệt khi Android hỏi; không có trên cửa hàng nào: ứng dụng tự đề xuất mỗi phiên bản mới (chạm Cập nhật, rồi xác nhận trong trình cài đặt của Android; lần đầu, Android sẽ xin bạn cho phép Legato cài ứng dụng). Nó kết nối đến cùng những nơi như ứng dụng Windows, giữ dữ liệu trên điện thoại và đồng bộ với các PC của bạn qua Wi-Fi từ Cài đặt › Sync Mode. iPhone: chưa có.' },
       { q: 'Chuyển sang PC mới thế nào?', a: 'Sync Mode giữ nhiều PC giống nhau. Để chuyển một lần: Cài đặt › Chung › Sao lưu thư viện của bạn, rồi Khôi phục bản sao lưu trên PC mới, và đăng nhập lại các tài khoản.' },
       { q: 'Cập nhật hoạt động thế nào?', a: 'Ứng dụng kiểm tra GitHub khi mở và cài phiên bản mới giữa hai bài hát, hoặc khi không phát gì. Bạn nhận các phiên bản đã được thử trước (Ổn định); Cài đặt › Chung có kênh Beta nhận mọi thay đổi đầu tiên, và có thể lỗi. Trên Android, ứng dụng theo kênh Beta và chỉ tải phiên bản mới khi bạn chạm Cập nhật.' },

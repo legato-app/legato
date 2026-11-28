@@ -50,7 +50,8 @@ sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-app
 To try a build on a real Linux desktop without building it: push to `platforms` with `[linux trial]` in the head commit
 message, and download the debug AppImage from that run's artifacts (kept 7 days). What Linux still hides is listed in
 `MISSING_ON_LINUX` (`ui/src/shared/platform.ts`). Without a tray icon, closing quits Legato; without a keyring, sign-ins
-last until it closes. Details: [docs/development.md](docs/development.md).
+last until it closes. An AppImage updates itself; a .deb only says a new version is out. Details:
+[docs/development.md](docs/development.md).
 
 ## Website
 
@@ -116,6 +117,12 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
   land on the Stable afterwards, unchecked and with the Beta notes. An incomplete `latest-lite.json` stops the whole
   promotion; to promote the full app anyway, delete that asset from the `vX.Y.Z` release and run promote again (Lite
   PCs stay where they are).
+- **Linux** rides the same releases: `release.yml`'s `linux` jobs (x86_64 on `ubuntu-22.04`, aarch64 on
+  `ubuntu-22.04-arm`) build an AppImage and a .deb of both editions, without write access; the AppImages are signed with
+  the same key. `linux-attach` then puts the files on `vX.Y.Z` and adds `linux-x86_64` / `linux-aarch64` to
+  `latest.json` and `latest-lite.json` (`scripts/linux-feed.mjs`), there and on `beta`. A Linux failure holds neither
+  Windows nor Android back. A .deb installs nothing by itself: it opens the new release's page. As for the Lite, promote
+  once the release run is over.
 - **Phones** follow Beta: each Beta's APK is what the Android app offers (Settings › About, a toast), downloaded when
   the user taps Update and installed by Android's installer. Stable carries no APK yet. The website's Android link is
   the newest release's own APK from GitHub's list (a Beta whose Android job failed is passed over); before the list

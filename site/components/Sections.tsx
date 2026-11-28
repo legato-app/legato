@@ -216,7 +216,11 @@ export function Privacy({ rows, english }: { rows: [string, string][]; english?:
 /** Three steps, numbered in the playback blue, then the one way in. */
 export function Start() {
   const c = useCopy()
-  const { href, lite } = useLatest()
+  const { href, lite, linux } = useLatest()
+  const linuxEditions = [
+    { product: 'Legato', files: linux.full },
+    { product: 'Legato Lite', files: linux.lite },
+  ].filter((edition) => edition.files.length > 0)
   return (
     <>
       <motion.ol {...inView} variants={group} className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -244,6 +248,21 @@ export function Start() {
           </a>{' '}
           · {c.start.liteAbout}
         </p>
+      )}
+      {linuxEditions.length > 0 && (
+        <div className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-2">
+          <p>{c.start.linuxAbout}</p>
+          {linuxEditions.map(({ product, files }) => (
+            <p key={product} className="mt-1 flex flex-wrap gap-x-3">
+              <span>{product}</span>
+              {files.map((file) => (
+                <a key={file.name} href={file.href} className="font-semibold text-ink underline decoration-line underline-offset-4">
+                  {file.name}
+                </a>
+              ))}
+            </p>
+          ))}
+        </div>
       )}
     </>
   )

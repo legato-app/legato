@@ -113,6 +113,7 @@ export const de: Copy = {
     ],
     lite: 'Legato Lite herunterladen',
     liteAbout: 'Für kleine PCs: das Wesentliche von Legato, ohne Live Editor, Visualisierung, Überblenden, Titelerkennung, Plugins, Hörräume, Handy-Fernbedienung, Streaming-Overlay, Discord, Wohnzimmermodus, Karaoke, Blindtest, Podcasts und Hörbücher. Wird neben Legato installiert, mit eigener Bibliothek.',
+    linuxAbout: 'Linux, neu und kaum erprobt: Ein AppImage aktualisiert sich selbst, ein .deb sagt dir, wann du das nächste herunterladen kannst.',
   },
   next: {
     title: 'Was als Nächstes kommt',
@@ -135,7 +136,7 @@ export const de: Copy = {
       { q: 'Brauche ich ein Konto?', a: 'Keins bei uns. Du meldest dich bei den Diensten an, die du schon nutzt, auf deren eigenen Seiten.' },
       { q: 'Lädt es Musik herunter?', a: 'Nein. Musik läuft im eigenen Player jedes Dienstes oder aus deinen Dateien. Kein Audio einer Plattform wird heruntergeladen, aufgenommen oder extrahiert; nur die Musikerkennung hört zu, wenn du sie darum bittest.' },
       { q: 'Brauche ich Spotify Premium?', a: 'Zum Abspielen nicht: Legato liest nur deine Spotify-Playlists, und ihre Songs laufen über YouTube, wenn die App sie dort findet. Zum Lesen mit eigenem App-Schlüssel braucht es einen kostenlosen Schlüssel aus Spotifys Entwickler-Dashboard, dessen Besitzer Premium braucht, solange die App im Entwicklungsmodus ist. Ohne ihn füge den Link einer öffentlichen Playlist ein, oder nutze Spotify verbinden unter Musik hinzufügen für deine privaten Listen und Lieblingssongs (lies zuerst, was dort steht: Spotifys Regeln verbieten es).' },
-      { q: 'Mac oder Linux?', a: 'Vorerst nur Windows 10 und 11.' },
+      { q: 'Mac oder Linux?', a: 'Windows 10 und 11. Eine Linux-Version (x86_64 und ARM64) ist neu und kaum erprobt: Ihre Dateien erscheinen unter dem Windows-Knopf, sobald das neueste Stable-Release sie enthält. Mac: noch nicht.' },
       { q: 'Gibt es eine Android-Version?', a: 'Eine Beta, ja: eine APK über den Download-Link unter dem Windows-Button (Android 8 oder neuer, 64 Bit). Öffne die Datei auf deinem Handy und erlaube Installationen aus deinem Browser, wenn Android fragt; es gibt keinen Store-Eintrag: Die App bietet jede neue Version selbst an (tippe auf Aktualisieren und bestätige im Installer von Android; beim ersten Mal bittet Android dich, Legato das Installieren von Apps zu erlauben). Sie spricht mit denselben Stellen wie die Windows-App, behält ihre Daten auf dem Handy und synchronisiert sich per WLAN mit deinen PCs über Einstellungen › Synchronisierung. iPhone: noch nicht.' },
       { q: 'Wie ziehe ich auf einen neuen PC um?', a: 'Die Synchronisierung hält mehrere PCs gleich. Für einen einmaligen Umzug: Einstellungen › Allgemein › Bibliothek sichern, dann Sicherung wiederherstellen auf dem neuen PC, und melde dich wieder bei deinen Konten an.' },
       { q: 'Wie funktionieren Updates?', a: 'Die App prüft beim Start GitHub und installiert eine neue Version zwischen zwei Songs oder während nichts läuft. Du bekommst die Versionen, die zuerst erprobt wurden (Stabil); Einstellungen › Allgemein hat einen Beta-Kanal, der jede Änderung zuerst bringt und kaputtgehen kann. Unter Android folgt die App Beta und lädt eine neue Version nur herunter, wenn du auf Aktualisieren tippst.' },

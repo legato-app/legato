@@ -1,13 +1,14 @@
 # Architecture
 
-Legato is a Tauri 2 desktop app: a Rust core does the work, and a React interface draws it in a WebView2 window.
+Legato is a Tauri 2 desktop app: a Rust core does the work, and a React interface draws it in the system's webview (WebView2 on
+Windows, WebKitGTK on Linux).
 There is no backend: the library, settings and tokens stay on the user's PC.
 
 ```
 ui/                     React interface, one folder per feature
   shared/api.ts         the only caller of Rust (Tauri invoke)
         │  IPC commands, events, `art` image scheme
-src-tauri/              thin shell: commands, keychain, WebView2 hook, media panel, tray, Discord
+src-tauri/              thin shell: commands, keychain, webview hooks, media panel, tray, Discord
   ├─ crates/core        library, matching, SQLite, sync, mixes, sharing
   ├─ crates/connectors  YouTube Music, Spotify, Apple catalog, Discord, nearby sharing, image cache
   ├─ crates/player      audio engine thread, gapless queue
@@ -24,7 +25,7 @@ src-tauri/              thin shell: commands, keychain, WebView2 hook, media pan
 | `music-connectors` | One module per service. Shared OAuth PKCE loopback (Spotify), Spotify's public embeds and the messages of Connect Spotify's and Connect Apple Music's pages, YouTube Music web session, normal YouTube search, iTunes catalog and Apple Music album / playlist links, Deezer playlist / album links (public API), LRCLIB lyrics (a server song's own come first, OpenSubsonic's or Jellyfin's; the source picker scores each found, `lyrics::score`, and keeps a pick per song, `lyrics::pick_key`), SponsorBlock segments (hash prefix, opt-in), AudD song recognition (user's token), Last.fm, ListenBrainz (user's token), personal music servers (`subsonic`: Navidrome, Airsonic, Gonic, Ampache, token auth; `jellyfin`: its access token; `plex`: PIN sign-in on plex.tv, then the server alone; one door for the three, `servers::Conn`), Discord IPC, nearby sharing and Sync Mode's network swap (mDNS + SPAKE2), listening rooms on the local network (`rooms`: SPAKE2 per listener, sealed frames; [rooms.md](rooms.md)), image cache. One HTTP client for all of them (`connectors::http()`: connections and TLS sessions reused; a client per call cost a new connection per request). Every client takes `Noted` as its resolver: each host it connects to is noted in `music_core::netlog`. Base URLs are injectable for tests. |
 | `music-player` | Native playback of local files, music server songs (`http.rs`: range requests into a bounded read-ahead buffer, retries; the engine sees `server:` paths, never URLs) and previews (rodio, symphonia) on its own thread, with a gapless queue, through the live processing chain. Live Editor export of local files (WAV). Music Detector clips from the microphone or what the PC plays (WASAPI loopback), memory only. |
 | `music-dsp` | Live audio processing, pure Rust: biquads, BS.1770 loudness meter, Adaptive Sound gain, limiter, the Live Editor's effects (EQ, compressor, width, echo, reverb, 3D) and speed / tempo / pitch (WSOLA), shared `Control`. |
-| `music-shield` | Ad and tracker blocking with Brave's adblock engine, plus the scripts for the app's web windows: YouTube's player (`live.js` and its neighbours), Spotify's page (`spotify.js`), Apple Music's (`apple.js`), Exportify's (`exportify.js`). |
+| `music-shield` | Ad and tracker blocking with Brave's adblock engine, plus the scripts for the app's web windows: YouTube's player (`live.js` and its neighbours), Spotify's page (`spotify.js`), Apple Music's (`apple.js`), Exportify's (`exportify.js`). For Linux, the same lists as a WebKit content blocker (`content_blocker.rs`). |
 | `music-plugins` | Third-party plugins: one QuickJS runtime per plugin (64 MB, 1 s per run, no DOM, network or files), manifest and permissions checked in Rust, HTTPS gateway to approved public hosts. Author guide: `docs/plugins.md`. |
 | `src-tauri` | IPC commands (`lib.rs`, and per feature: `detector.rs`, `editor.rs`, `themes.rs`, `syncmode.rs`, `plugins.rs`, `links.rs`, `spotify_web.rs`, `spotify_export.rs`, `apple_web.rs`), OS keychain, WebView2 request hook, Windows media panel, tray icon, window background, voice search through Windows' speech recognition (`speech.rs`). No business logic. |
 
@@ -55,7 +56,10 @@ src-tauri/              thin shell: commands, keychain, WebView2 hook, media pan
 - `crates/player`: rodio/symphonia, gapless queue, server streams, Music Detector clips.
 - `crates/dsp`: live processing, loudness, visualizer bands. `crates/shield`: ad blocker and page scripts.
 - Linux: `src-tauri/src/media/linux.rs` (MPRIS), `desktop.rs` (tray and keyring support), `desktop_file.rs`
-  (autostart entry); what the UI hides on Linux is `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`.
+  (autostart entry), `shield_linux.rs` (WebKitGTK asks no one before a request: the lists are compiled into its content
+  filter, once per version of them, and each request sent is noted; what is blocked is not reported by WebKit). What the
+  UI hides on Linux is `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`. Packages: AppImage (updates itself) and .deb
+  (only says a new version is out).
 - `crates/plugins`: one QuickJS runtime each.
 - `ui/`: React 19 + Zustand + Tailwind v4.
 - Android: `src-tauri/gen/android` (`MainActivity.kt`, `PlaybackService.kt`).

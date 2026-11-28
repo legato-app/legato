@@ -113,6 +113,7 @@ export const nl: Copy = {
     ],
     lite: 'Legato Lite downloaden',
     liteAbout: 'Voor kleine pc’s: het belangrijkste van Legato, zonder Live Editor, visualisatie, crossfade, nummerherkenning, plugins, luisterkamers, telefoonafstandsbediening, streamingoverlay, Discord, huiskamermodus, karaoke, blindtest, podcasts en luisterboeken. Wordt naast Legato geïnstalleerd, met een eigen bibliotheek.',
+    linuxAbout: 'Linux, nieuw en weinig getest: een AppImage werkt zichzelf bij, een .deb zegt wanneer je de volgende kunt downloaden.',
   },
   next: {
     title: 'Wat er nog komt',
@@ -135,7 +136,7 @@ export const nl: Copy = {
       { q: 'Heb ik een account nodig?', a: 'Niet bij ons. Je logt in bij de diensten die je al gebruikt, op hun eigen pagina’s.' },
       { q: 'Downloadt het muziek?', a: 'Nee. Muziek speelt in de eigen speler van elke dienst of uit je bestanden. Geen audio van een platform wordt gedownload, opgenomen of eruit gehaald; alleen Muziekherkenning luistert, als je erom vraagt.' },
       { q: 'Heb ik Spotify Premium nodig?', a: 'Niet om te luisteren: Legato leest alleen je Spotify-afspeellijsten, en de nummers spelen via YouTube als de app ze daar vindt. Ze lezen met je eigen app-sleutel vraagt een gratis sleutel uit Spotifys ontwikkelaarsdashboard, waarvan de eigenaar Premium nodig heeft zolang de app in ontwikkelmodus is. Zonder sleutel plak je de link van een openbare afspeellijst, of gebruik je Spotify verbinden bij Muziek toevoegen voor je privélijsten en Gelikete nummers (lees eerst wat er staat: de regels van Spotify verbieden het).' },
-      { q: 'Mac of Linux?', a: 'Voorlopig alleen Windows 10 en 11.' },
+      { q: 'Mac of Linux?', a: 'Windows 10 en 11. Een Linux-versie (x86_64 en ARM64) is nieuw en weinig getest: de bestanden verschijnen onder de Windows-knop zodra de nieuwste Stable-release ze bevat. Mac: nog niet.' },
       { q: 'Is er een Android-versie?', a: 'Een bèta, ja: een APK via de downloadlink onder de Windows-knop (Android 8 of nieuwer, 64-bit). Open het bestand op je telefoon en sta installaties vanuit je browser toe als Android erom vraagt; hij staat in geen enkele winkel: de app biedt elke nieuwe versie zelf aan (tik op Bijwerken en bevestig in het installatieprogramma van Android; de eerste keer vraagt Android je Legato toe te staan apps te installeren). Hij praat met dezelfde plekken als de Windows-app, houdt zijn gegevens op de telefoon en synchroniseert via wifi met je pc’s vanuit Instellingen › Synchronisatie. iPhone: nog niet.' },
       { q: 'Hoe verhuis ik naar een nieuwe pc?', a: 'Synchronisatie houdt meerdere pc’s gelijk. Voor een eenmalige verhuizing: Instellingen › Algemeen › Maak een back-up van je bibliotheek, dan Back-up terugzetten op de nieuwe pc, en log opnieuw in bij je accounts.' },
       { q: 'Hoe werken updates?', a: 'De app kijkt bij het starten op GitHub en installeert een nieuwe versie tussen twee nummers, of als er niets speelt. Je krijgt de versies die eerst getest zijn (Stabiel); Instellingen › Algemeen heeft een bètakanaal dat elke wijziging als eerste brengt, en kan haperen. Op Android volgt de app Beta en downloadt hij een nieuwe versie alleen als je op Bijwerken tikt.' },

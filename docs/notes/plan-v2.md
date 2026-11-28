@@ -714,8 +714,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
           `linux-attach`, `scripts/linux-feed.mjs`, the .deb that only says a new version is out. Left: a `.lmix`
           double-click on Linux (a MIME type of ours, full app only). To see at the first run: the arm runner’s build time,
           the files’ names, the packages installed.
-        6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs
-          (architecture, development: apt dependencies, CONTRIBUTING › Releasing).
+        6 `S` [x] Built 2026-11-28, the site not seen with Linux files (none released yet): downloads per edition and
+          processor once the latest Stable release lists them, privacy rows, architecture, development, CONTRIBUTING.
         7 `S` Measure the Lite on a small aarch64 machine (RAM, CPU while playing) against the Windows target.
       - To decide alone (2026-11-27, Opus): AppImage + .deb only; no plain text without a keyring; no global shortcuts under
         Wayland; aarch64 from the first release.

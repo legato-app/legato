@@ -113,6 +113,7 @@ export const id: Copy = {
     ],
     lite: 'Unduh Legato Lite',
     liteAbout: 'Untuk PC kecil: inti Legato, tanpa Live Editor, visualisasi, crossfade, pengenalan lagu, plugin, ruang dengar, remote ponsel, overlay streaming, Discord, mode ruang tamu, karaoke, tes buta, podcast, dan buku audio. Terpasang di samping Legato, dengan pustakanya sendiri.',
+    linuxAbout: 'Linux, baru dan belum banyak dicoba: AppImage memperbarui dirinya sendiri, .deb memberi tahu saat versi berikutnya bisa diunduh.',
   },
   next: {
     title: 'Yang akan datang',
@@ -135,7 +136,7 @@ export const id: Copy = {
       { q: 'Perlu akun?', a: 'Tidak di kami. Kamu masuk ke layanan yang sudah kamu pakai, di halaman mereka sendiri.' },
       { q: 'Apakah mengunduh musik?', a: 'Tidak. Musik diputar di pemutar setiap layanan sendiri atau dari file-mu. Tidak ada audio platform yang diunduh, direkam, atau diekstrak; hanya Detektor Musik yang mendengarkan, saat kamu minta.' },
       { q: 'Apakah perlu Spotify Premium?', a: 'Untuk memutar, tidak: Legato hanya membaca playlist Spotify-mu, dan lagunya diputar dari YouTube kalau aplikasi menemukannya di sana. Membacanya dengan kunci aplikasimu sendiri butuh kunci gratis dari dasbor pengembang Spotify, yang pemiliknya perlu Premium selama aplikasi masih dalam mode pengembangan. Tanpa itu, tempel tautan playlist publik, atau pakai Hubungkan Spotify di Tambah musik untuk daftar pribadimu dan Lagu yang Disukai (baca dulu keterangannya: aturan Spotify melarangnya).' },
-      { q: 'Mac atau Linux?', a: 'Untuk sekarang hanya Windows 10 dan 11.' },
+      { q: 'Mac atau Linux?', a: 'Windows 10 dan 11. Versi Linux (x86_64 dan ARM64) masih baru dan belum banyak dicoba: file-nya muncul di bawah tombol Windows setelah rilis Stable terbaru memuatnya. Mac: belum.' },
       { q: 'Ada versi Android?', a: 'Beta, ya: APK di tautan unduhan di bawah tombol Windows (Android 8 atau lebih baru, 64-bit). Buka file di ponselmu dan izinkan pemasangan dari peramban saat Android bertanya; tidak ada di toko aplikasi: aplikasinya sendiri menawarkan setiap versi baru (ketuk Perbarui, lalu konfirmasi di penginstal Android; pertama kali, Android memintamu mengizinkan Legato memasang aplikasi). Ia terhubung ke tempat yang sama dengan aplikasi Windows, menyimpan datanya di ponsel, dan sinkron dengan PC-mu lewat Wi-Fi dari Pengaturan › Mode Sinkron. iPhone: belum.' },
       { q: 'Bagaimana pindah ke PC baru?', a: 'Mode Sinkron menjaga beberapa PC tetap sama. Untuk pindah sekali saja: Pengaturan › Umum › Cadangkan koleksimu, lalu Pulihkan cadangan di PC baru, dan masuk lagi ke akun-akunmu.' },
       { q: 'Bagaimana pembaruan bekerja?', a: 'Aplikasi memeriksa GitHub saat dibuka dan memasang versi baru di antara dua lagu, atau saat tidak ada yang diputar. Kamu mendapat versi yang sudah dicoba lebih dulu (Stabil); Pengaturan › Umum punya kanal Beta yang membawa setiap perubahan lebih dulu, dan bisa rusak. Di Android, aplikasi mengikuti Beta dan hanya mengunduh versi baru saat kamu mengetuk Perbarui.' },

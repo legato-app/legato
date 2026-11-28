@@ -113,6 +113,7 @@ export const it: Copy = {
     ],
     lite: 'Scarica Legato Lite',
     liteAbout: 'Per PC poco potenti: l’essenziale di Legato, senza Live Editor, visualizzatore, dissolvenza incrociata, riconoscimento dei brani, plugin, stanze d’ascolto, telecomando dal telefono, overlay per lo streaming, Discord, modalità salotto, karaoke, blind test, podcast e audiolibri. Si installa accanto a Legato, con la sua libreria.',
+    linuxAbout: 'Linux, nuovo e poco provato: un’AppImage si aggiorna da sola, un .deb ti dice quando scaricare la successiva.',
   },
   next: {
     title: 'In arrivo',
@@ -135,7 +136,7 @@ export const it: Copy = {
       { q: 'Mi serve un account?', a: 'Non uno nostro. Accedi ai servizi che già usi, sulle loro pagine.' },
       { q: 'Scarica musica?', a: 'No. La musica suona nel lettore di ogni servizio o dai tuoi file. Nessun audio di una piattaforma viene scaricato, registrato o estratto; solo il Rilevatore musicale ascolta, quando glielo chiedi.' },
       { q: 'Serve Spotify Premium?', a: 'Per ascoltare no: Legato legge soltanto le tue playlist di Spotify, e i loro brani suonano da YouTube quando l’app li trova lì. Leggerle con la tua chiave app richiede una chiave gratuita dalla dashboard sviluppatori di Spotify, il cui proprietario deve avere Premium finché l’app è in modalità sviluppo. Senza, incolla il link di una playlist pubblica, oppure usa Collega Spotify in Aggiungi musica per le tue liste private e i Brani che ti piacciono (leggi prima cosa dice: le regole di Spotify lo vietano).' },
-      { q: 'Mac o Linux?', a: 'Solo Windows 10 e 11, per ora.' },
+      { q: 'Mac o Linux?', a: 'Windows 10 e 11. Una versione Linux (x86_64 e ARM64) è nuova e poco provata: i suoi file compaiono sotto il pulsante Windows quando l’ultima versione Stable li contiene. Mac: non ancora.' },
       { q: 'C’è una versione per Android?', a: 'Una beta, sì: un APK al link di download sotto il pulsante di Windows (Android 8 o successivo, 64 bit). Apri il file sul telefono e consenti le installazioni dal browser quando Android lo chiede; non è in nessuno store: l’app ti propone da sola ogni nuova versione (tocca Aggiorna, poi conferma nel programma di installazione di Android; la prima volta Android ti chiede di consentire a Legato di installare app). Parla con gli stessi posti dell’app per Windows, tiene i suoi dati sul telefono e si sincronizza con i tuoi PC via Wi-Fi da Impostazioni › Sincronizzazione. iPhone: non ancora.' },
       { q: 'Come passo a un nuovo PC?', a: 'La Sincronizzazione tiene uguali più PC. Per un trasloco una tantum: Impostazioni › Generali › Fai un backup della libreria, poi Ripristina un backup sul nuovo PC, e accedi di nuovo ai tuoi account.' },
       { q: 'Come funzionano gli aggiornamenti?', a: 'L’app controlla GitHub all’avvio e installa una nuova versione tra due brani, o mentre non suona niente. Ricevi le versioni provate prima (Stabile); Impostazioni › Generali ha un canale Beta che porta ogni modifica per primo, e può rompersi. Su Android, l’app segue Beta e scarica una nuova versione solo quando tocchi Aggiorna.' },

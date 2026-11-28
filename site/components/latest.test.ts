@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
-import { androidDownload, BETA_APK, installers } from './latest'
+import { androidDownload, BETA_APK, installers, linuxDownloads } from './latest'
 
 const asset = (name: string) => ({ name, browser_download_url: `https://example.test/${name}` })
 
@@ -33,4 +33,15 @@ it('falls back on `beta`’s copy when no listed release has an APK', () => {
 it('is the file the release workflow uploads to `beta`', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/release.yml', import.meta.url), 'utf8')
   expect(workflow).toContain(`gh release upload beta fixed/${BETA_APK.split('/').pop()} --clobber`)
+})
+
+it('lists each edition’s Linux files that are there, in a fixed order, never a signature', () => {
+  const files = ['Legato_1.2.5_arm64.deb', 'Legato_1.2.5_amd64.AppImage.sig', 'Legato_1.2.5_amd64.AppImage', 'Legato_1.2.5_aarch64.AppImage', 'Legato.Lite_1.2.5_amd64.deb', 'Legato_1.2.5_x64-setup.exe'].map(asset)
+  expect(linuxDownloads(files, 'Legato')).toEqual([
+    { name: 'AppImage x86_64', href: 'https://example.test/Legato_1.2.5_amd64.AppImage' },
+    { name: 'AppImage ARM64', href: 'https://example.test/Legato_1.2.5_aarch64.AppImage' },
+    { name: '.deb ARM64', href: 'https://example.test/Legato_1.2.5_arm64.deb' },
+  ])
+  expect(linuxDownloads(files, 'Legato.Lite')).toEqual([{ name: '.deb x86_64', href: 'https://example.test/Legato.Lite_1.2.5_amd64.deb' }])
+  expect(linuxDownloads([asset('Legato_1.2.5_x64-setup.exe')], 'Legato')).toEqual([])
 })

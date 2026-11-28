@@ -113,6 +113,7 @@ export const tr: Copy = {
     ],
     lite: 'Legato Lite’ı indir',
     liteAbout: 'Mütevazı bilgisayarlar için: Legato’nun temel özellikleri; Live Editor, görselleştirici, geçişli çalma, şarkı tanıma, eklentiler, dinleme odaları, telefondan kumanda, yayın katmanı, Discord, oturma odası modu, karaoke, kör test, podcast’ler ve sesli kitaplar olmadan. Legato’nun yanına, kendi kitaplığıyla kurulur.',
+    linuxAbout: 'Linux, yeni ve az denenmiş: AppImage kendini günceller, .deb ise sıradakini ne zaman indireceğinizi söyler.',
   },
   next: {
     title: 'Sırada ne var',
@@ -135,7 +136,7 @@ export const tr: Copy = {
       { q: 'Hesap gerekiyor mu?', a: 'Bizde değil. Zaten kullandığın servislere kendi sayfalarında giriş yaparsın.' },
       { q: 'Müzik indiriyor mu?', a: 'Hayır. Müzik her servisin kendi oynatıcısında ya da dosyalarından çalar. Hiçbir platformun sesi indirilmez, kaydedilmez ya da çıkarılmaz; yalnızca Müzik Dedektörü, sen istediğinde dinler.' },
       { q: 'Spotify Premium gerekiyor mu?', a: 'Dinlemek için hayır: Legato yalnızca Spotify çalma listelerini okur; şarkılar, uygulama onları YouTube’da bulursa oradan çalar. Kendi anahtarınla okumak için Spotify’ın geliştirici panelinden ücretsiz bir anahtar gerekir; uygulama geliştirme modundayken anahtar sahibinin Premium’u olmalıdır. Anahtar yoksa herkese açık bir liste bağlantısı yapıştır ya da özel listelerin ve Beğenilen Şarkılar için Müzik ekle’deki Spotify’ı bağla’yı kullan (önce ne dediğini oku: Spotify’ın kuralları bunu yasaklar).' },
-      { q: 'Mac ya da Linux?', a: 'Şimdilik yalnızca Windows 10 ve 11.' },
+      { q: 'Mac ya da Linux?', a: 'Windows 10 ve 11. Linux sürümü (x86_64 ve ARM64) yeni ve az denenmiş: en son Stable sürümde bulunduğunda dosyaları Windows düğmesinin altında görünür. Mac: henüz yok.' },
       { q: 'Android sürümü var mı?', a: 'Bir beta, evet: Windows düğmesinin altındaki indirme bağlantısında bir APK (Android 8 ya da üstü, 64 bit). Dosyayı telefonunda aç ve Android sorduğunda tarayıcından kuruluma izin ver; mağaza kaydı yok: uygulama her yeni sürümü kendisi önerir (Güncelle’ye dokun, sonra Android’in yükleyicisinde onayla; ilk seferde Android, Legato’nun uygulama yüklemesine izin vermeni ister). Windows uygulamasıyla aynı yerlerle konuşur, verilerini telefonda tutar ve Ayarlar › Eşitleme Modu’ndan Wi-Fi üzerinden bilgisayarlarınla eşitlenir. iPhone: henüz değil.' },
       { q: 'Yeni bir bilgisayara nasıl geçerim?', a: 'Eşitleme Modu birkaç bilgisayarı aynı tutar. Tek seferlik bir taşıma için: Ayarlar › Genel › Kitaplığını yedekle, sonra yeni bilgisayarda Yedeği geri yükle ve hesaplarına yeniden giriş yap.' },
       { q: 'Güncellemeler nasıl çalışır?', a: 'Uygulama açılışta GitHub’ı denetler ve yeni sürümü iki şarkı arasında ya da hiçbir şey çalmazken kurar. Önce denenmiş sürümleri alırsın (Kararlı); Ayarlar › Genel’de her değişikliği ilk getiren ve bozulabilen bir Beta kanalı var. Android’de uygulama Beta’yı izler ve yeni sürümü yalnızca Güncelle’ye dokunduğunda indirir.' },

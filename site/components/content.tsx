@@ -38,7 +38,7 @@ export type Copy = {
   /** english: said under the intro when PRIVACY isn't in the page's language. */
   privacy: { title: string; intro: string; head: Row; english: string; services: string; rows: Row[] }
   /** lite, liteAbout: the second download's link and what it leaves out. */
-  start: { title: string; intro: string; steps: Row[]; lite: string; liteAbout: string }
+  start: { title: string; intro: string; steps: Row[]; lite: string; liteAbout: string; linuxAbout: string }
   next: { title: string; intro: string; head: Row; rows: Row[] }
   /** href: where an answer's `[label]` leads. */
   faq: { title: string; intro: string; items: { q: string; a: string; href?: string }[] }
@@ -99,7 +99,7 @@ export function linked(text: string, href: string, className = 'text-ink underli
 
 export const PRIVACY: [string, string][] = [
   ['Library and settings', 'Stay on this PC, in a local database. A backup you make in Settings › General is one file, saved where you choose; sign-ins stay out of it.'],
-  ['Sign-ins and keys', 'Stay in the Windows Credential Manager.'],
+  ['Sign-ins and keys', 'Stay in the Windows Credential Manager, or on Linux in your keyring (without one, they are kept only until you close the app).'],
   ['Requests', "Go out through the app's core only: the interface never calls the network by itself. Settings › Privacy lists every host the app and its windows talked to today, and why."],
   ['Search', "What you search for goes to YouTube, YouTube Music and Apple Music, signed in or not, and to YouTube's suggestions as you type (Settings › General turns them off). Recent searches stay on this PC."],
   ['Connect Spotify', "Only when you use it. Exportify, a free open-source tool that isn't ours, opens at exportify.app: in an app window on a PC, in your browser on a phone. You sign in and accept on Spotify's own page, and it reads your lists through Spotify's official access and makes a file. On a PC the app takes that file in and deletes it, and Exportify keeps its Spotify access in that window's storage, on this PC. On a phone the file you save stays where you put it, the app reads the one you pick, and Exportify keeps its access in your browser. You can end that access at spotify.com/account/apps. Only titles, artists and lengths are kept (never Spotify's covers), then each song is searched on YouTube. Your Liked Songs join Liked Music: signed in to YouTube Music, those not liked there yet are liked on that account at the next sync, unless it's set not to take changes in Settings › Accounts. Spotify's own direction there, Import only or Off, decides whether Connect Spotify brings anything in, and nothing is ever sent back to Spotify."],
@@ -129,7 +129,7 @@ export const PRIVACY: [string, string][] = [
   ['Phone remote', "Off until you turn it on in Settings › Playback. Then this PC answers, on its own network only, the phones that have its link (a secret in its QR code): what plays, its cover and what's next go to them, and their taps come back. Nothing goes through the internet, and a new link ends the old one."],
   ['Streaming overlay', "Off until you turn it on in Settings › Playback. Then a page for OBS on this PC shows what plays and its cover, and the visualizer's bars if you turn them on (measured only while the page is shown); only this PC is answered."],
   ['YouTube embedding check', "When a YouTube song starts, its video id (and the next two) goes to YouTube's oEmbed, to learn whether its owner allows embedding. The answer is kept a day."],
-  ['Updates', "At launch and every 6 hours, the app asks GitHub whether a newer version exists. On Windows it installs it between two songs; on Android it downloads the new APK from GitHub only when you tap Update, and Android's installer asks you first."],
+  ['Updates', "At launch and every 6 hours, the app asks GitHub whether a newer version exists. On Windows and from a Linux AppImage it installs it between two songs (a Linux .deb only tells you, and opens the release page in your browser when you ask); on Android it downloads the new APK from GitHub only when you tap Update, and Android's installer asks you first."],
   ['Error log', 'Errors and playback switches are noted in a small log on this PC (5 MB at most). Nothing sends it: Settings › About › Copy diagnostics puts a summary in your clipboard for a bug report, without song titles or account names unless you ask.'],
 ]
 
@@ -236,6 +236,7 @@ export const en: Copy = {
     ],
     lite: 'Download Legato Lite',
     liteAbout: 'For small PCs: Legato’s essentials, without the Live Editor, the visualizer, crossfade, song recognition, plugins, listening rooms, the phone remote, the streaming overlay, Discord, living-room mode, karaoke, the blind test, podcasts and audiobooks. It installs beside Legato, with its own library.',
+    linuxAbout: 'Linux, new and little tried: an AppImage updates itself, a .deb tells you when to download the next one.',
   },
   // Unlike every other list here, what isn't out yet: docs/notes/plan-v2.md › Roadmap, in its order, minus what shipped.
   next: {
@@ -259,7 +260,7 @@ export const en: Copy = {
       { q: 'Do I need an account?', a: 'Not one of ours. You sign in to the services you already use, on their own pages.' },
       { q: 'Does it download music?', a: "No. Music plays in each service's own player or from your files. No platform's audio is downloaded, recorded or extracted; only the Music Detector listens, when you ask it to." },
       { q: 'Do I need Spotify Premium?', a: 'Not to play: Legato only reads your Spotify playlists, and their songs play from YouTube when the app finds them there. Reading them with your own app key needs a free key from Spotify’s developer dashboard, whose owner needs Premium while the app is in development mode. Without one, paste a public playlist link, or use Connect Spotify in Add music for your private lists and Liked Songs (read what it says first: the rules of Spotify forbid it).' },
-      { q: 'Mac or Linux?', a: 'Windows 10 and 11 only, for now.' },
+      { q: 'Mac or Linux?', a: 'Windows 10 and 11. A Linux version (x86_64 and ARM64) is new and little tried: its files show under the Windows button once the latest Stable release has them. Mac: not yet.' },
       { q: 'Is there an Android version?', a: "A beta, yes: an APK on the download link under the Windows button (Android 8 or later, 64-bit). Open the file on your phone and allow installs from your browser when Android asks; there is no store listing: the app offers each new version itself (tap Update, then confirm in Android's installer; the first time, Android asks you to allow Legato to install apps). It talks to the same places as the Windows app, keeps its data on the phone, and syncs with your PCs over Wi-Fi from Settings › Sync Mode. iPhone: not yet." },
       { q: 'How do I move to a new PC?', a: 'Sync Mode keeps several PCs alike. For a one-time move: Settings › General › Back up your library, then Restore a backup on the new PC, and sign in to your accounts again.' },
       { q: 'How do updates work?', a: 'The app checks GitHub at launch and installs a new version between two songs, or while nothing plays. You get the versions that were tried first (Stable); Settings › General has a Beta channel that brings every change first, and may break. On Android, the app follows Beta and downloads a new version only when you tap Update.' },
