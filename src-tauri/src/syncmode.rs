@@ -41,6 +41,9 @@ pub(crate) struct Config {
     /// Folder holding `Legato Sync`. None = off.
     #[serde(default)]
     pub(crate) folder: Option<String>,
+    /// Was in a sync before (a folder stopped, a device forgotten): pairing again keeps this PC's settings.
+    #[serde(default)]
+    pub(crate) left_a_sync: bool,
     /// The OneDrive question was answered (set up, or not now).
     #[serde(default)]
     pub(crate) asked: bool,
@@ -394,12 +397,13 @@ pub async fn sync_setup(app: AppHandle, state: State<'_, AppState>, folder: Stri
         None => state.store.set(KEY, None).map_err(err)?,
     }
     let mut c = config(&state);
-    // First PC: its settings are the reference. A PC joining others' sync takes theirs; one already syncing with them
-    // (this folder again, or paired devices) keeps its changes and their times.
-    if first {
-        state.lib().stamp_all_settings(now_ms()).map_err(err)?;
-    } else if c.folder.as_deref() != Some(folder.as_str()) && c.peers.is_empty() {
-        state.lib().take_others_settings().map_err(err)?;
+    // The reference, joining others, or resuming this PC's own sync (`sm::settings_through_folder`).
+    let configured = c.folder.as_deref() == Some(folder.as_str());
+    let wrote_here = sm::device_file(&c.device).is_some_and(|name| dir.join(name).is_file());
+    match sm::settings_through_folder(first, configured, wrote_here, !c.peers.is_empty()) {
+        sm::OwnSettings::Reference => state.lib().stamp_all_settings(now_ms()).map_err(err)?,
+        sm::OwnSettings::TakeOthers => state.lib().take_others_settings().map_err(err)?,
+        sm::OwnSettings::Keep => {}
     }
     c.folder = Some(folder);
     c.asked = true;
@@ -418,6 +422,7 @@ pub async fn sync_setup(app: AppHandle, state: State<'_, AppState>, folder: Stri
 pub async fn sync_stop(state: State<'_, AppState>, sync: State<'_, SyncMode>) -> CmdResult<()> {
     let mut c = config(&state);
     c.folder = None;
+    c.left_a_sync = true;
     save_config(&state, &c)?;
     state.store.set(KEY, None).map_err(err)?;
     let mut inner = sync.inner.lock().unwrap();

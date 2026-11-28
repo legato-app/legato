@@ -299,6 +299,35 @@ fn swap_playlist_keys(value: &Value, map: &HashMap<String, String>) -> Value {
 }
 const PLAYLIST_KEYED: [&str; 2] = ["hiddenPlaylists", "playlistCovers"];
 
+/// What a PC's settings become as it starts syncing.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OwnSettings {
+    /// Nobody else yet: they are the reference (`stamp_all_settings`).
+    Reference,
+    /// Joining others: theirs win (`take_others_settings`).
+    TakeOthers,
+    /// Resuming this PC's own sync: left as they are, with their times.
+    Keep,
+}
+
+/// Through a folder. `first`: no other PC's file in it. `configured`: it already syncs through this folder. `wrote_here`:
+/// its own file is in it (a sync stopped, then started again). `paired`: it syncs with devices.
+pub fn settings_through_folder(first: bool, configured: bool, wrote_here: bool, paired: bool) -> OwnSettings {
+    if first {
+        OwnSettings::Reference
+    } else if configured || wrote_here || paired {
+        OwnSettings::Keep
+    } else {
+        OwnSettings::TakeOthers
+    }
+}
+
+/// By a code (this PC joins the device showing it). `folder`: it syncs through one. `paired`: with devices. `left`: it
+/// was in a sync before (a folder stopped, a device forgotten).
+pub fn settings_by_code(folder: bool, paired: bool, left: bool) -> OwnSettings {
+    if folder || paired || left { OwnSettings::Keep } else { OwnSettings::TakeOthers }
+}
+
 impl Library {
     fn times(&self) -> Result<Map<String, Value>> {
         Ok(self.setting(TIMES)?.and_then(|v| v.as_object().cloned()).unwrap_or_default())
@@ -1623,6 +1652,23 @@ mod tests {
         // The song itself still arrives.
         assert!(library.tracks()?.iter().any(|row| row.track.title == "Both"));
         Ok(())
+    }
+
+    #[test]
+    fn a_pc_joins_others_or_resumes_its_own_sync() {
+        use OwnSettings::{Keep, Reference, TakeOthers};
+        // A new, empty folder: the reference. A folder with other PCs, never seen: joined.
+        assert_eq!(settings_through_folder(true, false, false, false), Reference);
+        assert_eq!(settings_through_folder(false, false, false, false), TakeOthers);
+        // Resumed: the same folder, or stopped then started again (its file still there). Paired devices: already syncing.
+        assert_eq!(settings_through_folder(false, true, false, false), Keep);
+        assert_eq!(settings_through_folder(false, false, true, false), Keep);
+        assert_eq!(settings_through_folder(false, false, false, true), Keep);
+        // By a code: a new PC joins; one syncing, or one that forgot a device and pairs again, keeps its own.
+        assert_eq!(settings_by_code(false, false, false), TakeOthers);
+        assert_eq!(settings_by_code(true, false, false), Keep);
+        assert_eq!(settings_by_code(false, true, false), Keep);
+        assert_eq!(settings_by_code(false, false, true), Keep);
     }
 
     #[test]

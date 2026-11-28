@@ -674,10 +674,10 @@ async fn pair(app: AppHandle, state: &AppState, code: String, link: Option<Strin
             (code, addrs)
         }
     };
-    // This device joins the one showing the code: that one's settings win, unless this one already syncs. Before any
-    // snapshot leaves (an older Legato's swap included).
+    // This device joins the one showing the code: that one's settings win, unless this one syncs or did
+    // (`settings_by_code`). Before any snapshot leaves (an older Legato's swap included).
     let config = syncmode::config(state);
-    if config.folder.is_none() && config.peers.is_empty() {
+    if music_core::syncmode::settings_by_code(config.folder.is_some(), !config.peers.is_empty(), config.left_a_sync) == music_core::syncmode::OwnSettings::TakeOthers {
         state.lib().take_others_settings().map_err(err)?;
     }
     if addrs.is_empty() {
@@ -710,6 +710,7 @@ pub async fn devices_wake(app: AppHandle) -> CmdResult<()> {
 pub async fn device_forget(app: AppHandle, state: State<'_, AppState>, id: String) -> CmdResult<()> {
     let mut c = syncmode::config(&state);
     c.peers.retain(|p| p.card.id != id);
+    c.left_a_sync = true;
     syncmode::save_config(&state, &c)?;
     state.store.set(&format!("{KEY}{id}"), None).map_err(err)?;
     emit(&app);

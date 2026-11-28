@@ -133,7 +133,8 @@ the songs until it updates.
 
 First sync: the PC set up first (or the one showing the code) is the reference for settings never changed since. A PC
 that joins, by the folder or with a code, takes the others' settings: its own lose their times (`take_others_settings`),
-unless it already syncs (the same folder again, or paired devices). After that, any change on any PC wins by its time; a
+unless it already syncs or resumes its own (the same folder, even stopped meanwhile: its file is there; paired devices;
+a code after it forgot one). Changing to a folder that holds other PCs is joining them. After that, any change on any PC wins by its time; a
 setting a PC saves for the first time (an update's new one) carries none.
 
 Playlists made in the app got random ids at schema v10 (were `custom-<row id>`, which two PCs could both make).
