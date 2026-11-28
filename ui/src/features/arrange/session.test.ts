@@ -5,7 +5,7 @@ import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { surfaceName, whereIs } from './names'
-import { arrange, beginArranging, discardArrangement, finishArranging, hideSurface, nudgeSurface, placeSurface, undoMove, useArrange } from './session'
+import { arrange, beginArranging, discardArrangement, finishArranging, hideSurface, nudgeSurface, placeSurface, redoMove, undoMove, useArrange } from './session'
 
 const notify = vi.fn()
 const settings = vi.hoisted(() => ({ now: {} as Settings, listeners: new Set<(state: { settings: Settings }) => void>() }))
@@ -72,7 +72,33 @@ it('says where a moved surface went, or that it can’t, each move undoable', ()
   hideSurface('sidebar', name)
   expect(said()).toBe('Sidebar on the left')
   undoMove()
-  expect([draft()?.hidden, said()]).toEqual([['sidebar'], ''])
+  expect([draft()?.hidden, said()]).toEqual([['sidebar'], 'Sidebar hidden'])
+  undoMove()
+  expect(said()).toBe('Sidebar on the left')
+  redoMove()
+  expect(said()).toBe('Sidebar hidden')
+})
+
+it('says a refusal each time, and nothing for a drop where the surface already is', () => {
+  beginArranging()
+  const name = surfaceName('sidebar', [])
+  const heard = () => [useArrange.getState().said, useArrange.getState().saidCount] as const
+  nudgeSurface('sidebar', name, 'left')
+  const [words, count] = heard()
+  nudgeSurface('sidebar', name, 'left')
+  expect(heard()).toEqual([words, count + 1])
+  placeSurface('sidebar', name, 'left', 0)
+  expect(heard()).toEqual([words, count + 1])
+  expect(useArrange.getState().history.past).toEqual([])
+})
+
+it('names Undo and Redo themselves for a move about no single surface', () => {
+  beginArranging()
+  arrange(right)
+  undoMove()
+  expect(useArrange.getState().said).toBe('Undo')
+  redoMove()
+  expect(useArrange.getState().said).toBe('Redo')
 })
 
 it('moves and says sides as seen, right to left', () => {

@@ -1328,6 +1328,7 @@ const pl: Record<string, string> = {
   'Drag a part to move it': 'Przeciągnij część, aby ją przenieść',
   'Move {part}': 'Przenieś: {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Przeciągnij albo użyj Alt i strzałek; Delete ukrywa',
+  'Drag it, or use Alt and the arrows': 'Przeciągnij albo użyj Alt i strzałek',
   'Move left': 'Przesuń w lewo',
   'Move right': 'Przesuń w prawo',
   'Show {part}': 'Pokaż: {part}',

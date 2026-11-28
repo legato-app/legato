@@ -1328,6 +1328,7 @@ const ja: Record<string, string> = {
   'Drag a part to move it': 'パーツをドラッグして移動します',
   'Move {part}': '{part}を移動',
   'Drag it, or use Alt and the arrows; Delete hides it': 'ドラッグするか、Alt と矢印キー。Delete で非表示',
+  'Drag it, or use Alt and the arrows': 'ドラッグするか、Alt と矢印キー',
   'Move left': '左へ移動',
   'Move right': '右へ移動',
   'Show {part}': '{part}を表示',

@@ -1328,6 +1328,7 @@ const it: Record<string, string> = {
   'Drag a part to move it': 'Trascina una parte per spostarla',
   'Move {part}': 'Sposta {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Trascinala, o usa Alt e le frecce; Canc la nasconde',
+  'Drag it, or use Alt and the arrows': 'Trascinala, o usa Alt e le frecce',
   'Move left': 'Sposta a sinistra',
   'Move right': 'Sposta a destra',
   'Show {part}': 'Mostra {part}',

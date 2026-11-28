@@ -1328,6 +1328,7 @@ const pt: Record<string, string> = {
   'Drag a part to move it': 'Arraste uma parte para movê-la',
   'Move {part}': 'Mover {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Arraste, ou use Alt e as setas; Delete oculta',
+  'Drag it, or use Alt and the arrows': 'Arraste, ou use Alt e as setas',
   'Move left': 'Mover para a esquerda',
   'Move right': 'Mover para a direita',
   'Show {part}': 'Mostrar {part}',

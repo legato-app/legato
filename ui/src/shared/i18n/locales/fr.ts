@@ -1337,6 +1337,7 @@ const fr: Record<string, string> = {
   'Drag a part to move it': 'Faites glisser une partie pour la déplacer',
   'Move {part}': 'Déplacer {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Faites-la glisser, ou Alt et les flèches ; Suppr la masque',
+  'Drag it, or use Alt and the arrows': 'Faites-la glisser, ou Alt et les flèches',
   'Move left': 'Déplacer à gauche',
   'Move right': 'Déplacer à droite',
   'Show {part}': 'Afficher : {part}',

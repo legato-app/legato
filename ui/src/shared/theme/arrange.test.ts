@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { layoutFromPlacement, moveInGroup, moveSurface, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
+import { canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
 import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
 
 const start = DEFAULT_LAYOUT
@@ -93,6 +93,11 @@ describe('toggleHidden', () => {
 
   it.each<HideTarget>([{ surface: 'brand' }, { surface: plugin }, { surface: 'playerBar', part: 'song' }, { surface: 'topbar', part: 'search' }, { page: 'album', part: 'tracks' }, { page: 'songs', part: 'list' }, { page: 'album', part: 'nothing' }])('never hides %o', (target) => {
     expect(toggleHidden(start, target)).toBe(start)
+  })
+
+  it('tells a surface that never hides from one that can’t just now', () => {
+    expect((['brand', plugin, 'sidebar', 'playerBar'] as Surface[]).map(neverHides)).toEqual([true, true, false, false])
+    expect([canHideSurface([], 'sidebar'), canHideSurface(['topbar'], 'sidebar'), canHideSurface([], 'brand')]).toEqual([true, false, false])
   })
 
   it('never hides both the sidebar and the top bar', () => {

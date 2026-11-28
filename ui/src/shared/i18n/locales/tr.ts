@@ -1328,6 +1328,7 @@ const tr: Record<string, string> = {
   'Drag a part to move it': 'Taşımak için bir bölümü sürükleyin',
   'Move {part}': '{part} öğesini taşı',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Sürükleyin ya da Alt ile ok tuşlarını kullanın; Delete gizler',
+  'Drag it, or use Alt and the arrows': 'Sürükleyin ya da Alt ile ok tuşlarını kullanın',
   'Move left': 'Sola taşı',
   'Move right': 'Sağa taşı',
   'Show {part}': '{part} öğesini göster',

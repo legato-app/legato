@@ -15,8 +15,16 @@ import { PRESETS, type Theme } from '../../shared/theme/theme'
 import { historyFrom, moved, redone, undone, type History } from './history'
 import { whereIs } from './names'
 
-/** `said`: the last move in words, for screen readers (the bar's live region). */
-export const useArrange = create<{ history: History; said: string }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '' }))
+/**
+ * `said`: the last move in words, for screen readers (the bar's live region). `saidCount` grows each time, so the same
+ * words twice in a row are said twice.
+ */
+export const useArrange = create<{ history: History; said: string; saidCount: number }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '', saidCount: 0 }))
+
+/** The surface whose move made a placement: Undo and Redo say where it is then. */
+const movedSurfaces = new WeakMap<Placement, { surface: Surface; name: string }>()
+
+const announce = (said: string) => useArrange.setState(({ saidCount }) => ({ said, saidCount: saidCount + 1 }))
 
 /** The theme picked, as saved (`current` patches the accent in); the System one under that name, for a copy of it. */
 function pickedTheme(): Theme {
@@ -27,7 +35,8 @@ function pickedTheme(): Theme {
 }
 
 function show(history: History, said = '') {
-  useArrange.setState({ history, said })
+  useArrange.setState({ history })
+  announce(said)
   useArrangeDraft.setState({ draft: history.present })
 }
 
@@ -51,27 +60,46 @@ export function beginArranging() {
   })
 }
 
-const step = (change: (history: History) => History) => show(change(useArrange.getState().history))
-
 /** A move made on the draft (`shared/theme/arrange.ts`). */
-export const arrange = (next: Placement) => step((history) => moved(history, next))
-export const undoMove = () => step(undone)
-export const redoMove = () => step(redone)
+export const arrange = (next: Placement) => show(moved(useArrange.getState().history, next))
+
+/** After Undo or Redo: where the surface `move` was about is now, or `action` for a move about no single one. */
+function showTravelled(history: History, move: Placement, action: string) {
+  const about = movedSurfaces.get(move)
+  show(history, about ? whereIs(history.present, about.surface, about.name) : action)
+}
+
+export function undoMove() {
+  const { history } = useArrange.getState()
+  const back = undone(history)
+  if (back !== history) showTravelled(back, history.present, tr('Undo'))
+}
+
+export function redoMove() {
+  const { history } = useArrange.getState()
+  const forth = redone(history)
+  if (forth !== history) showTravelled(forth, forth.present, tr('Redo'))
+}
+
 /** The app's own arrangement. */
 export const arrangeDefault = () => arrange(DEFAULT_LAYOUT)
 
 /** A surface moved or hidden, and said: where it is now, or that it can't (`name`: as the user reads it). */
 function say(surface: Surface, name: string, next: Placement, refused: string) {
   const { history } = useArrange.getState()
-  if (next === history.present) return useArrange.setState({ said: refused })
+  if (next === history.present) return announce(refused)
+  movedSurfaces.set(next, { surface, name })
   show(moved(history, next), whereIs(next, surface, name))
 }
 
 const present = () => useArrange.getState().history.present
 const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
 
-/** Dropped by the pointer into `region`, at slot `at`. */
-export const placeSurface = (surface: Surface, name: string, region: Region, at: number) => say(surface, name, moveSurface(present(), surface, region, at), cannotGo(name))
+/** Dropped by the pointer into `region`, at slot `at`. Zones only offer where it may go: unmoved, it was there already. */
+export function placeSurface(surface: Surface, name: string, region: Region, at: number) {
+  const next = moveSurface(present(), surface, region, at)
+  if (next !== present()) say(surface, name, next, '')
+}
 
 /** Moved by an arrow key. */
 export const nudgeSurface = (surface: Surface, name: string, direction: Direction) =>

@@ -1328,6 +1328,7 @@ const sv: Record<string, string> = {
   'Drag a part to move it': 'Dra en del för att flytta den',
   'Move {part}': 'Flytta {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Dra den, eller använd Alt och piltangenterna; Delete döljer den',
+  'Drag it, or use Alt and the arrows': 'Dra den, eller använd Alt och piltangenterna',
   'Move left': 'Flytta åt vänster',
   'Move right': 'Flytta åt höger',
   'Show {part}': 'Visa {part}',

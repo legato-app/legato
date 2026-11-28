@@ -1292,6 +1292,7 @@ const ar: Record<string, string> = {
   'Drag a part to move it': 'اسحب جزءًا لنقله',
   'Move {part}': 'نقل {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'اسحبه، أو استخدم Alt والأسهم؛ Delete يخفيه',
+  'Drag it, or use Alt and the arrows': 'اسحبه، أو استخدم Alt والأسهم',
   'Move left': 'نقل إلى اليسار',
   'Move right': 'نقل إلى اليمين',
   'Show {part}': 'إظهار {part}',

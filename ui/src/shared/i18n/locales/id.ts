@@ -1328,6 +1328,7 @@ const id: Record<string, string> = {
   'Drag a part to move it': 'Seret sebuah bagian untuk memindahkannya',
   'Move {part}': 'Pindahkan {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Seret, atau gunakan Alt dan tombol panah; Delete menyembunyikannya',
+  'Drag it, or use Alt and the arrows': 'Seret, atau gunakan Alt dan tombol panah',
   'Move left': 'Pindahkan ke kiri',
   'Move right': 'Pindahkan ke kanan',
   'Show {part}': 'Tampilkan {part}',

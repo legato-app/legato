@@ -1292,6 +1292,7 @@ const he: Record<string, string> = {
   'Drag a part to move it': 'גררו חלק כדי להזיז אותו',
   'Move {part}': 'הזזת {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'גררו, או השתמשו ב-Alt ובחצים; Delete מסתיר',
+  'Drag it, or use Alt and the arrows': 'גררו, או השתמשו ב-Alt ובחצים',
   'Move left': 'הזזה שמאלה',
   'Move right': 'הזזה ימינה',
   'Show {part}': 'הצגת {part}',

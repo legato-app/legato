@@ -79,9 +79,12 @@ export type HideTarget = { surface: Surface; part?: undefined } | { surface: Par
 
 const toggled = <Item>(list: Item[], item: Item) => (list.includes(item) ? list.filter((other) => other !== item) : [...list, item])
 
-/** The logo and plugins' panels never hide; one of the sidebar and the top bar stays (a way around the app). */
-function canHideSurface(hidden: Surface[], surface: Surface): boolean {
-  if (surface === 'brand' || pluginOf(surface)) return false
+/** The logo and plugins' panels never hide: no eye, no key for them. */
+export const neverHides = (surface: Surface) => surface === 'brand' || pluginOf(surface) !== undefined
+
+/** Whether `surface` can be hidden now: one of the sidebar and the top bar stays (a way around the app). */
+export function canHideSurface(hidden: Surface[], surface: Surface): boolean {
+  if (neverHides(surface)) return false
   if (surface === 'sidebar') return !hidden.includes('topbar')
   if (surface === 'topbar') return !hidden.includes('sidebar')
   return true

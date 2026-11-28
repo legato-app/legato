@@ -1328,6 +1328,7 @@ const ru: Record<string, string> = {
   'Drag a part to move it': 'Перетащите часть, чтобы переместить её',
   'Move {part}': 'Переместить: {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Перетащите или используйте Alt со стрелками; Delete скрывает',
+  'Drag it, or use Alt and the arrows': 'Перетащите или используйте Alt со стрелками',
   'Move left': 'Переместить влево',
   'Move right': 'Переместить вправо',
   'Show {part}': 'Показать: {part}',

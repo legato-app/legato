@@ -1328,6 +1328,7 @@ const zh: Record<string, string> = {
   'Drag a part to move it': '拖动某个部分即可移动',
   'Move {part}': '移动{part}',
   'Drag it, or use Alt and the arrows; Delete hides it': '拖动它，或用 Alt 加方向键；按 Delete 隐藏',
+  'Drag it, or use Alt and the arrows': '拖动它，或用 Alt 加方向键',
   'Move left': '向左移动',
   'Move right': '向右移动',
   'Show {part}': '显示{part}',

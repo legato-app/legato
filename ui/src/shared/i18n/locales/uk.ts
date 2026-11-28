@@ -1328,6 +1328,7 @@ const uk: Record<string, string> = {
   'Drag a part to move it': 'Перетягніть частину, щоб перемістити її',
   'Move {part}': 'Перемістити: {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Перетягніть або скористайтеся Alt зі стрілками; Delete ховає',
+  'Drag it, or use Alt and the arrows': 'Перетягніть або скористайтеся Alt зі стрілками',
   'Move left': 'Перемістити ліворуч',
   'Move right': 'Перемістити праворуч',
   'Show {part}': 'Показати: {part}',

@@ -1328,6 +1328,7 @@ const nl: Record<string, string> = {
   'Drag a part to move it': 'Sleep een onderdeel om het te verplaatsen',
   'Move {part}': '{part} verplaatsen',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Sleep het, of gebruik Alt en de pijltjes; Delete verbergt het',
+  'Drag it, or use Alt and the arrows': 'Sleep het, of gebruik Alt en de pijltjes',
   'Move left': 'Naar links',
   'Move right': 'Naar rechts',
   'Show {part}': '{part} tonen',

@@ -1328,6 +1328,7 @@ const vi: Record<string, string> = {
   'Drag a part to move it': 'Kéo một phần để di chuyển',
   'Move {part}': 'Di chuyển {part}',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Kéo, hoặc dùng Alt và các phím mũi tên; Delete để ẩn',
+  'Drag it, or use Alt and the arrows': 'Kéo, hoặc dùng Alt và các phím mũi tên',
   'Move left': 'Sang trái',
   'Move right': 'Sang phải',
   'Show {part}': 'Hiện {part}',

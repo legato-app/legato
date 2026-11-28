@@ -1328,6 +1328,7 @@ const ko: Record<string, string> = {
   'Drag a part to move it': '부분을 끌어서 옮기세요',
   'Move {part}': '{part} 옮기기',
   'Drag it, or use Alt and the arrows; Delete hides it': '끌거나 Alt와 화살표 키를 쓰세요. Delete로 숨깁니다',
+  'Drag it, or use Alt and the arrows': '끌거나 Alt와 화살표 키를 쓰세요',
   'Move left': '왼쪽으로 이동',
   'Move right': '오른쪽으로 이동',
   'Show {part}': '{part} 표시',

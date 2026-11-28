@@ -1328,6 +1328,7 @@ const hi: Record<string, string> = {
   'Drag a part to move it': 'किसी हिस्से को खिसकाने के लिए खींचें',
   'Move {part}': '{part} खिसकाएँ',
   'Drag it, or use Alt and the arrows; Delete hides it': 'खींचें, या Alt और तीर दबाएँ; Delete से छिपाएँ',
+  'Drag it, or use Alt and the arrows': 'खींचें, या Alt और तीर दबाएँ',
   'Move left': 'बाएँ खिसकाएँ',
   'Move right': 'दाएँ खिसकाएँ',
   'Show {part}': '{part} दिखाएँ',

@@ -1328,6 +1328,7 @@ const de: Record<string, string> = {
   'Drag a part to move it': 'Zieh einen Teil, um ihn zu verschieben',
   'Move {part}': '{part} verschieben',
   'Drag it, or use Alt and the arrows; Delete hides it': 'Ziehen oder Alt und die Pfeiltasten; Entf blendet aus',
+  'Drag it, or use Alt and the arrows': 'Ziehen oder Alt und die Pfeiltasten',
   'Move left': 'Nach links',
   'Move right': 'Nach rechts',
   'Show {part}': '{part} einblenden',
