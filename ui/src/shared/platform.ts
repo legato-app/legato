@@ -27,6 +27,8 @@ export const MISSING_ON_LINUX = {
   // Windows' device callbacks (unplug.rs) and its loopback capture.
   deviceEvents: { settings: ['Pause during calls', 'Pause when headphones disconnect'] },
   listenToThisPc: {},
+  // session.rs reads Linux's players, but the Detector asks them only on "This PC" (detector.rs): back with that.
+  mediaSessionLookup: { settings: ['Ask this PC’s media players first'] },
   // Pages in a window read through WebView2's message channel: Spotify's, Exportify's and Apple Music's.
   playerPageImports: { settings: ['Connect Spotify'] },
   // YouTube's watch page for the videos that refuse the embed (ytwatch.rs).
