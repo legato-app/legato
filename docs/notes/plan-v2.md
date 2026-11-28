@@ -325,9 +325,11 @@ Where a line says "reading", the owner hasn't confirmed it.
       dropped file (`protocol::file_of`: absolute, that extension, not a folder; then `openRemix` → `lmix_read`). Registered
       by the installer only (`src-tauri/tauri.windows.conf.json` `fileAssociations`; its uninstaller removes it), never by
       the app; dev, e2e and bench builds don't bundle. Decided alone (2026-11-18): class `Legato.Remix`, "Legato remix",
-      the exe's own icon, role left at the default (macOS only); Windows only, else Android and Linux would claim it too; no
+      the exe's own icon, role left at the default (macOS only); Windows only, else Android would claim it too (Linux: see 2026-11-28 below); no
       `.legatosync`. If the installer breaks: delete `src-tauri/tauri.windows.conf.json`. Untried: a real install,
       double-click (app closed and open), uninstall. Still open: the local file that carries audio (the owner's call).
+      2026-11-28, Linux (Linux slice 5, `025ca068`): a MIME type of ours, installed by the .deb and written by the AppImage;
+      the Lite has its own entry. Untried: a double-click on a real Linux desktop.
 - [ ] `M` Optional sign-in with Discord, for a profile (the owner will make a Discord bot anyway). Never required.
       First use: the share page shows who shared a playlist, their profile carried in the link so it can't be faked
       (the owner's word: encrypted in the link). Open before building: encryption alone doesn't stop a fake, a
@@ -644,7 +646,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
       item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
       word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).
-      Designed 2026-11-27 (Opus), not built (below). WebKitGTK instead of WebView2: check the YouTube embed there first
+      Designed 2026-11-27 (Opus); slices 0 to 6 built 2026-11-28 (below), none tried for real; slice 7 open. WebKitGTK instead of WebView2: check the YouTube embed there first
       (codecs, autoplay, the shield's hooks and `live.js`), then the keychain (Secret Service), the tray, Open at startup,
       packaging (AppImage or .deb) and its update feeds.
       - Base: the former item 18 (folded in above). The CI already compiles the non-Windows paths (macOS job), so Linux = those paths plus
@@ -730,7 +732,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       a Beta with the APK; Android first; YouTube signed out on the phone, the library from the PC by sync.
   - [ ] iPhone: not for now (the owner's word, 2026-11-07); later, their signing choice (Apple Developer Program, or an
         unsigned .ipa).
-- [ ] `S` + `M` Connect Spotify on the phone (the owner, 2026-11-28). Today the phone's card only opens a data export
+- [x] `S` + `M` Connect Spotify on the phone (the owner, 2026-11-28): both built, not tried on a phone. Today the phone's card only opens a data export
       file (`SpotifyConnect.tsx`: no Connect on `phoneApp`; the Exportify window and Spotify's page need a second
       webview with our script, which Android doesn't give). S: an "Open Exportify" button that opens exportify.net in
       the phone's browser, the export saved, then picked by the existing file import (an Exportify file is read
@@ -1170,7 +1172,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       is kept, the moves going into a copy; a window as narrow as a phone’s has no mode.
   - [x] Slice 3 `M` (2026-11-28), not tried for real: a handle on each part drawn (`data-surface`), drop zones at the
     window’s sides and on either half of the parts there (`features/arrange/zones.ts`), Alt and the arrows, Delete or H
-    to hide, a Show button in the bar, right-click on a handle, each move said in a live region; the entries show.
+    to hide, a Show button in the bar, right-click on a handle, each move said in a live region; the entries show. Mirrored in right-to-left languages (`f5fbce08`, the fix that followed).
     - Decided alone (2026-11-28): an arrow steps across the window (past neighbours, then over the page); the top bar
       has a handle for hiding only; handles sit in the middle of their part.
   - [ ] Slice 4 `M`: the three bars' parts and the eye.
