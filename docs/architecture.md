@@ -54,6 +54,8 @@ src-tauri/              thin shell: commands, keychain, WebView2 hook, media pan
 - `crates/connectors`: one module per service or site, the shared OAuth PKCE loopback.
 - `crates/player`: rodio/symphonia, gapless queue, server streams, Music Detector clips.
 - `crates/dsp`: live processing, loudness, visualizer bands. `crates/shield`: ad blocker and page scripts.
+- Linux: `src-tauri/src/media/linux.rs` (MPRIS), `desktop.rs` (tray and keyring support), `desktop_file.rs`
+  (autostart entry); what the UI hides on Linux is `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`.
 - `crates/plugins`: one QuickJS runtime each.
 - `ui/`: React 19 + Zustand + Tailwind v4.
 - Android: `src-tauri/gen/android` (`MainActivity.kt`, `PlaybackService.kt`).
