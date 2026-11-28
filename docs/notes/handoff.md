@@ -8,33 +8,35 @@ changes; older versions are in git. Updated 2026-11-27, end of window 2 on the s
 
 ## Where things stand
 - **Repository**: `legato-app/legato`. **master** on origin = `23ce8341`, Beta **v1.2.456**. **platforms** on origin =
-  `7503849c`, pushed; local `platforms` = `bddcee60`, four commits ahead (not pushed, not reviewed). Push `platforms`
-  after each reviewed lot (`check` runs, no release). master only by push, on the owner's word.
-- **Pushed on platforms, up to `7503849c`**:
-  - the site's Android link takes the newest APK (`f406039d`, `4dd9e5ec`);
-  - Linux, slices 0 and 1: a CI build and a trial AppImage on a push whose message says `[linux trial]` (`1374f868`,
-    `ce87dc3e`), the interface hides what Linux lacks (`5950c1fd`);
-  - a Stable release cleaned up: CodeQL, release notes that leave out what only the code's readers care about
-    (`11aed31b`, `7419231c`);
-  - the Lite sync fix: a PC that joins others' sync takes their settings instead of overwriting them (`bc5c271d`);
-  - security pass fixes landed, details in private notes.
-- **Local, not reviewed**: `40060f24` (resuming a stopped sync keeps this PC's settings), `7d32c78d` (a backup can be
-  added to the library, removing nothing), `7723f222` (Add from a backup, with its settings if wanted), `bddcee60`
-  (untick the swapped-title turn on merged songs, which no commit built).
-- **Release gate**: the Stable check has a point 10, a read-only white-hat pass, its report kept private (`bf1cc912`).
-- **Not tried for real**: Linux (nothing run on a real Linux yet), the Lite build (its sync overwrote the full app's
-  settings once, fixed in `bc5c271d`, not re-run), Adaptive Sound and the Android crackle fixes on a phone, the swapped-title fix on a second PC,
-  the Stable gate's white-hat pass.
+  `398e2eab`, pushed. Its `check` run was still going when this was written; the Linux clippy job is part of it.
+  Push `platforms` after each reviewed lot (no release). master only by push, on the owner's word.
+- **Pushed on platforms, up to `398e2eab`**:
+  - Linux, slices 0 to 3: the trial AppImage (a push whose head message has `[linux trial]`, artifact kept 7 days),
+    clippy of the app shell, the MPRIS media panel, autostart, `legato://` from the .deb or AppImage, the table of what
+    Linux hides (`MISSING_ON_LINUX`), no tray means closing quits, no keyring means sign-ins last until close.
+  - the swapped-title fix turned at merge time;
+  - "Add from a backup" (merges a copy, removes nothing, its settings optional);
+  - Spotify on the phone, step S: "Open Exportify" in the browser, then the saved file is taken;
+  - Lite slices 9 and 10;
+  - rearrange, slice 2 (hidden in the interface until its screen lands);
+  - signatures of the installers and the APK kept apart from the build;
+  - README: editions and platforms section;
+  - AutoEQ licence checked: the data has no stated reuse terms; the plan line is marked "to drop", the owner decides.
+- **Local, not reviewed**: `370a5bf9` (rearrange, slice 3: move the app's parts by dragging, or with the keyboard).
+- **Not tried for real**: Linux (nothing run on a real Linux desktop), the trial AppImage, Spotify on the phone,
+  Add from a backup, the swapped-title fix on a second PC, Lite 9-10, the release notes and signatures on a real release.
 
 ## Next, in order
-1. **Opus reviews** the four local commits above, then the pushed batch if not yet reviewed.
-2. **Swapped titles**: the fix is `merge_in` plus `backwardsTitles3` (a swapped title came back on Beta v1.2.456).
-3. **Rest of `51276a5a`** (release workflow hardening; the actions are pinned): the part not yet landed, in private notes.
-4. **Linux, slices 2 and 3** (plan-v2, Linux line).
-5. **Spotify on the phone** (plan-v2, `S` then `M`): Exportify in the phone's browser, then the user's own client ID
-   with PKCE over a `legato://` redirect.
-6. **Then the rest of the handoff's list**: Lite slices 9 and 10 (a lighter background, the 250 MB cover cache is
-   disk), rearrange slices 2 to 7, the theme code. The owner's bench (two commands) is still to run.
+1. **Opus reviews `370a5bf9`**, then one trial AppImage run by the owner (WSL or a VM, their choice).
+2. **Linux slices 4 and 5**: the shield on WebKitGTK (filter and host list) and the Linux release job (x86_64 and
+   aarch64, AppImage and .deb, both editions).
+3. **Spotify, step M** (plan-v2): the owner's own client ID, PKCE, a `legato://` redirect.
+4. **Rearrange, slices 4 to 7** (plan-v2, rearrange line).
+5. **Theme code** (plan-v2, `L`): designed, not built.
+6. **Profiles** (plan-v2, `M-L`): designed, after the Lite.
+7. Hidden video decoding (plan-v2 lead): measure only; no rule forbids it, nothing to build.
+8. Release cache: the study advises against it.
+
 
 ## Waiting on the owner
 - The two bench runs (item 1). Auto mode refused to start them.
