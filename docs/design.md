@@ -115,6 +115,15 @@ parts in their new places. PC only. Settings › Appearance › Theme › "Let t
 default, on every synced PC); right-click › "Default layout" does the same. Importing a theme that changes something
 asks first: its layout, colors only, or cancel.
 
+**Arranging by hand** writes this same key (`features/arrange`, loaded when first used). Right-click › "Arrange the
+app…", Settings › Appearance or a shortcut with no default key. Handles sit over what the format can move: the surfaces,
+the bars' parts, the shown page's blocks, the songs lists' columns, Now Playing's parts, the page header's art and
+lines, the two columns' widths; an eye on what can hide, shown again from the floating bar. A big block's handle is a
+pill in its corner and its outline lets the pointer through (the page still scrolls); a small part's covers it. Every
+handle is a button (Alt and the arrows, Delete), every move said in a live region. The draft is drawn live and written
+only at Done, into the user's own theme (a preset or System copied first), with Undo. What nothing may arrange has no
+handle: Settings, Add-ons, dialogs, and under Now Playing all but it and the top bar.
+
 ```json
 "layout": { "v": 1,
   "regions": { "top": ["topbar"], "left": ["sidePanel"], "right": ["sidebar"], "bottom": ["playerBar"] },

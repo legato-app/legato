@@ -5,4 +5,20 @@ description: "Colors, CSS and what survives them."
 
 A theme is a set of colors plus optional CSS, added from Settings › Appearance (24 at most). Light and dark both ship; the default follows Windows. The sky-blue accent is for playback only.
 
+## Arrange the app by hand
+
+On a PC, right-click an empty part of the app › **Arrange the app…** (also in Settings › Appearance, or a shortcut you pick in Settings › Shortcuts). Then drag what you want elsewhere:
+
+- the sidebar and the side panel to the left or the right, the player bar to the top or the bottom;
+- what the three bars hold, each within its group;
+- the blocks of the page on screen, the columns of the song lists by their header, and the parts of Now Playing while it is open;
+- the picture of a page’s header, whose lines and buttons the **Page header** menu sets;
+- the edge of the sidebar or the side panel, to set its width.
+
+An eye hides what can be hidden, and a button in the floating bar shows it again. Each handle works from the keyboard: Alt and the arrows move it, Delete hides it. **Done** (or Escape) saves into a theme of your own, copying a built-in one first, with an Undo; **Discard** leaves things as they were. Settings, Add-ons and dialogs never move.
+
+A theme file can say the same in its `layout` key: the [format](https://github.com/legato-app/legato/blob/master/docs/design.md#theme-layout).
+
+## What a theme’s CSS can’t hide
+
 Elements marked `data-brand` (the name, the logo, legal notices) survive any CSS, a theme’s or a plugin’s. A plugin with the `ui:style` permission restyles the whole interface the same way.

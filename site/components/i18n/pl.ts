@@ -33,7 +33,7 @@ export const pl: Copy = {
     { title: 'Naciśnij K, by śpiewać', text: 'Zsynchronizowane teksty, linijka po linijce, w panelu obok każdej strony, w dużym rozmiarze w Teraz odtwarzane albo na pełnym ekranie, jak tutaj.', alt: 'Tryb karaoke: duży tekst na rozmytej okładce, grana linijka świeci w całości.' },
     { title: 'Naciśnij V i zgaś światło', text: 'Słupki LED, pierścień wokół okładki, wskazówki VU, spektrogram, presety w stylu MilkDrop, na pełnym ekranie.', alt: 'Wizualizer na pełnym ekranie: kolumny słupków LED na ciemnej stronie.' },
     { title: 'Zmieniaj utwór, gdy gra', text: 'Prędkość, wysokość dźwięku, 10-pasmowy korektor, pogłos i dźwięk 3D, w Live Editorze.', alt: 'Live Editor obok dużej okładki: wersje utworu, presety, prędkość i wysokość dźwięku.' },
-    { title: 'Urządź ją po swojemu', text: 'Kolory, czcionki, obraz lub film w tle, twój własny CSS i to, gdzie stoją części aplikacji.', alt: 'Strona Utwory w Legato w innym motywie.' },
+    { title: 'Urządź ją po swojemu', text: 'Kolory, czcionki, obraz lub film w tle, twój własny CSS oraz części aplikacji przeciągnięte tam, gdzie chcesz.', alt: 'Strona Utwory w Legato w innym motywie.' },
   ],
   fixes: {
     title: 'O co słuchacze wciąż proszą wielkie aplikacje',

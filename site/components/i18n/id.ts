@@ -33,7 +33,7 @@ export const id: Copy = {
     { title: 'Tekan K untuk karaoke', text: 'Lirik bertimer, baris demi baris, di panel di samping halaman mana pun, besar di Sedang diputar, atau layar penuh seperti di sini.', alt: 'Mode karaoke: lirik besar di atas sampul buram, baris yang diputar menyala utuh.' },
     { title: 'Tekan V, lampu padam', text: 'Batang LED, cincin di sekitar sampul, jarum VU, spektrogram, preset ala MilkDrop, layar penuh.', alt: 'Visualizer layar penuh: kolom batang LED di halaman gelap.' },
     { title: 'Ubah lagu sambil diputar', text: 'Kecepatan, nada, EQ 10 band, gema, dan suara 3D, di Live Editor.', alt: 'Live Editor di samping sampul besar: versi lagu, preset, kecepatan, dan nada.' },
-    { title: 'Buat jadi milikmu', text: 'Warna, font, gambar atau video sebagai latar, CSS-mu sendiri, dan letak bagian-bagian aplikasi.', alt: 'Halaman Lagu di Legato dengan tema lain.' },
+    { title: 'Buat jadi milikmu', text: 'Warna, font, gambar atau video sebagai latar, CSS-mu sendiri, dan bagian-bagian aplikasi yang diseret ke tempat yang kamu mau.', alt: 'Halaman Lagu di Legato dengan tema lain.' },
   ],
   fixes: {
     title: 'Yang terus diminta pendengar dari aplikasi besar',

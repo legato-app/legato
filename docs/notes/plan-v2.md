@@ -1209,6 +1209,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Decided alone (2026-11-28): a width saved into the theme fixes it, as any theme's width does: the sidebar's own
       edge comes back with the usual width.
   - [ ] Slice 7 `S`: docs (`docs/design.md` › Theme layout, the themes' help, Figma light and dark) and a line on the site.
+    2026-11-28: the docs, the themes' help and the site line are done; the Figma pages are left (they need the owner's
+    Figma open).
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.
 - [x] `M` Plugin pictures: an optional manifest `icon` (a png in the plugin's folder, size-capped, read and checked by Rust, never fetched; an API 2 addition) on the card and the details. The author's picture only for verified authors, shipped with the app next to `crates/plugins/trusted-authors.json`; others keep the initial.

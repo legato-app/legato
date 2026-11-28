@@ -33,7 +33,7 @@ export const it: Copy = {
     { title: 'Premi K per il karaoke', text: 'Testi sincronizzati, riga per riga, in un pannello accanto a qualsiasi pagina, in grande in In riproduzione o a schermo intero come qui.', alt: 'Modalità karaoke: testo grande su una copertina sfocata, la riga in corso illuminata per intero.' },
     { title: 'Premi V, luci spente', text: 'Barre LED, un anello intorno alla copertina, aghi VU, uno spettrogramma, preset in stile MilkDrop, a schermo intero.', alt: 'Il visualizzatore a schermo intero: colonne di barre LED su una pagina scura.' },
     { title: 'Cambia un brano mentre suona', text: 'Velocità, intonazione, un equalizzatore a 10 bande, riverbero e suono 3D, nel Live Editor.', alt: 'Il Live Editor accanto a una grande copertina: le versioni del brano, i preset, la velocità e l’intonazione.' },
-    { title: 'Rendila tua', text: 'Colori, caratteri, un’immagine o un video di sfondo, il tuo CSS e la posizione delle parti dell’app.', alt: 'La pagina Brani di Legato con un altro tema.' },
+    { title: 'Rendila tua', text: 'Colori, caratteri, un’immagine o un video di sfondo, il tuo CSS e le parti dell’app trascinate dove le vuoi.', alt: 'La pagina Brani di Legato con un altro tema.' },
   ],
   fixes: {
     title: 'Ciò che gli ascoltatori continuano a chiedere alle grandi app',

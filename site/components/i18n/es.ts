@@ -33,7 +33,7 @@ export const es: Copy = {
     { title: 'Pulsa K para el karaoke', text: 'Letras sincronizadas, línea por línea, en un panel junto a cualquier página, en grande en Reproduciendo o a pantalla completa como aquí.', alt: 'Modo karaoke: letras grandes sobre una portada difuminada, la línea que suena iluminada entera.' },
     { title: 'Pulsa V y apaga la luz', text: 'Barras LED, un anillo alrededor de la portada, agujas de vúmetro, un espectrograma, presets al estilo MilkDrop, a pantalla completa.', alt: 'El visualizador a pantalla completa: columnas de barras LED sobre una página oscura.' },
     { title: 'Cambia una canción mientras suena', text: 'Velocidad, tono, un ecualizador de 10 bandas, reverberación y sonido 3D, en el Live Editor.', alt: 'El Live Editor junto a una portada grande: las versiones de la canción, presets, velocidad y tono.' },
-    { title: 'Hazla tuya', text: 'Colores, fuentes, una imagen o un vídeo de fondo, tu propio CSS y el sitio de cada parte de la app.', alt: 'La página Canciones de Legato con otro tema.' },
+    { title: 'Hazla tuya', text: 'Colores, fuentes, una imagen o un vídeo de fondo, tu propio CSS y las partes de la app arrastradas adonde quieras.', alt: 'La página Canciones de Legato con otro tema.' },
   ],
   fixes: {
     title: 'Lo que los oyentes siguen pidiendo a las grandes apps',

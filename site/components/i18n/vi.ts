@@ -33,7 +33,7 @@ export const vi: Copy = {
     { title: 'Nhấn K để hát karaoke', text: 'Lời bài hát theo thời gian, từng dòng, trong khung bên cạnh mọi trang, cỡ lớn trong Đang phát, hoặc toàn màn hình như ở đây.', alt: 'Chế độ karaoke: lời lớn trên bìa mờ, dòng đang hát sáng cả dòng.' },
     { title: 'Nhấn V, tắt đèn', text: 'Cột LED, vòng quanh bìa đĩa, kim VU, phổ âm, preset kiểu MilkDrop, toàn màn hình.', alt: 'Trình hiển thị toàn màn hình: các cột LED trên nền tối.' },
     { title: 'Đổi bài hát khi đang phát', text: 'Tốc độ, cao độ, EQ 10 băng, vang và âm thanh 3D, trong Live Editor.', alt: 'Live Editor bên cạnh bìa lớn: các phiên bản của bài, preset, tốc độ và cao độ.' },
-    { title: 'Biến nó thành của bạn', text: 'Màu sắc, phông chữ, ảnh hoặc video làm nền, CSS của riêng bạn và vị trí từng phần của ứng dụng.', alt: 'Trang Bài hát của Legato với giao diện khác.' },
+    { title: 'Biến nó thành của bạn', text: 'Màu sắc, phông chữ, ảnh hoặc video làm nền, CSS của riêng bạn và các phần của ứng dụng kéo tới nơi bạn muốn.', alt: 'Trang Bài hát của Legato với giao diện khác.' },
   ],
   fixes: {
     title: 'Điều người nghe cứ mãi xin các ứng dụng lớn',

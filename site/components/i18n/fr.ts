@@ -33,7 +33,7 @@ export const fr: Copy = {
     { title: 'K pour le karaoké', text: 'Des paroles synchronisées, ligne par ligne, dans un panneau à côté de n’importe quelle page, en grand dans la lecture en cours, ou en plein écran comme ici.', alt: 'Le mode karaoké : de grandes paroles sur une pochette floutée, la ligne chantée s’illumine en entier.' },
     { title: 'V, et on éteint la lumière', text: 'Des barres LED, un anneau autour de la pochette, des vu-mètres à aiguille, un spectrogramme, des préréglages façon MilkDrop, en plein écran.', alt: 'Le visualiseur en plein écran : des colonnes de barres LED sur une page sombre.' },
     { title: 'Modifiez un titre pendant qu’il joue', text: 'Vitesse, hauteur, un égaliseur 10 bandes, de la réverbération et du son 3D, dans le Live Editor.', alt: 'Le Live Editor à côté d’une grande pochette : les versions du titre, les préréglages, la vitesse et la hauteur.' },
-    { title: 'À votre image', text: 'Couleurs, polices, une image ou une vidéo en fond, votre propre CSS, et la place de chaque partie de l’application.', alt: 'La page Titres de Legato dans un autre thème.' },
+    { title: 'À votre image', text: 'Couleurs, polices, une image ou une vidéo en fond, votre propre CSS, et les parties de l’application glissées où vous les voulez.', alt: 'La page Titres de Legato dans un autre thème.' },
   ],
   fixes: {
     title: 'Ce que les auditeurs réclament aux grandes applis',
