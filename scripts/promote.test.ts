@@ -82,6 +82,16 @@ describe('promote', () => {
     // The website isn't in the app.
     expect(notesFrom(['feat(site): a 3D window', 'fix(player): no black video', 'fix(sites): kept'])).toBe('### Fixed\n- No black video\n- Kept')
     expect(notesFrom(['feat(site): a 3D window'])).toBe('Small fixes and improvements.')
+    // Nothing only a developer meets: the repository's tools, Linux before it ships, file names and build words.
+    const internal = [
+      'fix(ci): the macOS check runs',
+      'feat(bench): measure the Lite',
+      'feat(linux): hide what is missing',
+      'feat(lite): the __LITE__ define, shared/edition.ts and pnpm dev:lite / build:lite',
+      'fix(lite): a Lite built with the full app’s dependencies is a compile error',
+      'feat(lite): the Lite edition in the shell, its own identifier and update feed',
+    ]
+    expect(notesFrom([...internal, 'feat(lite): one YouTube embed', 'fix: a .lmix opens', 'fix(themes): the CSS of a theme'])).toBe('### Added\n- One YouTube embed\n\n### Fixed\n- A .lmix opens\n- The CSS of a theme')
     // Every line, however many (the owner's rule, 2026-11-05).
     const many = Array.from({ length: 60 }, (_, i) => `fix: n${i}`)
     expect(notesFrom(many).split('\n')).toHaveLength(61)
