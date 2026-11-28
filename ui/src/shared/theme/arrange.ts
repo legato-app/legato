@@ -15,6 +15,29 @@ export function moveSurface(placement: Placement, surface: Surface, region: Regi
   return { ...placement, regions }
 }
 
+export type Direction = 'left' | 'right' | 'up' | 'down'
+
+/**
+ * One step by an arrow key: across the window, a column goes left or right (its side's other surfaces, then over the page
+ * to the other side), a bar up or down. The same placement at the window's edge, or where the surface can't go.
+ */
+export function stepSurface(placement: Placement, surface: Surface, direction: Direction): Placement {
+  const forward = direction === 'right' || direction === 'down'
+  const [before, after]: [Region, Region] = direction === 'left' || direction === 'right' ? ['left', 'right'] : ['top', 'bottom']
+  const region = REGIONS.find((side) => placement.regions[side].includes(surface))
+  // From a bar's side to a column's (the logo): the outer end of that side.
+  if (region !== before && region !== after) return moveSurface(placement, surface, forward ? after : before, forward ? undefined : 0)
+  const here = placement.regions[region]
+  const index = here.indexOf(surface)
+  // `moveSurface`'s slot: before what sits there now, so one step later is two slots on.
+  if (forward && index < here.length - 1) return moveSurface(placement, surface, region, index + 2)
+  if (!forward && index > 0) return moveSurface(placement, surface, region, index - 1)
+  // Past this side's end: over the page, to the near end of the other one.
+  if (forward && region === before) return moveSurface(placement, surface, after, 0)
+  if (!forward && region === after) return moveSurface(placement, surface, before)
+  return placement
+}
+
 /** A choice as a placement keeps it: no empty list, nothing at all when both are. */
 function trimmed({ order, hidden }: PartsChoice): PartsChoice | undefined {
   if (!order?.length && !hidden?.length) return undefined

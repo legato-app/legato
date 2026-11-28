@@ -510,7 +510,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
   return (
     // On the window's background, under the panels (docs/design.md).
     // Phone layout: a mini player (cover, song, like, previous / play / next, a progress line); Now Playing has the rest.
-    <footer dir="ltr" ref={volumeWheelRef} onContextMenu={onMenu(() => barEntries(true))} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
+    <footer dir="ltr" data-surface="playerBar" ref={volumeWheelRef} onContextMenu={onMenu(() => barEntries(true))} style={{ order }} className={`relative flex shrink-0 items-center justify-between gap-6 px-4 phone:h-16 phone:gap-2 phone:px-3 ${hidden ? 'h-0' : 'h-22'}`}>
       {/* In key order: each iframe keeps its place as the two swap roles (a moved iframe reloads). */}
       {now?.youtubeId &&
         [...(tail ? [tail] : []), { key: frameKey, videoId: now.youtubeId }]

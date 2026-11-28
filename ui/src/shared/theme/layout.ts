@@ -14,7 +14,7 @@ const MAX_NEWER_LAYOUT = 8_000
 export const REGIONS = ['top', 'left', 'right', 'bottom'] as const
 export type Region = (typeof REGIONS)[number]
 export const SURFACES = ['brand', 'topbar', 'sidebar', 'sidePanel', 'playerBar'] as const
-type BuiltinSurface = (typeof SURFACES)[number]
+export type BuiltinSurface = (typeof SURFACES)[number]
 /** One of the app's own parts, or a plugin's panel by the plugin's id (the manifest's rules for an id). */
 export type Surface = BuiltinSurface | `plugin:${string}`
 const PLUGIN_SURFACE = /^plugin:(?![.-])(?!.*\.\.)[a-z0-9.-]{3,64}$/

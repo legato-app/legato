@@ -1,4 +1,14 @@
 /** The arranging mode's keys. Pure. */
+import type { Direction } from '../../shared/theme/arrange'
+
+const ARROWS: Record<string, Direction> = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }
+
+/** A key on a surface's handle: Alt and an arrow moves it, Delete (or H) hides it. */
+export function surfaceKey(event: Pick<KeyboardEvent, 'code' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey'>): Direction | 'hide' | null {
+  if (event.ctrlKey || event.metaKey || event.shiftKey) return null
+  if (event.altKey) return ARROWS[event.code] ?? null
+  return event.code === 'Delete' || event.code === 'KeyH' ? 'hide' : null
+}
 
 /** What a key does while arranging: Escape is Done, Ctrl+Z undoes, Ctrl+Y or Ctrl+Shift+Z redoes. Text fields keep theirs. */
 export function barKey(event: Pick<KeyboardEvent, 'code' | 'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey' | 'target'>): 'done' | 'undo' | 'redo' | null {

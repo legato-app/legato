@@ -1152,12 +1152,15 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     the interface calls it yet.
   - [x] Slice 2 `M` (2026-11-28), not tried for real: the mode (`features/arrange`, loaded on first use; `app/arrangeDraft`
     drawn by `useShellLayout`), its bar (Undo, Redo, Default layout, Discard, Done; Escape), entries (right-click,
-    Settings › Appearance, a shortcut with no key), `shared/theme/saveArrangement`, the Undo toast. Nothing drags yet:
-    Default layout is the only move until slice 3, so this does not reach `master` alone.
+    Settings › Appearance, a shortcut with no key), `shared/theme/saveArrangement`, the Undo toast.
     - Decided alone (2026-11-28): `themeLayouts` is turned back on at Done (nothing is written before), the bar saying
       so; another theme picked meanwhile starts over from it, the moves not saved said gone; a layout a newer app wrote
       is kept, the moves going into a copy; a window as narrow as a phone’s has no mode.
-  - [ ] Slice 3 `M`: surfaces (drop zones, keyboard, announcements).
+  - [x] Slice 3 `M` (2026-11-28), not tried for real: a handle on each part drawn (`data-surface`), drop zones at the
+    window’s sides and on either half of the parts there (`features/arrange/zones.ts`), Alt and the arrows, Delete or H
+    to hide, a Show button in the bar, right-click on a handle, each move said in a live region; the entries show.
+    - Decided alone (2026-11-28): an arrow steps across the window (past neighbours, then over the page); the top bar
+      has a handle for hiding only; handles sit in the middle of their part.
   - [ ] Slice 4 `M`: the three bars' parts and the eye.
   - [ ] Slice 5 `M`: page parts, columns by their header, the header's choice (check the virtualized table's headers and
     a drag under Now Playing).

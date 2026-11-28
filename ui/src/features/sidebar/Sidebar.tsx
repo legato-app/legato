@@ -276,7 +276,7 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
   }
 
   return (
-    <aside className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
+    <aside data-surface="sidebar" className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
       {parts.map((part) => (
         <Fragment key={part}>{blocks[part]}</Fragment>
       ))}

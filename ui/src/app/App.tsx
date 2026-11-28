@@ -104,7 +104,7 @@ function useSearchCentered(box: React.RefObject<HTMLDivElement | null>, on: bool
 function Brand({ className = '', order }: { className?: string; order?: number }) {
   const go = useStore((s) => s.go)
   return (
-    <button data-brand onClick={() => go({ name: 'home' })} title={tr('Home')} style={{ order }} className={`flex items-center gap-2.5 rounded-md px-2 py-1 ${className}`}>
+    <button data-brand data-surface="brand" onClick={() => go({ name: 'home' })} title={tr('Home')} style={{ order }} className={`flex items-center gap-2.5 rounded-md px-2 py-1 ${className}`}>
       <Logo />
       <span data-brand-name className="text-[0.9375rem] font-bold tracking-tight phone:hidden">Legato</span>
     </button>
@@ -183,7 +183,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
   }
   return (
     // Over Now Playing: a veil from the top keeps logo, Close player and window buttons readable on any cover.
-    <header data-tauri-drag-region style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
+    <header data-tauri-drag-region data-surface="topbar" style={{ order }} className={`relative z-30 flex h-13 shrink-0 items-center gap-3 pe-2 ps-5 phone:gap-1 phone:pe-2 phone:ps-1 ${full ? 'bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_80%,transparent),transparent)] phone:hidden' : ''}`}>
       {/* The phone: the logo or Back, never both (Home is a tab there). */}
       {brand && <Brand className={canBack && !full ? 'phone:hidden' : ''} />}
       {full && (

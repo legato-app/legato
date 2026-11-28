@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { moveSurface, toggleHidden } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
-import { barKey } from './barKeys'
+import { barKey, surfaceKey } from './barKeys'
 import { HISTORY_LIMIT, historyFrom, moved, redone, undone } from './history'
 
 const right = moveSurface(DEFAULT_LAYOUT, 'sidebar', 'right')
@@ -23,6 +23,13 @@ it('keeps a bounded past', () => {
   let history = historyFrom(DEFAULT_LAYOUT)
   for (let move = 0; move < HISTORY_LIMIT + 5; move++) history = moved(history, { ...history.present })
   expect(history.past).toHaveLength(HISTORY_LIMIT)
+})
+
+it('reads a handle’s keys', () => {
+  const key = (code: string, held: Partial<Record<'ctrlKey' | 'shiftKey' | 'altKey' | 'metaKey', boolean>> = {}) => surfaceKey({ code, ctrlKey: false, shiftKey: false, altKey: false, metaKey: false, ...held })
+  expect([key('ArrowLeft', { altKey: true }), key('ArrowDown', { altKey: true }), key('Delete'), key('KeyH')]).toEqual(['left', 'down', 'hide', 'hide'])
+  // A plain arrow moves the focus' way, Ctrl+Alt is the app's global keys.
+  expect([key('ArrowLeft'), key('ArrowLeft', { altKey: true, ctrlKey: true }), key('Delete', { shiftKey: true }), key('Enter')]).toEqual([null, null, null, null])
 })
 
 it('reads the mode’s keys', () => {

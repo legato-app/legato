@@ -51,18 +51,12 @@ export const LITE_CUTS = {
   audiobooks: { pages: ['books'], menuItems: ['audiobooks'], settings: ['Audiobooks'] },
 } satisfies Record<string, Cut>
 
-/** Built in slices and not whole yet: cut from every build until its last slice lands, then its entry leaves. */
-export const UNFINISHED = {
-  // Arranging the app: the mode opens, nothing drags before slice 3 (plan-v2 "Arrange the app").
-  arrange: { settings: ['Arrange the app'], shortcuts: ['arrange'] },
-} satisfies Record<string, Cut>
+export type Feature = keyof typeof LITE_CUTS | keyof typeof MISSING_ON_LINUX
 
-export type Feature = keyof typeof LITE_CUTS | keyof typeof MISSING_ON_LINUX | keyof typeof UNFINISHED
+/** False for a feature Lite cuts or Linux lacks: for the buttons and rules no table reaches. */
+export const offered = (feature: Feature) => !(LITE && feature in LITE_CUTS) && !(linuxApp && feature in MISSING_ON_LINUX)
 
-/** False for a feature Lite cuts, Linux lacks or no build has whole yet: for the buttons and rules no table reaches. */
-export const offered = (feature: Feature) => !(feature in UNFINISHED) && !(LITE && feature in LITE_CUTS) && !(linuxApp && feature in MISSING_ON_LINUX)
-
-const cuts: Cut[] = [...Object.values(UNFINISHED), ...(LITE ? Object.values(LITE_CUTS) : []), ...(linuxApp ? Object.values(MISSING_ON_LINUX) : [])]
+const cuts: Cut[] = [...(LITE ? Object.values(LITE_CUTS) : []), ...(linuxApp ? Object.values(MISSING_ON_LINUX) : [])]
 const cutBy = (list: (cut: Cut) => readonly string[] | undefined) => {
   const names = new Set(cuts.flatMap((cut) => list(cut) ?? []))
   return (name: string) => names.has(name)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { layoutFromPlacement, moveInGroup, moveSurface, toggleHidden, type HideTarget } from './arrange'
+import { layoutFromPlacement, moveInGroup, moveSurface, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
 import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
 
 const start = DEFAULT_LAYOUT
@@ -32,6 +32,41 @@ describe('moveSurface', () => {
     expect(moveSurface(start, 'brand', 'top', 2).regions.top).toEqual(['topbar', 'brand'])
     expect(moveSurface(start, 'brand', 'top', 1)).toBe(start)
     expect(moveSurface(start, 'sidebar', 'left')).toBe(start)
+  })
+})
+
+describe('stepSurface', () => {
+  const steps = (surface: Surface, ...directions: Direction[]) => directions.reduce((placement, direction) => stepSurface(placement, surface, direction), start)
+  const sides = ({ regions }: Placement) => [regions.left, regions.right]
+
+  it('carries a column across the window, past its neighbours and over the page', () => {
+    expect(sides(steps('sidebar', 'right'))).toEqual([[], ['sidebar', 'sidePanel']])
+    expect(sides(steps('sidebar', 'right', 'right'))).toEqual([[], ['sidePanel', 'sidebar']])
+    expect(sides(steps('sidebar', 'right', 'right', 'left'))).toEqual([[], ['sidebar', 'sidePanel']])
+    expect(sides(steps('sidebar', 'right', 'left'))).toEqual([['sidebar'], ['sidePanel']])
+    expect(sides(steps('sidePanel', 'left'))).toEqual([['sidebar', 'sidePanel'], []])
+  })
+
+  it('stops at the window’s edge and where the surface can’t go', () => {
+    for (const [surface, direction] of [['sidebar', 'left'], ['sidePanel', 'right'], ['sidebar', 'up'], ['playerBar', 'left'], ['playerBar', 'down'], ['topbar', 'down'], ['topbar', 'left']] as [Surface, Direction][]) {
+      expect(stepSurface(start, surface, direction), `${surface} ${direction}`).toBe(start)
+    }
+  })
+
+  it('carries a bar over the page, then past its neighbours there', () => {
+    const above = steps('playerBar', 'up')
+    // Over the page: the near end of the top, under the top bar.
+    expect([above.regions.top, above.regions.bottom]).toEqual([['brand', 'topbar', 'playerBar'], []])
+    expect(steps('playerBar', 'up', 'up').regions.top).toEqual(['brand', 'playerBar', 'topbar'])
+    expect(steps('playerBar', 'up', 'down')).toEqual(start)
+  })
+
+  it('takes the logo to any side', () => {
+    expect(steps('brand', 'left').regions.left).toEqual(['brand', 'sidebar'])
+    expect(steps('brand', 'right').regions.right).toEqual(['sidePanel', 'brand'])
+    // Down: past the top bar first, then over the page.
+    expect(steps('brand', 'down').regions.top).toEqual(['topbar', 'brand'])
+    expect(steps('brand', 'down', 'down').regions.bottom).toEqual(['brand', 'playerBar'])
   })
 })
 

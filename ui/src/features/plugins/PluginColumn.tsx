@@ -12,7 +12,7 @@ export function PluginColumn({ plugin }: { plugin: string }) {
   if (!installed || narrow) return null
   const name = installed.manifest?.name ?? plugin
   return (
-    <aside aria-label={name} onContextMenu={onMenu(() => pluginPanelMenu(installed))} className="flex w-75 shrink-0 flex-col gap-3 overflow-y-auto rounded-lg bg-panel p-3 phone:hidden">
+    <aside data-surface={`plugin:${plugin}`} aria-label={name} onContextMenu={onMenu(() => pluginPanelMenu(installed))} className="flex w-75 shrink-0 flex-col gap-3 overflow-y-auto rounded-lg bg-panel p-3 phone:hidden">
       <h2 className="text-sm font-medium">{name}</h2>
       <PluginPanel plugin={plugin} />
     </aside>

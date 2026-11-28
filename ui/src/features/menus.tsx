@@ -61,7 +61,7 @@ import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, use
 import { artistBlocked } from './player/blockedArtists'
 import { notifyError } from '../app/notifyError'
 import { copyText } from '../app/copyText'
-import { isCutSection, offered } from '../shared/liteCuts'
+import { isCutSection } from '../shared/liteCuts'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
@@ -531,7 +531,7 @@ function pluginItems(where: 'track' | 'playlist' | 'player', context: Record<str
 }
 
 /** Moving the app's parts by hand: a PC's wide window only. */
-const arrangeItem = (): MenuEntry => !phoneApp && !isPhone() && offered('arrange') && { label: tr('Arrange the app…'), icon: <SquaresFour size={16} />, onSelect: startArranging }
+const arrangeItem = (): MenuEntry => !phoneApp && !isPhone() && { label: tr('Arrange the app…'), icon: <SquaresFour size={16} />, onSelect: startArranging }
 
 /** The way back from a theme's layout: no id, so no menu setting hides it. */
 const defaultLayoutItem = (): MenuEntry => shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: turnLayoutsOff }

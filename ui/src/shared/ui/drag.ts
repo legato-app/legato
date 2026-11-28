@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
+import type { Surface } from '../theme/layout'
 
 /**
  * Drag and drop with the pointer, not HTML5's: Tauri's window file drop (audio files, QR codes dropped on the app)
@@ -10,7 +11,12 @@ import { create } from 'zustand'
  * handler registered under that id (`useDropTarget`). Lists give their rows `data-slot="<index>"`: the slot is where
  * the item lands (before that row, or after it on its lower half).
  */
-export type DragData = { kind: 'tracks'; ids: number[]; from?: { playlist: number; row: number } } | { kind: 'queue'; i: number } | { kind: 'home'; id: string }
+export type DragData =
+  | { kind: 'tracks'; ids: number[]; from?: { playlist: number; row: number } }
+  | { kind: 'queue'; i: number }
+  | { kind: 'home'; id: string }
+  /** A part of the app moved by hand (`features/arrange`). */
+  | { kind: 'arrange'; scope: 'surface'; id: Surface }
 
 export type Target = {
   accepts: (d: DragData) => boolean

@@ -3,7 +3,8 @@ import { moveSurface } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
 import { useArrangeDraft } from '../../app/arrangeDraft'
-import { arrange, beginArranging, discardArrangement, finishArranging, undoMove } from './session'
+import { surfaceName, whereIs } from './names'
+import { arrange, beginArranging, discardArrangement, finishArranging, hideSurface, nudgeSurface, placeSurface, undoMove, useArrange } from './session'
 
 const notify = vi.fn()
 const settings = vi.hoisted(() => ({ now: {} as Settings, listeners: new Set<(state: { settings: Settings }) => void>() }))
@@ -51,6 +52,32 @@ it('draws the moves, writes nothing before Done, then saves a copy with a way ba
   expect(text).toBe(`Layout saved in ${preset.name} custom`)
   options.action.run()
   expect([settings.now.theme, settings.now.customThemes]).toEqual([preset.id, []])
+})
+
+it('says where a moved surface went, or that it can’t, each move undoable', () => {
+  beginArranging()
+  const said = () => useArrange.getState().said
+  const name = surfaceName('sidebar', [])
+  nudgeSurface('sidebar', name, 'right')
+  expect([draft()?.regions.right, said()]).toEqual([['sidebar', 'sidePanel'], 'Sidebar on the right, 1 of 2'])
+  placeSurface('sidebar', name, 'left', 0)
+  expect(said()).toBe('Sidebar on the left')
+  nudgeSurface('sidebar', name, 'left')
+  expect(said()).toBe('Sidebar can’t go there')
+  hideSurface('sidebar', name)
+  expect([draft()?.hidden, said()]).toEqual([['sidebar'], 'Sidebar hidden'])
+  hideSurface('topbar', surfaceName('topbar', []))
+  expect(said()).toBe('Top bar can’t be hidden')
+  hideSurface('sidebar', name)
+  expect(said()).toBe('Sidebar on the left')
+  undoMove()
+  expect([draft()?.hidden, said()]).toEqual([['sidebar'], ''])
+})
+
+it('names a plugin’s panel after the plugin', () => {
+  expect(surfaceName('plugin:example.panel', [{ id: 'example.panel', manifest: { name: 'Example' } }])).toBe('Example')
+  expect(surfaceName('plugin:gone', [])).toBe('gone')
+  expect(whereIs(DEFAULT_LAYOUT, 'brand', 'Logo')).toBe('Logo at the top, 1 of 2')
 })
 
 it('says nothing and writes nothing when Done finds nothing moved', () => {

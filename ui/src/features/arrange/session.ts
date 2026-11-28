@@ -8,12 +8,15 @@ import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { tr } from '../../shared/i18n/i18n'
-import { DEFAULT_LAYOUT, resolveLayout, type Placement } from '../../shared/theme/layout'
+import { moveSurface, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
+import { DEFAULT_LAYOUT, resolveLayout, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
 import { historyFrom, moved, redone, undone, type History } from './history'
+import { whereIs } from './names'
 
-export const useArrange = create<{ history: History }>(() => ({ history: historyFrom(DEFAULT_LAYOUT) }))
+/** `said`: the last move in words, for screen readers (the bar's live region). */
+export const useArrange = create<{ history: History; said: string }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '' }))
 
 /** The theme picked, as saved (`current` patches the accent in); the System one under that name, for a copy of it. */
 function pickedTheme(): Theme {
@@ -23,8 +26,8 @@ function pickedTheme(): Theme {
   return settings.theme === 'system' ? { ...theme, name: tr('System') } : theme
 }
 
-function show(history: History) {
-  useArrange.setState({ history })
+function show(history: History, said = '') {
+  useArrange.setState({ history, said })
   useArrangeDraft.setState({ draft: history.present })
 }
 
@@ -56,6 +59,25 @@ export const undoMove = () => step(undone)
 export const redoMove = () => step(redone)
 /** The app's own arrangement. */
 export const arrangeDefault = () => arrange(DEFAULT_LAYOUT)
+
+/** A surface moved or hidden, and said: where it is now, or that it can't (`name`: as the user reads it). */
+function say(surface: Surface, name: string, next: Placement, refused: string) {
+  const { history } = useArrange.getState()
+  if (next === history.present) return useArrange.setState({ said: refused })
+  show(moved(history, next), whereIs(next, surface, name))
+}
+
+const present = () => useArrange.getState().history.present
+const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
+
+/** Dropped by the pointer into `region`, at slot `at`. */
+export const placeSurface = (surface: Surface, name: string, region: Region, at: number) => say(surface, name, moveSurface(present(), surface, region, at), cannotGo(name))
+
+/** Moved by an arrow key. */
+export const nudgeSurface = (surface: Surface, name: string, direction: Direction) => say(surface, name, stepSurface(present(), surface, direction), cannotGo(name))
+
+/** Hidden, or shown again. */
+export const hideSurface = (surface: Surface, name: string) => say(surface, name, toggleHidden(present(), { surface }), tr('{part} can’t be hidden', { part: name }))
 
 /** Leaves the mode, nothing saved. */
 export function discardArrangement() {
