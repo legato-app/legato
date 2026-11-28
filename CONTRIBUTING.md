@@ -39,6 +39,19 @@ then runs the type check, ESLint, Vitest, Clippy (warnings are errors) and the R
 mock, quit. About 15 seconds once built; CI runs it in its own job. Run it when a change touches playback, the welcome,
 search, the library scan or how the app starts and ends. [docs/development.md](docs/development.md) has the details.
 
+## Linux
+
+Packages for a Linux build (Debian, Ubuntu):
+
+```bash
+sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libasound2-dev libdbus-1-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
+```
+
+To try a build on a real Linux desktop without building it: push to `platforms` with `[linux trial]` in the head commit
+message, and download the debug AppImage from that run's artifacts (kept 7 days). What Linux still hides is listed in
+`MISSING_ON_LINUX` (`ui/src/shared/platform.ts`). Without a tray icon, closing quits Legato; without a keyring, sign-ins
+last until it closes. Details: [docs/development.md](docs/development.md).
+
 ## Website
 
 `site/`: Next.js exported to plain files, deployed to GitHub Pages by `.github/workflows/pages.yml` when master's
