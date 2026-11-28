@@ -12,6 +12,7 @@ import { useStore } from './store'
 import { toggleFullscreen } from './fullscreen'
 import { cycleLoop } from '../features/player/abLoop'
 import { useVoiceAsk } from '../features/search/voiceRun'
+import { startArranging } from './arrangeDraft'
 
 const player = () => usePlayer.getState()
 // A full screen on top (the visualizer's, the cover display) or picture-in-picture: the other screens' keys wait for Esc.
@@ -65,6 +66,7 @@ export const RUN: Record<ActionId, () => void> = {
   settings: () => !onTop() && useStore.getState().go({ name: 'settings', section: 'shortcuts' }),
   goBack: () => !onTop() && (player().full ? player().setFull(false) : useStore.getState().goBack()),
   goForward: () => !onTop() && useStore.getState().goForward(),
+  arrange: () => !onTop() && startArranging(),
   // Rust shows the window itself (global only).
   showApp: () => {},
 }

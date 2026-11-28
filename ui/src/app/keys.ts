@@ -38,6 +38,7 @@ export type ActionId =
   | 'settings'
   | 'goBack'
   | 'goForward'
+  | 'arrange'
   | 'showApp'
 
 export interface ActionInfo {
@@ -85,6 +86,8 @@ export const ACTIONS: ActionInfo[] = [
   { id: 'settings', label: msg('Settings'), keys: 'Ctrl+Comma', global: null },
   { id: 'goBack', label: msg('Back'), keys: 'Alt+ArrowLeft', global: null },
   { id: 'goForward', label: msg('Forward'), keys: 'Alt+ArrowRight', global: null },
+  // No default: a mode entered now and then (menus and Settings open it too).
+  { id: 'arrange', label: msg('Arrange the app'), keys: null, global: null },
   { id: 'showApp', label: msg('Show Legato'), keys: null, global: 'Ctrl+Alt+KeyM', globalOnly: true },
 ]
 

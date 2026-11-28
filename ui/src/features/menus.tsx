@@ -1,5 +1,5 @@
 /** Right-click menus, one builder per kind of thing (track, playlist, album, artist, player, app). Built when opened: fresh state. */
-import { UsersThree, Devices, DotsThree, ArrowCounterClockwise, ArrowsClockwise, ArrowsOutSimple, ArrowSquareOut, ClipboardText, Layout, Copy, CopySimple, Disc, DownloadSimple, ChartBar, Eye, EyeSlash, MusicNotesSimple, FolderOpen, FolderSimple, FolderSimplePlus, FrameCorners, PushPin, PushPinSlash, Info, Power, ImageSquare, Gear, Link, Timer, SpeakerHifi, Users, ListBullets, ListPlus, MagnifyingGlass, MicrophoneStage, MinusCircle, Moon, Palette, Gradient, Gauge, Equalizer, FlipVertical, Pause, PencilSimple, PictureInPicture, Play, Playlist, Plus, PlusCircle, Prohibit, PuzzlePiece, Queue, Books, Microphone, Television, Radio, Repeat, Scales, ShareNetwork, Shuffle, SlidersHorizontal, Sparkle, Star, SortAscending, SkipBack, SkipForward, SpeakerHigh, Swatches, ThumbsDown, Trash, UploadSimple, VinylRecord, BookmarkSimple, Alarm, ArrowsIn, Question } from '@phosphor-icons/react'
+import { UsersThree, Devices, DotsThree, ArrowCounterClockwise, ArrowsClockwise, ArrowsOutSimple, ArrowSquareOut, ClipboardText, Layout, Copy, CopySimple, Disc, DownloadSimple, ChartBar, Eye, EyeSlash, MusicNotesSimple, FolderOpen, FolderSimple, FolderSimplePlus, FrameCorners, PushPin, PushPinSlash, Info, Power, ImageSquare, Gear, Link, Timer, SpeakerHifi, Users, ListBullets, ListPlus, MagnifyingGlass, MicrophoneStage, MinusCircle, Moon, Palette, Gradient, Gauge, Equalizer, FlipVertical, Pause, PencilSimple, PictureInPicture, Play, Playlist, Plus, PlusCircle, Prohibit, PuzzlePiece, Queue, Books, Microphone, Television, Radio, Repeat, Scales, ShareNetwork, Shuffle, SlidersHorizontal, Sparkle, Star, SortAscending, SkipBack, SkipForward, SpeakerHigh, Swatches, ThumbsDown, Trash, UploadSimple, VinylRecord, BookmarkSimple, Alarm, ArrowsIn, Question, SquaresFour } from '@phosphor-icons/react'
 import { ArrowLeft, ArrowRight } from '../shared/ui/directional'
 import { openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useSettings } from '../app/settings'
@@ -54,6 +54,8 @@ import { needleLook } from './player/vizVu'
 import { lookOptions, lookSettings, lookValue, usePluginViz } from './plugins/pluginViz'
 import { msg, tr, trn } from '../shared/i18n/i18n'
 import { ask, askText } from '../shared/ui/Ask'
+import { startArranging } from '../app/arrangeDraft'
+import { isPhone } from '../shared/phone'
 import { phoneApp } from '../shared/platform'
 import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, useBookmarks } from './player/bookmarks'
 import { artistBlocked } from './player/blockedArtists'
@@ -527,6 +529,9 @@ function pluginItems(where: 'track' | 'playlist' | 'player', context: Record<str
   if (!items.length) return []
   return ['-', ...items.map(({ plugin, command }) => ({ label: command.title, icon: <PuzzlePiece size={16} />, onSelect: () => runCommand(plugin, command.id, context) }))]
 }
+
+/** Moving the app's parts by hand: a PC's wide window only. */
+const arrangeItem = (): MenuEntry => !phoneApp && !isPhone() && { label: tr('Arrange the app…'), icon: <SquaresFour size={16} />, onSelect: startArranging }
 
 /** The way back from a theme's layout: no id, so no menu setting hides it. */
 const defaultLayoutItem = (): MenuEntry => shellLayoutOn() && { label: tr('Default layout'), icon: <Layout size={16} />, onSelect: turnLayoutsOff }
@@ -1064,6 +1069,7 @@ export function appMenu(): MenuEntry[] {
     '-',
     player().now && { id: 'nowPlaying', label: tr('Now playing'), icon: <ArrowsOutSimple size={16} />, onSelect: () => player().setFull(true) },
     tag('room', roomItem()),
+    arrangeItem(),
     defaultLayoutItem(),
     { id: 'settings', label: tr('Settings'), icon: <Gear size={16} />, onSelect: () => go({ name: 'settings', section: 'general' }) },
   ])

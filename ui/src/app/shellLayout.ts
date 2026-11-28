@@ -6,6 +6,7 @@ import { tr } from '../shared/i18n/i18n'
 import { useNarrow, usePhone } from '../shared/phone'
 import { phoneApp } from '../shared/platform'
 import { layoutOn, resolveLayout, withHiddenParts, withPluginPanels, type Pages, type Placement } from '../shared/theme/layout'
+import { useArrangeDraft } from './arrangeDraft'
 import { useSettings } from './settings'
 import { useStore } from './store'
 
@@ -13,19 +14,23 @@ import { useStore } from './store'
 export const useLayoutFailure = create(() => ({ failed: false }))
 
 export function dropLayout() {
+  useArrangeDraft.setState({ draft: null })
   useLayoutFailure.setState({ failed: true })
   useStore.getState().notify(tr('This theme’s layout didn’t work: the default layout is back'), { kind: 'error' })
 }
 
-/** The arrangement on screen: the theme's, unless themes may not arrange the app or it broke; a phone keeps its own. */
+/** The arrangement on screen: the one being arranged, else the theme's, unless themes may not arrange the app or it
+ *  broke; a phone keeps its own. */
 export function useShellLayout(): Placement {
   const allowed = useSettings((s) => s.settings.themeLayouts)
   const layout = useSettings((s) => s.current().layout)
   const failed = useLayoutFailure((s) => s.failed)
   const phone = usePhone()
   const plugins = usePlugins((s) => s.list)
+  // Not drawn by a window narrowed meanwhile: the phone's own, as for a theme's.
+  const draft = useArrangeDraft((state) => (phone ? null : state.draft))
   // The app's own arrangement stays `DEFAULT_LAYOUT` itself: a copy would pass for a theme's (LayoutBoundary).
-  return useMemo(() => withPluginPanels(resolveLayout(allowed && !failed ? layout : undefined, phone), plugins), [allowed, failed, layout, phone, plugins])
+  return useMemo(() => withPluginPanels(draft ?? resolveLayout(allowed && !failed ? layout : undefined, phone), plugins), [draft, allowed, failed, layout, phone, plugins])
 }
 
 /** Now Playing's pages: the arrangement's, with the parts the user hid. */

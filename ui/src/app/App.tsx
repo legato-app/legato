@@ -1,7 +1,7 @@
 import { CaretDown, CopySimple, DotsThree, Gear, Minus, PuzzlePiece, Square, Warning, WifiSlash, X } from '@phosphor-icons/react'
 import { CaretLeft, CaretRight } from '../shared/ui/directional'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, lazy, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { AddonsView, AddView, AlbumsView, AlbumView, ArtistsView, ArtistView, BlindTest, ConnectWizard, CoverScreen, HealthView, PipScreen, HistoryView, HomeView, ImportDialog, ImportScreen, Karaoke, MixesView, MixView, BooksView, NotFoundView, OnScreenKeyboard, PodcastsView, TvHome, RadioView, NowPlaying, PlaylistView, PluginColumn, preloadHome, RoomDialog, SearchView, SettingsView, ShareDialog, SmartView, SongsView, StatsView, VizScreen, Welcome } from './pages'
 // Up next running out: similar songs (registers itself with the player).
@@ -50,6 +50,7 @@ import { Logo } from '../shared/ui/Logo'
 import { searchShift } from './searchShift'
 import { useSettings } from './settings'
 import { dropLayout, useNowPlayingPages, useShellLayout } from './shellLayout'
+import { useArrangeDraft } from './arrangeDraft'
 import { LayoutBoundary } from './LayoutBoundary'
 import { arrangeParts, DEFAULT_LAYOUT, layoutRegions, PART_GROUPS, pluginOf, type PartsChoice, type Surface } from '../shared/theme/layout'
 import { restoreScreen, startClosingPlayerOnNavigate, startScreenSaving } from './screen'
@@ -62,6 +63,9 @@ import { Asker } from '../shared/ui/Ask'
 import { WebcamScan } from '../features/share/WebcamScan'
 import { tr, trn, useLang } from '../shared/i18n/i18n'
 import { offered } from '../shared/liteCuts'
+
+// The arranging mode's bar, loaded when the mode opens (`startArranging`).
+const ArrangeBar = lazy(() => import('../features/arrange/ArrangeBar'))
 
 // Pages load on first visit (pages.ts), Home's download starts now, in parallel with the settings and the library.
 preloadHome()
@@ -372,6 +376,7 @@ export function App() {
 
   // Where the theme puts the shell's parts (its own arrangement without a layout).
   const placement = useShellLayout()
+  const arranging = useArrangeDraft((state) => !!state.draft)
   const nowPlayingPages = useNowPlayingPages(placement.pages)
   const shell = layoutRegions(placement, full)
   // Open wide, the library stands in for the page: only with a sidebar to hold it.
@@ -462,6 +467,11 @@ export function App() {
       <PhoneTabs />
       <MiniPlayer />
       <VolumeHud />
+      {arranging && (
+        <PageBoundary fallback={null}>
+          <ArrangeBar />
+        </PageBoundary>
+      )}
       {full && (
         <PageBoundary fallback={null}>
           <PageLayout.Provider value={nowPlayingPages}>

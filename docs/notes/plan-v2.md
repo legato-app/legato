@@ -1143,7 +1143,13 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - [x] Slice 1 `S` (2026-11-27): pure `shared/theme/arrange.ts` (`moveSurface`, `moveInGroup`, `toggleHidden`,
     `layoutFromPlacement`) and `shared/order.ts` (`moveToSlot`, the queue's now); table and round-trip tests. Nothing in
     the interface calls it yet.
-  - [ ] Slice 2 `M`: edit mode (store, draft, bar, entries, history, `saveArrangement`, Undo toast), a lazy chunk.
+  - [x] Slice 2 `M` (2026-11-28), not tried for real: the mode (`features/arrange`, loaded on first use; `app/arrangeDraft`
+    drawn by `useShellLayout`), its bar (Undo, Redo, Default layout, Discard, Done; Escape), entries (right-click,
+    Settings › Appearance, a shortcut with no key), `shared/theme/saveArrangement`, the Undo toast. Nothing drags yet:
+    Default layout is the only move until slice 3, so this does not reach `master` alone.
+    - Decided alone (2026-11-28): `themeLayouts` is turned back on at Done (nothing is written before), the bar saying
+      so; another theme picked meanwhile starts over from it, the moves not saved said gone; a layout a newer app wrote
+      is kept, the moves going into a copy; a window as narrow as a phone’s has no mode.
   - [ ] Slice 3 `M`: surfaces (drop zones, keyboard, announcements).
   - [ ] Slice 4 `M`: the three bars' parts and the eye.
   - [ ] Slice 5 `M`: page parts, columns by their header, the header's choice (check the virtualized table's headers and

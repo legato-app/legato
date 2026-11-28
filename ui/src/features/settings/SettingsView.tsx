@@ -43,6 +43,7 @@ import { canKeepAwake } from '../../shared/awake'
 import { DESKTOP_ONLY, DESKTOP_ONLY_SECTIONS } from './desktopOnly'
 import { PHONE_FOLDED } from './phoneFold'
 import { usePhone } from '../../shared/phone'
+import { startArranging } from '../../app/arrangeDraft'
 import { LanguagePicker } from './LanguagePicker'
 import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
@@ -195,6 +196,7 @@ const MenuCustomize = lazy(() => import('./MenuCustomize'))
 
 function Appearance() {
   const [menus, setMenus] = useState(false)
+  const narrow = usePhone()
   const { settings: s, update, current } = useSettings()
   const playing = usePlayer((p) => !!p.now)
   const col = (c: Column) => (s.columns.includes(c) ? s.columns.filter((x) => x !== c) : COLUMNS.filter((x) => x === c || s.columns.includes(x)))
@@ -212,6 +214,14 @@ function Appearance() {
       {/* The phone keeps its own arrangement (its row is desktop only): no empty box. */}
       {!phoneApp && (
         <div className="rounded-xl border border-line bg-raised">
+          {/* A window as narrow as a phone's draws the phone's arrangement: nothing to arrange. */}
+          {!narrow && (
+            <Row label={msg('Arrange the app')} sub={tr('Move and hide the parts of the app, saved into a theme of your own')}>
+              <Button variant="ghost" onClick={startArranging}>
+                {tr('Arrange…')}
+              </Button>
+            </Row>
+          )}
           <Row setting="themeLayouts" label={msg('Let themes arrange the app')} sub={tr('A theme may move or hide the sidebar, the side panel and the player bar. Off, only its colors and CSS apply. This setting applies to every synced PC')} toggle />
         </div>
       )}
