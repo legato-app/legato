@@ -13,15 +13,22 @@ keeps secrets and data. Written 2026-10-17; re-check the Spotify part when Spoti
 | Android (optional, from Windows) | JDK 17, the Android SDK (platform-tools, emulator, an API 36 image), NDK 30.0.16248370, and `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`. On the owner's PC all of it sits in `C:\dev\android` (outside AppData: Claude's shell sees a virtualized one), nothing on the PATH: dot-source `C:\dev\android\env.ps1` (sets `JAVA_HOME`, `ANDROID_HOME`, `NDK_HOME`, the PATH) before an Android build. Emulator: AVD `legato36`. |
 
 ```bash
-sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libasound2-dev libdbus-1-dev
+sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libasound2-dev libdbus-1-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
 ```
 
 Windows is the app's platform. In CI, macOS builds the whole app and passes every check; Linux checks the Rust crates,
-and on a Rust change runs clippy on the app shell, full and Lite (`check.yml`). The app has never been driven on either:
-the media panel, the ad shield's network hook and the system accent are Windows only (what Linux hides:
-`ui/src/shared/platform.ts`, its table beside `ui/src/shared/liteCuts.ts`). A debug AppImage to try on a real Linux: a push to `platforms` whose last commit says
-`[linux trial]` in its message (or, once the file is on master, the `linux trial` workflow by hand); it also needs
-`file patchelf` and GStreamer's plugins (`.github/workflows/linux-trial.yml`).
+and on a Rust change runs clippy on the app shell, full and Lite (`check.yml`). Linux has its own pieces: the MPRIS media
+panel and media keys, open at startup through the desktop's autostart folder, `legato://` links from the .deb or AppImage,
+and the sound mixer names Legato. The app has never been driven on a real Linux desktop. What Linux still hides is one
+table, `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`, which sits beside `liteCuts.ts`.
+
+**Trying on Linux.** `.github/workflows/linux-trial.yml` builds a debug AppImage and keeps it 7 days as an artifact.
+Trigger: a push to `platforms` whose head commit message contains `[linux trial]` (the body counts too), or the workflow
+run by hand once the file is on master. The job installs the packages above, plus `file`, `patchelf` and GStreamer's tools.
+
+**Without a tray or a keyring.** Without a tray icon (GNOME without an extension), closing the window quits Legato; the
+`closeToTray` setting is kept as it is. Without a keyring, sign-ins last until Legato closes (`src-tauri/src/desktop.rs`,
+`secrets.rs`).
 
 **Claude Code.** The recipes that kept coming back are project skills in `.claude/skills/`: `add-setting`,
 `add-connector` and `release-check` (`/release-check` before a push: it reports, never pushes). `.claude/launch.json`
@@ -261,8 +268,8 @@ To look at or delete them (here for `spotify`):
 | macOS | `security find-generic-password -s app.legato.desktop -a spotify` | `security delete-generic-password -s app.legato.desktop -a spotify` |
 | Linux | `secret-tool search service app.legato.desktop` | `secret-tool clear service app.legato.desktop username spotify` |
 
-Linux needs a running Secret Service (GNOME Keyring, or KWallet with its Secret Service on). Without one, nothing can
-be saved and Spotify stays signed out.
+Linux needs a running Secret Service (GNOME Keyring, or KWallet with its Secret Service on). Without one, sign-ins
+last until Legato closes, and Spotify stays signed out after a restart.
 
 Full reset: delete both keychain entries, the data folder and the webview profile above.
 
