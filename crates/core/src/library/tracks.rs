@@ -180,23 +180,33 @@ impl Library {
     /// Once: the songs older versions saved backwards ("doja cat *slowed*" by "like that") are turned round
     /// (`turn_video_only`). A sync never renames a song a PC has: two versions don't undo each other. How many were.
     pub fn turn_backwards_titles(&self) -> Result<usize> {
-        // 2: the first rule asked for a proof few libraries had.
-        const DONE: &str = "backwardsTitles2";
+        // 2: the first rule asked for a proof few libraries had. 3: a merge could bring such a song after the pass.
+        const DONE: &str = "backwardsTitles3";
         if self.setting(DONE)?.is_some() {
             return Ok(0);
         }
         self.tx(|| {
-            let artists = self.artist_keys()?;
-            let mut turned = 0;
-            for mut row in self.track_rows(None)? {
-                if turn_video_only(&mut row.track, &artists) {
-                    self.set_details(row.id, &row.track.title, &row.track.artist, None)?;
-                    turned += 1;
-                }
-            }
+            let turned = self.turn_songs_backwards(None)?;
             self.set_setting(DONE, &serde_json::json!(true))?;
             Ok(turned)
         })
+    }
+
+    /// `turn_video_only` over these songs (None: the whole library), by the artists it names now. How many it renamed.
+    pub(crate) fn turn_songs_backwards(&self, only: Option<&[i64]>) -> Result<usize> {
+        // Reading every artist is the costly half: not for no song.
+        if only.is_some_and(<[i64]>::is_empty) {
+            return Ok(0);
+        }
+        let artists = self.artist_keys()?;
+        let mut turned = 0;
+        for mut row in self.track_rows(only.map(|ids| ids_json(ids.iter().copied())).as_deref())? {
+            if turn_video_only(&mut row.track, &artists) {
+                self.set_details(row.id, &row.track.title, &row.track.artist, None)?;
+                turned += 1;
+            }
+        }
+        Ok(turned)
     }
 
     pub fn upsert_track(&self, t: &Track) -> Result<i64> {

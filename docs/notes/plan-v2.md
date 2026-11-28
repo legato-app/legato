@@ -282,8 +282,9 @@ the order; a line leaves only when it ships or the user drops it.
     renames no song a PC has.
 - [ ] `S` Mixes' artist key for a YouTube Music upload titled "Title - Artist" (`mixes::credit` splits it on the dash
       and takes the left side): grouping, Like seeds and the artist name a mix may show; no song renamed.
-- [ ] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
-      `turn_video_only` on the songs a merge inserts, never on one already there.
+- [x] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
+      `turn_video_only` on the songs a merge inserts, never on one already there; the one-time turn runs once more
+      (`backwardsTitles3`). 2026-11-28, not tried.
 
 ## The owner's asks of 2026-11-07, evening
 

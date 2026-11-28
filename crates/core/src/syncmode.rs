@@ -651,6 +651,8 @@ impl Library {
 
         // 3. Songs: found here or added (row ids of this PC). Removed ones stay out.
         let mut local: HashMap<u32, Option<i64>> = HashMap::new();
+        // The songs this PC didn't have, whichever step brings them.
+        let mut inserted = Vec::new();
         let mut row = |i: u32, m: &mut Merged| -> Result<Option<i64>> {
             if let Some(id) = local.get(&i) {
                 return Ok(*id);
@@ -667,6 +669,7 @@ impl Library {
                         let id = self.upsert_track(&t)?;
                         if had.is_none() {
                             m.songs += 1;
+                            inserted.push(id);
                         }
                         Some(id)
                     }
@@ -842,6 +845,9 @@ impl Library {
         }
         // Last: what this file brought of the user's (plays, ratings, lists) holds its songs.
         m.deleted += self.drop_left_imports()?;
+        // An older PC may send a song backwards. Only those new here, once everything is in: the file may bring the
+        // proof of the artist too.
+        self.turn_songs_backwards(Some(&inserted))?;
         Ok(m)
     }
 
@@ -1159,6 +1165,79 @@ mod tests {
         }
         assert_eq!(titles_sorted(&turned)?, ["like that *slowed*"]);
         assert_eq!(titles_sorted(&old)?, ["doja cat *slowed*"]);
+        Ok(())
+    }
+
+    /// A song only a video named, as a pasted link saves it: the video's id and frame, no album.
+    fn video_song(id: &str, title: &str, artist: &str) -> Track {
+        Track { artist: artist.into(), art: Some(crate::model::youtube_art(id)), ..song(title, id) }
+    }
+
+    /// A song that makes its artist known: it has an album.
+    fn album_song(id: &str, artist: &str) -> Track {
+        Track { artist: artist.into(), album: Some("Album".into()), ..song("Say So", id) }
+    }
+
+    fn artist_and_title(library: &Library, song: &Track) -> Result<(String, String)> {
+        let id = library.find(song)?.expect("the song is there");
+        Ok(library.track(id)?.map(|row| (row.track.artist, row.track.title)).expect("the song has a source"))
+    }
+
+    #[test]
+    fn a_backwards_title_new_here_arrives_the_right_way_round() -> Result<()> {
+        let backwards = video_song("v1", "doja cat *slowed*", "like that");
+        let right = ("doja cat".to_string(), "like that *slowed*".to_string());
+        // This PC knows the artist, and its one-time pass has already run.
+        let (here, older) = (Library::in_memory()?, Library::in_memory()?);
+        here.upsert_track(&album_song("c1", "Doja Cat"))?;
+        here.turn_backwards_titles()?;
+        older.upsert_track(&backwards)?;
+        here.merge(&snap(&older))?;
+        assert_eq!(artist_and_title(&here, &backwards)?, right);
+        // An empty library: the same file brings the proof, after the song, and a playlist alone brings another.
+        let listed = video_song("v2", "doja cat *sped up*", "paint the town");
+        older.upsert_track(&album_song("c1", "Doja Cat"))?;
+        older.save_playlist(Source::Youtube, "p1", "Edits", std::slice::from_ref(&listed))?;
+        let mut file = snap(&older);
+        file.library.retain(|index| !file.tracks[*index as usize].track().ids.values().any(|id| id == "v2"));
+        let empty = Library::in_memory()?;
+        empty.merge(&file)?;
+        assert_eq!(artist_and_title(&empty, &backwards)?, right);
+        assert_eq!(artist_and_title(&empty, &listed)?, ("doja cat".to_string(), "paint the town *sped up*".to_string()));
+        // The same file again adds nothing and keeps the names.
+        assert_eq!(empty.merge(&file)?.songs, 0);
+        assert_eq!(artist_and_title(&empty, &backwards)?, right);
+        Ok(())
+    }
+
+    #[test]
+    fn a_merge_renames_no_song_already_here_and_none_it_cannot_tell() -> Result<()> {
+        let (here, other) = (Library::in_memory()?, Library::in_memory()?);
+        let kept = video_song("v1", "doja cat *slowed*", "like that");
+        here.upsert_track(&kept)?;
+        other.upsert_track(&kept)?;
+        other.upsert_track(&album_song("c1", "Doja Cat"))?;
+        let long = Track { duration_ms: Some(10 * 60_000 + 1), ..video_song("v2", "doja cat *sped up*", "paint the town") };
+        let unknown = video_song("v3", "Someone", "A Song");
+        other.upsert_track(&long)?;
+        other.upsert_track(&unknown)?;
+        here.merge(&snap(&other))?;
+        for song in [&kept, &long, &unknown] {
+            assert_eq!(artist_and_title(&here, song)?, (song.artist.clone(), song.title.clone()));
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn a_library_that_ran_the_earlier_pass_runs_it_once_more() -> Result<()> {
+        let library = Library::in_memory()?;
+        let backwards = video_song("v1", "doja cat *slowed*", "like that");
+        library.upsert_track(&backwards)?;
+        library.upsert_track(&album_song("c1", "Doja Cat"))?;
+        library.set_setting("backwardsTitles2", &serde_json::json!(true))?;
+        assert_eq!(library.turn_backwards_titles()?, 1);
+        assert_eq!(artist_and_title(&library, &backwards)?, ("doja cat".to_string(), "like that *slowed*".to_string()));
+        assert_eq!(library.turn_backwards_titles()?, 0);
         Ok(())
     }
 
