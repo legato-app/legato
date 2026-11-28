@@ -25,10 +25,14 @@ For a small PC, releases that carry `Legato.Lite_…_x64-setup.exe` offer Legato
 ## Editions and platforms
 
 - **Legato Lite** (Windows): a lighter build with its own library. It leaves out the Live Editor, the visualizer, song
-  fades, the Music Detector, Discord, plugins, listening rooms, the phone remote, karaoke, podcasts and audiobooks.
-- **Linux**: in progress. The build runs in CI and a trial AppImage can be made on request; there is no release yet.
-- **Android**: Connect Spotify opens Exportify in your browser, then takes the export file you saved.
-- **Backups**: Add from a backup (Settings › Library backup) merges an older copy of your library into yours, removing nothing.
+  fades, the Music Detector, Discord, plugins, listening rooms, the phone remote, the streaming overlay, the blind test,
+  living-room mode, karaoke, podcasts and audiobooks.
+- **Linux**: in progress. CI checks it on Linux, and the maintainers build a trial AppImage to test it on a real desktop;
+  there is no release yet.
+- **Android**: the APK is in the releases, as a Beta (the newest one is on the `beta` release). Connect Spotify opens
+  Exportify in your browser, then takes the export file you saved. Not yet tried on a phone.
+- **Backups**: Add from a backup (Settings › Library and storage) merges a backup file into your library, removing
+  nothing. A backup made by this version or an older one works; a newer one is refused.
 
 ## Everything else is on the website
 
