@@ -1,16 +1,14 @@
 # Linux trial (plan-v2 "Linux for both versions", slice 0): a debug AppImage of the full app as an artifact, to try on a
-# real Linux (the embed, its codecs, `live.js`, the Google sign-in). Never released, never signed: no secret here. Run by
-# hand (Actions › linux trial, once this file is on master) or by pushing any branch to `linux-trial`.
+# real Linux (the embed, its codecs, `live.js`, the Google sign-in). Never released, never signed: no secret here.
+# Run by a push to `platforms` whose last commit says `[linux trial]` in its message (the body is enough), or by hand
+# (Actions › linux trial) once this file is on master: the hand trigger only reads master's copy. Any other push to
+# `platforms` skips the job: no AppImage each time.
 name: linux trial
 
 on:
   workflow_dispatch:
   push:
-    branches: [linux-trial]
-
-concurrency:
-  group: linux-trial-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [platforms]
 
 permissions:
   contents: read
@@ -21,6 +19,11 @@ env:
 
 jobs:
   appimage:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[linux trial]')
+    # On the job, not the workflow: a skipped push never cancels a trial under way, a newer trial does.
+    concurrency:
+      group: linux-trial
+      cancel-in-progress: true
     # The oldest base the design targets (WebKitGTK 4.1): an AppImage runs on that glibc and newer.
     runs-on: ubuntu-22.04
     timeout-minutes: 60
