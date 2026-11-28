@@ -32,7 +32,8 @@ the order; a line leaves only when it ships or the user drops it.
       put elsewhere. Tests in core; never run on a real library.
       Decided alone (2026-11-27): ticked on that; the songs the mixes had already dropped have their own line below.
 - [ ] `S` Songs old mixes dropped, now in no playlist and never played (for the owner): not told apart from songs added
-      by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the way. (to check: 5789ef7d cleans them out once after a copy; is the visible, undoable Clean up still wanted?)
+      by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the
+      way. (to check: 5789ef7d cleans them out once after a copy; is the visible, undoable Clean up still wanted?)
 - [x] `M` Disconnecting Spotify asks once to keep or remove what only Spotify brought, a library backup made first (the
       owner, 2026-11-26). 2026-11-27: the question after Disconnect removes the imported playlists and the songs only
       Spotify knows that nothing else holds (`library::cleanup`, the mix cleanup’s rule: no other source, no list that
@@ -53,7 +54,7 @@ the order; a line leaves only when it ships or the user drops it.
     - Limit: an older Legato keeps the songs until it updates (the question says it).
     - 2026-11-27 (review): an `import-back` comes after the record it ends even on a PC whose clock is behind (else a
       song added by hand there was swept).
-- [x] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
+- [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et
       tout c pas ouf et en plus sa doit rien changer et enleve la bar en dessous »). Built 2026-11-19 (`docs/playback.md`
@@ -103,7 +104,7 @@ the order; a line leaves only when it ships or the user drops it.
       the user pastes or drops an exact Discord link, so no off-by-default switch; easiest to undo = delete the listener
       in `PlayerBar.tsx`. (5) A picture is only read for a share card's link (`share_read_image`), never kept as a cover.
 
-- [x] `M` Android: the sound sometimes crackles or sounds saturated (the owner, 2026-11-18, cause unknown to them, "maybe
+- [ ] `M` Android: the sound sometimes crackles or sounds saturated (the owner, 2026-11-18, cause unknown to them, "maybe
       the connection"). Their answers: a YouTube song, Bluetooth earphones, the screen off or the app in the background, no
       effect on. Not reproduced. The owner's word (2026-11-18): fix the live processing so it holds up there; never
       switch it off to dodge the problem. Suspect first (read in the code, not proven): by default every YouTube song is
@@ -138,8 +139,8 @@ the order; a line leaves only when it ships or the user drops it.
       (offline render in Chromium: all on then off = the neutral level), desktop too. NOT ticked: the cause is likely,
       not certain. To try on the phone: (1) Live Editor used on a song then reset, YouTube song, Bluetooth, screen off:
       no crackle = the idle parts were it. (2) Same with crossfade on, across a song change. (3) 8D (Space) and reverb on:
-      Done 2026-11-28 (390e82fe, 306de9a3, c0245823), not tried on a phone: see "Check live in the real app".
       crackles only then = those parts alone are too heavy (next: a lighter reverb on Android). (4) Speed or pitch changed.
+      Fixes landed 2026-11-18/19 (390e82fe, 306de9a3, c0245823), not tried on the phone.
 - [x] `M` The devices sync heard sooner on the network (the owner, 2026-11-18, from the phone: "que ça se détecte plus
       rapidement sur le réseau"). Today (`src-tauri/src/devices.rs`): listening starts 20 s after launch (`FIRST`), the
       automatic round runs every 60 s (`EVERY`) and wakes early only when a trusted device is heard for the first time
@@ -290,7 +291,8 @@ the order; a line leaves only when it ships or the user drops it.
       1.1.785 on their phone; the diagnostics show three restarts in a minute and no error line: a native crash). 2026-11-07: the plugin's Kotlin (tauri-plugin-barcode-scanner
       2.5.3) shows no sure cause; a Java crash now lands in the diagnostics (`MainActivity.kt` `keepCrashes`, never built
       here: no Android toolchain on this PC), so the next Beta's Copy diagnostics names it. Faster: the phone on USB with
-      debugging on, `adb logcat -b crash -d` on a PC with the SDK. (to check: 8e9fb3f2 and 81f4511d show a crash in the diagnostics; the crash cause is still open)
+      debugging on, `adb logcat -b crash -d` on a PC with the SDK. (to check: 8e9fb3f2 and 81f4511d show a crash in the
+      diagnostics; the crash cause is still open)
 
 ## The owner's answers of 2026-11-11 (still to build)
 Also settled: no push yet (they try with `pnpm dev` first); the flowing background, the new-releases section and the
@@ -384,7 +386,8 @@ Where a line says "reading", the owner hasn't confirmed it.
     release) reads it. Both frozen installs pass offline with 11.9.0 here; not tried for real (no CI run yet).
     - Decided alone (2026-11-27): 11.9.0, the local one (lockfileVersion 9.0 is read by 9 to 11; it needs Node
       22.13 or later, which `node-version: 22` gives); `release.yml` too, as two versions would stop the action.
-- [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale. (to check: where the FAQ label is set, not located in this pass)
+- [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale. (to
+      check: where the FAQ label is set, not located in this pass)
 - [x] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
   - 2026-11-27: `pnpm why motion` in `site/` finds one version, 14.14.0. Site not built, not tried for real.
     - Decided alone (2026-11-27): lockfile updated offline, so nothing else moved.
@@ -458,7 +461,8 @@ copies, downloads for offline), their accounts, limits and paid plan.
       forbid rebuilding its sets on YouTube without a registered app of theirs. Today's way, untried: Tune My Music's
       CSV export through Add music › song list.
 - [ ] 16. `M` Reach: left, microsoft/winget-pkgs#474341 merged by Microsoft's moderators (submitted 2026-11-07; then
-      a manifest per Stable, `packaging/README.md`). Done: the website in 18 languages, README screens, Discussions; (to check: is winget-pkgs#474341 merged? ad435198 says submitted only)
+      a manifest per Stable, `packaging/README.md`). Done: the website in 18 languages, README screens, Discussions; (to
+      check: is winget-pkgs#474341 merged? ad435198 says submitted only)
       no Scoop (decided alone).
 - [ ] 17. `L` Listening rooms over the internet, no server of ours: sealed control messages through a public relay (the
       owner's call), or the LAN. Takes in "Listen together on the local network".
@@ -709,7 +713,13 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       a Beta with the APK; Android first; YouTube signed out on the phone, the library from the PC by sync.
   - [ ] iPhone: not for now (the owner's word, 2026-11-07); later, their signing choice (Apple Developer Program, or an
         unsigned .ipa).
-- [ ] `S` + `M` Connect Spotify on the phone (the owner, 2026-11-28). Today the phone's card only opens a data export file (`SpotifyConnect.tsx`: no Connect on `phoneApp`; the Exportify window and Spotify's page need a second webview with our script, which Android doesn't give). S: an "Open Exportify" button that opens exportify.net in the phone's browser, the export saved, then picked by the existing file import (an Exportify file is read already); the privacy row already names Exportify. M: the user's own client ID (the desktop's app-key path, playlist scopes only), signed in through the browser with PKCE and a `legato://` redirect (Android deep link), the same Rust import. The page-reading path stays desktop only.
+- [ ] `S` + `M` Connect Spotify on the phone (the owner, 2026-11-28). Today the phone's card only opens a data export
+      file (`SpotifyConnect.tsx`: no Connect on `phoneApp`; the Exportify window and Spotify's page need a second
+      webview with our script, which Android doesn't give). S: an "Open Exportify" button that opens exportify.net in
+      the phone's browser, the export saved, then picked by the existing file import (an Exportify file is read
+      already); the privacy row already names Exportify. M: the user's own client ID (the desktop's app-key path,
+      playlist scopes only), signed in through the browser with PKCE and a `legato://` redirect (Android deep link), the
+      same Rust import. The page-reading path stays desktop only.
 
 **Medium**
 - [ ] `S` Community: GitHub Discussions (on since 2026-11-07, with the "good first issue" label) linked from About, a
@@ -1152,7 +1162,6 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   asked for at the press and let go of when the window closes, no picture is kept or sent. Decoding is tested on a real QR
   matrix; not tried: WebView2's camera permission prompt and a real webcam. Left: the share import's QR (it reads an
   image file today), wormhole words.
-      clicked in a browser (deep-link registration).
 - [ ] `M-L` Practice mode for musicians: A-B loop, slow down without pitch change (Live Editor has it), key and chords shown,
       count-in / metronome on the song's tempo.
       2026-11-12, the A-B loop: the player's menu has A–B loop (Loop starts here / Loop ends here / Clear the loop); at the end the
@@ -1371,10 +1380,14 @@ Most useful first; the tag is the effort.
 
 ## Check live in the real app (built and unit-tested, never driven for real)
 
-- [ ] Right-click customising screen (tick, reorder, Reset per kind, 4a6ba10c, MenuCustomize.tsx): not driven in the app.
-- [ ] Adaptive Sound as one steady gain per song, from its integrated loudness (4173b567, c74d9eb9, bdd3e3ba, 362dd86b): the owner's phone and PC, not tried for real.
-- [ ] A video-only title saved swapped, then turned by a sync from an older PC (a273ab9f, e80a2ca4): two real PCs, not tried.
-- [ ] Android crackle gone: a YouTube song on the phone, Bluetooth earphones, screen off or app in background, crossfade and 8D each on (fixes 390e82fe, 306de9a3, c0245823).
+- [ ] Right-click customising screen (tick, reorder, Reset per kind, 4a6ba10c, MenuCustomize.tsx): not driven in the
+      app.
+- [ ] Adaptive Sound as one steady gain per song, from its integrated loudness (4173b567, c74d9eb9, bdd3e3ba, 362dd86b):
+      the owner's phone and PC, not tried for real.
+- [ ] A video-only title saved swapped, then turned by a sync from an older PC (a273ab9f, e80a2ca4): two real PCs, not
+      tried.
+- [ ] Android crackle gone: a YouTube song on the phone, Bluetooth earphones, screen off or app in background, crossfade
+      and 8D each on (fixes 390e82fe, 306de9a3, c0245823).
 - [ ] Connect Apple Music on the owner's account (the owner's ask to keep it in mind, 2026-10-31): All Playlists read with
       covers, a long library playlist and Favorite Songs read to their end, the `media-user-token` cookie ending the
       sign-in step, a second import updating the lists. If it breaks, `apple.js`'s selectors are the first suspect (only a
@@ -1530,6 +1543,8 @@ Most useful first; the tag is the effort.
 
 ## Waiting on the user (outside the code)
 
+- [ ] Lite sync of 2026-11-28: the full app's UI settings were replaced by the Lite's defaults (fix on the way); restore
+      them from the daily library copy (steps in the owner's private notes).
 The owner's answers (2026-11-07, a quiz over the open questions; the lines they changed say so). Kept as they are: on
 the phone a YouTube song plays out of sight outside Now Playing, SponsorBlock off by default, the volume curve, star
 ratings in the library only (not in the files' tags), imports at one search per 3 s, no checking of every YouTube
@@ -1598,8 +1613,8 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
       `playOnWatchPage`, not reproduced).
 - [ ] `S` Share page: no covers and no player yet (covers would load from YouTube's host for the visitor).
 - [x] `S` Stats recap cards. Ticked 2026-11-18 (lot 63, audit of the line): the recap shipped (`812a8d96` a year or a month as cards to share, `d725d9fe` the profile card; `features/stats/RecapView.tsx`, `recapCards.ts`, `recapDraw.ts`, tested in `recap.test.ts`). What the line still asked is a try by hand (the card from the web page, the QR's look and size): Check live.
-      (to check: 353d301f says the night's security pass landed; what is left is not listed)
 - [ ] `M` Whole-app security pass (for Opus).
+      (to check: 353d301f says the night's security pass landed; what is left is not listed)
 - [ ] `S` Signed-out YouTube search: check it on the owner's PC; if it still fails, read the error under the search.
 - [ ] `S` Settings labels: review the descriptions' length and read the labels in the app in every language; the JSX per group is optional.
 - [x] `S` Server songs levelled: Jellyfin's `NormalizationGain` and Plex's loudness (other scales).
@@ -1617,8 +1632,9 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
 - [ ] `S` Last.fm "Discoveries": left for the owner (its public API has changed).
 - [ ] `S` Internet radio: a phone tab, and the station's own metadata (no ICY).
   2026-11-18 (lot 63): the phone tab is done: Radio is the 5th bottom tab (`PhoneTabs.tsx`, the lit tab chosen by the pure `tabLogic.ts`, tested), since the sidebar that holds Radio is hidden on a phone. Untried on a phone (5 tabs at 375 px). Left: the station's own metadata (ICY, a stream read: needs a real station).
-      (to check: the focus timer is in the app (ee7973a3, 611dc3b0, 768cc172 mention it); the no-lyrics filter and the summary not located)
 - [ ] `S` Focus / workout sessions: the session itself (timer, no-lyrics filter, summary) is left.
+      (to check: the focus timer is in the app (ee7973a3, 611dc3b0, 768cc172 mention it); the no-lyrics filter and the
+      summary not located)
   Audit 2026-11-18 (lot 63): the timer (the sleep timer's fade) and the summary ("N songs in M min") already shipped in `player/focus.ts`; only the no-lyrics filter is left, and no library field says a song has lyrics (they are fetched per song), so it needs a data source first: the owner's call.
 - [ ] `S` Smart playlists from words: the LLM half, with the user's own key, is left for the owner (a service and a privacy row to decide).
 - [x] `M` Blind test: left out, the artist-only guess, the answer timer, several players (local or LAN), a game from one playlist.
@@ -1632,8 +1648,9 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
 - [ ] `M` Blind test on several devices (LAN): rounds, turns and scores in step between them; a sync design first.
 - [x] `S` Typed `invoke` wrappers: the argument names and types are not checked by a test yet. Done 2026-11-18: `ui/src/shared/apiCommands.test.ts` reads `shared/api.ts` and every `.rs` under `src-tauri/src`, and fails when an `invoke('<cmd>', { … })` names a command that is not in `generate_handler!` or not defined by a `#[tauri::command]` fn, passes a key that command's parameters do not take (Rust snake_case read as Tauri's camelCase; `State`, `AppHandle`, `Window`, `WebviewWindow` left out, `Channel` kept) or leaves out a required one (an `Option` may be omitted); and when `generate_handler!` registers a name no command defines. Names and keys only, no types (ts-rs owns those). It found NO mismatch: the 279 wrappers all agree with the 280-odd commands today (checked that it can fail: a renamed key in `ytmArtist` is reported, then restored). No other file calls `invoke` outside tests. NOT done: the types of the arguments and the answers. References read: `ui/src/shared/api.ts`, `src-tauri/src/lib.rs` (`generate_handler!`), the command signatures under `src-tauri/src` (State and AppHandle parameters, `Option` ones).
 - [x] `S` Library scan progress: a small `M` with its own Channel, not started. Done 2026-11-18 (small): the Local files section of Settings › Accounts (`SourcesView.tsx`) now shows "Reading your files… {done} of {total}" with a thin bar under its folders while a scan runs, from the SAME report the Songs page already follows (`scan-progress`, `useScan`, sent by `rescan` every 200 ms at most; the text already exists in the 19 locales, nothing to translate). Found while reading: the progress already existed as an app-wide event, fired by every scan (the rescan button, adding or removing a folder, the folder watcher, a drop), and Songs showed it; only Settings did not. Decided alone (2026-11-18): NOT a new `tauri::ipc::Channel` on `rescan` / `rescan_local` as the line said: a Channel serves only the call that opened it, so the watcher's and a drop's scans would stay silent and the same count would be sent twice; the event reaches every window part that wants it, which is what both screens need. NOT seen on screen: the demo emits no scan progress, so the bar was checked by `tsc` and lint only, not by eye; `progressOf` and the store keep their existing test. References read: `src-tauri/src/library_cmd.rs` (`rescan`), `ui/src/features/library/scanProgress.ts` (+ test), `LibraryView.tsx:285-302`, `SourcesView.tsx` (Local files), `viz.rs` (`viz_start`, the Channel prior art).
-      (to check: 6bef82c0 marks explicit songs from YouTube Music's E badge, Exportify and iTunes; this line says the rows give no flag: which is current?)
 - [ ] `S` Hide explicit songs: untried on real answers (YouTube Music's page rows give no flag).
+      (to check: 6bef82c0 marks explicit songs from YouTube Music's E badge, Exportify and iTunes; this line says the
+      rows give no flag: which is current?)
 
 ### Personal servers (what is left)
 - [ ] `S` Plex's Sign out ends nothing at Plex: the account's token is dropped at the pick, and an owned server's
@@ -1644,10 +1661,11 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
   it needs the account token, which is dropped at the pick on purpose (only the server's own token is kept). Keeping
   the account token longer widens what a keychain leak gives: not for a call we can't check. The privacy row already
   tells the user to remove the device at plex.tv.
-      (checked 2026-11-28: jellyfin.rs:300, plex.rs:483 and subsonic.rs:362 have search; src-tauri/src/catalog_search.rs does not call them)
 - [ ] `S` Plex's JWT sign-in (clients.plex.tv, a device key pair, the token refreshed each week) if Plex retires
   the legacy PIN's long-lived tokens.
 - [ ] `S` Your music server in the app's search (`Conn::search` built for the three kinds, not wired). Decided alone
+      (checked 2026-11-28: jellyfin.rs:300, plex.rs:483 and subsonic.rs:362 have search; src-tauri/src/catalog_search.rs
+      does not call them)
   (2026-11-06): left for later; the library mirrors the whole server at each sync, so its songs already come
   up in the library's own search; the server's search would only add what came since the last sync.
   Skipped 2026-11-11 (decided alone): nothing a user would see beyond that gap (songs added in the last 30 minutes),
