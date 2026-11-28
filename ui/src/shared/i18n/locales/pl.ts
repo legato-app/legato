@@ -2733,6 +2733,12 @@ const pl: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': także gdy aplikacja działa w tle lub w zasobniku. Kliknij klawisz, aby go zmienić, Backspace go usuwa.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Nie udało się otworzyć mikrofonu: sprawdź, czy jest podłączony i czy system pozwala aplikacjom z niego korzystać.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Nie udało się otworzyć kamery: sprawdź, czy jest podłączona i czy system pozwala aplikacjom z niej korzystać.',
+  'Add from a backup': 'Dodaj z kopii zapasowej',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Dodaje to, co jest w pliku, a czego brakuje w tej bibliotece: utwory, playlisty, odsłuchy, oceny i wersje z Live Editora. Nic stąd nie znika.',
+  'Take its settings too': 'Weź też jej ustawienia',
+  'Added from the backup: {changes}': 'Dodano z kopii: {changes}',
+  'Nothing new in this backup.': 'W tej kopii nie ma nic nowego.',
+  'add merge backup recover songs playlists settings': 'dodaj scal kopia zapasowa odzyskaj utwory playlisty ustawienia',
 }
 
 export default pl

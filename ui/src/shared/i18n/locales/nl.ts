@@ -2733,6 +2733,12 @@ const nl: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': ook met de app op de achtergrond of in het systeemvak. Klik op een toets om hem te wijzigen, Backspace verwijdert hem.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'De microfoon kon niet worden geopend: controleer of er een is aangesloten en of je systeem apps toestaat hem te gebruiken.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'De camera kon niet worden geopend: controleer of er een is aangesloten en of je systeem apps toestaat hem te gebruiken.',
+  'Add from a backup': 'Uit een back-up toevoegen',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Voegt toe wat in het bestand staat en niet in deze bibliotheek: nummers, afspeellijsten, geluisterde nummers, beoordelingen en Live Editor-versies. Hier wordt niets verwijderd.',
+  'Take its settings too': 'Ook de instellingen overnemen',
+  'Added from the backup: {changes}': 'Toegevoegd uit de back-up: {changes}',
+  'Nothing new in this backup.': 'Niets nieuws in deze back-up.',
+  'add merge backup recover songs playlists settings': 'toevoegen samenvoegen back-up herstellen nummers afspeellijsten instellingen',
 }
 
 export default nl

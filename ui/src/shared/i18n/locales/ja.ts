@@ -2733,6 +2733,12 @@ const ja: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': '：アプリがバックグラウンドやトレイにあるときも。キーをクリックして変更、Backspaceで削除します。',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'マイクを開けませんでした。接続されていること、アプリによる使用がシステムで許可されていることを確認してください。',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'カメラを開けませんでした。接続されていること、アプリによる使用がシステムで許可されていることを確認してください。',
+  'Add from a backup': 'バックアップから追加',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'ファイルにあってこのライブラリにないもの（曲、プレイリスト、再生履歴、評価、Live Editor のバージョン）を追加します。ここからは何も削除されません。',
+  'Take its settings too': '設定も取り込む',
+  'Added from the backup: {changes}': 'バックアップから追加しました：{changes}',
+  'Nothing new in this backup.': 'このバックアップに新しいものはありません。',
+  'add merge backup recover songs playlists settings': '追加 統合 バックアップ 復元 曲 プレイリスト 設定',
 }
 
 export default ja

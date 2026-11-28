@@ -2733,6 +2733,12 @@ const ko: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': 앱이 백그라운드나 트레이에 있을 때도. 키를 클릭해 변경하고, Backspace로 삭제합니다.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': '마이크를 열 수 없습니다. 연결되어 있는지, 시스템에서 앱의 사용을 허용하는지 확인하세요.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': '카메라를 열 수 없습니다. 연결되어 있는지, 시스템에서 앱의 사용을 허용하는지 확인하세요.',
+  'Add from a backup': '백업에서 추가',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': '파일에는 있고 이 라이브러리에는 없는 곡, 재생목록, 감상 기록, 평점, Live Editor 버전을 추가합니다. 여기서는 아무것도 삭제되지 않습니다.',
+  'Take its settings too': '설정도 가져오기',
+  'Added from the backup: {changes}': '백업에서 추가함: {changes}',
+  'Nothing new in this backup.': '이 백업에는 새로운 항목이 없습니다.',
+  'add merge backup recover songs playlists settings': '추가 병합 백업 복구 곡 재생목록 설정',
 }
 
 export default ko

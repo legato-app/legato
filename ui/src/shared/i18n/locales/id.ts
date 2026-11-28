@@ -2733,6 +2733,12 @@ const id: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': juga saat aplikasi di latar belakang atau di tray. Klik tombol untuk menggantinya, Backspace menghapusnya.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofon tidak dapat dibuka: pastikan ada yang terhubung dan sistemmu mengizinkan aplikasi memakainya.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kamera tidak dapat dibuka: pastikan ada yang terhubung dan sistemmu mengizinkan aplikasi memakainya.',
+  'Add from a backup': 'Tambahkan dari cadangan',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Menambahkan isi file yang belum ada di pustaka ini: lagu, daftar putar, riwayat putar, rating, dan versi Live Editor. Tidak ada yang dihapus.',
+  'Take its settings too': 'Ambil juga pengaturannya',
+  'Added from the backup: {changes}': 'Ditambahkan dari cadangan: {changes}',
+  'Nothing new in this backup.': 'Tidak ada yang baru di cadangan ini.',
+  'add merge backup recover songs playlists settings': 'tambah gabung cadangan pulihkan lagu daftar putar pengaturan',
 }
 
 export default id

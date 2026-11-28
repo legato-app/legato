@@ -2673,6 +2673,12 @@ const he: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': גם כשהאפליקציה ברקע או במגש המערכת. לחצו על מקש כדי לשנות אותו, Backspace מסיר אותו.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'לא ניתן היה לפתוח את המיקרופון: בדקו שמחובר מיקרופון ושהמערכת מאפשרת לאפליקציות להשתמש בו.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'לא ניתן היה לפתוח את המצלמה: בדקו שמחוברת מצלמה ושהמערכת מאפשרת לאפליקציות להשתמש בה.',
+  'Add from a backup': 'הוספה מגיבוי',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'מוסיף את מה שיש בקובץ וחסר בספרייה הזו: שירים, פלייליסטים, האזנות, דירוגים וגרסאות Live Editor. שום דבר כאן לא מוסר.',
+  'Take its settings too': 'לקחת גם את ההגדרות שלו',
+  'Added from the backup: {changes}': 'נוסף מהגיבוי: {changes}',
+  'Nothing new in this backup.': 'אין שום דבר חדש בגיבוי הזה.',
+  'add merge backup recover songs playlists settings': 'הוספה מיזוג גיבוי שחזור שירים פלייליסטים הגדרות',
 }
 
 export default he

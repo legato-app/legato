@@ -2733,6 +2733,12 @@ const zh: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': '：应用在后台或托盘中时也可用。点击按键可更改，Backspace 可删除。',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': '无法打开麦克风：请检查是否已连接，以及系统是否允许应用使用它。',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': '无法打开摄像头：请检查是否已连接，以及系统是否允许应用使用它。',
+  'Add from a backup': '从备份添加',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': '添加文件中有而本音乐库没有的内容：歌曲、播放列表、播放记录、评分和 Live Editor 版本。这里不会删除任何内容。',
+  'Take its settings too': '同时采用其设置',
+  'Added from the backup: {changes}': '已从备份添加：{changes}',
+  'Nothing new in this backup.': '此备份中没有新内容。',
+  'add merge backup recover songs playlists settings': '添加 合并 备份 恢复 歌曲 播放列表 设置',
 }
 
 export default zh

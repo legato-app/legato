@@ -2733,6 +2733,12 @@ const tr: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': uygulama arka planda veya bildirim alanındayken de. Değiştirmek için bir tuşa tıkla, Geri tuşu kaldırır.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofon açılamadı: birinin bağlı olduğunu ve sisteminin uygulamaların kullanmasına izin verdiğini kontrol et.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kamera açılamadı: birinin bağlı olduğunu ve sisteminin uygulamaların kullanmasına izin verdiğini kontrol et.',
+  'Add from a backup': 'Yedekten ekle',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Dosyada olup bu kitaplıkta olmayanları ekler: şarkılar, çalma listeleri, dinlemeler, puanlar ve Live Editor sürümleri. Buradan hiçbir şey kaldırılmaz.',
+  'Take its settings too': 'Ayarlarını da al',
+  'Added from the backup: {changes}': 'Yedekten eklendi: {changes}',
+  'Nothing new in this backup.': 'Bu yedekte yeni bir şey yok.',
+  'add merge backup recover songs playlists settings': 'ekle birleştir yedek kurtar şarkılar çalma listeleri ayarlar',
 }
 
 export default tr

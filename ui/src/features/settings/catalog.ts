@@ -149,6 +149,7 @@ export const SETTINGS: SettingDef[] = [
   { id: msg('Update channel'), in: 'Updates', keywords: msg('beta stable release early preview prerelease testing new features updates version') },
   { id: msg('Cover cache size'), in: 'Cover cache', keywords: msg('covers pictures images artwork cache disk space storage size limit clear delete empty free') },
   { id: msg('Back up your library'), in: 'Library backup', keywords: msg('backup save copy export file library playlists likes history move new pc computer') },
+  { id: msg('Add from a backup'), in: 'Library backup', keywords: msg('add merge backup recover songs playlists settings') },
   { id: msg('Restore a backup'), in: 'Library backup', keywords: msg('restore backup import file library replace') },
   { id: msg('Clear covers'), in: 'Cover cache', keywords: msg('covers pictures images artwork cache disk space storage size limit clear delete empty free') },
   { id: msg('Library'), in: 'Storage', keywords: msg('library database disk space storage size') },

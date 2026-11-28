@@ -2673,6 +2673,12 @@ const ar: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': حتى والتطبيق في الخلفية أو في علبة النظام. انقر مفتاحًا لتغييره، وBackspace يزيله.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'تعذّر فتح الميكروفون: تأكّد من أنّ ميكروفونًا موصول وأنّ نظامك يسمح للتطبيقات باستخدامه.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'تعذّر فتح الكاميرا: تأكّد من أنّ كاميرا موصولة وأنّ نظامك يسمح للتطبيقات باستخدامها.',
+  'Add from a backup': 'الإضافة من نسخة احتياطية',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'يضيف ما في الملف وليس في هذه المكتبة: الأغاني وقوائم التشغيل ومرات الاستماع والتقييمات ونسخ Live Editor. لا يُزال شيء من هنا.',
+  'Take its settings too': 'خذ إعداداتها أيضًا',
+  'Added from the backup: {changes}': 'أُضيف من النسخة الاحتياطية: {changes}',
+  'Nothing new in this backup.': 'لا جديد في هذه النسخة الاحتياطية.',
+  'add merge backup recover songs playlists settings': 'إضافة دمج نسخة احتياطية استرجاع أغاني قوائم تشغيل إعدادات',
 }
 
 export default ar

@@ -2733,6 +2733,12 @@ const uk: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': і коли застосунок у фоні чи в треї. Клацни клавішу, щоб змінити її, Backspace видаляє.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Не вдалося відкрити мікрофон: перевірте, що він під’єднаний і що система дозволяє застосункам ним користуватися.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Не вдалося відкрити камеру: перевірте, що вона під’єднана і що система дозволяє застосункам нею користуватися.',
+  'Add from a backup': 'Додати з резервної копії',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Додає те, що є у файлі й чого немає в цій бібліотеці: пісні, плейлисти, прослуховування, оцінки та версії Live Editor. Звідси нічого не видаляється.',
+  'Take its settings too': 'Взяти й її налаштування',
+  'Added from the backup: {changes}': 'Додано з копії: {changes}',
+  'Nothing new in this backup.': 'У цій копії немає нічого нового.',
+  'add merge backup recover songs playlists settings': 'додати об’єднати резервна копія відновити пісні плейлисти налаштування',
 }
 
 export default uk

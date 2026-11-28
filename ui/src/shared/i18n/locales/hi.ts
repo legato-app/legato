@@ -2733,6 +2733,12 @@ const hi: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': ऐप बैकग्राउंड या ट्रे में हो तब भी। बदलने के लिए किसी कुंजी पर क्लिक करें, Backspace उसे हटाता है।',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'माइक्रोफ़ोन नहीं खुल सका: जाँचें कि एक जुड़ा है और आपका सिस्टम ऐप्स को उसे इस्तेमाल करने देता है।',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'कैमरा नहीं खुल सका: जाँचें कि एक जुड़ा है और आपका सिस्टम ऐप्स को उसे इस्तेमाल करने देता है।',
+  'Add from a backup': 'बैकअप से जोड़ें',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'फ़ाइल में जो है और इस लाइब्रेरी में नहीं, वह जोड़ता है: गाने, प्लेलिस्ट, सुनी गई बार, रेटिंग और Live Editor के वर्शन। यहाँ से कुछ नहीं हटता।',
+  'Take its settings too': 'इसकी सेटिंग भी लें',
+  'Added from the backup: {changes}': 'बैकअप से जोड़ा गया: {changes}',
+  'Nothing new in this backup.': 'इस बैकअप में कुछ नया नहीं है।',
+  'add merge backup recover songs playlists settings': 'जोड़ें मिलाएँ बैकअप वापस पाएँ गाने प्लेलिस्ट सेटिंग',
 }
 
 export default hi

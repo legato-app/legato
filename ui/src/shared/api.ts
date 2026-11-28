@@ -165,6 +165,8 @@ export const api = {
   libraryBackup: (path: string) => invoke<void>('library_backup', { path }),
   /** A backup replaces the library, then the app restarts on it (no answer on success). */
   libraryRestore: (path: string) => invoke<void>('library_restore', { path }),
+  /** What the backup holds and this library doesn't, added (its settings too when `settings`); nothing here goes. */
+  libraryMergeBackup: (path: string, settings: boolean) => invoke<Merged>('library_merge_backup', { path, settings }),
   /** Android's picker addresses (shared/files.ts): a picked file copied into the cache, its path. A path stays. */
   pickedIn: (address: string) => invoke<string>('picked_in', { address }),
   /** Where to write a file that goes out to an address: name in the cache. */

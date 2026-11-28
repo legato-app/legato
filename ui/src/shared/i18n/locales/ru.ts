@@ -2733,6 +2733,12 @@ const ru: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': и когда приложение в фоне или в трее. Нажми на клавишу, чтобы изменить её, Backspace удаляет.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Не удалось открыть микрофон: проверьте, что он подключён и что система разрешает приложениям им пользоваться.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Не удалось открыть камеру: проверьте, что она подключена и что система разрешает приложениям ею пользоваться.',
+  'Add from a backup': 'Добавить из резервной копии',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Добавляет то, что есть в файле и чего нет в этой медиатеке: песни, плейлисты, прослушивания, оценки и версии Live Editor. Отсюда ничего не удаляется.',
+  'Take its settings too': 'Взять и её настройки',
+  'Added from the backup: {changes}': 'Добавлено из копии: {changes}',
+  'Nothing new in this backup.': 'В этой копии нет ничего нового.',
+  'add merge backup recover songs playlists settings': 'добавить объединить резервная копия восстановить песни плейлисты настройки',
 }
 
 export default ru

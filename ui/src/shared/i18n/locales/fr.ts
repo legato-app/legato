@@ -2733,6 +2733,12 @@ const fr: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ' : même avec l’application en arrière-plan ou dans la zone de notification. Cliquez sur une touche pour la changer, Retour arrière la retire.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Impossible d’ouvrir le micro : vérifiez qu’un micro est branché et que votre système autorise les applications à l’utiliser.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Impossible d’ouvrir la caméra : vérifiez qu’une caméra est branchée et que votre système autorise les applications à l’utiliser.',
+  'Add from a backup': 'Ajouter depuis une sauvegarde',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Ajoute ce que le fichier contient et pas cette bibliothèque : titres, playlists, écoutes, notes et versions du Live Editor. Rien n’est retiré ici.',
+  'Take its settings too': 'Reprendre aussi ses réglages',
+  'Added from the backup: {changes}': 'Ajouté depuis la sauvegarde : {changes}',
+  'Nothing new in this backup.': 'Rien de nouveau dans cette sauvegarde.',
+  'add merge backup recover songs playlists settings': 'ajouter fusionner sauvegarde récupérer titres playlists réglages',
 }
 
 export default fr

@@ -2733,6 +2733,12 @@ const vi: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': cả khi ứng dụng chạy nền hoặc ở khay hệ thống. Nhấp vào phím để đổi, Backspace để xóa.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Không mở được micrô: hãy kiểm tra xem đã cắm micrô chưa và hệ thống có cho ứng dụng dùng nó không.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Không mở được máy ảnh: hãy kiểm tra xem đã cắm máy ảnh chưa và hệ thống có cho ứng dụng dùng nó không.',
+  'Add from a backup': 'Thêm từ bản sao lưu',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Thêm những gì có trong tệp mà thư viện này chưa có: bài hát, danh sách phát, lượt nghe, xếp hạng và phiên bản Live Editor. Không xóa gì ở đây.',
+  'Take its settings too': 'Lấy cả cài đặt của nó',
+  'Added from the backup: {changes}': 'Đã thêm từ bản sao lưu: {changes}',
+  'Nothing new in this backup.': 'Bản sao lưu này không có gì mới.',
+  'add merge backup recover songs playlists settings': 'thêm gộp sao lưu khôi phục bài hát danh sách phát cài đặt',
 }
 
 export default vi

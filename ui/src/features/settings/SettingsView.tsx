@@ -47,6 +47,7 @@ import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
 import { notifyError } from '../../app/notifyError'
 import { isCutSection, isCutSetting, offered } from '../../shared/liteCuts'
+import { mergedChanges } from '../syncmode/merged'
 
 const ICONS: Record<Category, ReactNode> = {
   general: <GearSix size={15} />,
@@ -744,6 +745,24 @@ function BackupRows() {
       setBusy(false)
     }
   }
+  const [takeSettings, setTakeSettings] = useState(false)
+  const addFrom = async () => {
+    // A daily or pre-update copy (library-*.db) adds too.
+    const path = await pickFile({ title: tr('Add from a backup'), filters: [{ ...filters[0], extensions: ['legato', 'db'] }] }).catch((e) => void useStore.setState({ error: String(e) }))
+    if (!path) return
+    setBusy(true)
+    try {
+      const changes = mergedChanges(await api.libraryMergeBackup(path, takeSettings))
+      // Its settings first: the interface reads them before the lists they name.
+      if (takeSettings) await useSettings.getState().reload()
+      await useStore.getState().refresh()
+      useStore.getState().notify(changes ? tr('Added from the backup: {changes}', { changes }) : tr('Nothing new in this backup.'))
+    } catch (e) {
+      useStore.setState({ error: String(e) })
+    } finally {
+      setBusy(false)
+    }
+  }
   const restore = async () => {
     // A daily or pre-update copy (library-*.db) restores too.
     const path = await pickFile({ title: tr('Restore a backup'), filters: [{ ...filters[0], extensions: ['legato', 'db'] }] }).catch((e) => void useStore.setState({ error: String(e) }))
@@ -767,6 +786,15 @@ function BackupRows() {
       <Row label={msg('Library health')} sub={tr('Songs that can’t play, files gone, songs with no cover or missing their artist or album: one page to fix them.')}>
         <Button variant="ghost" onClick={() => useStore.getState().go({ name: 'health' })}>
           {tr('Open')}
+        </Button>
+      </Row>
+      <Row label={msg('Add from a backup')} sub={tr('Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.')}>
+        <label className="flex items-center gap-2 text-xs text-ink-2">
+          <input type="checkbox" checked={takeSettings} onChange={(e) => setTakeSettings(e.target.checked)} className="size-4 shrink-0 accent-[var(--accent)]" />
+          {tr('Take its settings too')}
+        </label>
+        <Button variant="ghost" disabled={busy} onClick={() => void addFrom()}>
+          {tr('Add')}
         </Button>
       </Row>
       <Row label={msg('Restore a backup')} sub={tr('Replaces this library with the file’s, then Legato restarts. The library you have now is kept beside it first.')}>

@@ -2733,6 +2733,12 @@ const sv: Record<string, string> = {
   ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': även när appen är i bakgrunden eller i meddelandefältet. Klicka på en tangent för att ändra den, Backsteg tar bort den.',
   'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofonen kunde inte öppnas: kontrollera att en är ansluten och att systemet låter appar använda den.',
   'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kameran kunde inte öppnas: kontrollera att en är ansluten och att systemet låter appar använda den.',
+  'Add from a backup': 'Lägg till från en säkerhetskopia',
+  'Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.': 'Lägger till det som finns i filen men inte i biblioteket: låtar, spellistor, lyssningar, betyg och Live Editor-versioner. Inget tas bort här.',
+  'Take its settings too': 'Ta även dess inställningar',
+  'Added from the backup: {changes}': 'Tillagt från säkerhetskopian: {changes}',
+  'Nothing new in this backup.': 'Inget nytt i den här säkerhetskopian.',
+  'add merge backup recover songs playlists settings': 'lägg till slå ihop säkerhetskopia återställ låtar spellistor inställningar',
 }
 
 export default sv
