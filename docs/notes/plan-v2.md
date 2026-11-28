@@ -709,6 +709,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       a Beta with the APK; Android first; YouTube signed out on the phone, the library from the PC by sync.
   - [ ] iPhone: not for now (the owner's word, 2026-11-07); later, their signing choice (Apple Developer Program, or an
         unsigned .ipa).
+- [ ] `S` + `M` Connect Spotify on the phone (the owner, 2026-11-28). Today the phone's card only opens a data export file (`SpotifyConnect.tsx`: no Connect on `phoneApp`; the Exportify window and Spotify's page need a second webview with our script, which Android doesn't give). S: an "Open Exportify" button that opens exportify.net in the phone's browser, the export saved, then picked by the existing file import (an Exportify file is read already); the privacy row already names Exportify. M: the user's own client ID (the desktop's app-key path, playlist scopes only), signed in through the browser with PKCE and a `legato://` redirect (Android deep link), the same Rust import. The page-reading path stays desktop only.
 
 **Medium**
 - [ ] `S` Community: GitHub Discussions (on since 2026-11-07, with the "good first issue" label) linked from About, a
