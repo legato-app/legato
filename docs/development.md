@@ -22,7 +22,8 @@ the two .deb can sit side by side).
 
 Windows is the app's platform. In CI, macOS builds the whole app and passes every check; Linux checks the Rust crates,
 and on a Rust change runs clippy on the app shell, full and Lite (`check.yml`). Linux has its own pieces: the MPRIS media
-panel and media keys, open at startup through the desktop's autostart folder, `legato://` links from the .deb or AppImage,
+panel and media keys, open at startup through the desktop's autostart folder, `legato://` links from the .deb or AppImage
+(Lite's .deb claims none),
 the ad blocker as a WebKit content filter (its blocked count is not shown), and the sound mixer names Legato. The app has never been driven on a real Linux desktop. What Linux still hides is one
 table, `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`, which sits beside `liteCuts.ts`.
 

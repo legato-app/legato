@@ -8,7 +8,8 @@
 //! A `.lmix` file double-clicked comes the same way, as its path (`file_of`): the installer registers that file type
 //! (`tauri.windows.conf.json`), never the running app, and its uninstaller removes it.
 //! Linux: a .deb's own entry names the types (`linux/legato.desktop`, the `.lmix` one declared by
-//! `linux/legato-remix.xml`; Lite's `legato-lite.desktop` takes the link only); an AppImage installs nothing, so the app
+//! `linux/legato-remix.xml`; Lite's `legato-lite.desktop` claims none, so that two packages never compete for the
+//! link); an AppImage installs nothing, so the app
 //! writes its entry and that declaration for this user and asks for the types (`xdg-mime`), by the same rule between the
 //! two editions (`takes_over`).
 
@@ -308,12 +309,12 @@ mod tests {
         assert_eq!(full["bundle"]["linux"]["deb"]["files"], serde_json::json!({ "/usr/share/mime/packages/app.legato.desktop.xml": "./linux/legato-remix.xml" }));
         assert!(REMIX_DECLARATION.contains(&format!("type=\"{REMIX_TYPE}\"")) && REMIX_DECLARATION.contains("pattern=\"*.lmix\""));
         assert!(include_str!("../linux/legato.desktop").contains(&format!("{REMIX_TYPE};")));
-        // Lite's own entry, and no declaration: two packages can't own the same file.
+        // Lite's own entry, claiming no type, and no declaration: two packages can't own the same file.
         let lite = json(include_str!("../tauri.lite-linux.conf.json"));
         assert_eq!(lite["bundle"]["linux"]["deb"]["desktopTemplate"], "./linux/legato-lite.desktop");
         assert!(lite["bundle"]["linux"]["deb"]["files"].is_null());
         let entry = include_str!("../linux/legato-lite.desktop");
-        assert!(entry.contains("MimeType=x-scheme-handler/legato;") && !entry.contains(REMIX_TYPE));
+        assert!(entry.contains("\nExec={{exec}} %u") && !entry.contains("MimeType="));
     }
 
     #[test]

@@ -1,10 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { loadLang, useLang } from '../../shared/i18n/i18n'
-import { searchSettings, SETTINGS_INDEX } from './search'
+import { searchSettings, SETTINGS_INDEX, shownHere } from './search'
 
 const labels = (q: string) => searchSettings(q).map((e) => e.label)
 
 describe('settings search', () => {
+  it('leaves out the rows this copy doesn’t have', () => {
+    const shown = (phone: boolean, selfUpdate: boolean) => searchSettings('automatic updates').filter((entry) => shownHere(entry, { phone, selfUpdate })).map((entry) => entry.label)
+    expect(shown(false, true)).toContain('Automatic updates')
+    expect(shown(false, false)).not.toContain('Automatic updates')
+    expect(shown(true, true)).not.toContain('Automatic updates')
+  })
+
   it('finds by label or keyword, every word must match', () => {
     expect(labels('fade')[0]).toBe('Fade between songs')
     expect(labels('crossfade')).toContain('Fade between songs')

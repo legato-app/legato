@@ -33,7 +33,7 @@ import { SettingToggle, type SwitchSetting } from './SettingToggle'
 import { copyText } from '../../app/copyText'
 import { FadeEditor } from './FadeEditor'
 import { BrowserScene, CountsScene, CoverShapes, DensityScene, FadeScene, ListCoversScene, MiniPlayerScene, MixCoverScene, MotionScene, NowPlayingScene, ProgressScene, SleepButtonScene, SourceIconScene, TunerScene, VolumeScene } from './previews'
-import { searchSettings, type SettingEntry } from './search'
+import { searchSettings, shownHere, type SettingEntry } from './search'
 import { CATEGORIES, categoryOf, groupDef, labelOf, type Category } from './catalog'
 import { locale, msg, tr } from '../../shared/i18n/i18n'
 import { nextAlarm } from '../player/alarmTime'
@@ -1104,7 +1104,8 @@ function PlaybackSection() {
 /** Search box over the section list: results replace it while typing, Enter opens the first. */
 function SettingsSearch({ onPick }: { onPick: (e: SettingEntry) => void }) {
   const [q, setQ] = useState('')
-  const hits = searchSettings(q).filter((e) => !phoneApp || !(DESKTOP_ONLY.has(e.label) || DESKTOP_ONLY_SECTIONS.has(e.section))).slice(0, 12)
+  const { selfUpdate } = useDesktopSupport()
+  const hits = searchSettings(q).filter((entry) => shownHere(entry, { phone: phoneApp, selfUpdate })).slice(0, 12)
   const pick = (e: SettingEntry) => {
     setQ('')
     onPick(e)

@@ -393,6 +393,11 @@ mod tests {
         let jobs: Vec<&str> = release.lines().filter(|line| line.trim_start().starts_with("needs:") && line.contains("linux")).collect();
         assert_eq!(jobs, ["    needs: [release, lite-attach, linux]"], "only the attach job waits for Linux");
         assert!(release.contains(r#""latest.json Legato" "latest-lite.json Legato.Lite""#));
+        // The full app's packages are copied out before the Lite's build, which writes to the same folders.
+        let step = |text: &str| release.find(text).unwrap_or_else(|| panic!("{text}"));
+        let full = step("take target/release/bundle/appimage/Legato_*.AppImage target/release/bundle/deb/Legato_*.deb");
+        assert!(step("pnpm tauri build --bundles appimage,deb") < full && full < step("--config src-tauri/tauri.lite-linux.conf.json"));
+        assert!(step(r#"take "target/release/bundle/appimage/Legato Lite_"*.AppImage "target/release/bundle/deb/Legato Lite_"*.deb"#) > full);
         // Two .deb packages can't own the same file.
         let lite: serde_json::Value = serde_json::from_str(include_str!("../tauri.lite-linux.conf.json")).unwrap();
         assert_eq!(lite["mainBinaryName"], "legato-lite");

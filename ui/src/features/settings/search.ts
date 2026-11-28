@@ -1,7 +1,8 @@
 import type { SettingsSection } from '../../app/store'
 import { comboLabel, OFFERED_ACTIONS } from '../../app/keys'
 import { msg, tr } from '../../shared/i18n/i18n'
-import { categoryOf, labelOf, SETTINGS } from './catalog'
+import { categoryOf, labelOf, SELF_UPDATE_SETTINGS, SETTINGS } from './catalog'
+import { DESKTOP_ONLY, DESKTOP_ONLY_SECTIONS } from './desktopOnly'
 import { fold } from '../../shared/format'
 import { isCutSection, isCutSetting } from '../../shared/liteCuts'
 
@@ -26,6 +27,15 @@ export const SETTINGS_INDEX: SettingEntry[] = [
   ...SETTINGS.filter((e) => !isCutSetting(e.id) && !isCutSection(categoryOf(e.id) ?? 'general')).map((e): SettingEntry => ({ section: categoryOf(e.id) ?? 'general', label: e.id, name: labelOf(e.id) === e.id ? undefined : labelOf(e.id), keywords: e.keywords, was: e.was })),
   ...OFFERED_ACTIONS.map((a): SettingEntry => ({ section: 'shortcuts', label: a.label, keywords: msg('keyboard shortcut hotkey global background'), extra: a.keys ? comboLabel(a.keys) : undefined })),
 ]
+
+/**
+ * False for an entry whose row this copy doesn't have: a PC's own on a phone, the updates' switch where the app can't
+ * install them (a Linux .deb, asked at run time: `desktop.rs`).
+ */
+export function shownHere({ label, section }: SettingEntry, { phone, selfUpdate }: { phone: boolean; selfUpdate: boolean }): boolean {
+  if (!selfUpdate && SELF_UPDATE_SETTINGS.has(label)) return false
+  return !phone || !(DESKTOP_ONLY.has(label) || DESKTOP_ONLY_SECTIONS.has(section))
+}
 
 /** Entries where every word typed appears in the label or keywords (English or the interface's language); label matches first. */
 export function searchSettings(query: string, index = SETTINGS_INDEX): SettingEntry[] {

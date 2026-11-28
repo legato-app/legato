@@ -352,6 +352,7 @@ jobs:
   lite-attach:
     needs: [release, lite]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -443,15 +444,25 @@ jobs:
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
         run: |
-          pnpm tauri build --bundles appimage,deb --no-sign
-          pnpm tauri build --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite-linux.conf.json --bundles appimage,deb --no-sign -- --no-default-features
           out="$RUNNER_TEMP/linux"
           mkdir -p "$out"
-          # GitHub turns a space into a dot anyway: name the files so, and the updater files' links are the assets'.
-          for package in target/release/bundle/appimage/*.AppImage target/release/bundle/deb/*.deb; do
-            name=$(basename "$package")
-            cp "$package" "$out/${name// /.}"
-          done
+          # One edition's packages, taken right after its build: the next one may empty the bundle folders. A package not
+          # there stops the job. GitHub turns a space into a dot anyway: name the files so, and the updater files' links
+          # are the assets'.
+          take() {
+            for package in "$@"; do
+              if [ ! -f "$package" ]; then
+                echo "::error::No package matches $package"
+                exit 1
+              fi
+              name=$(basename "$package")
+              cp "$package" "$out/${name// /.}"
+            done
+          }
+          pnpm tauri build --bundles appimage,deb --no-sign
+          take target/release/bundle/appimage/Legato_*.AppImage target/release/bundle/deb/Legato_*.deb
+          pnpm tauri build --features lite --config src-tauri/tauri.lite.conf.json --config src-tauri/tauri.lite-linux.conf.json --bundles appimage,deb --no-sign -- --no-default-features
+          take "target/release/bundle/appimage/Legato Lite_"*.AppImage "target/release/bundle/deb/Legato Lite_"*.deb
 
       # The updater installs AppImages only (a .deb's new version is downloaded by hand: desktop.rs).
       - name: Sign the AppImages
@@ -481,6 +492,7 @@ jobs:
     needs: [release, lite-attach, linux]
     if: ${{ !cancelled() && needs.release.result == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -523,6 +535,7 @@ jobs:
   apk:
     needs: [release, android]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/download-artifact@v8
         with:

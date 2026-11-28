@@ -248,6 +248,9 @@ export const SETTINGS: SettingDef[] = [
   { id: msg('Sharing'), in: 'Sharing', keywords: msg('discord share profile') },
 ]
 
+/** Rows a copy that can't install its updates (a Linux .deb) doesn't have: its page and the search leave them out. */
+export const SELF_UPDATE_SETTINGS: ReadonlySet<string> = new Set(['Automatic updates'])
+
 const GROUP = new Map(GROUPS.map((g, i) => [g.id, { ...g, index: i }]))
 const CATEGORY_IDS = new Set<string>(CATEGORIES.map((c) => c.id))
 
