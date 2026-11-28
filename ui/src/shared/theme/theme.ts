@@ -710,7 +710,7 @@ export const DEFAULTS: Settings = {
   mixCovers: 'varied',
   autoUpdate: true,
   updateChannel: 'stable',
-  coverCacheMb: 500,
+  coverCacheMb: LITE ? 250 : 500,
   upNext: false,
   sidePanel: 'upNext',
   toastPlace: 'bottom',

@@ -894,7 +894,7 @@ pub fn run() {
                 }
             });
 
-            app.manage(AppState { app: app.handle().clone(), lib: Mutex::new(lib), store: secrets::store(&app.config().identifier, &dir), open, player: Player::spawn(), shield, art: music_connectors::art::ArtCache::new(dir.join("art"), 500 << 20), cache: Caches::default(), nearby: Arc::new(Mutex::new(NearbyState::Idle)), nearby_task: Mutex::default(), media, media_last: Mutex::default(), tray, playing_artist: Mutex::default(), discord: discord::Discord::spawn() });
+            app.manage(AppState { app: app.handle().clone(), lib: Mutex::new(lib), store: secrets::store(&app.config().identifier, &dir), open, player: Player::spawn(), shield, art: music_connectors::art::ArtCache::new(dir.join("art"), storage::DEFAULT_ART_CAP_MB << 20), cache: Caches::default(), nearby: Arc::new(Mutex::new(NearbyState::Idle)), nearby_task: Mutex::default(), media, media_last: Mutex::default(), tray, playing_artist: Mutex::default(), discord: discord::Discord::spawn() });
             // The output device picked in the player menu.
             outputs::apply(&app.state::<AppState>());
             // Reads the library's settings: after AppState.

@@ -639,6 +639,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Lite shows.
       - Decided alone (2026-11-28): the 60 s count from the last moment something played, so the pause between two
         songs never suspends the page; a song change in the tray may take longer than in the full app.
+    - [x] Slice 10, 2026-11-28: built, not measured, not tried for real. Lite’s cover folder is capped at 250 MB
+      (disk; the pictures held in memory are as before), by default only: a size the user picked stays.
 - [ ] `L` Linux for both versions, full and Lite (the owner, 2026-11-27), after Windows and Android. Folds in the former
       item 18: WebKitGTK, the MPRIS media panel, the tray, PipeWire for the Detector; built by GitHub's Actions (the owner's
       word, 2026-11-07); local tries in WSL or a VM once the owner sets one up (a system change, theirs).

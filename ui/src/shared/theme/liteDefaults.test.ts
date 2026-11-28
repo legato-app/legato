@@ -11,6 +11,12 @@ describe('Lite’s own defaults', () => {
     expect(sanitize(null)).toMatchObject({ motion: false, backdropMotion: false })
   })
 
+  // The folder on disk, as the shell caps it before the interface speaks (storage.rs).
+  it('keeps half the covers on disk', () => {
+    expect([DEFAULTS.coverCacheMb, sanitize(null).coverCacheMb]).toEqual([250, 250])
+    expect(sanitize({ coverCacheMb: 1000 }).coverCacheMb).toBe(1000)
+  })
+
   it('keeps what the user, or a synced full app, chose', () => {
     expect(sanitize({ motion: true, backdropMotion: true, defaultsVersion: 12 })).toMatchObject({ motion: true, backdropMotion: true })
   })

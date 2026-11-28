@@ -15,6 +15,9 @@ pub async fn art_cache_size(app: tauri::AppHandle) -> CmdResult<u64> {
     tauri::async_runtime::spawn_blocking(move || app.state::<AppState>().art.size()).await.map_err(err)
 }
 
+/// The cover folder's cap until the interface sends the setting's (`coverCacheMb`, the same default): half in Lite.
+pub const DEFAULT_ART_CAP_MB: u64 = if cfg!(feature = "lite") { 250 } else { 500 };
+
 /// New cap of the cover cache, in MB. Over it: pruned in the background.
 #[tauri::command]
 pub fn set_art_cache_cap(state: State<AppState>, mb: u64) {
