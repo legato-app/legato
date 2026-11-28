@@ -693,7 +693,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         0 `M` [x] Trial, built 2026-11-28 (`1374f868`, `ce87dc3e`), not tried for real: the owner has not run the AppImage. The shell built in CI, a debug AppImage as an artifact. The owner runs it (WSLg or a VM, their own
           setup): the embed plays, `live.js` runs, the Google sign-in, `cookies_for_url`. Go on or stop there.
         1 `M` [x] Built 2026-11-28 (`5950c1fd`, `d2101957`, `ad105d23`, `e6f2409e`): the table of what is missing in the UI, clippy Linux in CI (green), Linux told by the build. Not tried for real.
-        2 `M` MPRIS + `session.rs` on Linux.
+        2 `M` [x] Built 2026-11-28, not tried for real: MPRIS (`media/linux.rs`, written on zbus, no new crate) and
+          `session.rs` on Linux. To read at the first .deb: the `.desktop` file's name (MPRIS `DesktopEntry`).
         3 `M` Secret Service (a message when there is no daemon), tray / `closeToTray`, XDG autostart, `legato://`,
           single instance (D-Bus), `PULSE_PROP`.
         4 `L` WebKitGTK shield (filter + host list) and its rule tests.

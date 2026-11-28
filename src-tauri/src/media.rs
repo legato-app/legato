@@ -1,5 +1,5 @@
-//! Windows media panel and media keys (SystemMediaTransportControls of the main window).
-//! Buttons → `media-key` event to the UI ("play", "pause", "next", "previous", "stop"); seek bar → `media-seek` (ms).
+//! The system's media panel and media keys: Windows' SystemMediaTransportControls of the main window, Linux's MPRIS
+//! (`media/linux.rs`). Buttons → `media-key` event to the UI ("play", "pause", "next", "previous", "stop"); seek bar → `media-seek` (ms).
 //! UI → `media_update`: what's playing, shown in the volume flyout / lock screen.
 
 use serde::Deserialize;
@@ -136,11 +136,95 @@ mod imp {
     }
 }
 
-/// Off Windows: no media panel yet.
-#[cfg(not(windows))]
+/// MPRIS: the position a desktop was told, moved on by the time since while the song plays.
+#[cfg(any(target_os = "linux", test))]
+pub fn position_at(now: &NowPlaying, elapsed_ms: u64) -> u64 {
+    let position = now.position_ms.saturating_add(if now.playing { elapsed_ms } else { 0 });
+    now.duration_ms.map_or(position, |duration| position.min(duration))
+}
+
+/// A seek by an offset, kept inside the song.
+#[cfg(any(target_os = "linux", test))]
+pub fn seek_target(position_ms: u64, offset_ms: i64, duration_ms: u64) -> u64 {
+    position_ms.saturating_add_signed(offset_ms).min(duration_ms)
+}
+
+/// Further than a bar moving on its own gets: the desktop must be told.
+#[cfg(any(target_os = "linux", test))]
+pub fn jumped(expected_ms: u64, got_ms: u64) -> bool {
+    expected_ms.abs_diff(got_ms) > 2_000
+}
+
+/// MPRIS' one play / pause button, as the key the interface knows.
+#[cfg(any(target_os = "linux", test))]
+pub fn toggle_key(playing: bool) -> &'static str {
+    if playing { "pause" } else { "play" }
+}
+
+#[cfg(any(target_os = "linux", test))]
+pub fn playback_status(now: Option<&NowPlaying>) -> &'static str {
+    match now {
+        None => "Stopped",
+        Some(now) if now.playing => "Playing",
+        Some(_) => "Paused",
+    }
+}
+
+/// The end of the name on the bus: only the installed app takes its edition's, any other build never does.
+#[cfg(any(target_os = "linux", test))]
+pub fn bus_suffix(installed: bool, lite: bool, process: u32) -> String {
+    match (installed, lite) {
+        (true, false) => "legato".into(),
+        (true, true) => "legato_lite".into(),
+        (false, _) => format!("legato.instance{process}"),
+    }
+}
+
+/// A cover file's extension, from its first bytes.
+#[cfg(any(target_os = "linux", test))]
+pub fn art_extension(bytes: &[u8]) -> &'static str {
+    match bytes {
+        [0x89, b'P', b'N', b'G', ..] => "png",
+        [b'R', b'I', b'F', b'F', _, _, _, _, b'W', b'E', b'B', b'P', ..] => "webp",
+        _ => "jpg",
+    }
+}
+
+/// A song as MPRIS names its parts.
+#[cfg(any(target_os = "linux", test))]
+#[derive(Debug, PartialEq)]
+pub struct MprisFields {
+    pub track_id: String,
+    pub title: String,
+    pub artists: Vec<String>,
+    pub album: Option<String>,
+    pub length_us: Option<i64>,
+    /// A `file://` address: the desktop reads the cover this PC holds, never one on the internet.
+    pub art_url: Option<String>,
+}
+
+#[cfg(any(target_os = "linux", test))]
+pub fn metadata_of(now: &NowPlaying, art: Option<&std::path::Path>, track: u64) -> MprisFields {
+    MprisFields {
+        track_id: format!("/app/legato/track/{track}"),
+        title: now.title.clone(),
+        artists: vec![now.artist.clone()],
+        album: now.album.clone(),
+        length_us: now.duration_ms.map(|duration| i64::try_from(duration.saturating_mul(1000)).unwrap_or(i64::MAX)),
+        art_url: art.and_then(|file| tauri::Url::from_file_path(file).ok()).map(String::from),
+    }
+}
+
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(target_os = "linux")]
+pub use linux::Media;
+
+/// Elsewhere (macOS, phones): no media panel here.
+#[cfg(not(any(windows, target_os = "linux")))]
 pub struct Media;
 
-#[cfg(not(windows))]
+#[cfg(not(any(windows, target_os = "linux")))]
 impl Media {
     pub fn install(_: &tauri::WebviewWindow) -> anyhow::Result<Self> {
         Ok(Self)
@@ -156,6 +240,37 @@ impl Media {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn song(playing: bool, position_ms: u64, duration_ms: Option<u64>) -> NowPlaying {
+        NowPlaying { title: "One More Time".into(), artist: "Daft Punk".into(), album: None, playing, position_ms, duration_ms, youtube: false }
+    }
+
+    #[test]
+    fn mpris_keeps_the_position_and_seeks_inside_the_song() {
+        assert_eq!(position_at(&song(true, 1_000, Some(10_000)), 500), 1_500);
+        assert_eq!(position_at(&song(false, 1_000, Some(10_000)), 500), 1_000);
+        assert_eq!(position_at(&song(true, 9_900, Some(10_000)), 500), 10_000);
+        assert_eq!(position_at(&song(true, 9_900, None), 500), 10_400);
+        assert_eq!(seek_target(1_000, -5_000, 10_000), 0);
+        assert_eq!(seek_target(8_000, 5_000, 10_000), 10_000);
+        assert_eq!(seek_target(1_000, 2_000, 10_000), 3_000);
+        assert!(!jumped(1_000, 2_900) && jumped(1_000, 3_500) && jumped(9_000, 1_000));
+    }
+
+    #[test]
+    fn mpris_names_the_song_and_the_build() {
+        assert_eq!((toggle_key(true), toggle_key(false)), ("pause", "play"));
+        assert_eq!((playback_status(None), playback_status(Some(&song(true, 0, None))), playback_status(Some(&song(false, 0, None)))), ("Stopped", "Playing", "Paused"));
+        assert_eq!(bus_suffix(true, false, 7), "legato");
+        assert_eq!(bus_suffix(true, true, 7), "legato_lite");
+        assert_eq!(bus_suffix(false, true, 7), "legato.instance7");
+        assert_eq!((art_extension(b"\x89PNG\r\n"), art_extension(b"RIFF\0\0\0\0WEBPVP8 "), art_extension(&[0xff, 0xd8, 0xff])), ("png", "webp", "jpg"));
+        let file = std::env::temp_dir().join("now cover.jpg");
+        let fields = metadata_of(&song(true, 0, Some(320_000)), Some(&file), 3);
+        assert_eq!((fields.track_id.as_str(), fields.artists.as_slice(), fields.length_us), ("/app/legato/track/3", &["Daft Punk".to_string()][..], Some(320_000_000)));
+        assert!(fields.art_url.is_some_and(|url| url.starts_with("file:///") && url.ends_with("now%20cover.jpg")));
+        assert_eq!(metadata_of(&song(true, 0, None), None, 4).art_url, None);
+    }
 
     #[test]
     fn timespan_conversions() {
