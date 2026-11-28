@@ -4,11 +4,11 @@
 you need. Private notes are `docs/notes/report*.md`, on the PC that wrote them only; they are not in git.
 
 Where the work stands, for a session with no history here. Rewrite it, short, when a branch, a release or the next step
-changes; older versions are in git. Updated 2026-11-27, end of window 2 on the second PC.
+changes; older versions are in git. Updated 2026-11-28, window 5.
 
 ## Where things stand
 - **Repository**: `legato-app/legato`. **master** on origin = `23ce8341`, Beta **v1.2.456**. **platforms** on origin =
-  `398e2eab`, pushed. Its `check` run was still going when this was written; the Linux clippy job is part of it.
+  `398e2eab`, pushed. Its `check` run failed; `f5fbce08` fixes it, locally, not pushed yet.
   Push `platforms` after each reviewed lot (no release). master only by push, on the owner's word.
 - **Pushed on platforms, up to `398e2eab`**:
   - Linux, slices 0 to 3: the trial AppImage (a push whose head message has `[linux trial]`, artifact kept 7 days),
@@ -18,28 +18,36 @@ changes; older versions are in git. Updated 2026-11-27, end of window 2 on the s
   - "Add from a backup" (merges a copy, removes nothing, its settings optional);
   - Spotify on the phone, step S: "Open Exportify" in the browser, then the saved file is taken;
   - Lite slices 9 and 10;
-  - rearrange, slice 2 (hidden in the interface until its screen lands);
+  - rearrange, slice 2 (code only; slice 3 shows it);
   - signatures of the installers and the APK kept apart from the build;
-  - README: editions and platforms section;
   - AutoEQ licence checked: the data has no stated reuse terms; the plan line is marked "to drop", the owner decides.
-- **Local, not reviewed**: `370a5bf9` (rearrange, slice 3: move the app's parts by dragging, or with the keyboard).
+- **Local, not pushed**:
+  - `370a5bf9`: rearrange, slice 3, the parts move by dragging or with the keyboard; the mode is visible now. Opus
+    reviewed it; its LOWs are open.
+  - `f5fbce08`: the arrangement follows right-to-left languages; fixes the red `check`.
+  - `b72805c9`: Linux slice 4, ad blocking on WebKitGTK and a list of what the windows reach. No review note yet.
+  - `3b9a60e8`: README, editions and platforms. No review note yet.
 - **Not tried for real**: Linux (nothing run on a real Linux desktop), the trial AppImage, Spotify on the phone,
-  Add from a backup, the swapped-title fix on a second PC, Lite 9-10, the release notes and signatures on a real release.
+  Add from a backup, the swapped-title fix on a second PC, Lite 9-10, the release notes and signatures on a real release,
+  the arrangement mode on a phone (not built).
 
 ## Next, in order
-1. **Opus reviews `370a5bf9`**, then one trial AppImage run by the owner (WSL or a VM, their choice).
-2. **Linux slices 4 and 5**: the shield on WebKitGTK (filter and host list) and the Linux release job (x86_64 and
-   aarch64, AppImage and .deb, both editions).
-3. **Spotify, step M** (plan-v2): the owner's own client ID, PKCE, a `legato://` redirect.
-4. **Rearrange, slices 4 to 7** (plan-v2, rearrange line).
-5. **Theme code** (plan-v2, `L`): designed, not built.
-6. **Profiles** (plan-v2, `M-L`): designed, after the Lite.
-7. Hidden video decoding (plan-v2 lead): measure only; no rule forbids it, nothing to build.
-8. Release cache: the study advises against it.
+1. **Review `f5fbce08`, `b72805c9` and `3b9a60e8`**, then push `platforms` (the red `check` on `398e2eab` is fixed by
+   `f5fbce08`).
+2. **One trial AppImage run by the owner** (WSL or a VM, their choice), now that Linux slice 4 is in.
+3. **Linux slices 5 and 6**: the Linux release job (x86_64 and aarch64, AppImage and .deb, both editions), then
+   `docs/architecture.md` and the website line.
+4. **Spotify, step M** (plan-v2): each user's own client ID, PKCE, a `legato://` redirect.
+5. **Rearrange, slices 4 to 7** (plan-v2, rearrange line).
+6. **Theme code** (plan-v2, `L`): designed, not built.
+7. **Profiles** (plan-v2, `M-L`): designed, after the Lite.
+8. Hidden video decoding (plan-v2 lead): measure only; no rule forbids it, nothing to build.
+9. Release cache: the study advises against it.
 
 
 ## Waiting on the owner
-- The two bench runs (item 1). Auto mode refused to start them.
+- The two bench runs: `node scripts/bench.mjs --skip-build`, then `node scripts/bench.mjs --lite --skip-build`, about
+  20 minutes each, with nothing else heavy running.
 - A Beta at 30 points: count the ticked plan-v2 lines since v1.2.456 (`S` 1, `M` 2, `L` 3). A push to master is a Beta
   (`git push origin platforms:master`; the head must not carry `[skip release]`), on the owner's word.
 - Fixing every song saved swapped for sure would take one YouTube request per song: the owner's call.
