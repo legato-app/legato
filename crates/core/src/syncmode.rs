@@ -52,10 +52,17 @@ pub struct TrackRef {
     pub duration_ms: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub isrc: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "ids_from_elsewhere")]
     pub ids: BTreeMap<Source, String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub art: Option<String>,
+}
+
+/// A song's ids as another PC sends them: a file path is only ever this PC's own, found by its own scan.
+fn ids_from_elsewhere<'de, D: serde::Deserializer<'de>>(deserializer: D) -> std::result::Result<BTreeMap<Source, String>, D::Error> {
+    let mut ids = BTreeMap::<Source, String>::deserialize(deserializer)?;
+    ids.remove(&Source::Local);
+    Ok(ids)
 }
 
 impl TrackRef {
@@ -1594,6 +1601,27 @@ mod tests {
         for library in [&chosen, &updated] {
             assert_eq!(library.setting("ui")?.unwrap()["glow"], "strong");
         }
+        Ok(())
+    }
+
+    #[test]
+    fn a_received_snapshot_never_sets_a_songs_file_path() -> Result<()> {
+        let sender = Library::in_memory()?;
+        sender.save_ui_settings(&serde_json::json!({ "theme": "dark" }), 10)?;
+        let mut sent = snap(&sender);
+        // A file as some older or foreign writer made it: songs with file paths.
+        let song = |title: &str, ids: &[(Source, &str)]| TrackRef { title: title.into(), artist: "Artist".into(), album: None, duration_ms: Some(1000), isrc: None, ids: ids.iter().map(|(source, id)| (*source, id.to_string())).collect(), art: None };
+        sent.tracks = vec![song("Both", &[(Source::Youtube, "video"), (Source::Local, r"C:\Music\a.mp3")]), song("File only", &[(Source::Local, r"\\server\share\b.mp3")])];
+        sent.library = vec![0, 1];
+        let received = decode(&encode(&sent, None)?, None)?;
+        assert_eq!(received.tracks[0].ids, BTreeMap::from([(Source::Youtube, "video".to_string())]));
+        assert!(received.tracks[1].ids.is_empty());
+        let library = Library::in_memory()?;
+        library.merge(&received)?;
+        let paths: i64 = library.db.query_row("SELECT COUNT(*) FROM track_ids WHERE source = ?1", [Source::Local.as_str()], |row| row.get(0))?;
+        assert_eq!(paths, 0);
+        // The song itself still arrives.
+        assert!(library.tracks()?.iter().any(|row| row.track.title == "Both"));
         Ok(())
     }
 
