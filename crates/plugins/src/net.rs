@@ -5,7 +5,7 @@
 use anyhow::{Result, anyhow, bail, ensure};
 use reqwest::dns::{Addrs, Name, Resolve, Resolving};
 use serde::{Deserialize, Serialize};
-use std::net::{IpAddr, SocketAddr};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -24,11 +24,29 @@ pub fn https_host(url: &str) -> Option<String> {
 /// Public internet address (not this PC, the LAN, link-local, multicast, documentation ranges…).
 pub fn public(ip: IpAddr) -> bool {
     match ip {
-        IpAddr::V4(v) => !(v.is_private() || v.is_loopback() || v.is_link_local() || v.is_broadcast() || v.is_documentation() || v.is_unspecified() || v.is_multicast() || v.octets()[0] == 100 && (v.octets()[1] & 0xC0) == 64 || v.octets()[0] == 0),
+        IpAddr::V4(v) => {
+            let [a, b, c, _] = v.octets();
+            // Also shared (100.64/10), "this network" (0/8), benchmarking (198.18/15), protocol (192.0.0/24) and reserved
+            // (240/4) ranges.
+            let other = a == 0 || a >= 240 || (a == 100 && (b & 0xC0) == 64) || (a == 198 && (b & 0xFE) == 18) || (a == 192 && b == 0 && c == 0);
+            !(v.is_private() || v.is_loopback() || v.is_link_local() || v.is_broadcast() || v.is_documentation() || v.is_unspecified() || v.is_multicast() || other)
+        }
         IpAddr::V6(v) => {
             let s = v.segments();
-            !(v.is_loopback() || v.is_unspecified() || v.is_multicast() || (s[0] & 0xFE00) == 0xFC00 || (s[0] & 0xFFC0) == 0xFE80 || v.to_ipv4_mapped().is_some_and(|m| !public(IpAddr::V4(m))))
+            let internal = v.is_loopback() || v.is_unspecified() || v.is_multicast() || (s[0] & 0xFE00) == 0xFC00 || (s[0] & 0xFFC0) == 0xFE80 || (s[0] & 0xFFC0) == 0xFEC0 || (s[0] == 0x64 && s[1] == 0xff9b && s[2] == 1);
+            !internal && carried_ipv4(s).is_none_or(|inner| public(IpAddr::V4(inner)))
         }
+    }
+}
+
+/// The IPv4 address an IPv6 one stands for: mapped (`::ffff:`), compatible (`::`), NAT64 (`64:ff9b::`) or 6to4 (`2002:`).
+fn carried_ipv4(s: [u16; 8]) -> Option<Ipv4Addr> {
+    let address = |high: u16, low: u16| Ipv4Addr::from((u32::from(high) << 16) | u32::from(low));
+    match s {
+        [0, 0, 0, 0, 0, 0 | 0xffff, high, low] => Some(address(high, low)),
+        [0x64, 0xff9b, 0, 0, 0, 0, high, low] => Some(address(high, low)),
+        [0x2002, high, low, ..] => Some(address(high, low)),
+        _ => None,
     }
 }
 
@@ -167,10 +185,10 @@ mod tests {
         assert!(https_host("http://api.example.com/").is_none());
         assert!(https_host("https://user:pw@api.example.com/").is_none());
         assert!(https_host("file:///C:/x").is_none());
-        for ip in ["127.0.0.1", "10.0.0.2", "192.168.1.10", "172.16.0.1", "169.254.1.1", "100.64.0.1", "::1", "fe80::1", "fd00::1", "::ffff:192.168.0.1", "0.0.0.0"] {
+        for ip in ["127.0.0.1", "10.0.0.2", "192.168.1.10", "172.16.0.1", "169.254.1.1", "100.64.0.1", "::1", "fe80::1", "fd00::1", "::ffff:192.168.0.1", "0.0.0.0", "198.18.0.1", "192.0.0.8", "240.0.0.1", "::c0a8:101", "64:ff9b::c0a8:101", "64:ff9b:1::1", "2002:c0a8:101::1", "fec0::1"] {
             assert!(!public(ip.parse().unwrap()), "{ip}");
         }
-        for ip in ["8.8.8.8", "1.1.1.1", "2606:4700:4700::1111"] {
+        for ip in ["8.8.8.8", "1.1.1.1", "2606:4700:4700::1111", "64:ff9b::808:808", "2002:808:808::1"] {
             assert!(public(ip.parse().unwrap()), "{ip}");
         }
     }
