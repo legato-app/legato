@@ -32,7 +32,7 @@ the order; a line leaves only when it ships or the user drops it.
       put elsewhere. Tests in core; never run on a real library.
       Decided alone (2026-11-27): ticked on that; the songs the mixes had already dropped have their own line below.
 - [ ] `S` Songs old mixes dropped, now in no playlist and never played (for the owner): not told apart from songs added
-      by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the way.
+      by hand or by link, so nothing removes them; a “Clean up songs” that shows them first, with undo, would be the way. (to check: 5789ef7d cleans them out once after a copy; is the visible, undoable Clean up still wanted?)
 - [x] `M` Disconnecting Spotify asks once to keep or remove what only Spotify brought, a library backup made first (the
       owner, 2026-11-26). 2026-11-27: the question after Disconnect removes the imported playlists and the songs only
       Spotify knows that nothing else holds (`library::cleanup`, the mix cleanup’s rule: no other source, no list that
@@ -53,7 +53,7 @@ the order; a line leaves only when it ships or the user drops it.
     - Limit: an older Legato keeps the songs until it updates (the question says it).
     - 2026-11-27 (review): an `import-back` comes after the record it ends even on a PC whose clock is behind (else a
       song added by hand there was swept).
-- [ ] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
+- [x] `M` Adaptive Sound as the owner meant it (2026-11-19, from the phone: « adaptive sound n'est pas dutout ce que je
       voulais prcq perso je voulais que en mode sa soit comme de base le song mais juste que sa detecte le volume de la
       video et que sa le stabilise sur le volume que tu veux sans avoir de gros haut ou de gros bas prcq la les bouton et
       tout c pas ouf et en plus sa doit rien changer et enleve la bar en dessous »). Built 2026-11-19 (`docs/playback.md`
@@ -281,7 +281,7 @@ the order; a line leaves only when it ships or the user drops it.
     renames no song a PC has.
 - [ ] `S` Mixes' artist key for a YouTube Music upload titled "Title - Artist" (`mixes::credit` splits it on the dash
       and takes the left side): grouping, Like seeds and the artist name a mix may show; no song renamed.
-- [ ] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
+- [x] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
       `turn_video_only` on the songs a merge inserts, never on one already there.
 
 ## The owner's asks of 2026-11-07, evening
@@ -290,7 +290,7 @@ the order; a line leaves only when it ships or the user drops it.
       1.1.785 on their phone; the diagnostics show three restarts in a minute and no error line: a native crash). 2026-11-07: the plugin's Kotlin (tauri-plugin-barcode-scanner
       2.5.3) shows no sure cause; a Java crash now lands in the diagnostics (`MainActivity.kt` `keepCrashes`, never built
       here: no Android toolchain on this PC), so the next Beta's Copy diagnostics names it. Faster: the phone on USB with
-      debugging on, `adb logcat -b crash -d` on a PC with the SDK.
+      debugging on, `adb logcat -b crash -d` on a PC with the SDK. (to check: 8e9fb3f2 and 81f4511d show a crash in the diagnostics; the crash cause is still open)
 
 ## The owner's answers of 2026-11-11 (still to build)
 Also settled: no push yet (they try with `pnpm dev` first); the flowing background, the new-releases section and the
@@ -1365,6 +1365,8 @@ Most useful first; the tag is the effort.
 
 ## Check live in the real app (built and unit-tested, never driven for real)
 
+- [ ] Adaptive Sound as one steady gain per song, from its integrated loudness (4173b567, c74d9eb9, bdd3e3ba, 362dd86b): the owner's phone and PC, not tried for real.
+- [ ] A video-only title saved swapped, then turned by a sync from an older PC (a273ab9f, e80a2ca4): two real PCs, not tried.
 - [ ] Android crackle gone: a YouTube song on the phone, Bluetooth earphones, screen off or app in background, crossfade and 8D each on (fixes 390e82fe, 306de9a3, c0245823).
 - [ ] Connect Apple Music on the owner's account (the owner's ask to keep it in mind, 2026-10-31): All Playlists read with
       covers, a long library playlist and Favorite Songs read to their end, the `media-user-token` cookie ending the
