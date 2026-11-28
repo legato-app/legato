@@ -32,6 +32,12 @@ describe('cleanCss', () => {
     expect(cleanCss(theme)).toBe(theme)
   })
 
+  it('reads an address however it is written, keeping data: pictures', () => {
+    const outside = ['a{background:url(https://x.example/a)}', 'a{background:\\75 rl(http://art.localhost/x)}', 'a{background:u\\r\\l(https://x.example/a)}', 'a{background:image-set("http://art.localhost/x" 1x)}', 'a{background:-webkit-image-set("https://x.example/a" 1x)}', '@font-face{font-family:f;src:\\75rl("http://art.localhost/y")}']
+    for (const css of outside) expect(cleanCss(css), css).not.toMatch(/https?:/)
+    for (const kept of ['a{background:image-set(url(data:image/png;base64,AA) 1x)}', 'a{background:image-set("data:image/png;base64,AA" type("image/png") 1x)}', '.a::after{content:"\\201C \\2014"}']) expect(cleanCss(kept), kept).toBe(kept)
+  })
+
   it('gives nothing for text that never settles', () => {
     const nested = '@im'.repeat(50) + '@import;' + 'port;'.repeat(50)
     expect(cleanCss(nested)).toBe('')
