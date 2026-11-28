@@ -7,9 +7,11 @@
 //! removes it only when it still names Lite's exe (`windows/hooks-lite.nsh`).
 //! A `.lmix` file double-clicked comes the same way, as its path (`file_of`): the installer registers that file type
 //! (`tauri.windows.conf.json`), never the running app, and its uninstaller removes it.
+//! Linux: a .deb's own entry names the type (`linux/legato.desktop`); an AppImage installs nothing, so the app writes
+//! its entry for this user and asks for the type (`xdg-mime`), by the same rule between the two editions (`takes_link`).
 
-// Windows only; the argument parsing below is tested on every system.
-#![cfg_attr(not(windows), allow(dead_code))]
+// Windows and Linux register; the argument parsing below is tested on every system.
+#![cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 
 use std::sync::Mutex;
 
@@ -57,6 +59,54 @@ pub fn register() {
         && let Ok(exe) = std::env::current_exe()
     {
         let _ = win::register(&exe);
+    }
+    #[cfg(target_os = "linux")]
+    if !cfg!(debug_assertions)
+        && crate::identity::installed()
+        && let Some(appimage) = crate::desktop_file::appimage()
+    {
+        // Off the start: `xdg-mime` is a shell script.
+        std::thread::spawn(move || {
+            if let Err(error) = linux::register(&appimage) {
+                crate::diag::warn("protocol", "link type not registered", &format!("{error:#}"));
+            }
+        });
+    }
+}
+
+/// Legato Lite's entry on Linux.
+#[cfg(any(target_os = "linux", test))]
+const LITE_ENTRY: &str = "app.legato.lite.desktop";
+
+/// Whether the entry holding the link type (`current`, none: nobody) gives way to `mine`: nobody's or ours does, and a
+/// Lite's to the full app. Anything else was the user's choice.
+#[cfg(any(target_os = "linux", test))]
+fn takes_link(current: Option<&str>, mine: &str, this_is_lite: bool) -> bool {
+    current.is_none_or(|name| name.is_empty() || name == mine || (name == LITE_ENTRY && !this_is_lite))
+}
+
+#[cfg(target_os = "linux")]
+mod linux {
+    use crate::desktop_file::{entry, xdg_folder};
+    use std::path::Path;
+    use std::process::Command;
+
+    const SCHEME: &str = "x-scheme-handler/legato";
+
+    pub fn register(appimage: &Path) -> anyhow::Result<()> {
+        let mine = format!("{}.desktop", crate::identity::INSTALLED);
+        let current = Command::new("xdg-mime").args(["query", "default", SCHEME]).output()?;
+        if !super::takes_link(Some(String::from_utf8_lossy(&current.stdout).trim()), &mine, cfg!(feature = "lite")) {
+            return Ok(());
+        }
+        let data = xdg_folder(std::env::var_os("XDG_DATA_HOME"), std::env::var_os("HOME"), ".local/share").ok_or_else(|| anyhow::anyhow!("No home folder"))?;
+        let applications = data.join("applications");
+        std::fs::create_dir_all(&applications)?;
+        let text = entry(crate::identity::PRODUCT, crate::identity::INSTALLED, appimage, Some("%u"), &[("MimeType", &format!("{SCHEME};"))]);
+        std::fs::write(applications.join(&mine), text)?;
+        let set = Command::new("xdg-mime").args(["default", &mine, SCHEME]).status()?;
+        anyhow::ensure!(set.success(), "xdg-mime refused");
+        Ok(())
     }
 }
 
@@ -184,6 +234,27 @@ mod tests {
         // Another working exe, not Lite's: left alone by both.
         assert!(keeps(&command(&other), &full, false) && keeps(&command(&other), &lite, true));
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn on_linux_the_link_leaves_another_choice_alone() {
+        let (full, lite) = ("app.legato.desktop.desktop", LITE_ENTRY);
+        for nobody_or_ours in [None, Some(""), Some(full)] {
+            assert!(takes_link(nobody_or_ours, full, false), "{nobody_or_ours:?}");
+        }
+        assert!(takes_link(Some(lite), full, false) && takes_link(Some(lite), lite, true));
+        assert!(!takes_link(Some(full), lite, true) && !takes_link(Some("other.desktop"), full, false));
+        // The names the two configs give.
+        let identifier = |json: &str| serde_json::from_str::<serde_json::Value>(json).unwrap()["identifier"].as_str().unwrap().to_string();
+        assert_eq!(format!("{}.desktop", identifier(include_str!("../tauri.lite.conf.json"))), LITE_ENTRY);
+    }
+
+    #[test]
+    fn the_deb_entry_takes_the_link_and_passes_it_on() {
+        let config: serde_json::Value = serde_json::from_str(include_str!("../tauri.linux.conf.json")).unwrap();
+        assert_eq!(config["bundle"]["linux"]["deb"]["desktopTemplate"], "./linux/legato.desktop");
+        let template = include_str!("../linux/legato.desktop");
+        assert!(template.contains("\nExec={{exec}} %u\n") && template.contains("\nMimeType=x-scheme-handler/legato;\n"));
     }
 
     #[test]
