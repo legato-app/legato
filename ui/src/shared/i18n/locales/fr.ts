@@ -806,6 +806,8 @@ const fr: Record<string, string> = {
   'Open at startup': 'Ouvrir au démarrage',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'S’ouvre quand vous vous connectez à Windows. Aussi dans le Gestionnaire des tâches › Applications de démarrage',
   'Opens when you sign in to this computer': 'S’ouvre quand vous ouvrez votre session sur cet ordinateur',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'Aucun service de trousseau ne tourne (GNOME Keyring ou KWallet) : vos connexions durent jusqu’à la fermeture de Legato.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'Ce bureau n’affiche pas d’icônes de notification : fermer la fenêtre quitte Legato',
   'Quiet': 'Doux',
   'Normal': 'Normal',
   'Loud': 'Fort',

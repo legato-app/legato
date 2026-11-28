@@ -798,6 +798,8 @@ const vi: Record<string, string> = {
   'Open at startup': 'Mở khi khởi động',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Mở khi bạn đăng nhập Windows. Cũng có trong Trình quản lý Tác vụ › Ứng dụng khởi động',
   'Opens when you sign in to this computer': 'Mở khi bạn đăng nhập vào máy tính này',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'Không có dịch vụ chùm khóa nào đang chạy (GNOME Keyring hoặc KWallet): các lần đăng nhập chỉ giữ đến khi đóng Legato.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'Màn hình nền này không hiện biểu tượng khay hệ thống: đóng cửa sổ sẽ thoát Legato',
   'Quiet': 'Nhỏ',
   'Normal': 'Bình thường',
   'Loud': 'To',

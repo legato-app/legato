@@ -1,16 +1,25 @@
 use anyhow::Result;
 use keyring::{Entry, Error};
 use music_core::model::SecretStore;
+#[cfg(any(target_os = "linux", test))]
+use music_core::model::MemoryStore;
 use std::path::Path;
 use std::sync::Arc;
+#[cfg(any(target_os = "linux", test))]
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// The user's AudD token (Music Detector): kept and synced by both editions.
 pub const AUDD_TOKEN: &str = "audd_token";
 
-/// The app's secrets: the OS keychain, or on Android a private file (`FileStore`).
-#[cfg(not(target_os = "android"))]
+/// The app's secrets: the OS keychain (`KeyringOrMemory` on Linux), or on Android a private file (`FileStore`).
+#[cfg(not(any(target_os = "android", target_os = "linux")))]
 pub fn store(service: &str, _: &Path) -> Arc<dyn SecretStore> {
     Arc::new(KeyringStore::new(service))
+}
+
+#[cfg(target_os = "linux")]
+pub fn store(service: &str, _: &Path) -> Arc<dyn SecretStore> {
+    Arc::new(KeyringOrMemory::new(KeyringStore::new(service)))
 }
 
 #[cfg(target_os = "android")]
@@ -46,6 +55,60 @@ impl SecretStore for KeyringStore {
         }
         Ok(())
     }
+}
+
+/// False once Linux's keyring refused to keep a secret: it lasts until the app closes.
+pub fn keychain_kept() -> bool {
+    #[cfg(target_os = "linux")]
+    return KEPT.load(Ordering::Relaxed);
+    #[cfg(not(target_os = "linux"))]
+    true
+}
+
+#[cfg(any(target_os = "linux", test))]
+static KEPT: AtomicBool = AtomicBool::new(true);
+
+/// Linux: the Secret Service (GNOME Keyring, KWallet), which a session may not run. What it can't take stays in memory
+/// until the app closes, never in a plain file. Nothing asks it at start: that would open its unlock dialog every time.
+#[cfg(any(target_os = "linux", test))]
+struct KeyringOrMemory<Keyring> {
+    keyring: Keyring,
+    /// What the keyring couldn't take; `null`: removed meanwhile.
+    memory: MemoryStore,
+}
+
+#[cfg(any(target_os = "linux", test))]
+impl<Keyring: SecretStore> KeyringOrMemory<Keyring> {
+    fn new(keyring: Keyring) -> Self {
+        Self { keyring, memory: MemoryStore::default() }
+    }
+}
+
+#[cfg(any(target_os = "linux", test))]
+impl<Keyring: SecretStore> SecretStore for KeyringOrMemory<Keyring> {
+    fn get(&self, key: &str) -> Option<serde_json::Value> {
+        // Memory first: what it holds is newer than what the keyring may still have.
+        self.memory.get(key).or_else(|| self.keyring.get(key)).filter(|value| !value.is_null())
+    }
+
+    fn set(&self, key: &str, value: Option<serde_json::Value>) -> Result<()> {
+        match self.keyring.set(key, value.clone()) {
+            Ok(()) => self.memory.set(key, None),
+            Err(error) if unreachable(&error) => {
+                if KEPT.swap(false, Ordering::Relaxed) {
+                    crate::diag::warn("secrets", "keychain not reachable, secrets kept in memory", "");
+                }
+                self.memory.set(key, Some(value.unwrap_or_default()))
+            }
+            Err(error) => Err(error),
+        }
+    }
+}
+
+/// No keyring service to answer, or it stays locked.
+#[cfg(any(target_os = "linux", test))]
+fn unreachable(error: &anyhow::Error) -> bool {
+    matches!(error.downcast_ref::<Error>(), Some(Error::NoStorageAccess(_) | Error::PlatformFailure(_)))
 }
 
 /// Android: `keyring` has no store there. One JSON object in the app's private folder, sealed by a key in Android's
@@ -113,5 +176,46 @@ impl SecretStore for FileStore {
             None => all.remove(key),
         };
         self.write(&all)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A keyring that answers every write as told, and holds nothing new.
+    struct Refusing(fn() -> anyhow::Error);
+
+    impl SecretStore for Refusing {
+        fn get(&self, key: &str) -> Option<serde_json::Value> {
+            (key == "old").then(|| "from the keyring".into())
+        }
+
+        fn set(&self, _: &str, _: Option<serde_json::Value>) -> Result<()> {
+            Err((self.0)())
+        }
+    }
+
+    fn no_service() -> anyhow::Error {
+        Error::NoStorageAccess("no Secret Service".into()).into()
+    }
+
+    #[test]
+    fn secrets_a_missing_keyring_cannot_take_stay_in_memory() -> Result<()> {
+        assert!(unreachable(&no_service()) && unreachable(&Error::PlatformFailure("no bus".into()).into()));
+        assert!(!unreachable(&Error::NoEntry.into()) && !unreachable(&anyhow::anyhow!("other")));
+        let store = KeyringOrMemory::new(Refusing(no_service));
+        assert_eq!(store.get("old"), Some("from the keyring".into()));
+        store.set("token", Some("kept".into()))?;
+        assert_eq!(store.get("token"), Some("kept".into()));
+        assert!(!KEPT.load(Ordering::Relaxed));
+        // Signed out meanwhile: gone, even if the keyring still holds it.
+        store.set("old", None)?;
+        store.set("token", None)?;
+        assert_eq!((store.get("old"), store.get("token")), (None, None));
+        // Another failure is told, nothing kept.
+        let refused = KeyringOrMemory::new(Refusing(|| anyhow::anyhow!("value too long")));
+        assert!(refused.set("token", Some("lost".into())).is_err() && refused.get("token").is_none());
+        Ok(())
     }
 }

@@ -695,8 +695,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         1 `M` [x] Built 2026-11-28 (`5950c1fd`, `d2101957`, `ad105d23`, `e6f2409e`): the table of what is missing in the UI, clippy Linux in CI (green), Linux told by the build. Not tried for real.
         2 `M` [x] Built 2026-11-28, not tried for real: MPRIS (`media/linux.rs`, written on zbus, no new crate) and
           `session.rs` on Linux. To read at the first .deb: the `.desktop` file's name (MPRIS `DesktopEntry`).
-        3 `M` Secret Service (a message when there is no daemon), tray / `closeToTray`, XDG autostart, `legato://`,
-          single instance (D-Bus), `PULSE_PROP`.
+        3 `M` [x] Built 2026-11-28, not tried for real: secrets kept in memory without a keyring (said in Accounts), no
+          tray = closing quits (said in General), XDG autostart, `legato://` (.deb template, AppImage by `xdg-mime`),
+          single instance as the plugin has it, `PULSE_PROP`. Left to slice 5: a `.lmix` double-click.
         4 `L` WebKitGTK shield (filter + host list) and its rule tests.
         5 `M` Linux release job x86_64 + aarch64, AppImage + .deb, both editions, the feed and the .deb case in `update.rs`.
         6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs

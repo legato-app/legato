@@ -798,6 +798,8 @@ const sv: Record<string, string> = {
   'Open at startup': 'Öppna vid start',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Öppnas när du loggar in i Windows. Finns också i Aktivitetshanteraren › Autostartappar',
   'Opens when you sign in to this computer': 'Öppnas när du loggar in på den här datorn',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'Ingen nyckelringstjänst körs (GNOME Keyring eller KWallet): dina inloggningar finns kvar tills Legato stängs.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'Det här skrivbordet visar inga ikoner i meddelandefältet: att stänga fönstret avslutar Legato',
   'Quiet': 'Tyst',
   'Normal': 'Normal',
   'Loud': 'Högt',

@@ -18,3 +18,7 @@ impl Tray {
         Ok(())
     }
 }
+
+pub fn host_seen() -> bool {
+    true
+}

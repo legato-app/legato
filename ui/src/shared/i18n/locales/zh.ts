@@ -798,6 +798,8 @@ const zh: Record<string, string> = {
   'Open at startup': '开机时打开',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': '登录 Windows 时打开。也可在任务管理器 › 启动应用中设置',
   'Opens when you sign in to this computer': '登录这台电脑时自动打开',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': '没有运行密钥环服务（GNOME Keyring 或 KWallet）：你的登录只保留到 Legato 关闭为止。',
+  'This desktop shows no tray icons: closing the window quits Legato': '此桌面环境不显示通知区域图标：关闭窗口会退出 Legato',
   'Quiet': '轻柔',
   'Normal': '标准',
   'Loud': '响亮',

@@ -37,6 +37,7 @@ import { searchSettings, type SettingEntry } from './search'
 import { CATEGORIES, categoryOf, groupDef, labelOf, type Category } from './catalog'
 import { locale, msg, tr } from '../../shared/i18n/i18n'
 import { nextAlarm } from '../player/alarmTime'
+import { useDesktopSupport } from '../../shared/desktopSupport'
 import { linuxApp, phoneApp } from '../../shared/platform'
 import { canKeepAwake } from '../../shared/awake'
 import { DESKTOP_ONLY, DESKTOP_ONLY_SECTIONS } from './desktopOnly'
@@ -808,6 +809,7 @@ function BackupRows() {
 
 function GeneralSection() {
   const { settings: s, update } = useSettings()
+  const desktop = useDesktopSupport()
   return (
     <div className="contents">
       <Group title={msg('Language')}>
@@ -816,7 +818,10 @@ function GeneralSection() {
       <Group title={msg('Starting and closing')}>
         <div className="rounded-xl border border-line bg-raised">
           <OpenAtStartup />
-          <Row setting="closeToTray" label={msg('Keep running in the notification area')} sub={s.closeToTray ? tr('Closing the window keeps the music going; Quit from the icon’s menu') : tr('Closing the window quits the app')} toggle />
+          {/* A desktop with no tray icons: no switch, the row says what closing does there. */}
+          <Row setting={desktop.tray ? 'closeToTray' : undefined} label={msg('Keep running in the notification area')} sub={!desktop.tray ? tr('This desktop shows no tray icons: closing the window quits Legato') : s.closeToTray ? tr('Closing the window keeps the music going; Quit from the icon’s menu') : tr('Closing the window quits the app')}>
+            {desktop.tray && <SettingToggle setting="closeToTray" label="Keep running in the notification area" />}
+          </Row>
           <Row setting="pipOnMinimize" label={msg('Picture-in-picture on minimize')} sub={tr('Minimizing while a song plays opens picture in picture, a small player above the other windows; its button brings the full window back')} toggle />
           <Row setting="pipClassic" label={msg('Classic mini player')} sub={tr('Picture in picture as a slim strip, the old-school way: a scrolling title, the time, every control; a YouTube video stays beside it')} toggle />
           <Row setting="reopen" label={msg('Reopen where you left off')} sub={tr('Same screen as when the app closed, Now Playing open if it was')} toggle />

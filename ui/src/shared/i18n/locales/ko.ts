@@ -798,6 +798,8 @@ const ko: Record<string, string> = {
   'Open at startup': '시작 시 열기',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Windows에 로그인하면 열립니다. 작업 관리자 › 시작 앱에서도 설정할 수 있습니다',
   'Opens when you sign in to this computer': '이 컴퓨터에 로그인하면 열립니다',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': '실행 중인 키링 서비스(GNOME Keyring 또는 KWallet)가 없습니다. 로그인은 Legato를 닫을 때까지만 유지됩니다.',
+  'This desktop shows no tray icons: closing the window quits Legato': '이 데스크톱은 알림 영역 아이콘을 표시하지 않습니다. 창을 닫으면 Legato가 종료됩니다',
   'Quiet': '조용하게',
   'Normal': '보통',
   'Loud': '크게',

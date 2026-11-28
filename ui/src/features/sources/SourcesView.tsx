@@ -12,6 +12,7 @@ import { SpotifyImport } from '../add/SpotifyConnect'
 import { useScan } from '../library/scanProgress'
 import { accountKey, api, type Direction, type PlexPin, type PlexServer, type ServerExposure, type ServerKind, type ServerStatus, type YtmAccount } from '../../shared/api'
 import { useGoogleAccounts } from './google'
+import { useDesktopSupport } from '../../shared/desktopSupport'
 import { timeAgo } from '../../shared/format'
 import { Button } from '../../shared/ui/Button'
 import { Led, LedChip, RoundButton, Segmented, Toggle } from '../../shared/ui/controls'
@@ -812,9 +813,15 @@ function LocalFolders() {
 }
 
 export function SourcesView() {
+  const { keychain } = useDesktopSupport()
   return (
     <div className="flex max-w-190 flex-col gap-6">
       <p className="text-[0.8125rem] text-ink-2">{phoneApp ? tr('Which account is connected to which service. Nothing goes through a server of ours: everything stays on your phone.') : tr('Which account is connected to which service. Nothing goes through a server of ours: everything stays on your computer.')}</p>
+      {!keychain && (
+        <p role="status" className="flex w-fit items-center gap-2.5 text-xs text-ink-2">
+          <Warning size={16} /> {tr('No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.')}
+        </p>
+      )}
       <div className="rounded-xl border border-line bg-raised">
         <GoogleAccounts />
         {/* An import in a window: none on the phone (FromPc). */}

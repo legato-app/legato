@@ -1,7 +1,7 @@
 import { Channel, invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import type { Box } from './artbox'
-import type { PlexPin, PlexServer, ServerExposure, ServerKind, ServerStatus, ServerSync, AddReport, AlbumInfo, ArtistPath, Bookmark, CastDevice, SongEnds, Chapter, DeviceOffer, DeviceOfferEvent, DevicesStatus, CacheStats, Contact, Credentials, DetectInput, DetectLayers, Detection, Direction, DiscordCard, Dropped, Edit, EditDraft, Effects, ExportReport, FileList, FileTags, FindReport, Heard, ImportDoubt, JumpPlaylist, LastfmStatus, LibraryChanges, LibraryData, LibraryHealth, LibraryPlaylist, LibraryTrack, ListImport, LinkImport, Listen, ListenbrainzStatus, ListRef, LiveReport, LiveSettings, LyricHit, Lyrics, LyricsAsk, LyricsChoice, MediaNow, Merged, Mix, NearbyState, Lmix, ArtistLink, Bio, SongCredit, NewRelease, OutputDevices, Pickup, PodcastFeed, RadioStation, Play, PlayerCommand, PlayerLevels, PlayerStatus, PlaylistEdit, PluginCall, PluginInfo, PluginInspect, Pref, PushFailed, RemoteLink, RemoteSong, RoomEvent, RoomFind, RoomHeard, RoomNow, RoomReaction, RoomSong, RoomStatus, Scrobble, SearchResults, ShareCode, SharePreview, SharedSong, ShieldStatus, ShortcutEntry, SongRelease, SongTags, Source, SourceStatus, SpotifyExport, SpotifyImport, SpotifyLibraryImport, SpotifyList, SpotifyPick, SpotifyProgress, SponsorSegment, Storage, SyncProbe, SyncReport, SyncStatus, SystemAccent, TagsSaved, Taken, TasteSignal, Track, UpdateStatus, WatchCmd, WatchRect, WatchReport, YtmAccount, YtmAccounts, YtmArtist, YtmHome } from './generated'
+import type { PlexPin, PlexServer, ServerExposure, ServerKind, ServerStatus, ServerSync, AddReport, AlbumInfo, ArtistPath, Bookmark, CastDevice, SongEnds, Chapter, DeviceOffer, DeviceOfferEvent, DesktopSupport, DevicesStatus, CacheStats, Contact, Credentials, DetectInput, DetectLayers, Detection, Direction, DiscordCard, Dropped, Edit, EditDraft, Effects, ExportReport, FileList, FileTags, FindReport, Heard, ImportDoubt, JumpPlaylist, LastfmStatus, LibraryChanges, LibraryData, LibraryHealth, LibraryPlaylist, LibraryTrack, ListImport, LinkImport, Listen, ListenbrainzStatus, ListRef, LiveReport, LiveSettings, LyricHit, Lyrics, LyricsAsk, LyricsChoice, MediaNow, Merged, Mix, NearbyState, Lmix, ArtistLink, Bio, SongCredit, NewRelease, OutputDevices, Pickup, PodcastFeed, RadioStation, Play, PlayerCommand, PlayerLevels, PlayerStatus, PlaylistEdit, PluginCall, PluginInfo, PluginInspect, Pref, PushFailed, RemoteLink, RemoteSong, RoomEvent, RoomFind, RoomHeard, RoomNow, RoomReaction, RoomSong, RoomStatus, Scrobble, SearchResults, ShareCode, SharePreview, SharedSong, ShieldStatus, ShortcutEntry, SongRelease, SongTags, Source, SourceStatus, SpotifyExport, SpotifyImport, SpotifyLibraryImport, SpotifyList, SpotifyPick, SpotifyProgress, SponsorSegment, Storage, SyncProbe, SyncReport, SyncStatus, SystemAccent, TagsSaved, Taken, TasteSignal, Track, UpdateStatus, WatchCmd, WatchRect, WatchReport, YtmAccount, YtmAccounts, YtmArtist, YtmHome } from './generated'
 
 // Every type the commands and events carry is a Rust type: `pnpm types` (ts-rs) writes it into ./generated, never by hand.
 // Re-exported here, so features import them from the api.
@@ -426,7 +426,10 @@ export const api = {
   /** Windows accent (light / dark theme variants); null off Windows. */
   systemAccent: () => invoke<SystemAccent | null>('system_accent'),
   restartApp: () => invoke<void>('restart_app'),
-  /** Opens at sign-in: Windows' startup list (Task Manager › Startup apps), read live. null off Windows. */
+  /** What this desktop gives: a tray, a keyring (Linux desktops may lack either). */
+  desktopSupport: () => invoke<DesktopSupport>('desktop_support'),
+  /** Opens at sign-in: Windows' startup list (Task Manager › Startup apps) or Linux's autostart folder, read live. null
+   *  where not offered. */
   autostart: () => invoke<boolean | null>('autostart'),
   setAutostart: (on: boolean) => invoke<void>('set_autostart', { on }),
   /** Other uploads of the same song when the video refuses embedding (101 / 150), best first. */

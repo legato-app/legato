@@ -253,6 +253,7 @@ const ANSWERS: Record<string, (args: Record<string, unknown>) => unknown> = {
   mixes: () => MIXES,
   system_accent: () => null,
   autostart: () => false,
+  desktop_support: () => ({ tray: true, keychain: true }),
   ytm_home: () => ({ shelves: [], moods: [] }),
   shield_status: () => ({ enabled: false, blocked: 0 }),
   edit_draft: () => null,

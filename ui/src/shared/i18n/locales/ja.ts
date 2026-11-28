@@ -798,6 +798,8 @@ const ja: Record<string, string> = {
   'Open at startup': 'スタートアップ時に開く',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Windowsへのサインイン時に開きます。タスクマネージャー › スタートアップ アプリ にもあります',
   'Opens when you sign in to this computer': 'このコンピューターにサインインすると起動します',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'キーリングサービス（GNOME Keyring または KWallet）が動いていません。サインインは Legato を閉じるまで保持されます。',
+  'This desktop shows no tray icons: closing the window quits Legato': 'このデスクトップは通知領域のアイコンを表示しません。ウィンドウを閉じると Legato が終了します',
   'Quiet': '小さめ',
   'Normal': '標準',
   'Loud': '大きめ',

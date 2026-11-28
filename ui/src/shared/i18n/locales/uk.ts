@@ -798,6 +798,8 @@ const uk: Record<string, string> = {
   'Open at startup': 'Відкривати під час запуску Windows',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Відкривається під час входу в Windows. Також у Диспетчер завдань › Автозавантаження програм',
   'Opens when you sign in to this computer': 'Відкривається під час входу в систему на цьому комп’ютері',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'Служба в’язки ключів не запущена (GNOME Keyring або KWallet): входи збережуться лише до закриття Legato.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'Ця стільниця не показує значки в області сповіщень: закриття вікна завершує Legato',
   'Quiet': 'Тихо',
   'Normal': 'Звичайно',
   'Loud': 'Гучно',

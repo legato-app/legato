@@ -89,6 +89,22 @@ impl Tray {
     }
 }
 
+/// Whether an icon in the notification area can show: always, but on Linux, where a desktop may have nowhere to put it
+/// (GNOME without an extension). Asked each time: the desktop's tray may start after the app.
+#[cfg(not(target_os = "linux"))]
+pub fn host_seen() -> bool {
+    true
+}
+
+#[cfg(target_os = "linux")]
+pub fn host_seen() -> bool {
+    let owned = || -> zbus::Result<bool> {
+        let connection = zbus::blocking::Connection::session()?;
+        Ok(zbus::blocking::fdo::DBusProxy::new(&connection)?.name_has_owner("org.kde.StatusNotifierWatcher".try_into()?)?)
+    };
+    owned().unwrap_or(false)
+}
+
 /// Restore and focus the main window (hidden in the tray, minimized or behind others).
 pub fn show_main(app: &AppHandle) {
     crate::background::show(app);

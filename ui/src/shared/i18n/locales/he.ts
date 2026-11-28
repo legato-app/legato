@@ -769,6 +769,8 @@ const he: Record<string, string> = {
   'Open at startup': 'פתיחה בהפעלת המחשב',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'נפתחת כשמתחברים ל-Windows. מופיעה גם במנהל המשימות ‹ אפליקציות הפעלה',
   'Opens when you sign in to this computer': 'נפתח כשאתם מתחברים למחשב הזה',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'לא פועל שירות מחזיק מפתחות (GNOME Keyring או KWallet): ההתחברויות נשמרות עד לסגירת Legato.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'שולחן העבודה הזה לא מציג סמלים באזור ההתראות: סגירת החלון מסיימת את Legato',
   'Quiet': 'שקט',
   'Normal': 'רגיל',
   'Loud': 'חזק',

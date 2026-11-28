@@ -798,6 +798,8 @@ const nl: Record<string, string> = {
   'Open at startup': 'Openen bij opstarten',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Opent als je je aanmeldt bij Windows. Ook in Taakbeheer › Opstart-apps',
   'Opens when you sign in to this computer': 'Opent wanneer je je aanmeldt op deze computer',
+  'No keyring service is running (GNOME Keyring or KWallet): your sign-ins last until Legato closes.': 'Er draait geen sleutelhangerdienst (GNOME Keyring of KWallet): je aanmeldingen blijven tot Legato sluit.',
+  'This desktop shows no tray icons: closing the window quits Legato': 'Dit bureaublad toont geen pictogrammen in het systeemvak: het venster sluiten sluit Legato af',
   'Quiet': 'Zacht',
   'Normal': 'Normaal',
   'Loud': 'Luid',
