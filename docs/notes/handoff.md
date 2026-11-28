@@ -63,7 +63,6 @@ changes; older versions are in git. Updated 2026-11-28, window 5 (Beta pushed 14
 - The two bench runs: `node scripts/bench.mjs --skip-build`, then `node scripts/bench.mjs --lite --skip-build`, about
   20 minutes each, with nothing else heavy running.
 - **WSL2 Debian** for the Linux trial: `wsl --install -d Debian` (admin and a reboot: the owner's).
-- **The "Two PCs" section** in this public file: keep or remove (the owner's call).
 - Fixing every song saved swapped for sure would take one YouTube request per song: the owner's call.
 - The Spotify legal questions.
 
@@ -86,11 +85,7 @@ changes; older versions are in git. Updated 2026-11-28, window 5 (Beta pushed 14
 - **Local checks**: targeted tests only, one at a time (CLAUDE.md › Commands). The full gate runs in CI.
 - **Reports** (`docs/notes/report*.md`) are git-ignored and never staged. Before a push: a clean tree, and
   `git log --name-only --format= origin/master..HEAD | grep -i notes/report` prints nothing.
-
-## Two PCs
-Two Windows PCs, kept alike through GitHub; one holds the signing keys and the Android tools. Setup lives in each PC's
-private memory. Moving PCs: push platforms, then on the other PC `git fetch` and `git switch platforms`; copy the private
-`docs/notes/report*.md` by hand if they are wanted there.
+- Machine-specific notes: a private, git-ignored file.
 
 ## Sessions
 For a new orchestrating session: read `CLAUDE.md`, this file, then the useful parts of `plan-v2.md`. One session per
