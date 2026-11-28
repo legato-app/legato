@@ -797,6 +797,7 @@ const uk: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Увага: умови YouTube забороняють блокувати рекламу в його плеєрі. Ризики: YouTube може обмежити твій обліковий запис, а відтворення ламається, коли YouTube змінює свій плеєр. YouTube Premium прибирає рекламу без цього ризику.',
   'Open at startup': 'Відкривати під час запуску Windows',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Відкривається під час входу в Windows. Також у Диспетчер завдань › Автозавантаження програм',
+  'Opens when you sign in to this computer': 'Відкривається під час входу в систему на цьому комп’ютері',
   'Quiet': 'Тихо',
   'Normal': 'Звичайно',
   'Loud': 'Гучно',

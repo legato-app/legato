@@ -797,6 +797,7 @@ const vi: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Lưu ý: điều khoản của YouTube cấm chặn quảng cáo trong trình phát của họ. Rủi ro: YouTube có thể hạn chế tài khoản của bạn, và việc phát sẽ hỏng khi YouTube thay đổi trình phát. YouTube Premium bỏ quảng cáo mà không có rủi ro này.',
   'Open at startup': 'Mở khi khởi động',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Mở khi bạn đăng nhập Windows. Cũng có trong Trình quản lý Tác vụ › Ứng dụng khởi động',
+  'Opens when you sign in to this computer': 'Mở khi bạn đăng nhập vào máy tính này',
   'Quiet': 'Nhỏ',
   'Normal': 'Bình thường',
   'Loud': 'To',

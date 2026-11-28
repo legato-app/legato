@@ -797,6 +797,7 @@ const es: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Nota: las condiciones de YouTube prohíben bloquear anuncios en su reproductor. Riesgos: YouTube puede restringir tu cuenta, y la reproducción se rompe cuando YouTube cambia su reproductor. YouTube Premium quita los anuncios sin este riesgo.',
   'Open at startup': 'Abrir al iniciar',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Se abre al iniciar sesión en Windows. También en Administrador de tareas › Aplicaciones de arranque',
+  'Opens when you sign in to this computer': 'Se abre cuando inicias sesión en este equipo',
   'Quiet': 'Suave',
   'Normal': 'Normal',
   'Loud': 'Fuerte',

@@ -24,6 +24,8 @@ mod autostart;
 mod background;
 mod backup;
 mod deferred;
+#[cfg(any(target_os = "linux", test))]
+mod desktop_file;
 #[cfg(not(feature = "lite"))]
 mod detector;
 // The Detector's first layer only.

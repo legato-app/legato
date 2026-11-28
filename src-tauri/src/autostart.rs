@@ -1,5 +1,6 @@
 //! Opens at sign-in (Settings › Advanced). Windows: the HKCU Run entry Task Manager › Startup apps lists.
-//! Task Manager's own switch lives in StartupApproved: read here, and turned back on with ours. Elsewhere: not offered.
+//! Task Manager's own switch lives in StartupApproved: read here, and turned back on with ours. Linux: a file of ours in
+//! the XDG autostart folder, a desktop's own switch in it read the same way. Elsewhere: not offered.
 
 /// Run value name (Task Manager falls back to it when the exe has no description): the edition's product name, the one
 /// its uninstaller deletes. Lite's own entry: both editions may open at sign-in, neither changes the other's.
@@ -9,26 +10,40 @@ const NAME: &str = crate::identity::PRODUCT;
 #[cfg(all(windows, not(feature = "lite")))]
 const OLD_NAME: &str = "Music App";
 
-/// Some(on) on Windows: this exe registered and not turned off in Task Manager. None elsewhere.
+/// Some(on) on Windows and Linux: this app registered and not turned off by the system's own switch. None elsewhere.
 pub fn get() -> Option<bool> {
     #[cfg(windows)]
     return Some(std::env::current_exe().is_ok_and(|exe| win::get(NAME, &exe)));
-    #[cfg(not(windows))]
+    #[cfg(target_os = "linux")]
+    return Some(linux::get());
+    #[cfg(not(any(windows, target_os = "linux")))]
     None
+}
+
+/// The entry is shared by every build under this user: only the installed app writes it.
+#[cfg(any(windows, target_os = "linux"))]
+fn may_write(on: bool) -> anyhow::Result<()> {
+    // A dev or bench build switching it off would switch the real one off.
+    anyhow::ensure!(crate::identity::installed(), "Open at startup works in the installed app: another build would change the real app's entry");
+    anyhow::ensure!(!on || !cfg!(debug_assertions), "Open at startup works in the installed app: a dev build would start without its dev server");
+    Ok(())
 }
 
 pub fn set(on: bool) -> anyhow::Result<()> {
     #[cfg(windows)]
     {
-        // One Run value for every build under this user: a dev or bench build switching it off would switch the real one off.
-        anyhow::ensure!(crate::identity::installed(), "Open at startup works in the installed app: another build would change the real app's entry");
-        anyhow::ensure!(!on || !cfg!(debug_assertions), "Open at startup works in the installed app: a dev build would start without its dev server");
+        may_write(on)?;
         win::set(NAME, &std::env::current_exe()?, on)
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "linux")]
+    {
+        may_write(on)?;
+        linux::set(on)
+    }
+    #[cfg(not(any(windows, target_os = "linux")))]
     {
         let _ = on;
-        anyhow::bail!("Open at startup is Windows only for now")
+        anyhow::bail!("Open at startup isn't offered on this system")
     }
 }
 
@@ -44,6 +59,53 @@ pub fn follow() {
         #[cfg(not(feature = "lite"))]
         let _ = win::rename(OLD_NAME, NAME);
         let _ = win::follow(NAME, &exe);
+    }
+    #[cfg(target_os = "linux")]
+    if !cfg!(debug_assertions) && crate::identity::installed() {
+        let _ = linux::follow();
+    }
+}
+
+/// This edition's file in the XDG autostart folder of `config`.
+#[cfg(any(target_os = "linux", test))]
+fn autostart_file(config: &std::path::Path) -> std::path::PathBuf {
+    config.join("autostart").join(format!("{}.desktop", crate::identity::INSTALLED))
+}
+
+#[cfg(target_os = "linux")]
+mod linux {
+    use crate::desktop_file::{enabled, entry, exec_of, launcher, with_exec, xdg_folder};
+    use std::path::PathBuf;
+
+    fn file() -> Option<PathBuf> {
+        xdg_folder(std::env::var_os("XDG_CONFIG_HOME"), std::env::var_os("HOME"), ".config").map(|config| super::autostart_file(&config))
+    }
+
+    /// Registered for what starts this app now, and not switched off by the desktop.
+    pub fn get() -> bool {
+        let Some(text) = file().and_then(|file| std::fs::read_to_string(file).ok()) else { return false };
+        enabled(&text) && launcher().is_ok_and(|launcher| exec_of(&text) == Some(launcher))
+    }
+
+    pub fn set(on: bool) -> anyhow::Result<()> {
+        let file = file().ok_or_else(|| anyhow::anyhow!("No home folder"))?;
+        if on {
+            std::fs::create_dir_all(file.parent().unwrap_or(&file))?;
+            std::fs::write(file, entry(crate::identity::PRODUCT, crate::identity::INSTALLED, &launcher()?, None, &[]))?;
+        } else if file.exists() {
+            std::fs::remove_file(file)?;
+        }
+        Ok(())
+    }
+
+    /// An entry naming a program that's gone (an AppImage updated under a new name, or moved): this one.
+    pub fn follow() -> anyhow::Result<()> {
+        let Some(file) = file() else { return Ok(()) };
+        let Ok(text) = std::fs::read_to_string(&file) else { return Ok(()) };
+        if exec_of(&text).is_some_and(|named| !named.exists()) {
+            std::fs::write(file, with_exec(&text, &launcher()?))?;
+        }
+        Ok(())
     }
 }
 
@@ -166,6 +228,12 @@ mod win {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn each_edition_has_its_own_autostart_file_on_linux() {
+        let file = autostart_file(std::path::Path::new("/home/me/.config"));
+        assert_eq!(file, std::path::Path::new("/home/me/.config").join("autostart").join(format!("{}.desktop", crate::identity::INSTALLED)));
+    }
 
     #[test]
     fn command_is_quoted() {

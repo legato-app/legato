@@ -797,6 +797,7 @@ const sv: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Obs: YouTubes villkor förbjuder blockering av annonser i dess spelare. Risker: YouTube kan begränsa ditt konto, och uppspelningen slutar fungera när YouTube ändrar sin spelare. YouTube Premium tar bort annonser utan den risken.',
   'Open at startup': 'Öppna vid start',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Öppnas när du loggar in i Windows. Finns också i Aktivitetshanteraren › Autostartappar',
+  'Opens when you sign in to this computer': 'Öppnas när du loggar in på den här datorn',
   'Quiet': 'Tyst',
   'Normal': 'Normal',
   'Loud': 'Högt',

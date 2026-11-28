@@ -768,6 +768,7 @@ const he: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'הערה: התנאים של YouTube אוסרים חסימת פרסומות בנגן שלו. סיכונים: YouTube עלול להגביל את החשבון שלכם, והניגון נשבר כש-YouTube משנה את הנגן. YouTube Premium מסיר פרסומות בלי הסיכון הזה.',
   'Open at startup': 'פתיחה בהפעלת המחשב',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'נפתחת כשמתחברים ל-Windows. מופיעה גם במנהל המשימות ‹ אפליקציות הפעלה',
+  'Opens when you sign in to this computer': 'נפתח כשאתם מתחברים למחשב הזה',
   'Quiet': 'שקט',
   'Normal': 'רגיל',
   'Loud': 'חזק',

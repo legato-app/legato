@@ -797,6 +797,7 @@ const nl: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Let op: de voorwaarden van YouTube verbieden het blokkeren van advertenties in de speler. Risico\'s: YouTube kan je account beperken, en het afspelen werkt niet meer als YouTube de speler verandert. YouTube Premium verwijdert advertenties zonder dit risico.',
   'Open at startup': 'Openen bij opstarten',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Opent als je je aanmeldt bij Windows. Ook in Taakbeheer › Opstart-apps',
+  'Opens when you sign in to this computer': 'Opent wanneer je je aanmeldt op deze computer',
   'Quiet': 'Zacht',
   'Normal': 'Normaal',
   'Loud': 'Luid',

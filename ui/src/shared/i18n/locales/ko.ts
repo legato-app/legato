@@ -797,6 +797,7 @@ const ko: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': '참고: YouTube 약관은 플레이어에서 광고 차단을 금지합니다. 위험: YouTube가 계정을 제한할 수 있으며, YouTube가 플레이어를 바꾸면 재생이 안 될 수 있습니다. YouTube Premium을 쓰면 이런 위험 없이 광고가 사라집니다.',
   'Open at startup': '시작 시 열기',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Windows에 로그인하면 열립니다. 작업 관리자 › 시작 앱에서도 설정할 수 있습니다',
+  'Opens when you sign in to this computer': '이 컴퓨터에 로그인하면 열립니다',
   'Quiet': '조용하게',
   'Normal': '보통',
   'Loud': '크게',

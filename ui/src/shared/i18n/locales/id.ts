@@ -797,6 +797,7 @@ const id: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'Catatan: ketentuan YouTube melarang pemblokiran iklan di pemutarnya. Risiko: YouTube bisa membatasi akunmu, dan pemutaran rusak saat YouTube mengubah pemutarnya. YouTube Premium menghapus iklan tanpa risiko ini.',
   'Open at startup': 'Buka saat startup',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Terbuka saat kamu masuk ke Windows. Juga ada di Pengelola Tugas › Aplikasi startup',
+  'Opens when you sign in to this computer': 'Terbuka saat Anda masuk ke komputer ini',
   'Quiet': 'Pelan',
   'Normal': 'Normal',
   'Loud': 'Keras',

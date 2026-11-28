@@ -797,6 +797,7 @@ const hi: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': 'ध्यान दें: YouTube की शर्तें उसके प्लेयर में विज्ञापन ब्लॉक करने से मना करती हैं। जोखिम: YouTube आपके अकाउंट पर पाबंदी लगा सकता है, और YouTube के प्लेयर बदलने पर प्लेबैक टूट जाता है। YouTube Premium इस जोखिम के बिना विज्ञापन हटाता है।',
   'Open at startup': 'स्टार्टअप पर खोलें',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Windows में साइन इन करने पर खुलता है। कार्य प्रबंधक › स्टार्टअप ऐप्स में भी',
+  'Opens when you sign in to this computer': 'जब आप इस कंप्यूटर में साइन इन करते हैं, तब खुलता है',
   'Quiet': 'धीमा',
   'Normal': 'सामान्य',
   'Loud': 'तेज़',

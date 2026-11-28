@@ -525,7 +525,7 @@ function OpenAtStartup() {
     })
   }
   return (
-    <Row label={msg('Open at startup')} sub={tr('Opens when you sign in to Windows. Also in Task Manager › Startup apps')}>
+    <Row label={msg('Open at startup')} sub={linuxApp ? tr('Opens when you sign in to this computer') : tr('Opens when you sign in to Windows. Also in Task Manager › Startup apps')}>
       <Toggle label={tr('Open at startup')} checked={on} onChange={change} />
     </Row>
   )

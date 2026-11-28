@@ -797,6 +797,7 @@ const ja: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': '注意：YouTubeの利用規約では、プレーヤー内の広告のブロックが禁止されています。リスク：YouTubeがアカウントを制限する可能性があり、YouTubeがプレーヤーを変更すると再生できなくなります。YouTube Premiumなら、このリスクなしで広告を削除できます。',
   'Open at startup': 'スタートアップ時に開く',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': 'Windowsへのサインイン時に開きます。タスクマネージャー › スタートアップ アプリ にもあります',
+  'Opens when you sign in to this computer': 'このコンピューターにサインインすると起動します',
   'Quiet': '小さめ',
   'Normal': '標準',
   'Loud': '大きめ',

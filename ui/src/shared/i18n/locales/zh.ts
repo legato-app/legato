@@ -797,6 +797,7 @@ const zh: Record<string, string> = {
   'Note: YouTube’s terms forbid blocking ads in its player. Risks: YouTube may restrict your account, and playback breaks when YouTube changes its player. YouTube Premium removes ads without this risk.': '注意：YouTube 的条款禁止在其播放器中拦截广告。风险：YouTube 可能会限制你的账号，并且当 YouTube 更改播放器时播放会失效。YouTube Premium 可以无风险地去除广告。',
   'Open at startup': '开机时打开',
   'Opens when you sign in to Windows. Also in Task Manager › Startup apps': '登录 Windows 时打开。也可在任务管理器 › 启动应用中设置',
+  'Opens when you sign in to this computer': '登录这台电脑时自动打开',
   'Quiet': '轻柔',
   'Normal': '标准',
   'Loud': '响亮',
