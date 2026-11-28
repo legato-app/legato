@@ -6,6 +6,7 @@ use adblock::content_blocking::{CbAction, CbRule, CbTrigger, CbType};
 use adblock::lists::{FilterSet, ParseOptions, RuleTypes};
 use anyhow::{Result, anyhow};
 use serde_json::Value;
+use std::fmt::Write;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 /// WebKit refuses a longer list whole.
@@ -25,7 +26,7 @@ pub fn content_blocker(lists: &str) -> Result<String> {
     let mut rules = within(rules, MAX_RULES - NEVER_BLOCKED.len());
     // Last, so they undo whatever matched before.
     rules.extend(NEVER_BLOCKED.map(never_block));
-    written(&rules)
+    written(rules)
 }
 
 /// What a converted list's compiled copy is filed under: another text, another key.
@@ -36,15 +37,22 @@ pub fn content_blocker_key(json: &str) -> u64 {
 }
 
 /// The converter holds a rule's kinds in a set, which comes out in a new order each time: sorted, so that the same
-/// rules always give the same text, and key.
-fn written(rules: &[CbRule]) -> Result<String> {
-    let mut list = serde_json::to_value(rules)?;
-    for rule in list.as_array_mut().into_iter().flatten() {
+/// rules always give the same text, and key. One rule at a time: the whole list as JSON values would take a small
+/// machine's memory at every launch.
+fn written(rules: Vec<CbRule>) -> Result<String> {
+    let mut list = String::from("[");
+    for (index, rule) in rules.into_iter().enumerate() {
+        let mut rule = serde_json::to_value(rule)?;
         if let Some(Value::Array(kinds)) = rule.pointer_mut("/trigger/resource-type") {
             kinds.sort_by(|first, second| first.as_str().cmp(&second.as_str()));
         }
+        if index > 0 {
+            list.push(',');
+        }
+        write!(list, "{rule}")?;
     }
-    Ok(list.to_string())
+    list.push(']');
+    Ok(list)
 }
 
 fn never_block(url_filter: &str) -> CbRule {
