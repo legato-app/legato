@@ -90,6 +90,7 @@ describe('promote', () => {
       'feat(lite): the __LITE__ define, shared/edition.ts and pnpm dev:lite / build:lite',
       'fix(lite): a Lite built with the full app’s dependencies is a compile error',
       'feat(lite): the Lite edition in the shell, its own identifier and update feed',
+      "feat(themes): the moves of a rearranged layout, within the theme rules, written back as a theme's layout",
     ]
     expect(notesFrom([...internal, 'feat(lite): one YouTube embed', 'fix: a .lmix opens', 'fix(themes): the CSS of a theme'])).toBe('### Added\n- One YouTube embed\n\n### Fixed\n- A .lmix opens\n- The CSS of a theme')
     // Every line, however many (the owner's rule, 2026-11-05).

@@ -19,6 +19,8 @@ const INTERNAL_SUBJECTS = new Set([
   'Legato Lite builds without its cut commands, plugins, internet rooms and Music Detector',
   "Lite's interface never calls the visualizer stream or draws the Discord account",
   'the event names stay in the api call, not a hand-written type',
+  // Rearrange's first slice: helpers only, nothing to see in the app until its screen lands.
+  "the moves of a rearranged layout, within the theme rules, written back as a theme's layout",
 ])
 /** "feat(player): smoother fades" → "Smoother fades" under "### Added". Other kinds (docs, ci, chore…) left out, and what
  *  only the code's readers care about (above): the update card is the app's. */
