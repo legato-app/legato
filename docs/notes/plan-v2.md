@@ -804,6 +804,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         for the library video do not apply while it plays split (its parts key by the video, `songKey`).
       Not tried: a real long mix, a real Google answer (the owner: turn the setting on, play a DJ set with chapters, let a
       part end, press Next / Previous, take a part out of Up next, shuffle, quit and reopen the app mid-set).
+      (to check: chapters of a long video landed (742e088f, 79c0979d); timestamps and the pinned comment not located)
 - [x] `M` Output devices: switch from the player bar, remember per device (volume, EQ preset).
       Ticked 2026-11-18 (audit): the switch, volume per device (`ca26c14c`) and EQ per device (`8fc31212`, `a5618b3d`) shipped; a device-change event is left (WASAPI watch: needs a real device).
       2026-11-13 (lot 27), EQ per device: Settings › Playback › Equalizer per output device (off by default) adds "Equalizer for this
@@ -917,6 +918,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   key (`POST /key?k=like`, the same secret and private addresses as every key, POST only; the interface toggles the
   heart of what plays, never during a blind test), tested in `logic.test.mjs`, `remote.rs`, `media.test.ts`. Left: the
   Xbox Game Bar widget (a UWP package, nothing here could build or load it).
+      (to check: the Stream Deck part landed (6d3d84f7, 09badb2f); the Xbox Game Bar widget not located)
 - [x] `L` A theme file alone can change the app's whole layout, A to Z (owner's ask 2026-11-26): not only colours and CSS, the arrangement of every surface (sidebar, player bar, pages, panels). To design first: what the file may say (a layout schema read by the shell, not raw code), how `BRAND_GUARD` and the right-click menus survive, how a broken file falls back to the default look.
   - Further (owner, 2026-11-26): a theme may also bring extra features with reactive code (JS or similar), always checked by Rust. Lead to weigh: the theme's script runs like a plugin (`crates/plugins`: rquickjs sandbox, permissions approved by the user and checked in Rust, no secrets, files or raw IPC, `docs/plugins.md`); the layout file binds to data the shell exposes (now playing, queue, lyrics…) instead of the script touching the DOM.
   - Owner (2026-11-26): no theme scripts in v1; after v1, a theme may name a plugin installed on its own (the usual
@@ -1166,6 +1168,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       edit becomes a draft like any editor change (Reset undoes it). Decided alone (2026-11-13): four steps, no setting. Never heard.
       2026-11-12: the loop has a key (L: start, end, clear, in the shortcuts table) and a band on the progress bar. Decided
       alone (2026-11-12): L, one key cycling the three steps, rather than three keys. Never tried by ear or on a screen.
+      (to check: A-B loop and practice speed landed (26af2559, abb85f55, 3e492039); key and chords not located)
 - [ ] `M-L` Profiles on one PC (each person's library, likes, history and Last.fm), switched from the top bar.
       2026-11-13 (wider mandate), still skipped: the first step is not the data model but the launch (which library file, which keychain names, which WebView2 profile are chosen before the window opens), the code the CI just showed a panic in; the owner's choices above come first.
       Skipped 2026-11-13 (night, not for this run): a profile is a second library file plus its own keychain entries and its own
@@ -1258,6 +1261,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       the audio is a ranged GET through the engine like a server song, `server:podcast:<address>`). Episodes of 20 minutes and more
       resume as any long song does; speed is the Live Editor's. Decided alone (2026-11-13): no directory search, no new-episode
       check, no downloads (a download is a copy of the audio; streaming only), no sidebar entry. 2026-11-13, second slice: Refresh on a show (reads the feed again; episodes not there the last time it was opened say New), played marks (a button per episode; starting one marks it; this PC only), OPML import (the exported text pasted; shows kept, no request made). 2026-11-13, third slice: Copy the list as OPML (clipboard). 2026-11-13, the background check: Settings › General › Check podcasts (off) reads each kept feed every six hours while the app is open (a minute after launch, 1.5 s between feeds, 30 shows at most, `podcasts/check.ts`) and a notice counts the new episodes; nothing is marked seen. The site's Podcasts privacy row says so. Never run for real. Never tried on a real feed or by ear; the privacy row says the feed host is reached.
+      (to check: podcasts with a six-hour check exist (2a5fdc01, 688a575c); resume per episode and speed not located)
 - [ ] `L` Living-room mode: big UI driven by a gamepad or the arrow keys (10-foot layout), for a PC on a TV.
       2026-11-13, first slice: Settings › General › Living-room mode (off, this PC only): the page zoom is 150 % at least, the focus ring
       thick, the arrows move between the visible controls (`livingRoom/spatial.ts`, nearest in that direction; inside the open dialog),
@@ -1266,6 +1270,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       a purpose-built home screen, the player bar enlarged beyond the zoom, on-screen keyboard for search.
       2026-11-13, third slice: an on-screen keyboard (Enter in a text field in the mode opens a grid of keys at the bottom, walked with the arrows or a pad; letters, digits, a few marks, space, delete, Done, Enter; lazy `livingRoom/OnScreenKeyboard.tsx`). 2026-11-13, fourth slice: a TV home (Settings › General › TV home, off by default; with the mode on, big tiles to Search, Songs, Albums, Artists, Mixes, Radio, Podcasts and Audiobooks when on, Settings; opens when the mode turns on, and in the app menu; lazy `livingRoom/TvHome.tsx`). Decided alone (2026-11-13): plain tiles, no cover rows, easy to replace by the owner's design. Never seen on a TV.
       2026-11-18 (lot 60): found that the TV home (fourth slice, `ac4ab854`) already is the dedicated home screen; added its Up next row (the next 6 queue songs as big tiles, a press plays that one; pure `tvQueue.ts`, tested). Left: the player bar enlarged beyond the zoom. Never seen on a TV; the arrows reach the new tiles through the existing `nextBox` map (not run for real). Decided alone (2026-11-18): no second focus-map function (`spatial.ts` `nextBox` already handles rows and edges, tested), the bar left alone (it needs a look on a real TV).
+      (to check: the TV home landed (ac4ab854, af01e735, c5c829df); gamepad input not located)
 - [ ] `L` Media panel off Windows.
 
 ## Visualizer v2 (user's ask 2026-10-30: more realistic, more detailed)
