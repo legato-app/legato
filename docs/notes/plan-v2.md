@@ -383,7 +383,7 @@ Where a line says "reading", the owner hasn't confirmed it.
   - 2026-11-27: `package.json` `packageManager` pins pnpm 11.9.0 and every `pnpm/action-setup` step (check, pages,
     release) reads it. Both frozen installs pass offline with 11.9.0 here; not tried for real (no CI run yet).
     - Decided alone (2026-11-27): 11.9.0, the local one (lockfileVersion 9.0 is read by 9 to 11; it needs Node
-      22.13 or later, which `node-version: 22` gives); `release.yml` too, as two versions would stop the action.
+      22.13 or later, which `node-version: 22` gives); `release.yml` too, as two versions would stop the action. (to check: where the FAQ label is set, not located in this pass)
 - [ ] `S` The FAQ label `[Docs › Plugins]` is English: translate "Docs" if the owner wants the word in every locale.
 - [x] `S` Bump the site's `motion` from `^14.9.0` to `^14.14.0` so it dedupes with the copy `fumadocs-ui` uses.
   - 2026-11-27: `pnpm why motion` in `site/` finds one version, 14.14.0. Site not built, not tried for real.
@@ -1365,6 +1365,7 @@ Most useful first; the tag is the effort.
 
 ## Check live in the real app (built and unit-tested, never driven for real)
 
+- [ ] Right-click customising screen (tick, reorder, Reset per kind, 4a6ba10c, MenuCustomize.tsx): not driven in the app.
 - [ ] Adaptive Sound as one steady gain per song, from its integrated loudness (4173b567, c74d9eb9, bdd3e3ba, 362dd86b): the owner's phone and PC, not tried for real.
 - [ ] A video-only title saved swapped, then turned by a sync from an older PC (a273ab9f, e80a2ca4): two real PCs, not tried.
 - [ ] Android crackle gone: a YouTube song on the phone, Bluetooth earphones, screen off or app in background, crossfade and 8D each on (fixes 390e82fe, 306de9a3, c0245823).
