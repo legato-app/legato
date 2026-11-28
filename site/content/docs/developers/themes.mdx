@@ -19,6 +19,8 @@ An eye hides what can be hidden, and a button in the floating bar shows it again
 
 A theme file can say the same in its `layout` key: the [format](https://github.com/legato-app/legato/blob/master/docs/design.md#theme-layout).
 
+While you arrange, the app slips hidden marks between the parts: a theme’s CSS that counts elements (`:first-child`, `:nth-child`) in the three bars, a page or a song list’s header can look off until Done.
+
 ## What a theme’s CSS can’t hide
 
 Elements marked `data-brand` (the name, the logo, legal notices) survive any CSS, a theme’s or a plugin’s. A plugin with the `ui:style` permission restyles the whole interface the same way.
