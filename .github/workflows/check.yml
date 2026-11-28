@@ -18,8 +18,9 @@ env:
 
 jobs:
   # Windows = the app's platform: everything. macOS: everything too (the app shell's non-Windows build). Linux: the
-  # Rust crates only (clippy + tests): the shell would need WebKitGTK, ~100 MB from Ubuntu mirrors that crawl some days
-  # (review 2026-10-23: 10+ min, then a timeout), and macOS already builds it.
+  # Rust crates (clippy + tests), and on a Rust change the app shell's clippy in both editions: it needs WebKitGTK,
+  # ~100 MB from Ubuntu mirrors that crawl some days (review 2026-10-23: 10+ min, then a timeout), so its packages are
+  # kept between runs.
   check:
     name: check (${{ matrix.os }})
     strategy:
@@ -27,37 +28,61 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v7
 
       # macOS is the costly runner and only a Rust change can break it there (the front end's tests run the same on Windows): on
       # a push or a pull request that touches none of the Rust, the shell, the files their tests read or a workflow, its job stays green and skips the
-      # rest. Anything unclear (no base commit, a failed fetch, another system) runs everything.
+      # rest. Linux skips only the app shell on such a push (`rust`). Anything unclear (no base commit, a failed fetch)
+      # runs everything.
       - id: scope
         shell: bash
         run: |
-          run=true
-          if [ "$RUNNER_OS" = macOS ]; then
-            base="${{ github.event.pull_request.base.sha || github.event.before }}"
-            case "$base" in 0000000*) base="" ;; esac
-            # No pipe into grep -q: under bash's pipefail a match cut early (SIGPIPE) or a failed diff would read as "no Rust".
-            # The Rust tests also read e2e/fixtures, examples/ and release.yml (include_str!).
-            if [ -n "$base" ] && git fetch --no-tags --depth=1 origin "$base" 2>/dev/null && files=$(git diff --name-only "$base" HEAD); then
-              grep -qE '^(crates/|src-tauri/|Cargo\.(toml|lock)$|rust-toolchain|e2e/fixtures/|examples/|\.github/workflows/)' <<<"$files" || run=false
-            fi
+          rust=true
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          case "$base" in 0000000*) base="" ;; esac
+          # No pipe into grep -q: under bash's pipefail a match cut early (SIGPIPE) or a failed diff would read as "no Rust".
+          # The Rust tests also read e2e/fixtures, examples/ and release.yml (include_str!).
+          if [ -n "$base" ] && git fetch --no-tags --depth=1 origin "$base" 2>/dev/null && files=$(git diff --name-only "$base" HEAD); then
+            grep -qE '^(crates/|src-tauri/|Cargo\.(toml|lock)$|rust-toolchain|e2e/fixtures/|examples/|\.github/workflows/)' <<<"$files" || rust=false
           fi
+          run=true
+          if [ "$RUNNER_OS" = macOS ]; then run=$rust; fi
           echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "rust=$rust" >> "$GITHUB_OUTPUT"
           [ "$run" = true ] || echo "macOS: no Rust change in this push, the rest of this job is skipped."
 
-      # Crates only: ALSA headers for the player (OpenSSL and pkg-config come with the runner). A slow Ubuntu mirror
-      # used to hang `apt-get update` for 20+ minutes: short timeouts, retries, a cap on the step.
+      # The downloaded packages, kept from run to run (a new set each week).
+      - id: week
+        if: (runner.os == 'Linux') && steps.scope.outputs.rust != 'false'
+        run: echo "week=$(date +%G-%V)" >> "$GITHUB_OUTPUT"
+      - if: (runner.os == 'Linux') && steps.scope.outputs.rust != 'false'
+        uses: actions/cache@v4
+        with:
+          path: ~/apt-archives
+          key: apt-webkit41-${{ steps.week.outputs.week }}
+          restore-keys: apt-webkit41-
+
+      # ALSA headers for the player (OpenSSL and pkg-config come with the runner); on a Rust change, WebKitGTK and the
+      # app shell's libraries too. A slow Ubuntu mirror used to hang `apt-get update` for 20+ minutes: short timeouts,
+      # retries, a cap on the step.
       - if: (runner.os == 'Linux') && steps.scope.outputs.run != 'false'
-        timeout-minutes: 8
+        timeout-minutes: 15
+        env:
+          RUST_CHANGED: ${{ steps.scope.outputs.rust }}
         run: |
           APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
           for i in 1 2 3; do sudo apt-get $APT update && break; sleep 5; done
-          sudo apt-get $APT install -y --no-install-recommends pkg-config libssl-dev libasound2-dev
+          packages="pkg-config libssl-dev libasound2-dev"
+          if [ "$RUST_CHANGED" != false ]; then
+            packages="$packages libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libdbus-1-dev"
+          fi
+          mkdir -p "$HOME/apt-archives/partial"
+          sudo apt-get $APT -o Dir::Cache::Archives="$HOME/apt-archives" -o APT::Keep-Downloaded-Packages=true install -y --no-install-recommends $packages
+          # Root downloaded them: the cache step reads them as the runner's user.
+          sudo rm -rf "$HOME/apt-archives/partial" "$HOME/apt-archives/lock"
+          sudo chown -R "$USER" "$HOME/apt-archives"
 
       # pnpm's version, here and in every workflow, is package.json's "packageManager".
       - if: (runner.os != 'Linux') && steps.scope.outputs.run != 'false'
@@ -126,6 +151,15 @@ jobs:
           HTTPS_PROXY: http://127.0.0.1:9
           ALL_PROXY: http://127.0.0.1:9
           NO_PROXY: 127.0.0.1,localhost
+
+      # The app shell on Linux, both editions. A check reads no page: an empty dist/ is enough (generate_context!).
+      - if: (runner.os == 'Linux') && steps.scope.outputs.rust != 'false'
+        run: |
+          mkdir -p dist && touch dist/index.html
+          cargo clippy -p legato --all-targets -- -D warnings
+          cargo clippy -p legato --no-default-features --features lite --all-targets -- -D warnings
+        env:
+          CARGO_NET_OFFLINE: true
 
   # The phone's shell type-checked on each push (release.yml builds the APK only at a release): what `#[cfg(desktop)]`
   # leaves out, `src/mobile/` and reqwest on rustls must still build for Android. A check, not a build: no Gradle, Java

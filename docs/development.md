@@ -16,9 +16,11 @@ keeps secrets and data. Written 2026-10-17; re-check the Spotify part when Spoti
 sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libasound2-dev libdbus-1-dev
 ```
 
-Windows is the app's platform. In CI, macOS builds the whole app and passes every check; Linux checks the Rust crates
-only (no WebKitGTK download from slow mirrors). The app has never been driven on either:
-the media panel, the ad shield's network hook and the system accent are Windows only.
+Windows is the app's platform. In CI, macOS builds the whole app and passes every check; Linux checks the Rust crates,
+and on a Rust change runs clippy on the app shell, full and Lite (`check.yml`). The app has never been driven on either:
+the media panel, the ad shield's network hook and the system accent are Windows only (what Linux hides:
+`ui/src/shared/platform.ts`). A debug AppImage to try on a real Linux: push a branch to `linux-trial` (or run the
+`linux trial` workflow); it also needs `file patchelf` and GStreamer's plugins (`.github/workflows/linux-trial.yml`).
 
 **Claude Code.** The recipes that kept coming back are project skills in `.claude/skills/`: `add-setting`,
 `add-connector` and `release-check` (`/release-check` before a push: it reports, never pushes). `.claude/launch.json`
