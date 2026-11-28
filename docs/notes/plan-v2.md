@@ -769,10 +769,17 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       Decided alone (2026-11-27): AutoEQ profiles moved to their own line below; the preset stays keyed by the output’s
       name, on this PC, never logged: a stable id (cpal’s) needs the player to list and pick outputs by id, more than
       picking a preset.
-- [ ] `S` AutoEQ profiles for known headphones (for the owner: the data licence to check first).
+- [ ] `S` AutoEQ profiles for known headphones (for the owner: the data licence to check first). (to drop: licence)
       Their parametric filters would also have to be mapped onto the 10-band graphic equalizer.
       The owner's word, 2026-11-27: "check the data licence yourself; integrate only if it allows a free public app,
       else drop the line and tell the owner".
+  Licence checked 2026-11-28: the code is MIT (`LICENSE`, Copyright 2018-2022 Jaakko Pasanen): free use with the
+  licence text kept. The measurement and target data have no licence in AutoEq's README ("Collection of headphone
+  measurements ... as numerical data from oratory1990, crinacle, Innerfidelity, Rtings and legacy headphone.com"). The
+  sources state no reuse terms we could read: crinacle's site none; oratory1990's wiki none (its presets are his own
+  measurements, with some from crinacle); Rtings' terms page was not read (a search snippet only: non-commercial use
+  and no systematic downloads). So a free public app cannot be said to be allowed to embed or download the profiles.
+  Recommendation: drop the line, or ask the sources for written permission first (the owner's call).
 - [x] `M` Credits and artist pages: who wrote / produced (MusicBrainz), a short bio (Wikipedia), links out.
       Ticked 2026-11-18 (audit): everything the line names shipped: the links (`MusicBrainz::artist_links`), Credits (`eae99997`), the bio (`afb764fd`), YouTube Music's About (`71d4c9bb`). What is left is a try against the real services (Check live).
       2026-11-12, the links out only: an artist's page has "Find links on MusicBrainz" (a click, two requests a second apart, the
