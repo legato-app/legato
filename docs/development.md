@@ -16,14 +16,15 @@ keeps secrets and data. Written 2026-10-17; re-check the Spotify part when Spoti
 sudo apt install build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev libasound2-dev libdbus-1-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
 ```
 
-Packaging (`pnpm tauri build --bundles appimage,deb`) also needs `file wget patchelf gstreamer1.0-tools`; Legato Lite's
+Packaging (`pnpm tauri build --bundles appimage,deb`) also needs `file wget patchelf gstreamer1.0-tools gstreamer1.0-pulseaudio` (the AppImage packs
+the plugins found on the machine); Legato Lite's
 packages add `--config src-tauri/tauri.lite-linux.conf.json` after its own config (its binary is `legato-lite`, so that
 the two .deb can sit side by side).
 
 Windows is the app's platform. In CI, macOS builds the whole app and passes every check; Linux checks the Rust crates,
 and on a Rust change runs clippy on the app shell, full and Lite (`check.yml`). Linux has its own pieces: the MPRIS media
 panel and media keys, open at startup through the desktop's autostart folder, `legato://` links from the .deb or AppImage
-(Lite's .deb claims none),
+(with both .deb installed, the full app takes the link from Lite when it starts),
 the ad blocker as a WebKit content filter (its blocked count is not shown), and the sound mixer names Legato. The app has never been driven on a real Linux desktop. What Linux still hides is one
 table, `MISSING_ON_LINUX` in `ui/src/shared/platform.ts`, which sits beside `liteCuts.ts`.
 

@@ -8,10 +8,10 @@
 //! A `.lmix` file double-clicked comes the same way, as its path (`file_of`): the installer registers that file type
 //! (`tauri.windows.conf.json`), never the running app, and its uninstaller removes it.
 //! Linux: a .deb's own entry names the types (`linux/legato.desktop`, the `.lmix` one declared by
-//! `linux/legato-remix.xml`; Lite's `legato-lite.desktop` claims none, so that two packages never compete for the
-//! link); an AppImage installs nothing, so the app
-//! writes its entry and that declaration for this user and asks for the types (`xdg-mime`), by the same rule between the
-//! two editions (`takes_over`).
+//! `linux/legato-remix.xml`; Lite's `legato-lite.desktop` the link only); the system picks one when both are installed,
+//! and the full app, once run, takes it from a Lite for this user. An AppImage installs nothing, so the app writes its
+//! entry and that declaration for this user and asks for the types (`xdg-mime`). Between the two editions the same rule
+//! both ways (`takes_over`).
 
 // Windows and Linux register; the argument parsing below is tested on every system.
 #![cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
@@ -102,22 +102,24 @@ pub fn register() {
         let _ = win::register(&exe);
     }
     #[cfg(target_os = "linux")]
-    if !cfg!(debug_assertions)
-        && crate::identity::installed()
-        && let Some(appimage) = crate::desktop_file::appimage()
-    {
+    if !cfg!(debug_assertions) && crate::identity::installed() {
         // Off the start: `xdg-mime` is a shell script.
-        std::thread::spawn(move || {
-            if let Err(error) = linux::register(&appimage) {
+        std::thread::spawn(|| {
+            let registered = match crate::desktop_file::appimage() {
+                Some(appimage) => linux::register(&appimage),
+                None => linux::take_from_lite(),
+            };
+            if let Err(error) = registered {
                 crate::diag::warn("protocol", "link type not registered", &format!("{error:#}"));
             }
         });
     }
 }
 
-/// Legato Lite's entry on Linux.
+/// Legato Lite's entries on Linux: the one its AppImage writes, named after its identifier, and its .deb's, named after
+/// the product (tauri-bundler).
 #[cfg(any(target_os = "linux", test))]
-const LITE_ENTRY: &str = "app.legato.lite.desktop";
+const LITE_ENTRIES: [&str; 2] = ["app.legato.lite.desktop", "Legato Lite.desktop"];
 
 /// A `.lmix` file's type, as `linux/legato-remix.xml` declares it.
 #[cfg(any(target_os = "linux", test))]
@@ -130,7 +132,7 @@ const REMIX_DECLARATION: &str = include_str!("../linux/legato-remix.xml");
 /// to the full app. Anything else was the user's choice.
 #[cfg(any(target_os = "linux", test))]
 fn takes_over(current: Option<&str>, mine: &str, this_is_lite: bool) -> bool {
-    current.is_none_or(|name| name.is_empty() || name == mine || (name == LITE_ENTRY && !this_is_lite))
+    current.is_none_or(|name| name.is_empty() || name == mine || (LITE_ENTRIES.contains(&name) && !this_is_lite))
 }
 
 #[cfg(target_os = "linux")]
@@ -147,8 +149,7 @@ mod linux {
         let mine = format!("{}.desktop", crate::identity::INSTALLED);
         let mut free = Vec::new();
         for &kind in OPENS {
-            let current = Command::new("xdg-mime").args(["query", "default", kind]).output()?;
-            if super::takes_over(Some(String::from_utf8_lossy(&current.stdout).trim()), &mine, cfg!(feature = "lite")) {
+            if super::takes_over(Some(&default_of(kind)?), &mine, cfg!(feature = "lite")) {
                 free.push(kind);
             }
         }
@@ -165,9 +166,34 @@ mod linux {
         let text = entry(crate::identity::PRODUCT, crate::identity::INSTALLED, appimage, Some("%u"), &[("MimeType", &types)]);
         std::fs::write(applications.join(&mine), text)?;
         for kind in free {
-            let set = Command::new("xdg-mime").args(["default", &mine, kind]).status()?;
-            anyhow::ensure!(set.success(), "xdg-mime refused");
+            set_default(&mine, kind)?;
         }
+        Ok(())
+    }
+
+    /// A .deb's full app takes the link from a Lite installed beside it. Anything else keeps what the system and the
+    /// user chose; without the package's own entry (another way of installing), nothing is asked.
+    pub fn take_from_lite() -> anyhow::Result<()> {
+        let mine = format!("{}.desktop", crate::identity::PRODUCT);
+        if cfg!(feature = "lite") || !Path::new("/usr/share/applications").join(&mine).exists() {
+            return Ok(());
+        }
+        let current = default_of(SCHEME)?;
+        if current != mine && super::takes_over(Some(&current), &mine, false) {
+            set_default(&mine, SCHEME)?;
+        }
+        Ok(())
+    }
+
+    /// The entry that opens a type for this user, "" for none.
+    fn default_of(kind: &str) -> anyhow::Result<String> {
+        let answer = Command::new("xdg-mime").args(["query", "default", kind]).output()?;
+        Ok(String::from_utf8_lossy(&answer.stdout).trim().to_string())
+    }
+
+    fn set_default(entry: &str, kind: &str) -> anyhow::Result<()> {
+        let set = Command::new("xdg-mime").args(["default", entry, kind]).status()?;
+        anyhow::ensure!(set.success(), "xdg-mime refused");
         Ok(())
     }
 
@@ -317,15 +343,19 @@ mod tests {
 
     #[test]
     fn on_linux_the_link_leaves_another_choice_alone() {
-        let (full, lite) = ("app.legato.desktop.desktop", LITE_ENTRY);
+        let (full, [lite, lite_deb]) = ("app.legato.desktop.desktop", LITE_ENTRIES);
         for nobody_or_ours in [None, Some(""), Some(full)] {
             assert!(takes_over(nobody_or_ours, full, false), "{nobody_or_ours:?}");
         }
         assert!(takes_over(Some(lite), full, false) && takes_over(Some(lite), lite, true));
-        assert!(!takes_over(Some(full), lite, true) && !takes_over(Some("other.desktop"), full, false));
-        // The names the two configs give.
-        let identifier = |json: &str| serde_json::from_str::<serde_json::Value>(json).unwrap()["identifier"].as_str().unwrap().to_string();
-        assert_eq!(format!("{}.desktop", identifier(include_str!("../tauri.lite.conf.json"))), LITE_ENTRY);
+        // A Lite's .deb gives way to the full app too, from its AppImage or its own .deb; not to a Lite's AppImage.
+        assert!(takes_over(Some(lite_deb), full, false) && takes_over(Some(lite_deb), "Legato.desktop", false));
+        assert!(!takes_over(Some(lite_deb), lite, true));
+        assert!(!takes_over(Some(full), lite, true) && !takes_over(Some("Legato.desktop"), lite, true) && !takes_over(Some("other.desktop"), full, false));
+        // The names the Lite's config gives.
+        let config: serde_json::Value = serde_json::from_str(include_str!("../tauri.lite.conf.json")).unwrap();
+        let named = |key: &str| format!("{}.desktop", config[key].as_str().unwrap());
+        assert_eq!([named("identifier"), named("productName")], LITE_ENTRIES);
     }
 
     #[test]
@@ -335,12 +365,12 @@ mod tests {
         assert_eq!(full["bundle"]["linux"]["deb"]["files"], serde_json::json!({ "/usr/share/mime/packages/app.legato.desktop.xml": "./linux/legato-remix.xml" }));
         assert!(REMIX_DECLARATION.contains(&format!("type=\"{REMIX_TYPE}\"")) && REMIX_DECLARATION.contains("pattern=\"*.lmix\""));
         assert!(include_str!("../linux/legato.desktop").contains(&format!("{REMIX_TYPE};")));
-        // Lite's own entry, claiming no type, and no declaration: two packages can't own the same file.
+        // Lite's own entry, claiming the link alone, and no declaration: two packages can't own the same file.
         let lite = json(include_str!("../tauri.lite-linux.conf.json"));
         assert_eq!(lite["bundle"]["linux"]["deb"]["desktopTemplate"], "./linux/legato-lite.desktop");
         assert!(lite["bundle"]["linux"]["deb"]["files"].is_null());
         let entry = include_str!("../linux/legato-lite.desktop");
-        assert!(entry.contains("\nExec={{exec}} %u") && !entry.contains("MimeType="));
+        assert!(entry.contains("\nExec={{exec}} %u\n") && entry.contains("\nMimeType=x-scheme-handler/legato;") && !entry.contains(REMIX_TYPE));
     }
 
     #[test]

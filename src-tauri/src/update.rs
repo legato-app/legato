@@ -393,6 +393,11 @@ mod tests {
         let jobs: Vec<&str> = release.lines().filter(|line| line.trim_start().starts_with("needs:") && line.contains("linux")).collect();
         assert_eq!(jobs, ["    needs: [release, lite-attach, linux]"], "only the attach job waits for Linux");
         assert!(release.contains(r#""latest.json Legato" "latest-lite.json Legato.Lite""#));
+        // The AppImage packs the build machine's GStreamer plugins: PulseAudio's output among them, in both workflows.
+        assert!([release.as_str(), include_str!("../../.github/workflows/linux-trial.yml")].iter().all(|workflow| workflow.contains("gstreamer1.0-libav gstreamer1.0-pulseaudio")));
+        // The .deb brings the libraries the binary links, under either of their names (before and after Ubuntu 24.04).
+        let linux = include_str!("../tauri.linux.conf.json");
+        assert!(linux.contains(r#""libasound2t64 | libasound2", "libssl3t64 | libssl3""#));
         // The full app's packages are copied out before the Lite's build, which writes to the same folders.
         let step = |text: &str| release.find(text).unwrap_or_else(|| panic!("{text}"));
         let full = step("take target/release/bundle/appimage/Legato_*.AppImage target/release/bundle/deb/Legato_*.deb");
