@@ -38,7 +38,7 @@ tauri = { version = "2.12.4", features = ["tray-icon", "unstable"] }
 tauri-plugin-opener = "2.7.2"
 tauri-plugin-dialog = "=2.8.4"
 tokio = { version = "1.53.3", features = ["time", "macros", "rt", "sync"] }
-notify = "8"
+notify = "9"
 ts-rs.workspace = true
 url = "2.5.8"
 
@@ -66,7 +66,7 @@ tauri-plugin-barcode-scanner = "2"
 
 # The session bus (MPRIS: media.rs, session.rs), already built for the keychain.
 [target.'cfg(target_os = "linux")'.dependencies]
-zbus = "5"
+zbus = "6"
 # The shield's filter and request list (shield_linux.rs): the bindings wry builds its windows with.
 webkit2gtk = { version = "2.0", features = ["v2_40"] }
 
