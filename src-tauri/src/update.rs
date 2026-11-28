@@ -387,6 +387,16 @@ mod tests {
     }
 
     #[test]
+    fn only_the_signing_step_gets_the_android_keystore() {
+        let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
+        let with_keystore: Vec<&str> = release.split("\n      - ").filter(|step| step.contains("${{ secrets.ANDROID_KEYSTORE }}") || step.contains("${{ secrets.ANDROID_KEYSTORE_PASSWORD }}")).collect();
+        assert_eq!(with_keystore.len(), 1, "one signing step in the Android job");
+        assert!(with_keystore[0].contains(r#""$apksigner" sign "#) && !with_keystore[0].contains("pnpm "), "{}", with_keystore[0]);
+        // The build leaves the APK unsigned: it writes no keystore for Gradle to read.
+        assert!(!release.contains("keystore.properties"));
+    }
+
+    #[test]
     fn only_the_signing_steps_get_the_updater_key() {
         let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
         let with_key: Vec<&str> = release.split("\n      - ").filter(|step| step.contains("${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}")).collect();
