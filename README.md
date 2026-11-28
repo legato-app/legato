@@ -22,6 +22,14 @@ Windows 10 and 11 · free · no account of ours
 Download `Legato_…_x64-setup.exe` from the [latest release](https://github.com/legato-app/legato/releases/latest) and run it.
 For a small PC, releases that carry `Legato.Lite_…_x64-setup.exe` offer Legato Lite: the essentials, installed beside Legato.
 
+## Editions and platforms
+
+- **Legato Lite** (Windows): a lighter build with its own library. It leaves out the Live Editor, the visualizer, song
+  fades, the Music Detector, Discord, plugins, listening rooms, the phone remote, karaoke, podcasts and audiobooks.
+- **Linux**: in progress. The build runs in CI and a trial AppImage can be made on request; there is no release yet.
+- **Android**: Connect Spotify opens Exportify in your browser, then takes the export file you saved.
+- **Backups**: Add from a backup (Settings › Library backup) merges an older copy of your library into yours, removing nothing.
+
 ## Everything else is on the website
 
 What it does, how each service plays, what leaves your PC, which file to download, Windows' SmartScreen warning,
