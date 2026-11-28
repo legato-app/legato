@@ -387,6 +387,20 @@ mod tests {
     }
 
     #[test]
+    fn only_the_signing_steps_get_the_updater_key() {
+        let release = include_str!("../../.github/workflows/release.yml").replace("\r\n", "\n");
+        let with_key: Vec<&str> = release.split("\n      - ").filter(|step| step.contains("${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}")).collect();
+        assert_eq!(with_key.len(), 2, "one signing step for each Windows job");
+        for step in with_key {
+            assert!(step.contains("pnpm tauri signer sign --app-version") && !step.contains("pnpm tauri build"), "{step}");
+        }
+        // Both builds leave the signature to those steps, and tauri-action publishes without building again.
+        let builds: Vec<&str> = release.lines().filter(|line| line.contains("pnpm tauri build")).collect();
+        assert!(builds.len() == 2 && builds.iter().all(|line| line.contains("--no-sign")), "{builds:?}");
+        assert!(release.contains("tauriScript: node scripts/already-built.mjs"));
+    }
+
+    #[test]
     #[cfg(not(feature = "lite"))]
     fn beta_reads_the_rolling_beta_release_that_the_workflow_feeds() {
         let url = Channel::Beta.endpoint().unwrap();

@@ -127,7 +127,8 @@ Updates (the `updateChannel` setting, kept per PC, not synced):
 The workflow needs the repository secret `TAURI_SIGNING_PRIVATE_KEY`, the private key made with
 `pnpm tauri signer generate` (kept in a key file outside the repository), plus `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if that key has a
 password. Without it the release stops at its first step. The public key is in `tauri.conf.json`. The updater downloads
-anonymously, so releases must be public.
+anonymously, so releases must be public. The installers are built without the key (`tauri build --no-sign`); a step
+after the build signs them (`tauri signer sign --app-version`), and `tauri-action` then only publishes.
 
 ```bash
 gh secret set TAURI_SIGNING_PRIVATE_KEY < path/to/the-key-file

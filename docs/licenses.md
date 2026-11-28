@@ -63,7 +63,7 @@ MPL-2.0 crates (`symphonia*`, `adblock`, `cssparser`, `selectors`, `dtoa-short`,
   (rules in [about.toml](../about.toml): dev dependencies left out, a crate's choice of licenses resolved to the one with
   fewest duties). Interface side: the `LICENSE` files of the production packages and the three fonts in `node_modules`.
 - `src-tauri/tauri.conf.json` › `bundle.resources` puts it in the installer.
-- `.github/workflows/release.yml` generates it before `tauri-action`, so each release matches its `Cargo.lock` and
+- `.github/workflows/release.yml` generates it before the build, so each release matches its `Cargo.lock` and
   `pnpm-lock.yaml`.
 - `src-tauri/build.rs`: a release build stops if the file is missing; a dev build writes a placeholder page instead,
   so `pnpm dev`, `pnpm check` and CI don't need cargo-about.
