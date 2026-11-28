@@ -790,8 +790,8 @@ function BackupRows() {
       </Row>
       <Row label={msg('Add from a backup')} sub={tr('Adds what the file holds and this library doesn’t: songs, playlists, listens, ratings and Live Editor versions. Nothing here is removed.')}>
         <label className="flex items-center gap-2 text-xs text-ink-2">
-          <input type="checkbox" checked={takeSettings} onChange={(e) => setTakeSettings(e.target.checked)} className="size-4 shrink-0 accent-[var(--accent)]" />
           {tr('Take its settings too')}
+          <Toggle label={tr('Take its settings too')} checked={takeSettings} onChange={setTakeSettings} />
         </label>
         <Button variant="ghost" disabled={busy} onClick={() => void addFrom()}>
           {tr('Add')}
