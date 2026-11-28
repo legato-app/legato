@@ -73,6 +73,12 @@ the heavy commands run without a separate ask: asking for the Stable gate is tha
    and the release notes agree.
 9. **Leak check on the whole range**: `git log --name-only --format= v<stable>..v<version> | grep -i notes/report`
    prints nothing; no personal data in the commits or the files they changed.
+10. **White-hat pass on the candidate** (the owner's ask, 2026-11-28): one Opus session, read-only, reads the tag for
+    flaws in the order of `docs/notes/report-security-2026-11-28.md` (IPC and window capabilities, the `art` scheme,
+    links and dropped files, the plugin sandbox, the LAN servers and sync, the shield, secrets, the update and CI, the
+    site), the range since the last Stable first. Its report goes to a git-ignored `docs/notes/report-security-<date>.md`
+    only: the repo is public, so no flaw in a tracked file, commit, issue or pull request before its fix ships. Any open
+    CRITICAL, HIGH or MED is red; its fix lands in a beta first (a neutral commit message), and the pass reads it again.
 
 Report in French, one line per item with its proof (the command and what it printed), then the verdict: **GO** (all
 green) or **NO-GO** with the blocking items first. A GO is never a promotion: `promote.yml` is run on the owner's
