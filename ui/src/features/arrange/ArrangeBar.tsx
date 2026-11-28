@@ -47,10 +47,10 @@ export default function ArrangeBar() {
     <>
       <ArrangeSurfaces />
       {/* data-brand: a theme's CSS can't hide the way out. */}
-      <div role="toolbar" aria-label={tr('Arranging the app')} data-brand="" onContextMenu={menu} className="fixed bottom-24 left-1/2 z-40 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-full border border-line bg-raised py-2 pr-2 pl-4 shadow-[0_8px_30px_var(--shadow)]">
+      <div role="toolbar" aria-label={tr('Arranging the app')} data-brand="" onContextMenu={menu} className="fixed bottom-24 left-1/2 z-40 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-full border border-line bg-raised py-2 ps-4 pe-2 shadow-[0_8px_30px_var(--shadow)]">
         <p className="text-[0.8125rem] font-medium">
           {tr('Drag a part to move it')}
-          {layoutsOff && <span className="ml-2 text-xs font-normal text-ink-2">{tr('Done turns themes’ arrangements back on')}</span>}
+          {layoutsOff && <span className="ms-2 text-xs font-normal text-ink-2">{tr('Done turns themes’ arrangements back on')}</span>}
         </p>
         <RoundButton label={tr('Undo')} size="sm" disabled={!canUndo} onClick={undoMove}>
           <ArrowUUpLeft size={16} />

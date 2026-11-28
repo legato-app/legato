@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest'
+import { useLang } from '../../shared/i18n/i18n'
 import { moveSurface } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
@@ -72,6 +73,16 @@ it('says where a moved surface went, or that it can’t, each move undoable', ()
   expect(said()).toBe('Sidebar on the left')
   undoMove()
   expect([draft()?.hidden, said()]).toEqual([['sidebar'], ''])
+})
+
+it('moves and says sides as seen, right to left', () => {
+  useLang.setState({ lang: 'he' })
+  beginArranging()
+  // Seen on the right, it goes left: towards the layout's right.
+  nudgeSurface('sidebar', surfaceName('sidebar', []), 'left')
+  expect(draft()?.regions.right).toEqual(['sidebar', 'sidePanel'])
+  expect(useArrange.getState().said).toBe('Sidebar on the left, 1 of 2')
+  useLang.setState({ lang: 'en' })
 })
 
 it('names a plugin’s panel after the plugin', () => {

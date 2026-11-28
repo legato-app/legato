@@ -7,8 +7,8 @@ import { useArrangeDraft } from '../../app/arrangeDraft'
 import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
-import { tr } from '../../shared/i18n/i18n'
-import { moveSurface, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
+import { isRtl, lang, tr } from '../../shared/i18n/i18n'
+import { mirroredSide, moveSurface, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT, resolveLayout, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
@@ -74,7 +74,8 @@ const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
 export const placeSurface = (surface: Surface, name: string, region: Region, at: number) => say(surface, name, moveSurface(present(), surface, region, at), cannotGo(name))
 
 /** Moved by an arrow key. */
-export const nudgeSurface = (surface: Surface, name: string, direction: Direction) => say(surface, name, stepSurface(present(), surface, direction), cannotGo(name))
+export const nudgeSurface = (surface: Surface, name: string, direction: Direction) =>
+  say(surface, name, stepSurface(present(), surface, mirroredSide(direction, isRtl(lang()))), cannotGo(name))
 
 /** Hidden, or shown again. */
 export const hideSurface = (surface: Surface, name: string) => say(surface, name, toggleHidden(present(), { surface }), tr('{part} can’t be hidden', { part: name }))

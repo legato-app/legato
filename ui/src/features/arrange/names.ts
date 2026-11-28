@@ -1,5 +1,6 @@
 /** The surfaces' names, and where one is now, as said to a screen reader. */
-import { msg, tr } from '../../shared/i18n/i18n'
+import { isRtl, lang, msg, tr } from '../../shared/i18n/i18n'
+import { mirroredSide } from '../../shared/theme/arrange'
 import { pluginOf, type BuiltinSurface, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 
 const NAMES: Record<BuiltinSurface, string> = { brand: msg('Logo'), topbar: msg('Top bar'), sidebar: msg('Sidebar'), sidePanel: msg('Side panel'), playerBar: msg('Player bar') }
@@ -19,6 +20,6 @@ export function whereIs(placement: Placement, surface: Surface, name: string): s
   const entry = Object.entries(placement.regions).find(([, surfaces]) => surfaces.includes(surface))
   if (!entry) return name
   const [region, surfaces] = entry as [Region, Surface[]]
-  const side = tr(WHERE[region], { part: name })
+  const side = tr(WHERE[mirroredSide(region, isRtl(lang()))], { part: name })
   return surfaces.length > 1 ? `${side}, ${tr('{position} of {count}', { position: surfaces.indexOf(surface) + 1, count: surfaces.length })}` : side
 }

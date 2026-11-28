@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, DotsSixVertical, EyeSlash } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
-import { msg, tr } from '../../shared/i18n/i18n'
+import { isRtl, msg, tr, useLang } from '../../shared/i18n/i18n'
 import type { Direction } from '../../shared/theme/arrange'
 import { placesOf, type Placement, type Surface } from '../../shared/theme/layout'
 import { onMenu } from '../../shared/ui/ContextMenu'
@@ -115,8 +115,9 @@ export function ArrangeSurfaces() {
   const plugins = usePlugins((state) => state.list)
   const boxes = useSurfaceBoxes(draft)
   const dragged = useDrag((state) => (state.data?.kind === 'arrange' ? state.data.id : null))
+  const rightToLeft = useLang((state) => isRtl(state.lang))
   const name = (surface: Surface) => surfaceName(surface, plugins)
-  const zones = dragged ? dropZones(draft, dragged, boxes, { width: window.innerWidth, height: window.innerHeight }) : []
+  const zones = dragged ? dropZones(draft, dragged, boxes, { width: window.innerWidth, height: window.innerHeight }, rightToLeft) : []
   return (
     <>
       {zones.map((zone) => (

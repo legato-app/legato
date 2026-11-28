@@ -24,6 +24,19 @@ it('offers a bar the top and the bottom, halved over and under what is there', (
   expect(zones.slice(2).map((zone) => [zone.box.top, zone.box.height])).toEqual([[0, 25], [25, 25]])
 })
 
+it('mirrors the zones right to left, where the layout’s left is seen on the right', () => {
+  // As drawn right to left: the sidebar (layout left) on the right, the side panel on the left.
+  const seen = { sidebar: box(800, 200), sidePanel: box(0, 300) }
+  const zones = dropZones(DEFAULT_LAYOUT, 'sidebar', seen, view, true)
+  expect(zones.map((zone) => [zone.region, zone.at, zone.box.left])).toEqual([
+    ['left', 0, view.width - EDGE],
+    ['right', 1, 0],
+    // Before the side panel: its half nearer the page, the right one here.
+    ['right', 0, 150],
+    ['right', 1, 0],
+  ])
+})
+
 it('offers nothing a surface can’t take, and no halves of what isn’t drawn', () => {
   expect(dropZones(DEFAULT_LAYOUT, 'sidePanel', {}, view).map((zone) => zone.key)).toEqual(['arrange:left', 'arrange:right'])
   expect(dropZones(DEFAULT_LAYOUT, 'topbar', {}, view).map((zone) => zone.region)).toEqual(['top'])

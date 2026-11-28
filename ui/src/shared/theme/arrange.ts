@@ -17,6 +17,16 @@ export function moveSurface(placement: Placement, surface: Surface, region: Regi
 
 export type Direction = 'left' | 'right' | 'up' | 'down'
 
+const OTHER_SIDE: Partial<Record<Direction | Region, Direction & Region>> = { left: 'right', right: 'left' }
+
+/**
+ * Right to left, the middle row is drawn mirrored: the layout's `left` is seen on the right. Turns a side as seen into
+ * the layout's, and back.
+ */
+export function mirroredSide<Side extends Direction | Region>(side: Side, rightToLeft: boolean): Side {
+  return (rightToLeft && (OTHER_SIDE[side] as Side | undefined)) || side
+}
+
 /**
  * One step by an arrow key: across the window, a column goes left or right (its side's other surfaces, then over the page
  * to the other side), a bar up or down. The same placement at the window's edge, or where the surface can't go.
