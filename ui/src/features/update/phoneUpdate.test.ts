@@ -6,7 +6,7 @@ let hook: (() => boolean) | null = null
 let onUpdate: ((s: UpdateStatus) => void) | null = null
 const install = vi.fn(() => Promise.resolve())
 const notify = vi.fn()
-vi.mock('../../shared/platform', () => ({ phoneApp: true }))
+vi.mock('../../shared/platform', async (original) => ({ ...(await original<typeof import('../../shared/platform')>()), phoneApp: true }))
 vi.mock('../../shared/diag', () => ({ note: () => {} }))
 vi.mock('../../app/settings', () => ({ useSettings: { getState: () => ({ settings: { autoUpdate: true } }) } }))
 vi.mock('../../app/store', () => ({ useStore: { getState: () => ({ notify }) } }))

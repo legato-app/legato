@@ -3,8 +3,14 @@ import { PRESETS, type Theme } from '../../shared/theme/theme'
 
 const settings = { themeLayouts: true }
 const answer = vi.fn()
-const platform = vi.hoisted(() => ({ phoneApp: false }))
-vi.mock('../../shared/platform', () => platform)
+const device = vi.hoisted(() => ({ phone: false }))
+// The rest of the module as it is: a new export there never breaks this mock.
+vi.mock('../../shared/platform', async (original) => ({
+  ...(await original<typeof import('../../shared/platform')>()),
+  get phoneApp() {
+    return device.phone
+  },
+}))
 vi.mock('../../app/settings', () => ({ useSettings: { getState: () => ({ settings }) } }))
 vi.mock('../../shared/ui/Ask', () => ({ askChoice: (question: unknown) => answer(question) }))
 const { askAboutLayout } = await import('./themeLayoutImport')
@@ -27,10 +33,10 @@ it('asks nothing without a layout, with one that changes nothing, or with the se
 })
 
 it('asks nothing on a phone and keeps the layout, for the PC', async () => {
-  platform.phoneApp = true
+  device.phone = true
   expect(await askAboutLayout(arranged)).toBe(arranged)
   expect(answer).not.toHaveBeenCalled()
-  platform.phoneApp = false
+  device.phone = false
 })
 
 it('lists the changes and takes the user’s pick', async () => {
