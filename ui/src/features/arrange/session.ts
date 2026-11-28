@@ -8,12 +8,12 @@ import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { isRtl, lang, tr } from '../../shared/i18n/i18n'
-import { mirroredSide, moveInGroup, moveSurface, partStep, stepPart, stepSurface, toggleHidden, type Direction } from '../../shared/theme/arrange'
-import { DEFAULT_LAYOUT, resolveLayout, type PartedSurface, type Placement, type Region, type Surface } from '../../shared/theme/layout'
+import { artStep, mirroredSide, moveInGroup, moveSurface, partStep, setHeader, stepPart, stepSurface, toggleHidden, type ArtPlace, type Direction, type PartOwner } from '../../shared/theme/arrange'
+import { DEFAULT_LAYOUT, resolveLayout, type HeaderChoice, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
 import { historyFrom, moved, redone, undone, type History } from './history'
-import { whereIs, whereIsPart } from './names'
+import { whereIs, whereIsHeader, whereIsPart } from './names'
 
 /**
  * `said`: the last move in words, for screen readers (the bar's live region). `saidCount` grows each time, so the same
@@ -95,7 +95,7 @@ function say(next: Placement, whereabouts: Whereabouts, refused: string) {
 
 // `name`, here and below: as the user reads it.
 const ofSurface = (surface: Surface, name: string): Whereabouts => (placement) => whereIs(placement, surface, name)
-const ofPart = (surface: PartedSurface, part: string, name: string): Whereabouts => (placement) => whereIsPart(placement, surface, part, name)
+const ofPart = (owner: PartOwner, part: string, name: string): Whereabouts => (placement) => whereIsPart(placement, owner, part, name)
 
 const present = () => useArrange.getState().history.present
 const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
@@ -114,20 +114,32 @@ export const nudgeSurface = (surface: Surface, name: string, direction: Directio
 /** Hidden, or shown again. */
 export const hideSurface = (surface: Surface, name: string) => say(toggleHidden(present(), { surface }), ofSurface(surface, name), cannotHide(name))
 
-/** A bar's part dropped by the pointer, at slot `at` of its container. */
-export function placePart(surface: PartedSurface, part: string, name: string, at: number) {
-  const next = moveInGroup(present(), surface, part, at)
-  if (next !== present()) say(next, ofPart(surface, part, name), '')
+/** A part dropped by the pointer, at slot `at` of its container. */
+export function placePart(owner: PartOwner, part: string, name: string, at: number) {
+  const next = moveInGroup(present(), owner, part, at)
+  if (next !== present()) say(next, ofPart(owner, part, name), '')
 }
 
-/** A bar's part moved by an arrow key, past the next of the parts `onScreen`. */
-export function nudgePart(surface: PartedSurface, part: string, name: string, direction: Direction, onScreen: readonly string[]) {
-  const step = partStep(surface, part, direction, isRtl(lang()))
-  say(step ? stepPart(present(), surface, part, step, onScreen) : present(), ofPart(surface, part, name), cannotGo(name))
+/** A part moved by an arrow key, past the next of the parts `onScreen`. */
+export function nudgePart(owner: PartOwner, part: string, name: string, direction: Direction, onScreen: readonly string[]) {
+  const step = partStep(owner, part, direction, isRtl(lang()))
+  say(step ? stepPart(present(), owner, part, step, onScreen) : present(), ofPart(owner, part, name), cannotGo(name))
 }
 
-/** A bar's part hidden, or shown again. */
-export const hidePart = (surface: PartedSurface, part: string, name: string) => say(toggleHidden(present(), { surface, part }), ofPart(surface, part, name), cannotHide(name))
+/** A part hidden, or shown again. */
+export const hidePart = (owner: PartOwner, part: string, name: string) => say(toggleHidden(present(), { owner, part }), ofPart(owner, part, name), cannotHide(name))
+
+/** The page headers' choice changed, about its `key`. Nothing to say when it was so already. */
+export function chooseHeader(key: keyof HeaderChoice, change: Partial<HeaderChoice>) {
+  const next = setHeader(present(), change)
+  if (next !== present()) say(next, (placement) => whereIsHeader(placement, key), '')
+}
+
+/** The art dropped by the pointer. */
+export const placeArt = (place: ArtPlace) => chooseHeader('art', { art: place })
+
+/** The art moved by an arrow key. */
+export const nudgeArt = (direction: Direction) => placeArt(artStep(direction, isRtl(lang())))
 
 /** Leaves the mode, nothing saved. */
 export function discardArrangement() {

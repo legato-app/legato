@@ -57,7 +57,7 @@ type Parts = Partial<Record<PartedSurface, PartsChoice>>
 /** The songs list's columns after Title and Artist, in the app's order. Time stays last, by the heart. */
 export const COLUMNS = ['album', 'year', 'genre', 'bpm', 'key', 'sources', 'plays', 'rating', 'added', 'duration'] as const
 export type Column = (typeof COLUMNS)[number]
-const MOVABLE_COLUMNS = COLUMNS.filter((column) => column !== 'duration')
+export const MOVABLE_COLUMNS = COLUMNS.filter((column) => column !== 'duration')
 
 /** A page header's art: before the words, after them, over them, or left out. */
 const HEADER_ART = ['start', 'end', 'top', 'none'] as const

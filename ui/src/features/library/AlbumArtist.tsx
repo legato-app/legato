@@ -1,4 +1,5 @@
 import { Clock, DotsThree, Heart, MicrophoneStage, Play, Plus, Radio, SpinnerGap } from '@phosphor-icons/react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { CaretLeft } from '../../shared/ui/directional'
 import { PlayingBars, PlayingMark } from '../player/PlayingMark'
 import { artistName } from '../../shared/artistName'
@@ -311,7 +312,9 @@ export function AlbumView({ album, artist }: { album: string; artist: string }) 
         }
       />
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="album" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
     </div>
   )
@@ -466,7 +469,9 @@ export function ArtistView({ artist }: { artist: string }) {
       {header}
       <HiddenExplicit tracks={hiddenHere} />
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="artist" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
     </div>
   )

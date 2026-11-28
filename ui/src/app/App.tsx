@@ -193,7 +193,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
         </button>
       )}
       {shown.map((part) => (
-        <ArrangePart key={part} surface="topbar" part={part}>
+        <ArrangePart key={part} owner="topbar" part={part}>
           {blocks[part]}
         </ArrangePart>
       ))}
@@ -201,7 +201,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
           window's buttons (on the span: on the button it would hide its hover); the page under the player doesn't light it. */}
       <span className={`flex items-center gap-1 ${full ? 'glass me-2 rounded-full' : 'pe-2'}`}>
         {addonsBySettings && (
-          <ArrangePart surface="topbar" part="addons">
+          <ArrangePart owner="topbar" part="addons">
             {addons}
           </ArrangePart>
         )}

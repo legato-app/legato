@@ -1,7 +1,8 @@
 import { CaretDown, DotsThree, Info, MagnifyingGlass, MicrophoneStage, Play, Plus, ShareNetwork, Shuffle, SlidersHorizontal, SortAscending, VinylRecord } from '@phosphor-icons/react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { artistName } from '../../shared/artistName'
 import { useShallow } from 'zustand/react/shallow'
-import { Fragment, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { usePageParts } from '../../shared/ui/usePageParts'
 import { useSettings } from '../../app/settings'
 import { pageQuery, useStore } from '../../app/store'
@@ -347,7 +348,9 @@ export function SongsView() {
     <>
       <PageHeader title={tr('Songs')} sub={reading ? tr('Reading your files… {done} of {total}', { done: reading[0].toLocaleString(), total: reading[1].toLocaleString() }) : `${trn(shown.length, '{n} song', '{n} songs')} · ${totalTime(shown)}${stats.sources > 1 ? ` · ${tr('{pct}% linked', { pct: stats.linkedPct })}` : ''}`} />
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="songs" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
     </>
   )
@@ -490,7 +493,9 @@ export function AlbumsView() {
     <>
       <PageHeader kicker={tr('Library')} title={tr('Albums')} sub={trn(albums.length, '{n} album', '{n} albums')} />
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="albums" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
     </>
   )
@@ -529,7 +534,9 @@ export function ArtistsView() {
     <>
       <PageHeader kicker={tr('Library')} title={tr('Artists')} sub={trn(artists.length, '{n} artist', '{n} artists')} />
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="artists" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
     </>
   )

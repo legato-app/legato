@@ -279,7 +279,7 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
   return (
     <aside data-surface="sidebar" className={`relative flex flex-col gap-2 ${wide ? 'min-w-0 flex-1' : 'shrink-0 phone:hidden'}`} style={wide ? undefined : { width }}>
       {parts.map((part) => (
-        <ArrangePart key={part} surface="sidebar" part={part}>
+        <ArrangePart key={part} owner="sidebar" part={part}>
           {blocks[part]}
         </ArrangePart>
       ))}

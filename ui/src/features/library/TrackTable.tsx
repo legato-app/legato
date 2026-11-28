@@ -6,6 +6,8 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { PageLayout } from '../../shared/ui/pageLayout'
 import { orderColumns } from '../../shared/theme/layout'
+import { COLUMN_NAMES } from '../../shared/ui/columnNames'
+import { ArrangePart } from '../../app/ArrangePart'
 import { useSettings } from '../../app/settings'
 import type { LibraryTrack, Source } from '../../shared/api'
 import { formatCount, formatDuration } from '../../shared/format'
@@ -26,7 +28,7 @@ import { AddToPlaylist } from './AddToPlaylist'
 import { removeFromPlaylist, removePositions } from './edits'
 import { dragSource, landing, useDrag, useDropTarget } from '../../shared/ui/drag'
 import { all, NONE, pick, picked, pickedRows, step, type Selection } from './selection'
-import { msg, tr, trn } from '../../shared/i18n/i18n'
+import { tr, trn } from '../../shared/i18n/i18n'
 import { pop } from '../../shared/motion'
 import { usePhone } from '../../shared/phone'
 import { fitColumns } from './fitColumns'
@@ -37,7 +39,6 @@ const order: Source[] = ['spotify', 'youtube', 'apple', 'server', 'local']
 const onControl = (e: React.MouseEvent) => e.target instanceof Element && !!e.target.closest('button, a, input, [role="menu"], [role="slider"]')
 // Title, artist and album share the room 2:1:1, so a narrow window never squeezes the title out.
 const width: Record<Column, string> = { album: 'minmax(0,1fr)', year: '44px', genre: 'minmax(0,0.6fr)', bpm: '44px', key: '44px', sources: '76px', plays: '52px', rating: '72px', added: '92px', duration: '52px' }
-const head: Record<Column, string> = { album: msg('Album'), year: msg('Year'), genre: msg('Genre'), bpm: msg('BPM'), key: msg('Key'), sources: msg('Sources'), plays: msg('Plays'), rating: msg('Rating'), added: msg('Date added'), duration: msg('Duration') }
 /** Header click sorts: first click → first sort, again → the second (reverse). Sources can't sort. */
 /** "23 Oct", "12 Mar 2025"; nothing when unknown (added before the app kept dates). */
 const addedDate = (at?: number | null) => {
@@ -50,7 +51,7 @@ export function columnsMenu(extra: MenuEntry[] = []): MenuEntry[] {
   const { settings: s, update } = useSettings.getState()
   const toggle = (c: Column) => update({ columns: s.columns.includes(c) ? s.columns.filter((x) => x !== c) : COLUMNS.filter((x) => x === c || s.columns.includes(x)) })
   return [
-    ...COLUMNS.map((c) => ({ label: tr(head[c]), checked: s.columns.includes(c), onSelect: () => toggle(c) })),
+    ...COLUMNS.map((c) => ({ label: tr(COLUMN_NAMES[c]), checked: s.columns.includes(c), onSelect: () => toggle(c) })),
     '-',
     {
       label: tr('Density'),
@@ -223,11 +224,13 @@ export function TrackTable({ tracks, empty, editId, rowActions, sort, onSort, fo
         <Head label={tr('Title')} sorts={headSorts.title} sort={sort} onSort={onSort} />
         {artistCol && <Head label={tr('Artist')} sorts={['artist', 'artist']} sort={sort} onSort={onSort} />}
         {lead.map((c) => (
-          <Head key={c} label={tr(head[c])} sorts={headSorts[c]} sort={sort} onSort={onSort} right={c === 'plays'} />
+          <ArrangePart key={c} owner="columns" part={c}>
+            <Head label={tr(COLUMN_NAMES[c])} sorts={headSorts[c]} sort={sort} onSort={onSort} right={c === 'plays'} />
+          </ArrangePart>
         ))}
         <span />
         {tail.map((c) => (
-          <Head key={c} label={tr(head[c])} icon={<Clock size={14} />} sorts={headSorts[c]} sort={sort} onSort={onSort} right />
+          <Head key={c} label={tr(COLUMN_NAMES[c])} icon={<Clock size={14} />} sorts={headSorts[c]} sort={sort} onSort={onSort} right />
         ))}
       </div>
       {tracks.length === 0 ? (

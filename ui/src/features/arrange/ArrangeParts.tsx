@@ -1,20 +1,21 @@
-import { EyeSlash } from '@phosphor-icons/react'
+import { DotsSixVertical } from '@phosphor-icons/react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
-import { isRtl, tr, useLang } from '../../shared/i18n/i18n'
-import { canHidePart, mirrorsParts, orderedParts, partAxis, partGroup } from '../../shared/theme/arrange'
-import { PART_GROUPS, type PartedSurface, type Placement } from '../../shared/theme/layout'
+import { isRtl, useLang } from '../../shared/i18n/i18n'
+import { canHidePart, hiddenParts, mirrorsParts, orderedContainers, orderedParts, partAxis, partGroup, type PartOwner } from '../../shared/theme/arrange'
+import type { Placement } from '../../shared/theme/layout'
 import { useDrag } from '../../shared/ui/drag'
 import type { DrawnBoxes } from './boxes'
-import { DropZone, handleProps, hideAndFollow } from './handles'
+import { DropZone, Eye, handleProps, PILL } from './handles'
 import { partName } from './names'
 import { hidePart, nudgePart, placePart } from './session'
 import { partZones, type Box } from './zones'
 
-/** Half the eye's size: it stays whole inside the window. */
-const EYE_REACH = 10
+/** A page's big blocks: outlined, the pointer passing through (the page still scrolls), their handle a pill in a corner.
+ *  The other parts are small: the handle covers them. */
+const BLOCKS: readonly PartOwner[] = ['album', 'artist', 'songs', 'albums', 'artists', 'home', 'nowPlayingColumns']
 
 interface PartProps {
-  surface: PartedSurface
+  owner: PartOwner
   part: string
   box: Box
   /** The parts of its container that have a box. */
@@ -22,65 +23,65 @@ interface PartProps {
   underDrag: boolean
 }
 
-/** A part's handle covers it, outlined; the eye on its corner hides the ones that can be. */
-function PartHandle({ surface, part, box, onScreen, underDrag }: PartProps) {
-  const name = partName(surface, part)
-  const id = `part:${surface}:${part}`
-  const hiding = canHidePart(surface, part)
-    ? { allowed: () => true, hide: () => hidePart(surface, part, name), isHidden: () => !!useArrangeDraft.getState().draft?.parts[surface]?.hidden?.includes(part) }
+/** A part's handle, with an eye on its corner for the ones that can hide. */
+function PartHandle({ owner, part, box, onScreen, underDrag }: PartProps) {
+  const name = partName(owner, part)
+  const id = `part:${owner}:${part}`
+  const hiding = canHidePart(owner, part)
+    ? { allowed: () => true, hide: () => hidePart(owner, part, name), isHidden: () => isHidden(owner, part) }
     : undefined
   const through = underDrag ? 'pointer-events-none' : ''
   const props = handleProps({
     id,
     name,
-    drag: { kind: 'arrange', scope: 'part', surface, id: part },
-    directions: partAxis(surface, part) === 'down' ? ['up', 'down'] : ['left', 'right'],
-    move: (direction) => nudgePart(surface, part, name, direction, onScreen),
+    drag: { kind: 'arrange', scope: 'part', owner, id: part },
+    directions: partAxis(owner, part) === 'down' ? ['up', 'down'] : ['left', 'right'],
+    move: (direction) => nudgePart(owner, part, name, direction, onScreen),
     hiding,
   })
   return (
     <>
-      <button {...props} style={box} className={`fixed z-35 cursor-grab touch-none rounded-md border border-dashed border-ink-3 hover:bg-ink/10 focus-visible:bg-ink/10 ${through}`} />
-      {hiding && (
-        <button
-          type="button"
-          aria-label={tr('Hide {part}', { part: name })}
-          title={tr('Hide {part}', { part: name })}
-          onClick={() => hideAndFollow(id, hiding)}
-          style={{ left: Math.min(box.left + box.width, window.innerWidth - EYE_REACH), top: Math.max(box.top, EYE_REACH) }}
-          className={`fixed z-36 flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-bg shadow-[0_2px_8px_var(--shadow)] ${through}`}
-        >
-          <EyeSlash size={12} weight="bold" />
-        </button>
+      {BLOCKS.includes(owner) ? (
+        <>
+          <div aria-hidden style={box} className="pointer-events-none fixed z-35 rounded-md border border-dashed border-ink-3" />
+          <button {...props} style={{ left: box.left + 4, top: box.top + 4 }} className={`fixed z-37 ${PILL} ${through} ${underDrag ? 'opacity-50' : ''}`}>
+            <DotsSixVertical size={14} weight="bold" /> {name}
+          </button>
+        </>
+      ) : (
+        <button {...props} style={box} className={`fixed z-36 cursor-grab touch-none rounded-md border border-dashed border-ink-3 hover:bg-ink/10 focus-visible:bg-ink/10 ${through}`} />
       )}
+      {hiding && <Eye id={id} name={name} box={box} hiding={hiding} className={through} />}
     </>
   )
 }
 
-/** The bars' parts: their handles over them, and the drop zones while one is dragged. */
-export function ArrangeParts({ draft, boxes }: { draft: Placement; boxes: DrawnBoxes['parts'] }) {
+function isHidden(owner: PartOwner, part: string) {
+  const { draft } = useArrangeDraft.getState()
+  return !!draft && hiddenParts(draft, owner).includes(part)
+}
+
+/** The parts' handles over the app, and the drop zones while one is dragged. `owners`: those with handles now. */
+export function ArrangeParts({ draft, owners, boxes }: { draft: Placement; owners: PartOwner[]; boxes: DrawnBoxes['parts'] }) {
   const drag = useDrag((state) => state.data)
   const rightToLeft = useLang((state) => isRtl(state.lang))
   const dragged = drag?.kind === 'arrange' && drag.scope === 'part' ? drag : null
-  const boxOf = (surface: PartedSurface, part: string): Box | undefined => boxes[`${surface}:${part}`]
+  const boxOf = (owner: PartOwner, part: string): Box | undefined => boxes[`${owner}:${part}`]
   const zones = dragged
     ? partZones(
-        orderedParts(draft, dragged.surface, partGroup(dragged.surface, dragged.id)),
+        orderedParts(draft, dragged.owner, partGroup(dragged.owner, dragged.id)),
         dragged.id,
-        (part) => boxOf(dragged.surface, part),
-        partAxis(dragged.surface, dragged.id),
-        rightToLeft && mirrorsParts(dragged.surface),
+        (part) => boxOf(dragged.owner, part),
+        partAxis(dragged.owner, dragged.id),
+        rightToLeft && mirrorsParts(dragged.owner),
       )
     : []
-  // A hidden bar's parts show nowhere. Containers first: the handles of what they hold are drawn over theirs.
-  const shown = (Object.keys(PART_GROUPS) as PartedSurface[])
-    .filter((surface) => !draft.hidden.includes(surface))
-    .flatMap((surface) =>
-      PART_GROUPS[surface].flatMap((group: readonly string[]) => {
-        const onScreen = orderedParts(draft, surface, group).filter((part) => boxOf(surface, part))
-        return onScreen.map((part) => ({ surface, part, box: boxOf(surface, part)!, onScreen }))
-      }),
-    )
+  const shown = owners.flatMap((owner) =>
+    orderedContainers(draft, owner).flatMap((group) => {
+      const onScreen = group.filter((part) => boxOf(owner, part))
+      return onScreen.map((part) => ({ owner, part, box: boxOf(owner, part)!, onScreen }))
+    }),
+  )
   return (
     <>
       {zones.map((zone) => (
@@ -89,11 +90,11 @@ export function ArrangeParts({ draft, boxes }: { draft: Placement; boxes: DrawnB
           id={zone.key}
           box={zone.box}
           accepts={(data) => data.kind === 'arrange' && data.scope === 'part'}
-          drop={() => placePart(dragged!.surface, dragged!.id, partName(dragged!.surface, dragged!.id), zone.at)}
+          drop={() => placePart(dragged!.owner, dragged!.id, partName(dragged!.owner, dragged!.id), zone.at)}
         />
       ))}
       {shown.map((handle) => (
-        <PartHandle key={`${handle.surface}:${handle.part}`} {...handle} underDrag={drag?.kind === 'arrange'} />
+        <PartHandle key={`${handle.owner}:${handle.part}`} {...handle} underDrag={drag?.kind === 'arrange'} />
       ))}
     </>
   )

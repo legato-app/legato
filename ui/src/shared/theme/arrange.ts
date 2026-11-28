@@ -3,7 +3,7 @@
  * rules, and the placement written back as a theme's layout. A move the rules refuse returns the same placement. Pure.
  */
 import { moveToSlot } from '../order'
-import { arrangeParts, DEFAULT_LAYOUT, HIDEABLE, LAYOUT_API, PAGE_PARTS, PART_GROUPS, placesOf, pluginOf, REGIONS, type Layout, type Pages, type PartedPage, type PartedSurface, type PartsChoice, type Placement, type Region, type Surface } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, headerLayout, HIDEABLE, LAYOUT_API, MOVABLE_COLUMNS, PAGE_PARTS, pagePartIds, PART_GROUPS, placesOf, pluginOf, REGIONS, type HeaderChoice, type Layout, type Pages, type PartedPage, type PartedSurface, type PartsChoice, type Placement, type Region, type Surface } from './layout'
 
 /** `surface` at slot `at` of `region` (a drop slot, the end by default). */
 export function moveSurface(placement: Placement, surface: Surface, region: Region, at = placement.regions[region].length): Placement {
@@ -48,6 +48,26 @@ export function stepSurface(placement: Placement, surface: Surface, direction: D
   return placement
 }
 
+/** What holds parts that move among themselves: a bar, a page, the songs lists' columns. */
+export type PartOwner = PartedSurface | PartedPage | 'columns'
+
+const isBar = (owner: PartOwner): owner is PartedSurface => owner in PART_GROUPS
+
+/** An owner's containers, each a list of parts in the app's order: a part never leaves its own. */
+function containers(owner: PartOwner): readonly (readonly string[])[] {
+  if (isBar(owner)) return PART_GROUPS[owner]
+  return [owner === 'columns' ? MOVABLE_COLUMNS : pagePartIds(owner)]
+}
+
+/** The parts sharing `part`'s container, in the app's order. */
+export const partGroup = (owner: PartOwner, part: string): readonly string[] => containers(owner).find((group) => group.includes(part)) ?? []
+
+/** The order and the hidden parts a placement keeps for an owner. */
+function choiceOf({ parts, pages }: Placement, owner: PartOwner): PartsChoice | undefined {
+  if (isBar(owner)) return parts[owner]
+  return owner === 'columns' ? { order: pages.lists?.columns } : pages[owner]
+}
+
 /** A choice as a placement keeps it: no empty list, nothing at all when both are. */
 function trimmed({ order, hidden }: PartsChoice): PartsChoice | undefined {
   if (!order?.length && !hidden?.length) return undefined
@@ -62,28 +82,36 @@ function withEntry<Container extends object, Key extends keyof Container>(record
   return copy
 }
 
-/** A bar's containers, each a list of parts in the app's order. */
-const containers = (surface: PartedSurface): readonly (readonly string[])[] => PART_GROUPS[surface]
-
-/** The parts sharing `part`'s container, in the app's order. */
-export const partGroup = (surface: PartedSurface, part: string): readonly string[] => containers(surface).find((group) => group.includes(part)) ?? []
-
-/** A container's parts as the placement orders them, the hidden ones keeping their place. */
-export const orderedParts = (placement: Placement, surface: PartedSurface, group: readonly string[]) => arrangeParts<string>({ order: placement.parts[surface]?.order }, group)
-
-/** Whether a part's container is drawn as a column (the player's middle, the sidebar) or runs across. */
-export function partAxis(surface: PartedSurface, part: string): 'across' | 'down' {
-  const playerMiddle = surface === 'playerBar' && (PART_GROUPS.playerBar[1] as readonly string[]).includes(part)
-  return surface === 'sidebar' || playerMiddle ? 'down' : 'across'
+/** The placement with an owner's choice, written where the layout format keeps it. */
+function withChoice(placement: Placement, owner: PartOwner, choice: PartsChoice): Placement {
+  const kept = trimmed(choice)
+  if (isBar(owner)) return { ...placement, parts: withEntry(placement.parts, owner, kept) }
+  if (owner === 'columns') return { ...placement, pages: withEntry<Pages, 'lists'>(placement.pages, 'lists', kept?.order && { columns: kept.order }) }
+  return { ...placement, pages: withEntry<Pages, PartedPage>(placement.pages, owner, kept) }
 }
 
-/** Whether a bar is drawn mirrored right to left: the player bar reads left to right in every language. */
-export const mirrorsParts = (surface: PartedSurface) => surface !== 'playerBar'
+export const hiddenParts = (placement: Placement, owner: PartOwner): readonly string[] => choiceOf(placement, owner)?.hidden ?? []
+
+/** A container's parts as the placement orders them, the hidden ones keeping their place. */
+export const orderedParts = (placement: Placement, owner: PartOwner, group: readonly string[]) => arrangeParts<string>({ order: choiceOf(placement, owner)?.order }, group)
+
+/** Each of an owner's containers, its parts as the placement orders them. */
+export const orderedContainers = (placement: Placement, owner: PartOwner) => containers(owner).map((group) => orderedParts(placement, owner, group))
+
+/** Whether a part's container is drawn as a column or runs across: the columns: the player's middle, the sidebar, the
+ *  pages' blocks and Now Playing's title block. */
+export function partAxis(owner: PartOwner, part: string): 'across' | 'down' {
+  if (owner === 'playerBar') return (PART_GROUPS.playerBar[1] as readonly string[]).includes(part) ? 'down' : 'across'
+  return owner === 'topbar' || owner === 'columns' || owner === 'nowPlayingColumns' || owner === 'nowPlayingControls' ? 'across' : 'down'
+}
+
+/** Whether an owner's parts are drawn mirrored right to left: the player bar reads left to right in every language. */
+export const mirrorsParts = (owner: PartOwner) => owner !== 'playerBar'
 
 /** The step an arrow key makes in a part's container, one earlier or later; null for an arrow across the container. */
-export function partStep(surface: PartedSurface, part: string, direction: Direction, rightToLeft: boolean): -1 | 1 | null {
-  const down = partAxis(surface, part) === 'down'
-  const seen = down ? direction : mirroredSide(direction, rightToLeft && mirrorsParts(surface))
+export function partStep(owner: PartOwner, part: string, direction: Direction, rightToLeft: boolean): -1 | 1 | null {
+  const down = partAxis(owner, part) === 'down'
+  const seen = down ? direction : mirroredSide(direction, rightToLeft && mirrorsParts(owner))
   if (seen === (down ? 'up' : 'left')) return -1
   return seen === (down ? 'down' : 'right') ? 1 : null
 }
@@ -92,33 +120,36 @@ export function partStep(surface: PartedSurface, part: string, direction: Direct
  * One step in the part's container, past the next of the parts `onScreen` (a hidden one, or one with nothing to show,
  * counts for nothing). The same placement at the container's end.
  */
-export function stepPart(placement: Placement, surface: PartedSurface, part: string, step: -1 | 1, onScreen: readonly string[]): Placement {
-  const order = orderedParts(placement, surface, partGroup(surface, part))
+export function stepPart(placement: Placement, owner: PartOwner, part: string, step: -1 | 1, onScreen: readonly string[]): Placement {
+  const order = orderedParts(placement, owner, partGroup(owner, part))
   const seen = order.filter((other) => other === part || onScreen.includes(other))
   const neighbor = seen[seen.indexOf(part) + step]
   if (neighbor === undefined) return placement
   // `moveInGroup`'s slot: before what sits there now, so after the neighbor is one further.
-  return moveInGroup(placement, surface, part, order.indexOf(neighbor) + (step > 0 ? 1 : 0))
+  return moveInGroup(placement, owner, part, order.indexOf(neighbor) + (step > 0 ? 1 : 0))
 }
 
-export const canHidePart = (surface: PartedSurface, part: string) => HIDEABLE[surface].includes(part)
+/** The columns always hide by the user's own pick, never by a layout. */
+export function canHidePart(owner: PartOwner, part: string): boolean {
+  if (isBar(owner)) return HIDEABLE[owner].includes(part)
+  return owner !== 'columns' && PAGE_PARTS[owner].some((known) => known.id === part && !('fixed' in known))
+}
 
-/** A bar's part at slot `at` of its own container (it never leaves it). */
-export function moveInGroup(placement: Placement, surface: PartedSurface, part: string, at: number): Placement {
-  const groups = containers(surface)
-  const choice = placement.parts[surface]
+/** A part at slot `at` of its own container. */
+export function moveInGroup(placement: Placement, owner: PartOwner, part: string, at: number): Placement {
+  const groups = containers(owner)
   // Every container's order as drawn.
-  const drawn = groups.map((group) => orderedParts(placement, surface, group))
+  const drawn = groups.map((group) => orderedParts(placement, owner, group))
   const moved = drawn.map((group) => (group.includes(part) ? moveToSlot(group, part, Math.max(0, Math.min(group.length, at))) : group))
   if (moved.flat().join() === drawn.flat().join()) return placement
   const order = moved.flat().join() === groups.flat().join() ? undefined : moved.flat()
-  return { ...placement, parts: withEntry(placement.parts, surface, trimmed({ order, hidden: choice?.hidden })) }
+  return withChoice(placement, owner, { order, hidden: choiceOf(placement, owner)?.hidden })
 }
 
-/** What an eye can hide: a surface, a bar's part, a page's part. */
-export type HideTarget = { surface: Surface; part?: undefined } | { surface: PartedSurface; part: string } | { page: PartedPage; part: string }
+/** What an eye can hide: a surface, or a part of a bar or a page. */
+export type HideTarget = { surface: Surface; part?: undefined } | { owner: PartOwner; part: string }
 
-const toggled = <Item>(list: Item[], item: Item) => (list.includes(item) ? list.filter((other) => other !== item) : [...list, item])
+const toggled = <Item>(list: readonly Item[], item: Item) => (list.includes(item) ? list.filter((other) => other !== item) : [...list, item])
 
 /** The logo and plugins' panels never hide: no eye, no key for them. */
 export const neverHides = (surface: Surface) => surface === 'brand' || pluginOf(surface) !== undefined
@@ -133,22 +164,30 @@ export function canHideSurface(hidden: Surface[], surface: Surface): boolean {
 
 /** Hides what shows, shows what is hidden. */
 export function toggleHidden(placement: Placement, target: HideTarget): Placement {
-  if ('page' in target) {
-    const part = PAGE_PARTS[target.page].find((known) => known.id === target.part)
-    if (!part || 'fixed' in part) return placement
-    const choice = placement.pages[target.page]
-    const next = trimmed({ order: choice?.order, hidden: toggled(choice?.hidden ?? [], target.part) })
-    return { ...placement, pages: withEntry<Pages, PartedPage>(placement.pages, target.page, next) }
-  }
   if (target.part !== undefined) {
-    if (!canHidePart(target.surface, target.part)) return placement
-    const choice = placement.parts[target.surface]
-    const next = trimmed({ order: choice?.order, hidden: toggled(choice?.hidden ?? [], target.part) })
-    return { ...placement, parts: withEntry(placement.parts, target.surface, next) }
+    const { owner, part } = target
+    if (!canHidePart(owner, part)) return placement
+    return withChoice(placement, owner, { order: choiceOf(placement, owner)?.order, hidden: toggled(hiddenParts(placement, owner), part) })
   }
   const { surface } = target
   if (!placement.hidden.includes(surface) && !canHideSurface(placement.hidden, surface)) return placement
   return { ...placement, hidden: toggled(placement.hidden, surface) }
+}
+
+/** Where a page header's art goes. */
+export type ArtPlace = NonNullable<HeaderChoice['art']>
+
+/** The page headers' choice with `change`: what is the app's own is left out of it. */
+export function setHeader(placement: Placement, change: Partial<HeaderChoice>): Placement {
+  const header = headerLayout({ ...placement.pages.header, ...change })
+  if (JSON.stringify(header) === JSON.stringify(placement.pages.header)) return placement
+  return { ...placement, pages: withEntry<Pages, 'header'>(placement.pages, 'header', header) }
+}
+
+/** Where an arrow key sends the art: before the title, after it (as seen: mirrored right to left), above, back down. */
+export function artStep(direction: Direction, rightToLeft: boolean): ArtPlace {
+  if (direction === 'up') return 'top'
+  return mirroredSide(direction, rightToLeft) === 'right' ? 'end' : 'start'
 }
 
 /** The theme `layout` that draws this placement: only what differs from the app's own, undefined when nothing does.

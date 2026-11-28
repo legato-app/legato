@@ -495,7 +495,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
     center: (
       <div className="flex w-140 min-w-0 flex-col items-center gap-1">
         {centerParts.map((part) => (
-          <ArrangePart key={part} surface="playerBar" part={part}>
+          <ArrangePart key={part} owner="playerBar" part={part}>
             {center[part]}
           </ArrangePart>
         ))}
@@ -504,7 +504,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
     actions: (
       <div className="flex w-85 items-center justify-end gap-2">
         {actionParts.map((part) => (
-          <ArrangePart key={part} surface="playerBar" part={part}>
+          <ArrangePart key={part} owner="playerBar" part={part}>
             {actions[part]}
           </ArrangePart>
         ))}
@@ -532,7 +532,7 @@ export function PlayerBar({ hidden, order }: { hidden: boolean; order?: number }
         </>
       ) : (
         arrangeParts(choice, PART_GROUPS.playerBar[0]).map((block) => (
-          <ArrangePart key={block} surface="playerBar" part={block}>
+          <ArrangePart key={block} owner="playerBar" part={block}>
             {blocks[block]}
           </ArrangePart>
         ))

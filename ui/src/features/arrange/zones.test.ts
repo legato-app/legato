@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { moveInGroup, moveSurface } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT } from '../../shared/theme/layout'
-import { boxAround, dropZones, EDGE, partZones } from './zones'
+import { artZones, boxAround, boxWithin, dropZones, EDGE, partZones } from './zones'
 
 const view = { width: 1000, height: 600 }
 const box = (left: number, width: number) => ({ left, top: 50, width, height: 450 })
@@ -62,4 +62,16 @@ it('offers nothing beside a part that isn’t on screen', () => {
 it('draws one box around a part drawn in several pieces', () => {
   expect(boxAround([{ left: 10, top: 20, width: 30, height: 10 }, { left: 50, top: 15, width: 10, height: 30 }])).toEqual({ left: 10, top: 15, width: 50, height: 30 })
   expect(boxAround([])).toBeNull()
+})
+
+it('keeps what of a box shows inside its page', () => {
+  const page = { left: 0, top: 100, width: 500, height: 300 }
+  expect(boxWithin({ left: 20, top: 50, width: 100, height: 100 }, page)).toEqual({ left: 20, top: 100, width: 100, height: 50 })
+  expect(boxWithin({ left: 20, top: 400, width: 100, height: 100 }, page)).toBeNull()
+})
+
+it('offers a header’s art a place above, before and after its title, as seen', () => {
+  const header = { left: 100, top: 0, width: 600, height: 300 }
+  expect(artZones(header).map((zone) => [zone.place, zone.box.left, zone.box.top])).toEqual([['top', 100, 0], ['start', 100, 100], ['end', 400, 100]])
+  expect(artZones(header, true).map((zone) => [zone.place, zone.box.left])).toEqual([['top', 100], ['start', 400], ['end', 100]])
 })

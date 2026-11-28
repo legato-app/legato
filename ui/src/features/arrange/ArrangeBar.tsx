@@ -2,18 +2,22 @@ import { ArrowCounterClockwise, ArrowUUpLeft, ArrowUUpRight, Check, Eye, Layout,
 import { useEffect } from 'react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { useSettings } from '../../app/settings'
+import { useStore } from '../../app/store'
 import { tr } from '../../shared/i18n/i18n'
-import type { PartedSurface, PartsChoice } from '../../shared/theme/layout'
+import { hiddenParts } from '../../shared/theme/arrange'
 import { Button } from '../../shared/ui/Button'
 import { RoundButton } from '../../shared/ui/controls'
 import { onMenu } from '../../shared/ui/ContextMenu'
 import { useDrag } from '../../shared/ui/drag'
+import { usePlayer } from '../player/store'
 import { usePlugins } from '../plugins/host'
+import { HEADER_ART_ID } from './ArrangeHeader'
 import { ArrangeSurfaces } from './ArrangeSurfaces'
 import { barKey } from './barKeys'
 import { focusOnceDrawn } from './handles'
 import { partName, surfaceName } from './names'
-import { arrangeDefault, discardArrangement, finishArranging, hidePart, hideSurface, redoMove, undoMove, useArrange } from './session'
+import { arrangeDefault, chooseHeader, discardArrangement, finishArranging, hidePart, hideSurface, redoMove, undoMove, useArrange } from './session'
+import { headerHasHandle, ownersShown } from './shown'
 
 const RUN = { done: finishArranging, undo: undoMove, redo: redoMove }
 
@@ -22,21 +26,24 @@ export default function ArrangeBar() {
   const canUndo = useArrange((state) => state.history.past.length > 0)
   const canRedo = useArrange((state) => state.history.future.length > 0)
   const layoutsOff = useSettings((state) => !state.settings.themeLayouts)
-  const hidden = useArrangeDraft((state) => state.draft?.hidden)
-  const parts = useArrangeDraft((state) => state.draft?.parts)
+  const draft = useArrangeDraft((state) => state.draft)
   const plugins = usePlugins((state) => state.list)
-  // What is hidden has no handle: shown again from the bar, surfaces first, then the bars' parts.
-  const hiddenThings = [
-    ...(hidden ?? []).map((surface) => ({ id: surface as string, name: surfaceName(surface, plugins), show: () => hideSurface(surface, surfaceName(surface, plugins)) })),
-    ...(Object.entries(parts ?? {}) as [PartedSurface, PartsChoice][]).flatMap(([surface, choice]) =>
-      (choice.hidden ?? []).map((part) => ({ id: `part:${surface}:${part}`, name: partName(surface, part), show: () => hidePart(surface, part, partName(surface, part)) })),
-    ),
-  ]
+  const view = useStore((state) => state.view.name)
+  const nowPlaying = usePlayer((state) => state.full)
+  const screen = { view, nowPlaying, hidden: draft?.hidden ?? [] }
+  // What is hidden has no handle: shown again from the bar. Surfaces, then the parts of what is on screen, then the art.
+  const hiddenThings = draft
+    ? [
+        ...draft.hidden.map((surface) => ({ id: surface as string, name: surfaceName(surface, plugins), show: () => hideSurface(surface, surfaceName(surface, plugins)) })),
+        ...ownersShown(screen).flatMap((owner) => hiddenParts(draft, owner).map((part) => ({ id: `part:${owner}:${part}`, name: partName(owner, part), show: () => hidePart(owner, part, partName(owner, part)) }))),
+        ...(headerHasHandle(screen) && draft.pages.header?.art === 'none' ? [{ id: HEADER_ART_ID, name: tr('Header art'), show: () => chooseHeader('art', { art: 'start' }) }] : []),
+      ]
+    : []
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const action = barKey(event)
-      // A dialog or a menu over the app keeps its keys; a drag its Escape (`drag.ts`).
-      if (!action || useDrag.getState().data || document.querySelector('[data-modal], [role="dialog"], [role="menu"]')) return
+      // A dialog or a menu over the app keeps its keys; a drag its Escape (`drag.ts`). Now Playing is arranged too.
+      if (!action || useDrag.getState().data || document.querySelector('[data-modal], [role="dialog"]:not([data-now-playing]), [role="menu"]')) return
       event.preventDefault()
       event.stopPropagation()
       RUN[action]()

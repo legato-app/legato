@@ -1180,8 +1180,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     hide, Show buttons in the bar. The player bar's and top bar's own handles sit on their edge towards the page.
     - Decided alone (2026-11-28): a part with nothing to show (no listening room, say) has no handle and a step passes
       it; a hidden bar's parts have none.
-  - [ ] Slice 5 `M`: page parts, columns by their header, the header's choice (check the virtualized table's headers and
-    a drag under Now Playing).
+  - [x] Slice 5 `M` (2026-11-28), not tried for real: the shown page's blocks (outlined, a pill in the corner, the page
+    still scrolling), the songs lists' columns by their header, Now Playing's columns, title block and buttons, the page
+    header's art dragged before, after or above the title, a "Page header" menu for its lines and buttons. Under Now
+    Playing only it and the top bar have handles.
+    - Decided alone (2026-11-28): the art's size stays the theme file's (no handle, no menu entry); an album's own track
+      table has no column to move; the bar shows again what is hidden on the page on screen only.
   - [ ] Slice 6 `S`: size handles (`sizes`).
   - [ ] Slice 7 `S`: docs (`docs/design.md` › Theme layout, the themes' help, Figma light and dark) and a line on the site.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.

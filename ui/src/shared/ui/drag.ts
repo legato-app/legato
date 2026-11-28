@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
-import type { PartedSurface, Surface } from '../theme/layout'
+import type { PartOwner } from '../theme/arrange'
+import type { Surface } from '../theme/layout'
 
 /**
  * Drag and drop with the pointer, not HTML5's: Tauri's window file drop (audio files, QR codes dropped on the app)
@@ -17,7 +18,8 @@ export type DragData =
   | { kind: 'home'; id: string }
   /** A part of the app moved by hand (`features/arrange`). */
   | { kind: 'arrange'; scope: 'surface'; id: Surface }
-  | { kind: 'arrange'; scope: 'part'; surface: PartedSurface; id: string }
+  | { kind: 'arrange'; scope: 'part'; owner: PartOwner; id: string }
+  | { kind: 'arrange'; scope: 'headerArt' }
 
 export type Target = {
   accepts: (d: DragData) => boolean

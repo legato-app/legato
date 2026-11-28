@@ -2,6 +2,7 @@
  * Where what is dragged can be dropped. A surface: each side of the window it may go to, and either half of the
  * surfaces already there (before or after them). A bar's part: either half of the others in its container. Pure.
  */
+import type { ArtPlace } from '../../shared/theme/arrange'
 import { placesOf, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 
 export interface Box {
@@ -36,6 +37,15 @@ export function boxAround(boxes: readonly Box[]): Box | null {
   const left = Math.min(...boxes.map((box) => box.left))
   const top = Math.min(...boxes.map((box) => box.top))
   return { left, top, width: Math.max(...boxes.map((box) => box.left + box.width)) - left, height: Math.max(...boxes.map((box) => box.top + box.height)) - top }
+}
+
+/** What of `box` shows inside `clip`; null when nothing does. */
+export function boxWithin(box: Box, clip: Box): Box | null {
+  const left = Math.max(box.left, clip.left)
+  const top = Math.max(box.top, clip.top)
+  const width = Math.min(box.left + box.width, clip.left + clip.width) - left
+  const height = Math.min(box.top + box.height, clip.top + clip.height) - top
+  return width > 0 && height > 0 ? { left, top, width, height } : null
 }
 
 /** `box` split in two: side by side (`across`), or one above the other. */
@@ -102,4 +112,19 @@ export function partZones(order: readonly string[], dragged: string, boxOf: (par
     const inOrder = mirrored && axis === 'across' ? [second, first] : [first, second]
     return inOrder.map((half, side) => ({ key: `arrange:part:${other}:${side}`, at: index + side, box: half }))
   })
+}
+
+export interface ArtZone {
+  key: string
+  place: ArtPlace
+  box: Box
+}
+
+/** Where a page header's art can be dropped: its top part is above the title, the halves under it before and after. */
+export function artZones(header: Box, rightToLeft = false): ArtZone[] {
+  const top = { ...header, height: header.height / 3 }
+  const under = { ...header, top: header.top + top.height, height: header.height - top.height }
+  const [left, right] = halves(true, under)
+  const zone = (place: ArtPlace, box: Box) => ({ key: `arrange:art:${place}`, place, box })
+  return [zone('top', top), zone('start', rightToLeft ? right : left), zone('end', rightToLeft ? left : right)]
 }

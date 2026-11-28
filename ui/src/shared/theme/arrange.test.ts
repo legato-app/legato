@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, orderedParts, partAxis, partGroup, partStep, stepPart, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
+import { artStep, canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, orderedParts, partAxis, partGroup, partStep, setHeader, stepPart, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
 import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
 
 const start = DEFAULT_LAYOUT
@@ -78,20 +78,20 @@ describe('moveInGroup', () => {
   })
 
   it('keeps what is hidden and ignores a part it does not have', () => {
-    const hidden = toggleHidden(start, { surface: 'topbar', part: 'addons' })
+    const hidden = toggleHidden(start, { owner: 'topbar', part: 'addons' })
     expect(moveInGroup(hidden, 'topbar', 'addons', 0).parts.topbar).toEqual({ order: ['addons', 'history', 'search', 'offline'], hidden: ['addons'] })
     expect(moveInGroup(start, 'topbar', 'nothing', 0)).toBe(start)
   })
 })
 
 describe('toggleHidden', () => {
-  it.each<HideTarget>([{ surface: 'sidebar' }, { surface: 'playerBar' }, { surface: 'topbar', part: 'history' }, { page: 'album', part: 'more' }])('hides and shows %o', (target) => {
+  it.each<HideTarget>([{ surface: 'sidebar' }, { surface: 'playerBar' }, { owner: 'topbar', part: 'history' }, { owner: 'album', part: 'more' }])('hides and shows %o', (target) => {
     const hidden = toggleHidden(start, target)
     expect(hidden).not.toEqual(start)
     expect(toggleHidden(hidden, target)).toEqual(start)
   })
 
-  it.each<HideTarget>([{ surface: 'brand' }, { surface: plugin }, { surface: 'playerBar', part: 'song' }, { surface: 'topbar', part: 'search' }, { page: 'album', part: 'tracks' }, { page: 'songs', part: 'list' }, { page: 'album', part: 'nothing' }])('never hides %o', (target) => {
+  it.each<HideTarget>([{ surface: 'brand' }, { surface: plugin }, { owner: 'playerBar', part: 'song' }, { owner: 'topbar', part: 'search' }, { owner: 'album', part: 'tracks' }, { owner: 'songs', part: 'list' }, { owner: 'album', part: 'nothing' }, { owner: 'columns', part: 'album' }])('never hides %o', (target) => {
     expect(toggleHidden(start, target)).toBe(start)
   })
 
@@ -123,11 +123,11 @@ describe('layoutFromPlacement', () => {
         PART_GROUPS[surface].flat().flatMap((part) => [
           (placement: Placement) => moveInGroup(placement, surface, part, 0),
           (placement: Placement) => moveInGroup(placement, surface, part, 9),
-          (placement: Placement) => toggleHidden(placement, { surface, part }),
+          (placement: Placement) => toggleHidden(placement, { owner: surface, part }),
         ]),
       ),
       ...surfaces.map((surface) => (placement: Placement) => toggleHidden(placement, { surface })),
-      ...(Object.keys(PAGE_PARTS) as PartedPage[]).flatMap((page) => PAGE_PARTS[page].map((part) => (placement: Placement) => toggleHidden(placement, { page, part: part.id }))),
+      ...(Object.keys(PAGE_PARTS) as PartedPage[]).flatMap((page) => PAGE_PARTS[page].map((part) => (placement: Placement) => toggleHidden(placement, { owner: page, part: part.id }))),
     ]
     let checked = 0
     for (const from of [start, base])
@@ -164,7 +164,7 @@ describe('a bar’s parts', () => {
 
   it('steps past the next part on screen, a hidden or empty one counting for nothing', () => {
     // Hidden `lyrics`, nothing in `sleep`: one step right of `room` is past `upNext`.
-    const hidden = toggleHidden(start, { surface: 'playerBar', part: 'lyrics' })
+    const hidden = toggleHidden(start, { owner: 'playerBar', part: 'lyrics' })
     const onScreen = ['room', 'upNext', 'volume']
     const moved = stepPart(hidden, 'playerBar', 'room', 1, onScreen)
     expect(shownOrder(moved, 'playerBar', 'room')).toEqual(['sleep', 'lyrics', 'upNext', 'room', 'volume', 'more', 'fullScreen'])
@@ -176,5 +176,52 @@ describe('a bar’s parts', () => {
     expect(stepPart(start, 'sidebar', 'nav', -1, ['nav', 'library'])).toBe(start)
     expect(stepPart(start, 'sidebar', 'library', 1, ['nav', 'library'])).toBe(start)
     expect(stepPart(start, 'playerBar', 'transport', 1, ['transport'])).toBe(start)
+  })
+})
+
+describe('a page’s parts and the lists’ columns', () => {
+  const sameAgain = (placement: Placement) => resolveLayout(sanitizeLayout(JSON.parse(JSON.stringify(layoutFromPlacement(placement)))) ?? undefined)
+
+  it('moves a page’s block, the fixed ones too, and writes it where the layout format keeps it', () => {
+    const moved = stepPart(start, 'artist', 'topSongs', -1, ['mostPlayed', 'topSongs', 'about'])
+    expect(moved.pages.artist?.order).toEqual(['topSongs', 'mostPlayed', 'discography', 'about', 'links', 'shelves'])
+    expect(sameAgain(moved).pages).toEqual(moved.pages)
+    // Back as the app's own: nothing left to say.
+    expect(stepPart(moved, 'artist', 'topSongs', 1, ['mostPlayed', 'topSongs']).pages).toEqual({})
+  })
+
+  it('moves a column among those shown, and never moves or hides Time', () => {
+    const moved = stepPart(start, 'columns', 'genre', -1, ['album', 'genre'])
+    expect(moved.pages.lists?.columns?.slice(0, 3)).toEqual(['genre', 'album', 'year'])
+    expect(sameAgain(moved).pages.lists).toEqual(moved.pages.lists)
+    expect(moveInGroup(start, 'columns', 'duration', 0)).toBe(start)
+    expect(toggleHidden(start, { owner: 'columns', part: 'album' })).toBe(start)
+  })
+
+  it('reads the arrows as each container runs', () => {
+    expect([partAxis('artist', 'about'), partAxis('columns', 'album'), partAxis('nowPlayingColumns', 'cover'), partAxis('nowPlaying', 'title'), partAxis('nowPlayingControls', 'volume')]).toEqual(['down', 'across', 'across', 'down', 'across'])
+    expect([partStep('columns', 'album', 'left', true), partStep('nowPlaying', 'title', 'up', true)]).toEqual([1, -1])
+  })
+})
+
+describe('the page headers’ choice', () => {
+  it('keeps what differs from the app’s own, and writes it into the layout', () => {
+    const end = setHeader(start, { art: 'end' })
+    expect(end.pages.header).toEqual({ art: 'end' })
+    const quiet = setHeader(end, { kicker: false, actions: 'beside' })
+    expect(quiet.pages.header).toEqual({ art: 'end', kicker: false, actions: 'beside' })
+    expect(layoutFromPlacement(quiet)?.pages?.header).toEqual(quiet.pages.header)
+    expect(setHeader(quiet, { art: 'start', kicker: true, actions: undefined }).pages).toEqual({})
+  })
+
+  it('says when nothing changed, and keeps the rest of the pages', () => {
+    expect(setHeader(start, { art: 'start' })).toBe(start)
+    const moved = stepPart(start, 'home', 'sections', -1, ['chips', 'sections'])
+    expect(setHeader(moved, { sub: false }).pages).toEqual({ home: moved.pages.home, header: { sub: false } })
+  })
+
+  it('sends the art where the arrow points, as seen', () => {
+    expect([artStep('left', false), artStep('right', false), artStep('up', false), artStep('down', false)]).toEqual(['start', 'end', 'top', 'start'])
+    expect([artStep('left', true), artStep('right', true)]).toEqual(['end', 'start'])
   })
 })

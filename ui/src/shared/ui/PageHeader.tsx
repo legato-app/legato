@@ -28,7 +28,7 @@ export function PageHeader({ kicker, title, sub, notice, actions, side, art, tin
     const wraps = beside && place !== 'top'
     const picture = place !== 'none' && (
       // The phone: the cover centered over the title, as phone players do.
-      <div className="shrink-0 phone:self-center phone:*:size-40!">{resized(art, choice?.artSize)}</div>
+      <div data-header-art="" className="shrink-0 phone:self-center phone:*:size-40!">{resized(art, choice?.artSize)}</div>
     )
     const words = (
       <div className={`flex min-w-0 flex-col gap-2 ${backdrop ? 'max-w-[70%] phone:max-w-none' : ''} ${wraps || place === 'end' ? 'flex-1' : ''}`}>
@@ -55,7 +55,7 @@ export function PageHeader({ kicker, title, sub, notice, actions, side, art, tin
       // The page's px-6 / pt-5 undone (main pane's edges); a page that scrolls around it gives it the same room.
       <div className="-mx-6 -mt-5 flex shrink-0 flex-col phone:-mx-4 phone:-mt-3">
         {/* `backdrop`: drawn behind the header at its own size (a playlist's wall of covers); the text goes white over it. */}
-        <header onContextMenu={onContextMenu} style={backdrop ? undefined : tint} className={`relative flex min-w-0 gap-7 px-6 py-5 transition-colors duration-500 phone:flex-col phone:items-stretch phone:gap-3 phone:px-4 phone:pt-4 phone:pb-4 ${place === 'top' ? 'flex-col items-start' : 'items-end'} ${wraps ? 'flex-wrap' : ''} ${backdrop ? 'isolate overflow-hidden bg-bg text-white [&_.kicker]:text-white/85! [&_.text-ink-2]:text-white/90!' : 'bg-bg'}`}>
+        <header data-page-header="art" onContextMenu={onContextMenu} style={backdrop ? undefined : tint} className={`relative flex min-w-0 gap-7 px-6 py-5 transition-colors duration-500 phone:flex-col phone:items-stretch phone:gap-3 phone:px-4 phone:pt-4 phone:pb-4 ${place === 'top' ? 'flex-col items-start' : 'items-end'} ${wraps ? 'flex-wrap' : ''} ${backdrop ? 'isolate overflow-hidden bg-bg text-white [&_.kicker]:text-white/85! [&_.text-ink-2]:text-white/90!' : 'bg-bg'}`}>
           {backdrop && (
             <div aria-hidden className="absolute inset-0 -z-10">
               {backdrop}
@@ -71,7 +71,7 @@ export function PageHeader({ kicker, title, sub, notice, actions, side, art, tin
   }
   return (
     // Actions under the title when both don't fit on a line (Stats' recap and periods in a narrow window, the phone).
-    <header onContextMenu={onContextMenu} className={`flex shrink-0 gap-x-6 gap-y-3 pt-1 pb-4 phone:pb-3 ${choice?.actions === 'below' ? 'flex-col items-start' : 'flex-wrap items-end justify-between'}`}>
+    <header data-page-header="plain" onContextMenu={onContextMenu} className={`flex shrink-0 gap-x-6 gap-y-3 pt-1 pb-4 phone:pb-3 ${choice?.actions === 'below' ? 'flex-col items-start' : 'flex-wrap items-end justify-between'}`}>
       <div className="flex min-w-0 flex-col gap-1">
         {kickerLine}
         {/* A page without a band (Songs, Albums, Stats…): 40 px, lighter than a band's Display L; the list starts higher. */}

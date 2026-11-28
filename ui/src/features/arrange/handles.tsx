@@ -1,4 +1,4 @@
-/** What a surface's handle and a part's share: the keys, the pointer, the menu, the drop zones, the focus. */
+/** What the handles share: the keys, the pointer, the menu, the eye, the drop zones, the focus. */
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, EyeSlash } from '@phosphor-icons/react'
 import type { ComponentProps } from 'react'
 import { msg, tr } from '../../shared/i18n/i18n'
@@ -82,6 +82,29 @@ export function handleProps({ id, name, drag, directions, move, hiding }: Movabl
       else moveAndFollow(action)
     },
   } satisfies ComponentProps<'button'> & { 'data-arrange': string }
+}
+
+/** A handle that names what it holds. */
+export const PILL = 'flex cursor-grab touch-none items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium whitespace-nowrap text-bg shadow-[0_8px_24px_var(--shadow)]'
+
+/** Half the eye's size: it stays whole inside the window. */
+const EYE_REACH = 10
+
+/** The eye on the corner of what can hide. */
+export function Eye({ id, name, box, hiding, className }: { id: string; name: string; box: Box; hiding: NonNullable<Movable['hiding']>; className: string }) {
+  const label = tr('Hide {part}', { part: name })
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={() => hideAndFollow(id, hiding)}
+      style={{ left: Math.min(box.left + box.width, window.innerWidth - EYE_REACH), top: Math.max(box.top, EYE_REACH) }}
+      className={`fixed z-38 flex size-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-bg shadow-[0_2px_8px_var(--shadow)] ${className}`}
+    >
+      <EyeSlash size={12} weight="bold" />
+    </button>
+  )
 }
 
 export function DropZone({ id, box, accepts, drop }: { id: string; box: Box; accepts: (data: DragData) => boolean; drop: () => void }) {

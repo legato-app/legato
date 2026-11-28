@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, ArrowUUpLeft, CalendarStar, ChartBar, ClockCounterClockwise, DotsSixVertical, EyeSlash, ListPlus, MusicNotes, Play, Playlist, PlusCircle, Shuffle, SlidersHorizontal, Sparkle, YoutubeLogo } from '@phosphor-icons/react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { ArrowRight } from '../../shared/ui/directional'
 import { artistName } from '../../shared/artistName'
 import { useShallow } from 'zustand/react/shallow'
@@ -662,7 +663,9 @@ export function HomeView() {
     <div data-flow={homeFlow ? 'on' : undefined} className="group/home relative isolate flex min-h-0 flex-1 flex-col">
       {homeFlow && <HomeFlow />}
       {parts.map((part) => (
-        <Fragment key={part}>{blocks[part]}</Fragment>
+        <ArrangePart key={part} owner="home" part={part}>
+          {blocks[part]}
+        </ArrangePart>
       ))}
       {customizing && <CustomizeHome onClose={() => setCustomizing(false)} />}
     </div>

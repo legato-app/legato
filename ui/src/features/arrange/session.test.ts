@@ -1,11 +1,11 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { useLang } from '../../shared/i18n/i18n'
 import { moveSurface } from '../../shared/theme/arrange'
-import { DEFAULT_LAYOUT, PART_GROUPS, type PartedSurface } from '../../shared/theme/layout'
+import { COLUMNS, DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, type PartedPage, type PartedSurface } from '../../shared/theme/layout'
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { PART_NAMES, surfaceName, whereIs } from './names'
-import { arrange, beginArranging, discardArrangement, finishArranging, hidePart, hideSurface, nudgePart, nudgeSurface, placePart, placeSurface, redoMove, undoMove, useArrange } from './session'
+import { arrange, beginArranging, chooseHeader, discardArrangement, finishArranging, hidePart, hideSurface, nudgeArt, nudgePart, nudgeSurface, placePart, placeSurface, redoMove, undoMove, useArrange } from './session'
 
 const notify = vi.fn()
 const settings = vi.hoisted(() => ({ now: {} as Settings, listeners: new Set<(state: { settings: Settings }) => void>() }))
@@ -170,6 +170,34 @@ it('moves and hides a bar’s parts, saying where each is, and saves them into t
   expect(settings.now.customThemes[0].layout?.parts).toEqual({ sidebar: { order: ['library', 'nav'] } })
 })
 
-it('names every part a bar has', () => {
-  for (const surface of Object.keys(PART_GROUPS) as PartedSurface[]) expect(Object.keys(PART_NAMES[surface]).sort()).toEqual([...PART_GROUPS[surface].flat()].sort())
+it('names every part of the bars, the pages and the lists', () => {
+  const named = (owner: keyof typeof PART_NAMES) => Object.keys(PART_NAMES[owner]).sort()
+  for (const bar of Object.keys(PART_GROUPS) as PartedSurface[]) expect(named(bar)).toEqual([...PART_GROUPS[bar].flat()].sort())
+  for (const page of Object.keys(PAGE_PARTS) as PartedPage[]) expect(named(page)).toEqual(PAGE_PARTS[page].map((part) => part.id).sort())
+  expect(named('columns')).toEqual([...COLUMNS].sort())
+})
+
+it('arranges a page and its header, saying what each change left, and saves them into the theme', () => {
+  beginArranging()
+  const said = () => useArrange.getState().said
+  nudgePart('album', 'more', 'More albums', 'up', ['tracks', 'more'])
+  expect(said()).toBe('More albums, 1 of 2')
+  hidePart('album', 'more', 'More albums')
+  expect(said()).toBe('More albums hidden')
+  nudgeArt('right')
+  expect([draft()?.pages.header, said()]).toEqual([{ art: 'end' }, 'Art after the title'])
+  chooseHeader('art', { art: 'none' })
+  expect(said()).toBe('Header art hidden')
+  chooseHeader('kicker', { kicker: false })
+  expect(said()).toBe('Line over the title hidden')
+  chooseHeader('actions', { actions: 'below' })
+  expect(said()).toBe('Buttons below the title')
+  undoMove()
+  expect([draft()?.pages.header, said()]).toEqual([{ art: 'none', kicker: false }, 'Page header'])
+  // Chosen as it already is: nothing said.
+  const before = useArrange.getState().saidCount
+  chooseHeader('art', { art: 'none' })
+  expect(useArrange.getState().saidCount).toBe(before)
+  finishArranging()
+  expect(settings.now.customThemes[0].layout?.pages).toEqual({ album: { order: ['more', 'tracks'], hidden: ['more'] }, header: { art: 'none', kicker: false } })
 })

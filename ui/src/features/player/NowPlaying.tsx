@@ -1,8 +1,9 @@
 import { ArrowSquareOut, CaretDown, DotsThree, EyeSlash, Heart, ImageSquare, MagicWand, MonitorPlay, Queue, Quotes, SlidersHorizontal, ThumbsDown } from '@phosphor-icons/react'
+import { ArrangePart } from '../../app/ArrangePart'
 import { artistName } from '../../shared/artistName'
 import { pop } from '../../shared/motion'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
@@ -396,7 +397,9 @@ export function NowPlaying() {
       <div className="flex min-w-0 flex-col justify-center gap-4 pb-8">
         {titleParts.map((part) => (
           <div key={part} className="contents" onContextMenu={hideMenu(part)}>
-            {titleBlocks[part]}
+            <ArrangePart owner="nowPlaying" part={part}>
+              {titleBlocks[part]}
+            </ArrangePart>
           </div>
         ))}
       </div>
@@ -405,7 +408,7 @@ export function NowPlaying() {
 
   return (
     // Whole window, under the see-through top bar (logo, Close player and window buttons stay on top, z-30).
-    <div role="dialog" aria-label={tr('Now playing')} onContextMenu={onMenu(playerMenu)} className="np-in fixed inset-0 z-20 isolate flex flex-col overflow-hidden bg-bg px-10 pt-17 pb-7 text-ink transition-colors duration-500 phone:px-5 phone:pt-[max(0.5rem,env(safe-area-inset-top))] phone:pb-[max(1rem,env(safe-area-inset-bottom))]" style={ambient}>
+    <div role="dialog" data-now-playing="" aria-label={tr('Now playing')} onContextMenu={onMenu(playerMenu)} className="np-in fixed inset-0 z-20 isolate flex flex-col overflow-hidden bg-bg px-10 pt-17 pb-7 text-ink transition-colors duration-500 phone:px-5 phone:pt-[max(0.5rem,env(safe-area-inset-top))] phone:pb-[max(1rem,env(safe-area-inset-bottom))]" style={ambient}>
       {immersive && <Backdrop url={backdrop} dim={backdropDim} motion={backdropMotion} />}
       {showVisualizer && vizBackdrop && motion && <VizBackdrop />}
 
@@ -431,7 +434,9 @@ export function NowPlaying() {
       {/* Phone layout: one column, the cover over the song; an open panel (lyrics, Up next, sound) takes the cover's place. */}
       <div className={`grid min-h-0 flex-1 grid-cols-(--columns) gap-12 phone:grid-cols-1 phone:gap-4 ${panel ? 'phone:grid-rows-1' : 'phone:grid-rows-[minmax(0,1fr)_auto]'}`} style={{ ['--columns' as string]: gridColumns }}>
         {columns.map((column) => (
-          <Fragment key={column}>{column === 'cover' ? stageColumn : wordsColumn}</Fragment>
+          <ArrangePart key={column} owner="nowPlayingColumns" part={column}>
+            {column === 'cover' ? stageColumn : wordsColumn}
+          </ArrangePart>
         ))}
       </div>
 
@@ -465,7 +470,9 @@ export function NowPlaying() {
           </span>
           <div className="flex min-w-0 items-center justify-end gap-1 phone:justify-around">
             {controlParts.map((part) => (
-              <Fragment key={part}>{controls[part]}</Fragment>
+              <ArrangePart key={part} owner="nowPlayingControls" part={part}>
+                {controls[part]}
+              </ArrangePart>
             ))}
           </div>
         </div>
