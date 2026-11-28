@@ -706,7 +706,10 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         3 `M` [x] Built 2026-11-28, not tried for real: secrets kept in memory without a keyring (said in Accounts), no
           tray = closing quits (said in General), XDG autostart, `legato://` (.deb template, AppImage by `xdg-mime`),
           single instance as the plugin has it, `PULSE_PROP`. Left to slice 5: a `.lmix` double-click.
-        4 `L` WebKitGTK shield (filter + host list) and its rule tests.
+        4 `L` [x] Built 2026-11-28, not tried for real: the lists as WebKit’s content filter (`content_blocker.rs`,
+          converted by adblock-rust) and every load noted (`shield_linux.rs`, type-checked against the bindings, never run).
+          Blocked requests are neither counted nor listed there (WebKit does not say them). To see at the first run: that
+          WebKit compiles the whole list, and the compile time on a small machine (done at each launch).
         5 `M` Linux release job x86_64 + aarch64, AppImage + .deb, both editions, the feed and the .deb case in `update.rs`.
         6 `S` Site: Linux downloads per edition (today the choice only takes `Legato_…-setup.exe`), privacy lines, docs
           (architecture, development: apt dependencies, CONTRIBUTING › Releasing).

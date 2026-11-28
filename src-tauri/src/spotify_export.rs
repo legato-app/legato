@@ -135,10 +135,13 @@ pub async fn spotify_export_open(app: AppHandle, state: State<'_, AppState>) -> 
     }
     let page = Url::parse(PAGE).map_err(err)?;
     WebviewWindowBuilder::new(&app, LABEL, WebviewUrl::External(page)).additional_browser_args(&crate::background::browser_args()).title("Exportify").inner_size(1000.0, 720.0).initialization_script(music_shield::EXPORTIFY_SCRIPT).on_download(on_download).build().map_err(err)?;
+    #[cfg(any(windows, target_os = "linux"))]
+    if let Some(wv) = app.get_webview(LABEL) {
+        let _ = crate::shield::watch(&wv);
+    }
     // No channel, no signals: elsewhere nothing to tell a silent page from a working one.
     #[cfg(windows)]
     if let Some(wv) = app.get_webview(LABEL) {
-        let _ = crate::shield::watch(&wv);
         let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
         *SIGNALS.lock().unwrap() = Some(tx);
         NAMES.lock().unwrap().clear();

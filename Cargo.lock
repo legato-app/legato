@@ -3186,6 +3186,7 @@ dependencies = [
  "tokio",
  "ts-rs",
  "url",
+ "webkit2gtk",
  "webview2-com",
  "windows",
  "windows-core",
@@ -3616,8 +3617,10 @@ version = "1.2.0"
 dependencies = [
  "adblock",
  "anyhow",
+ "regex",
  "reqwest",
  "rustls",
+ "serde_json",
  "tempfile",
  "webpki-roots",
 ]

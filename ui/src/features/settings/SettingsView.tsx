@@ -454,9 +454,11 @@ function ShieldSection() {
             }}
           />
         </Row>
-        <Row label={msg('Blocked requests')} sub={tr('Since app launch')}>
-          <span className="font-mono text-2xl tabular-nums">{formatCount(blocked)}</span>
-        </Row>
+        {offered('blockedCount') && (
+          <Row label={msg('Blocked requests')} sub={tr('Since app launch')}>
+            <span className="font-mono text-2xl tabular-nums">{formatCount(blocked)}</span>
+          </Row>
+        )}
         <Row label={msg('Lists')} sub={tr('EasyList · EasyPrivacy · built-in rules (offline)')}>
           <span className="flex items-center gap-2 kicker">
             <Led on={settings.shield} /> {settings.shield ? tr('Active') : tr('Inactive')}

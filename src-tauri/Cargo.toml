@@ -67,6 +67,8 @@ tauri-plugin-barcode-scanner = "2"
 # The session bus (MPRIS: media.rs, session.rs), already built for the keychain.
 [target.'cfg(target_os = "linux")'.dependencies]
 zbus = "5"
+# The shield's filter and request list (shield_linux.rs): the bindings wry builds its windows with.
+webkit2gtk = { version = "2.0", features = ["v2_40"] }
 
 [target.'cfg(windows)'.dependencies]
 webview2-com = "0.39.1"

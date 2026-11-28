@@ -1,5 +1,9 @@
 //! Ad/tracker blocker: Brave's adblock engine over EasyList + EasyPrivacy, cached on disk.
 
+mod content_blocker;
+
+pub use content_blocker::content_blocker;
+
 use adblock::Engine;
 use adblock::request::Request;
 use anyhow::Result;
@@ -81,7 +85,12 @@ impl Shield {
 }
 
 fn engine(lists: &str) -> Engine {
-    Engine::new_with_list_text(format!("{FALLBACK}\n{lists}"))
+    Engine::new_with_list_text(rules_text(lists))
+}
+
+/// Every rule the shield goes by: its own, then the lists'.
+fn rules_text(lists: &str) -> String {
+    format!("{FALLBACK}\n{lists}")
 }
 
 /// Concatenated cached lists, "" if none yet.

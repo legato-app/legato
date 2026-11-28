@@ -90,6 +90,9 @@ mod secrets;
 mod servers;
 #[cfg(windows)]
 mod shield;
+#[cfg(target_os = "linux")]
+#[path = "shield_linux.rs"]
+mod shield;
 mod sponsor;
 #[cfg(not(feature = "lite"))]
 mod viz;
@@ -531,7 +534,9 @@ fn shield_status(state: State<AppState>) -> ShieldStatus {
 /// Network part switches live; player script part on next launch.
 #[tauri::command]
 fn set_shield(state: State<AppState>, enabled: bool) {
-    state.shield.enabled.store(enabled, Ordering::Relaxed)
+    state.shield.enabled.store(enabled, Ordering::Relaxed);
+    #[cfg(target_os = "linux")]
+    shield::refresh(&state.app, &state.shield);
 }
 
 #[derive(Serialize, ts_rs::TS)]
@@ -845,7 +850,7 @@ pub fn run() {
             // Headphones unplugged, Bluetooth off: the interface pauses.
             #[cfg(windows)]
             unplug::spawn(app.handle().clone());
-            #[cfg(windows)]
+            #[cfg(any(windows, target_os = "linux"))]
             shield::install(window.as_ref(), shield.clone())?;
             // A WebView2 process that dies: logged, a dead renderer's page loaded again, a dead browser = app restarted.
             #[cfg(windows)]
@@ -868,11 +873,16 @@ pub fn run() {
 
             let lists = dir.join("shield");
             let fresh = shield.clone();
+            #[cfg(target_os = "linux")]
+            let shielded_app = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 let cached = music_shield::cached_lists(&lists);
                 if !cached.is_empty() {
                     fresh.reload(&cached);
                 }
+                // WebKitGTK's views take the rules up front, the built-in ones at least.
+                #[cfg(target_os = "linux")]
+                shield::rules_changed(&shielded_app, &fresh, &lists, &cached);
                 if music_shield::lists_stale(&lists) {
                     // Not through the connectors' client: noted here (Settings › Privacy).
                     for (_, url) in music_shield::LISTS {
@@ -880,6 +890,8 @@ pub fn run() {
                     }
                     if let Ok(text) = music_shield::download_lists(&lists).await {
                         fresh.reload(&text);
+                        #[cfg(target_os = "linux")]
+                        shield::rules_changed(&shielded_app, &fresh, &lists, &text);
                     }
                 }
             });

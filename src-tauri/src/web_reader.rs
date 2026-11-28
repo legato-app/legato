@@ -77,9 +77,10 @@ impl Site {
         }
         let page = if self.signed_in(app) { self.player } else { self.sign_in };
         WebviewWindowBuilder::new(app, self.label, WebviewUrl::External(Url::parse(page).expect("valid url"))).additional_browser_args(&crate::background::browser_args()).title(self.name).inner_size(1100.0, 760.0).initialization_script(self.script).build()?;
-        #[cfg(windows)]
+        #[cfg(any(windows, target_os = "linux"))]
         if let Some(webview) = app.get_webview(self.label) {
             let _ = crate::shield::watch(&webview);
+            #[cfg(windows)]
             crate::ytwatch::on_message(&webview, move |source, message| {
                 if let Some(parsed) = (self.parse)(source, message)
                     && let Some(inbox) = self.inbox.lock().unwrap().as_ref()

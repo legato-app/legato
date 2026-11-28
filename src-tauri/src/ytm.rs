@@ -35,7 +35,7 @@ pub fn open(app: &AppHandle, add_account: bool) -> tauri::Result<()> {
     }
     let url = Url::parse(if add_account { ADD_ACCOUNT } else { SIGN_IN }).expect("valid url");
     WebviewWindowBuilder::new(app, LABEL, WebviewUrl::External(url)).additional_browser_args(&crate::background::browser_args()).title("Sign in with Google · YouTube Music").inner_size(520.0, 720.0).build()?;
-    #[cfg(windows)]
+    #[cfg(any(windows, target_os = "linux"))]
     if let Some(wv) = app.get_webview(LABEL) {
         let _ = crate::shield::watch(&wv);
     }
@@ -73,7 +73,7 @@ pub async fn refresh(app: &AppHandle) -> bool {
     // Never focused: by default the new webview takes the keyboard focus even hidden (wry's MoveFocus), and the app's
     // window went inactive under the user 90 s after launch (Nov 2026 report, with a window-styling mod).
     let Ok(w) = WebviewWindowBuilder::new(app, REFRESH, WebviewUrl::External(url)).additional_browser_args(&crate::background::browser_args()).visible(false).focused(false).focusable(false).skip_taskbar(true).initialization_script_for_all_frames(NO_PASSKEY).build() else { return false };
-    #[cfg(windows)]
+    #[cfg(any(windows, target_os = "linux"))]
     let _ = crate::shield::watch(w.as_ref());
     let mut back = false;
     for _ in 0..15 {

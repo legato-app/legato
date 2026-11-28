@@ -15,8 +15,9 @@ export const linuxApp: boolean = typeof __LINUX__ !== 'undefined' && __LINUX__
  * than left dead (`liteCuts.ts` reads this table like Lite's). An entry leaves when its Linux twin lands.
  */
 export const MISSING_ON_LINUX = {
-  // The ad blocker, the list of what app windows reach and YouTube's sound processing are hooks into WebView2 (shield.rs).
-  adBlocking: { sections: ['shield'], settings: ['Block ads and trackers', 'App windows'] },
+  // WebKitGTK's content filter says nothing of what it stops (shield_linux.rs): the count would stay at zero.
+  blockedCount: {},
+  // Not wired on Linux yet.
   youtubeSound: { settings: ["Process YouTube's sound"] },
   // Windows' speech recognition and its settings pages.
   voiceSearch: { settings: ['Voice search'], shortcuts: ['voice'] },

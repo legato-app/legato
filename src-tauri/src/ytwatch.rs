@@ -232,11 +232,10 @@ fn make(app: &AppHandle, url: Url, rect: Option<Rect>, shield: Arc<music_shield:
     }
     let start = rect.unwrap_or(UNSEEN);
     let wv = window.add_child(builder, start.position(), start.size())?;
+    #[cfg(any(windows, target_os = "linux"))]
+    crate::shield::install(&wv, shield)?;
     #[cfg(windows)]
-    {
-        crate::shield::install(&wv, shield)?;
-        listen(&wv, app.clone())?;
-    }
+    listen(&wv, app.clone())?;
     // Moves or hides asked while it was being made.
     apply(&wv)?;
     Ok(())
