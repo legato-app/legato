@@ -2,7 +2,7 @@
 
 mod content_blocker;
 
-pub use content_blocker::content_blocker;
+pub use content_blocker::{content_blocker, content_blocker_key};
 
 use adblock::Engine;
 use adblock::request::Request;

@@ -1,5 +1,5 @@
 //! The shield on Linux (WebKitGTK), the twin of `shield.rs`. WebKit asks no one before a request: the lists are compiled
-//! into one of its content filters, once for each version of them (kept on disk for the next launches), and every view
+//! into one of its content filters, once for each text they convert to (kept on disk for the next launches), and every view
 //! the shield covers gets that one. Each request WebKit sends is noted (Settings › Privacy); what the filter stops is
 //! never sent, so it is neither noted nor counted.
 
@@ -7,7 +7,6 @@ use music_core::netlog::{self, Via};
 use music_shield::Shield;
 use std::cell::RefCell;
 use std::ffi::{CStr, CString};
-use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
@@ -21,7 +20,7 @@ const FILTER_NAME: &CStr = c"legato-shield";
 
 /// The views `install` covers, by label.
 static SHIELDED: Mutex<Vec<String>> = Mutex::new(Vec::new());
-/// The version of the rules asked for last: older ones ready after it are dropped.
+/// The key of the rules converted last: others ready after it are dropped.
 static WANTED: AtomicU64 = AtomicU64::new(0);
 
 thread_local! {
@@ -44,8 +43,8 @@ struct Pending {
     app: AppHandle,
     shield: Arc<Shield>,
     json: glib::Bytes,
-    version: u64,
-    /// This version's own folder: its compiled copy.
+    key: u64,
+    /// These rules' own folder: their compiled copy.
     folder: PathBuf,
 }
 
@@ -78,23 +77,18 @@ pub fn watch(webview: &tauri::Webview) -> tauri::Result<()> {
 /// The first lists, or fresh ones: converted for WebKit (a moment's work: not on the main thread), then loaded or
 /// compiled and given to the shielded views. `lists_dir`: where the downloaded lists are.
 pub fn rules_changed(app: &AppHandle, shield: &Arc<Shield>, lists_dir: &Path, lists: &str) {
-    let version = version_of(lists);
-    WANTED.store(version, Ordering::Relaxed);
     let json = match music_shield::content_blocker(lists) {
-        Ok(json) => glib::Bytes::from_owned(json.into_bytes()),
+        Ok(json) => json,
+        // The rules asked for before stay wanted.
         Err(error) => return crate::diag::warn("shield", "rules not converted for WebKit", &format!("{error:#}")),
     };
-    let pending = Pending { app: app.clone(), shield: shield.clone(), json, version, folder: lists_dir.join("webkit").join(format!("{version:016x}")) };
+    let key = music_shield::content_blocker_key(&json);
+    WANTED.store(key, Ordering::Relaxed);
+    let folder = lists_dir.join("webkit").join(format!("{key:016x}"));
+    let pending = Pending { app: app.clone(), shield: shield.clone(), json: glib::Bytes::from_owned(json.into_bytes()), key, folder };
     if let Err(error) = app.run_on_main_thread(move || load(pending)) {
         crate::diag::warn("shield", "rules not given to WebKit", &error.to_string());
     }
-}
-
-/// One version of the rules: the lists' text, as this version of the app converts it.
-fn version_of(lists: &str) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    (env!("CARGO_PKG_VERSION"), lists).hash(&mut hasher);
-    hasher.finish()
 }
 
 /// The switch moved, or the rules did: every shielded view follows.
@@ -189,7 +183,7 @@ unsafe extern "C" fn compiled(store: *mut glib::gobject_ffi::GObject, result: *m
 
 /// Kept for the views to come, given to those there, unless newer rules were asked for meanwhile.
 fn ready(pending: Pending, filter: Filter) {
-    if WANTED.load(Ordering::Relaxed) != pending.version {
+    if WANTED.load(Ordering::Relaxed) != pending.key {
         return;
     }
     FILTER.set(Some(filter));
@@ -197,10 +191,10 @@ fn ready(pending: Pending, filter: Filter) {
     refresh(&pending.app, &pending.shield);
 }
 
-/// Older versions' compiled copies, beside the one kept: removed (best effort).
+/// Other rules' compiled copies, beside the one kept: removed (best effort).
 fn forget_older(kept: &Path) {
-    let Some(Ok(versions)) = kept.parent().map(std::fs::read_dir) else { return };
-    for version in versions.flatten().filter(|version| version.path() != kept) {
-        let _ = std::fs::remove_dir_all(version.path());
+    let Some(Ok(copies)) = kept.parent().map(std::fs::read_dir) else { return };
+    for copy in copies.flatten().filter(|copy| copy.path() != kept) {
+        let _ = std::fs::remove_dir_all(copy.path());
     }
 }

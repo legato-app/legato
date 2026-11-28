@@ -5,6 +5,8 @@ use crate::rules_text;
 use adblock::content_blocking::{CbAction, CbRule, CbTrigger, CbType};
 use adblock::lists::{FilterSet, ParseOptions, RuleTypes};
 use anyhow::{Result, anyhow};
+use serde_json::Value;
+use std::hash::{DefaultHasher, Hash, Hasher};
 
 /// WebKit refuses a longer list whole.
 const MAX_RULES: usize = 150_000;
@@ -23,7 +25,26 @@ pub fn content_blocker(lists: &str) -> Result<String> {
     let mut rules = within(rules, MAX_RULES - NEVER_BLOCKED.len());
     // Last, so they undo whatever matched before.
     rules.extend(NEVER_BLOCKED.map(never_block));
-    Ok(serde_json::to_string(&rules)?)
+    written(&rules)
+}
+
+/// What a converted list's compiled copy is filed under: another text, another key.
+pub fn content_blocker_key(json: &str) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    json.hash(&mut hasher);
+    hasher.finish()
+}
+
+/// The converter holds a rule's kinds in a set, which comes out in a new order each time: sorted, so that the same
+/// rules always give the same text, and key.
+fn written(rules: &[CbRule]) -> Result<String> {
+    let mut list = serde_json::to_value(rules)?;
+    for rule in list.as_array_mut().into_iter().flatten() {
+        if let Some(Value::Array(kinds)) = rule.pointer_mut("/trigger/resource-type") {
+            kinds.sort_by(|first, second| first.as_str().cmp(&second.as_str()));
+        }
+    }
+    Ok(list.to_string())
 }
 
 fn never_block(url_filter: &str) -> CbRule {
@@ -53,6 +74,17 @@ mod tests {
     use super::*;
     use crate::Shield;
     use regex::RegexBuilder;
+
+    #[test]
+    fn the_compiled_copy_is_filed_by_what_webkit_compiles() {
+        let key = |lists: &str| content_blocker_key(&content_blocker(lists).unwrap());
+        let kinds = "||ads.example^$script,image,stylesheet,font,media,xmlhttprequest";
+        let first = key(kinds);
+        // The same lists at another launch: the same key, whatever order the converter held a rule's kinds in.
+        assert!((0..20).all(|_| key(kinds) == first));
+        assert_ne!(key("||other.example^$script,image,stylesheet,font,media,xmlhttprequest"), first);
+        assert_ne!(key("||ads.example^$script"), first);
+    }
 
     fn rules(lists: &str) -> Vec<CbRule> {
         serde_json::from_str(&content_blocker(lists).unwrap()).unwrap()

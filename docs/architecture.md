@@ -27,7 +27,7 @@ src-tauri/              thin shell: commands, keychain, webview hooks, media pan
 | `music-dsp` | Live audio processing, pure Rust: biquads, BS.1770 loudness meter, Adaptive Sound gain, limiter, the Live Editor's effects (EQ, compressor, width, echo, reverb, 3D) and speed / tempo / pitch (WSOLA), shared `Control`. |
 | `music-shield` | Ad and tracker blocking with Brave's adblock engine, plus the scripts for the app's web windows: YouTube's player (`live.js` and its neighbours), Spotify's page (`spotify.js`), Apple Music's (`apple.js`), Exportify's (`exportify.js`). For Linux, the same lists as a WebKit content blocker (`content_blocker.rs`). |
 | `music-plugins` | Third-party plugins: one QuickJS runtime per plugin (64 MB, 1 s per run, no DOM, network or files), manifest and permissions checked in Rust, HTTPS gateway to approved public hosts. Author guide: `docs/plugins.md`. |
-| `src-tauri` | IPC commands (`lib.rs`, and per feature: `detector.rs`, `editor.rs`, `themes.rs`, `syncmode.rs`, `plugins.rs`, `links.rs`, `spotify_web.rs`, `spotify_export.rs`, `apple_web.rs`), OS keychain, WebView2 request hook, Windows media panel, tray icon, window background, voice search through Windows' speech recognition (`speech.rs`). No business logic. |
+| `src-tauri` | IPC commands (`lib.rs`, and per feature: `detector.rs`, `editor.rs`, `themes.rs`, `syncmode.rs`, `plugins.rs`, `links.rs`, `spotify_web.rs`, `spotify_export.rs`, `apple_web.rs`), OS keychain, the webview's shield (WebView2's request hook, a WebKitGTK content filter on Linux), the OS media panel (MPRIS on Linux), tray icon, window background, voice search through Windows' speech recognition (`speech.rs`). No business logic. |
 
 ## Rules
 
