@@ -1,0 +1,64 @@
+# Linux trial (plan-v2 "Linux for both versions", slice 0): a debug AppImage of the full app as an artifact, to try on a
+# real Linux (the embed, its codecs, `live.js`, the Google sign-in). Never released, never signed: no secret here. Run by
+# hand (Actions › linux trial, once this file is on master) or by pushing any branch to `linux-trial`.
+name: linux trial
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [linux-trial]
+
+concurrency:
+  group: linux-trial-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+
+jobs:
+  appimage:
+    # The oldest base the design targets (WebKitGTK 4.1): an AppImage runs on that glibc and newer.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      # WebKitGTK and the shell's libraries, what the AppImage bundler calls, and the GStreamer plugins it packs for
+      # YouTube's codecs (tauri.linux-trial.conf.json › bundleMediaFramework).
+      - timeout-minutes: 20
+        run: |
+          APT="-o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+          for i in 1 2 3; do sudo apt-get $APT update && break; sleep 5; done
+          sudo apt-get $APT install -y --no-install-recommends \
+            pkg-config libssl-dev libasound2-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libdbus-1-dev \
+            file wget patchelf \
+            gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
+
+      - run: pnpm install --frozen-lockfile
+
+      # A guest identifier (its own data, no update, nothing outside its folders: identity.rs).
+      - run: pnpm tauri build --debug --bundles appimage --config src-tauri/tauri.linux-trial.conf.json
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: legato-linux-trial
+          path: target/debug/bundle/appimage/*.AppImage
+          if-no-files-found: error
+          retention-days: 7

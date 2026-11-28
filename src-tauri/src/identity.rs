@@ -46,7 +46,7 @@ mod tests {
     fn only_the_exact_identifier_is_the_installed_app() {
         let (this, other) = if cfg!(feature = "lite") { ("app.legato.lite", "app.legato.desktop") } else { ("app.legato.desktop", "app.legato.lite") };
         assert!(is_installed(this));
-        for guest in [other, "app.legato.lite.devbuild", "app.legato.desktop.devbuild", "app.legato.desktop.bench", "app.legato.lite.bench", "app.legato.desktop.e2e", "app.legato.desktop.firstrun", "app.legato.desktop2", "App.Legato.Desktop", "dev.musicapp.desktop", " app.legato.desktop", ""] {
+        for guest in [other, "app.legato.lite.devbuild", "app.legato.desktop.devbuild", "app.legato.desktop.bench", "app.legato.lite.bench", "app.legato.desktop.linuxtrial", "app.legato.desktop.e2e", "app.legato.desktop.firstrun", "app.legato.desktop2", "App.Legato.Desktop", "dev.musicapp.desktop", " app.legato.desktop", ""] {
             assert!(!is_installed(guest), "{guest:?} would act as the installed app");
         }
     }
@@ -76,7 +76,7 @@ mod tests {
         assert_eq!(id(installed), INSTALLED, "the edition's config is the installed app");
         let product = serde_json::from_str::<serde_json::Value>(installed).unwrap()["productName"].as_str().unwrap().to_string();
         assert_eq!(product, PRODUCT, "the shell's name is the installer's");
-        for guest in [include_str!("../tauri.dev.conf.json"), include_str!("../tauri.bench.conf.json"), include_str!("../tauri.e2e.conf.json"), include_str!("../tauri.lite.dev.conf.json"), include_str!("../tauri.lite.bench.conf.json")] {
+        for guest in [include_str!("../tauri.dev.conf.json"), include_str!("../tauri.bench.conf.json"), include_str!("../tauri.e2e.conf.json"), include_str!("../tauri.lite.dev.conf.json"), include_str!("../tauri.lite.bench.conf.json"), include_str!("../tauri.linux-trial.conf.json")] {
             assert!(!is_installed(&id(guest)), "a guest config carries the installed identifier");
         }
     }
