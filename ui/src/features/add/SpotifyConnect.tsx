@@ -1,9 +1,12 @@
 import { SpotifyLogo } from '@phosphor-icons/react'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { useEffect, useState } from 'react'
+import { notifyError } from '../../app/notifyError'
 import { useStore } from '../../app/store'
 import { api, type ExportTrouble, type SpotifyList, type SpotifyPick } from '../../shared/api'
 import { pickFile } from '../../shared/files'
 import { msg, tr } from '../../shared/i18n/i18n'
+import { EXPORTIFY } from '../../shared/links'
 import { phoneApp } from '../../shared/platform'
 import { Button } from '../../shared/ui/Button'
 import { Dialog } from '../../shared/ui/Dialog'
@@ -172,21 +175,23 @@ function SpotifyFile() {
   return (
     <>
       <Button variant="ghost" disabled={busy} onClick={() => void pick()} title={tr('Spotify sends it a few days after you ask for your data in its privacy settings. An Exportify file works too.')}>
-        {busy ? tr('Reading the file…') : tr('Open Spotify’s data export…')}
+        {busy ? tr('Reading the file…') : phoneApp ? tr('Choose the Exportify file…') : tr('Open Spotify’s data export…')}
       </Button>
       {lists && <ListPick title={tr('Your Spotify lists')} lists={lists} onClose={close} onStart={start} />}
     </>
   )
 }
 
-/** The phone keeps the export file only: Exportify's window would cover the app with no way back (FromPc). */
+/** On the phone, a window of the app for Exportify would cover it with no way back (FromPc): it opens in the browser,
+ *  and the file saved there is picked here. */
 export function SpotifyConnect() {
   return (
     <Card icon={SpotifyLogo} title={tr('Connect Spotify')} sub={tr('Import your playlists and Liked Songs, private ones too, with any free account.')}>
       <span className="mt-auto flex flex-wrap gap-2">
-        {!phoneApp && <SpotifyImport label={tr('Connect')} />}
+        {phoneApp ? <Button onClick={() => void openUrl(EXPORTIFY).catch(notifyError)}>{tr('Open Exportify')}</Button> : <SpotifyImport label={tr('Connect')} />}
         <SpotifyFile />
       </span>
+      {phoneApp && <p className="text-xs text-ink-3">{tr('Exportify is a free open-source tool, not ours. It opens in your browser: sign in with Spotify there, export your lists to a file, then come back here and choose that file.')}</p>}
     </Card>
   )
 }
