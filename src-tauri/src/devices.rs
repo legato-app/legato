@@ -674,6 +674,12 @@ async fn pair(app: AppHandle, state: &AppState, code: String, link: Option<Strin
             (code, addrs)
         }
     };
+    // This device joins the one showing the code: that one's settings win, unless this one already syncs. Before any
+    // snapshot leaves (an older Legato's swap included).
+    let config = syncmode::config(state);
+    if config.folder.is_none() && config.peers.is_empty() {
+        state.lib().take_others_settings().map_err(err)?;
+    }
     if addrs.is_empty() {
         return syncmode::join(app, state, code).await.map_err(|_| "No device is showing a code on this network".to_string());
     }

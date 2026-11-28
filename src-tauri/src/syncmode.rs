@@ -393,11 +393,14 @@ pub async fn sync_setup(app: AppHandle, state: State<'_, AppState>, folder: Stri
         Some(k) => state.store.save(KEY, &k.iter().map(|b| format!("{b:02x}")).collect::<String>()).map_err(err)?,
         None => state.store.set(KEY, None).map_err(err)?,
     }
-    // First PC: its settings are the reference. Joining PCs take the others'.
+    let mut c = config(&state);
+    // First PC: its settings are the reference. A PC joining others' sync takes theirs; one already syncing with them
+    // (this folder again, or paired devices) keeps its changes and their times.
     if first {
         state.lib().stamp_all_settings(now_ms()).map_err(err)?;
+    } else if c.folder.as_deref() != Some(folder.as_str()) && c.peers.is_empty() {
+        state.lib().take_others_settings().map_err(err)?;
     }
-    let mut c = config(&state);
     c.folder = Some(folder);
     c.asked = true;
     save_config(&state, &c)?;

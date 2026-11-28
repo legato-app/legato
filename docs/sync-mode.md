@@ -131,8 +131,10 @@ list or anything else of the user's, or another source. Another PC's library doe
 again (`import-back`, newer): it comes back everywhere. An older Legato keeps the records and sends them on, and keeps
 the songs until it updates.
 
-First sync: the PC set up first (or the one showing the code) is the reference for settings never changed since;
-joining PCs take its settings. After that, any change on any PC wins by its time.
+First sync: the PC set up first (or the one showing the code) is the reference for settings never changed since. A PC
+that joins, by the folder or with a code, takes the others' settings: its own lose their times (`take_others_settings`),
+unless it already syncs (the same folder again, or paired devices). After that, any change on any PC wins by its time; a
+setting a PC saves for the first time (an update's new one) carries none.
 
 Playlists made in the app got random ids at schema v10 (were `custom-<row id>`, which two PCs could both make).
 Settings naming playlists by row id (`hiddenPlaylists`, `playlistCovers`) are translated to portable keys and back.

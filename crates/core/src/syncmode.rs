@@ -297,13 +297,15 @@ impl Library {
         Ok(self.setting(TIMES)?.and_then(|v| v.as_object().cloned()).unwrap_or_default())
     }
 
-    /// Interface settings saved: each top-level key that changed gets `now` (newest change wins on merge).
+    /// Interface settings saved: each top-level key that changed gets `now` (newest change wins on merge). A key the saved
+    /// settings didn't hold yet gets none: an update's new default never beats another PC's choice.
     pub fn save_ui_settings(&self, new: &Value, now: i64) -> Result<()> {
         let old = self.setting("ui")?.unwrap_or(Value::Null);
         let mut times = self.times()?;
         if let Some(new) = new.as_object() {
             for (k, v) in new {
-                if old.get(k) != Some(v) {
+                // The very first save stamps everything: nothing says which values the user picked.
+                if old.get(k) != Some(v) && (old.is_null() || old.get(k).is_some()) {
                     times.insert(format!("ui.{k}"), now.into());
                 }
             }
@@ -320,7 +322,15 @@ impl Library {
         self.set_setting(TIMES, &Value::Object(times))
     }
 
-    /// First PC of a sync: its settings are the reference (all stamped now). Joining PCs keep 0 and take others'.
+    /// This PC joins others' sync: its settings count as never changed (no time, so 0 when they travel) and theirs win. The
+    /// values stay until theirs arrive; what changes here afterwards travels as usual.
+    pub fn take_others_settings(&self) -> Result<()> {
+        let mut times = self.times()?;
+        times.retain(|key, _| !key.starts_with("ui.") && !SHARED_ROWS.contains(&key.as_str()));
+        self.set_setting(TIMES, &Value::Object(times))
+    }
+
+    /// First PC of a sync: its settings are the reference (all stamped now). Joining PCs call `take_others_settings`.
     pub fn stamp_all_settings(&self, now: i64) -> Result<()> {
         let mut times = self.times()?;
         if let Some(ui) = self.setting("ui")?.as_ref().and_then(Value::as_object) {
@@ -1537,6 +1547,53 @@ mod tests {
         }
         full.merge(&older)?;
         assert_eq!(full.setting("ui")?.unwrap()["motion"], true);
+        Ok(())
+    }
+
+    #[test]
+    fn a_joining_pc_takes_the_others_settings_and_never_overwrites_them() -> Result<()> {
+        let full = Library::in_memory()?;
+        let lite = Library::in_memory()?;
+        let themes = serde_json::json!([{ "id": "custom-night", "name": "Night" }]);
+        full.save_ui_settings(&serde_json::json!({ "theme": "dark", "customThemes": themes, "crossfade": 4 }), 10)?;
+        // A Lite installed later, never changed: its first save stamped every default, newer than the full app's.
+        lite.save_ui_settings(&serde_json::json!({ "theme": "system", "customThemes": [], "crossfade": 2 }), 20)?;
+        lite.take_others_settings()?;
+        assert!(lite.settings_unstamped()?);
+        // By the folder or over the network, the snapshot leaves after the call: nothing in it beats anyone.
+        let joining = snap(&lite);
+        assert!(joining.settings.values().all(|setting| setting.at == 0));
+        assert_eq!(full.merge(&joining)?.settings, 0);
+        lite.merge(&snap(&full))?;
+        full.merge(&snap(&lite))?;
+        for library in [&full, &lite] {
+            let ui = library.setting("ui")?.unwrap();
+            assert_eq!((&ui["theme"], &ui["customThemes"], &ui["crossfade"]), (&"dark".into(), &themes, &4.into()));
+        }
+        // A change made on the joiner afterwards travels as usual.
+        lite.save_ui_settings(&serde_json::json!({ "theme": "light", "customThemes": themes, "crossfade": 4 }), 30)?;
+        full.merge(&snap(&lite))?;
+        assert_eq!(full.setting("ui")?.unwrap()["theme"], "light");
+        Ok(())
+    }
+
+    #[test]
+    fn an_updates_new_setting_never_beats_a_choice_made_elsewhere() -> Result<()> {
+        let chosen = Library::in_memory()?;
+        let updated = Library::in_memory()?;
+        // Both had settings before the update; one PC's user then picks the new one.
+        for library in [&chosen, &updated] {
+            library.save_ui_settings(&serde_json::json!({ "theme": "dark" }), 10)?;
+        }
+        chosen.save_ui_settings(&serde_json::json!({ "theme": "dark", "glow": "off" }), 20)?;
+        chosen.save_ui_settings(&serde_json::json!({ "theme": "dark", "glow": "strong" }), 30)?;
+        // The other updates later: its first save brings the default.
+        updated.save_ui_settings(&serde_json::json!({ "theme": "dark", "glow": "soft" }), 40)?;
+        chosen.merge(&snap(&updated))?;
+        updated.merge(&snap(&chosen))?;
+        for library in [&chosen, &updated] {
+            assert_eq!(library.setting("ui")?.unwrap()["glow"], "strong");
+        }
         Ok(())
     }
 
