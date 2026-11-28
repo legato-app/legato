@@ -1,5 +1,6 @@
 import type { Credentials } from '../../shared/api'
 import { msg } from '../../shared/i18n/i18n'
+import { phoneApp } from '../../shared/platform'
 
 export interface Step {
   title: string
@@ -28,8 +29,9 @@ export const guides: Record<'spotify', Guide> = {
       },
       {
         title: msg('Add the redirect address'),
-        text: msg('Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:'),
-        copy: 'http://127.0.0.1/callback',
+        text: phoneApp ? msg('Under “Redirect URIs”, paste exactly this address, click Add, then Save:') : msg('Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:'),
+        // The phone's: `PHONE_REDIRECT` (spotify.rs), a link back to the app. The PC's: its loopback.
+        copy: phoneApp ? 'legato://spotify-callback' : 'http://127.0.0.1/callback',
       },
       { title: msg('Paste your Client ID'), text: msg('Your app’s Settings → Client ID. The Client secret is not needed.') },
     ],

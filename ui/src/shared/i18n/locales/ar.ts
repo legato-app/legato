@@ -585,6 +585,7 @@ const ar: Record<string, string> = {
   'Open the Spotify dashboard': 'فتح لوحة Spotify',
   'Add the redirect address': 'أضف عنوان إعادة التوجيه',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': 'تحت «Redirect URIs»، الصق هذا العنوان تمامًا (دون منفذ)، وانقر «Add» ثم «Save»:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': 'تحت «Redirect URIs»، الصق هذا العنوان تمامًا، وانقر «Add» ثم «Save»:',
   'Paste your Client ID': 'الصق معرّف العميل (Client ID)',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'إعدادات تطبيقك ‹ Client ID. لا حاجة إلى Client secret.',
   'e.g. 3f9a…7c21e': 'مثال: 3f9a…7c21e',

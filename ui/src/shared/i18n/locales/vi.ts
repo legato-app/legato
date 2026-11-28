@@ -620,6 +620,7 @@ const vi: Record<string, string> = {
   'Open the Spotify dashboard': 'Mở trang quản lý Spotify',
   'Add the redirect address': 'Thêm địa chỉ chuyển hướng',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': 'Trong “Redirect URIs”, dán chính xác địa chỉ này (không có cổng), nhấp Add, rồi Save:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': 'Trong “Redirect URIs”, dán chính xác địa chỉ này, nhấp Add, rồi Save:',
   'Paste your Client ID': 'Dán Client ID của bạn',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'Settings của ứng dụng → Client ID. Không cần Client secret.',
   'e.g. 3f9a…7c21e': 'vd: 3f9a…7c21e',

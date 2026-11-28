@@ -29,6 +29,12 @@ pub async fn connect(state: State<'_, AppState>, source: Source, credentials: Cr
     let merged = state.credentials().merged_with(credentials);
     state.store.save("credentials", &merged).map_err(err)?;
     state.cache.status.clear();
+    // A phone's Spotify sign-in answers by a link that opens the app, not on its loopback.
+    #[cfg(mobile)]
+    if source == Source::Spotify {
+        let spotify = state.spotify().ok_or("Missing credentials")?;
+        return spotify.connect_by_link(crate::protocol::sign_in_answers()).await.map_err(err);
+    }
     let c = state.connector(source).ok_or("Missing credentials")?;
     c.connect().await.map_err(err)
 }

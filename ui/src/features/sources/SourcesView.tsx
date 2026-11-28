@@ -118,14 +118,13 @@ function ServiceRow({ service }: { service: 'spotify' }) {
   }
   return (
     <div data-setting={sourceLabel[service]} className={`flex flex-col gap-3 border-b border-line-soft px-4 py-3.5 ${selected ? 'bg-bg' : ''}`}>
-      <AccountLine on={connected} icon={<SourceIcon source={service} size={16} />} title={sourceLabel[service]} pitch={phoneApp && !connected ? tr('Connect it in Legato on your PC: your playlists come here when your devices sync.') : tr(guides[service].pitch)} state={connected ? tr('Connected') : tr('Not connected')}>
+      <AccountLine on={connected} icon={<SourceIcon source={service} size={16} />} title={sourceLabel[service]} pitch={tr(guides[service].pitch)} state={connected ? tr('Connected') : tr('Not connected')}>
         {connected ? (
           <Button variant="ghost" disabled={busy} onClick={() => void leave()}>
             {tr('Disconnect')}
           </Button>
         ) : (
-          // The wizard's key comes from Spotify's dashboard, its sign-in back through this device's loopback: the PC's.
-          !phoneApp && <Button onClick={() => go({ name: 'settings', section: 'sources', wizard: service })}>{tr('Connect')}</Button>
+          <Button onClick={() => go({ name: 'settings', section: 'sources', wizard: service })}>{tr('Connect')}</Button>
         )}
       </AccountLine>
       {connected && (

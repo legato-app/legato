@@ -620,6 +620,7 @@ const nl: Record<string, string> = {
   'Open the Spotify dashboard': 'Spotify-dashboard openen',
   'Add the redirect address': 'Het omleidingsadres toevoegen',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': 'Plak onder ‘Redirect URIs’ precies dit adres (zonder poort), klik op Add en dan op Save:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': 'Plak onder ‘Redirect URIs’ precies dit adres, klik op Add en dan op Save:',
   'Paste your Client ID': 'Plak je Client ID',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'Settings van je app → Client ID. Het Client secret is niet nodig.',
   'e.g. 3f9a…7c21e': 'bijv. 3f9a…7c21e',

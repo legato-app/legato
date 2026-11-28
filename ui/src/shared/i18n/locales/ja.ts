@@ -620,6 +620,7 @@ const ja: Record<string, string> = {
   'Open the Spotify dashboard': 'Spotifyのダッシュボードを開く',
   'Add the redirect address': 'リダイレクトアドレスを追加',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': '「Redirect URIs」に次のアドレスをそのまま（ポートなしで）貼り付け、Addをクリックしてから、Saveをクリックします：',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': '「Redirect URIs」に次のアドレスをそのまま貼り付け、Addをクリックしてから、Saveをクリックします：',
   'Paste your Client ID': 'Client IDを貼り付け',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'アプリのSettings → Client ID。Client secretは不要です。',
   'e.g. 3f9a…7c21e': '例：3f9a…7c21e',

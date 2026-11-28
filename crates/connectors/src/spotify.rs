@@ -1,4 +1,4 @@
-use crate::oauth::{OAuthClient, OAuthConfig, Opener};
+use crate::oauth::{OAuthClient, OAuthConfig, Opener, SIGN_IN_TIMEOUT};
 use anyhow::Result;
 use async_trait::async_trait;
 use music_core::matching::{best_match, normalize, primary_artist};
@@ -9,10 +9,14 @@ use serde::de::DeserializeOwned;
 use serde_json::json;
 use std::collections::BTreeMap;
 use std::sync::Arc;
+use tokio::sync::mpsc::UnboundedReceiver;
 use url::Url;
 
 // Playlists only: what plays comes from YouTube.
 const SCOPES: &str = "playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public";
+/// Where a phone's sign-in answers: a link that opens the app (the Android manifest's filter). The user adds it to their
+/// Spotify app's redirect addresses (the Connect steps show it).
+pub const PHONE_REDIRECT: &str = "legato://spotify-callback";
 
 #[derive(Deserialize)]
 struct Named {
@@ -87,6 +91,11 @@ impl Spotify {
             extra_auth_params: &[],
         };
         Self { oauth: OAuthClient::new(cfg, store, open), api: api.into() }
+    }
+
+    /// `connect` on a phone: the browser answers by `PHONE_REDIRECT`, which `answers` brings.
+    pub async fn connect_by_link(&self, answers: UnboundedReceiver<String>) -> Result<()> {
+        self.oauth.connect_by_link(PHONE_REDIRECT, answers, SIGN_IN_TIMEOUT).await
     }
 
     async fn get<T: DeserializeOwned>(&self, url: &str) -> Result<T> {

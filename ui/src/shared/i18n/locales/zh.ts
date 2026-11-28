@@ -620,6 +620,7 @@ const zh: Record<string, string> = {
   'Open the Spotify dashboard': '打开 Spotify 控制台',
   'Add the redirect address': '添加重定向地址',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': '在“Redirect URIs”下，原样粘贴此地址（不含端口），点击 Add，然后点击 Save：',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': '在“Redirect URIs”下，原样粘贴此地址，点击 Add，然后点击 Save：',
   'Paste your Client ID': '粘贴你的 Client ID',
   'Your app’s Settings → Client ID. The Client secret is not needed.': '你的应用的 Settings → Client ID。不需要 Client secret。',
   'e.g. 3f9a…7c21e': '例如 3f9a…7c21e',

@@ -21,7 +21,8 @@ export function ConnectWizard({ service, onClose }: { service: 'spotify'; onClos
 
   return (
     <form
-      className="flex w-120 shrink-0 flex-col gap-6 overflow-y-auto border-s border-line bg-panel px-8 py-10"
+      // A phone has no room beside the page: over it.
+      className="flex w-120 shrink-0 flex-col gap-6 overflow-y-auto border-s border-line bg-panel px-8 py-10 phone:fixed phone:inset-0 phone:z-40 phone:w-auto phone:border-s-0 phone:px-5 phone:py-6"
       onSubmit={async (e) => {
         e.preventDefault()
         if (step < last) return setStep(step + 1)

@@ -620,6 +620,7 @@ const ko: Record<string, string> = {
   'Open the Spotify dashboard': 'Spotify 대시보드 열기',
   'Add the redirect address': '리디렉션 주소 추가',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': '\'Redirect URIs\' 아래에 이 주소를 그대로 (포트 없이) 붙여넣고 Add를 클릭한 다음 Save를 클릭하세요:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': '\'Redirect URIs\' 아래에 이 주소를 그대로 붙여넣고 Add를 클릭한 다음 Save를 클릭하세요:',
   'Paste your Client ID': 'Client ID 붙여넣기',
   'Your app’s Settings → Client ID. The Client secret is not needed.': '앱의 Settings → Client ID. Client secret은 필요 없습니다.',
   'e.g. 3f9a…7c21e': '예: 3f9a…7c21e',

@@ -742,6 +742,12 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         `SpotifyFile`). Test: `SpotifyConnect.test.ts`.
   - [x] `S` The website's Connect Spotify privacy row says what differs on the phone (browser, file left where it is),
         2026-11-28.
+  - [x] `M`, 2026-11-28, not tried on a phone: the phone’s Accounts has `Connect` and the same key steps, with the
+        redirect `legato://spotify-callback` (added to the user’s Spotify app beside the PC’s). Same PKCE exchange
+        (`oauth.rs` `connect_by_link`), the manifest’s filter, `RunEvent::Opened` to the waiting sign-in
+        (`protocol.rs`), the token in the Keystore like the others. The Android build compiles (`cargo check`).
+        To see on a phone: the browser comes back to the app, and the app was not stopped meanwhile (else connect
+        again).
 
 **Medium**
 - [ ] `S` Community: GitHub Discussions (on since 2026-11-07, with the "good first issue" label) linked from About, a

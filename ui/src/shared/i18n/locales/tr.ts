@@ -620,6 +620,7 @@ const tr: Record<string, string> = {
   'Open the Spotify dashboard': 'Spotify panelini aç',
   'Add the redirect address': 'Yönlendirme adresini ekle',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': '“Redirect URIs” altına tam olarak bu adresi yapıştır (bağlantı noktası olmadan), Add’e, sonra Save’e tıkla:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': '“Redirect URIs” altına tam olarak bu adresi yapıştır, Add’e, sonra Save’e tıkla:',
   'Paste your Client ID': 'Client ID’ni yapıştır',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'Uygulamanın Settings bölümü → Client ID. Client secret gerekmez.',
   'e.g. 3f9a…7c21e': 'ör. 3f9a…7c21e',

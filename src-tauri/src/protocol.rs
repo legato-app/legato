@@ -17,6 +17,8 @@
 #![cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 
 use std::sync::Mutex;
+#[cfg(any(mobile, test))]
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 /// A link longer than this is dropped (a command line holds 32 767 characters).
 const MAX: usize = 30_000;
@@ -57,6 +59,30 @@ pub fn note(args: &[String]) -> bool {
     let Some(link) = arg_of(args).or_else(|| file_of(args)) else { return false };
     *PENDING.lock().unwrap() = Some(link);
     true
+}
+
+/// A phone's sign-in under way: the links the system opens the app with go to it (a PC's answers on its loopback).
+#[cfg(any(mobile, test))]
+static SIGN_IN: Mutex<Option<UnboundedSender<String>>> = Mutex::new(None);
+
+/// The links to come, for a new sign-in; one still waiting gets none any more.
+#[cfg(any(mobile, test))]
+pub fn sign_in_answers() -> UnboundedReceiver<String> {
+    let (sender, receiver) = unbounded_channel();
+    *SIGN_IN.lock().unwrap() = Some(sender);
+    receiver
+}
+
+/// A link the system opened the app with (a phone): the sign-in waiting reads it; none waiting, dropped. Untrusted: any
+/// app can open one, the sign-in takes its own answer only.
+#[cfg(any(mobile, test))]
+pub fn opened(link: &str) {
+    if arg_of(&[String::new(), link.to_string()]).is_none() {
+        return;
+    }
+    if let Some(sign_in) = SIGN_IN.lock().unwrap().as_ref() {
+        let _ = sign_in.send(link.to_string());
+    }
 }
 
 /// The link (or the remix file's path) a launch carried, once.
@@ -315,6 +341,30 @@ mod tests {
         assert!(lite["bundle"]["linux"]["deb"]["files"].is_null());
         let entry = include_str!("../linux/legato-lite.desktop");
         assert!(entry.contains("\nExec={{exec}} %u") && !entry.contains("MimeType="));
+    }
+
+    #[test]
+    fn a_phones_sign_in_gets_the_links_opened_while_it_waits() {
+        opened("legato://spotify-callback?state=early");
+        let mut first = sign_in_answers();
+        opened("legato://spotify-callback?code=C&state=S");
+        opened("https://example.test/not-ours");
+        assert_eq!(first.try_recv().ok().as_deref(), Some("legato://spotify-callback?code=C&state=S"));
+        assert!(first.try_recv().is_err());
+        // A newer one takes over: the first learns nothing more is coming.
+        let mut second = sign_in_answers();
+        assert!(matches!(first.try_recv(), Err(tokio::sync::mpsc::error::TryRecvError::Disconnected)));
+        opened("legato://spotify-callback?state=T");
+        assert!(second.try_recv().is_ok());
+    }
+
+    #[test]
+    fn the_android_app_and_the_connect_steps_name_the_phones_redirect() {
+        let redirect = music_connectors::spotify::PHONE_REDIRECT;
+        let address = tauri::Url::parse(redirect).unwrap();
+        let filter = format!("<data android:scheme=\"{}\" android:host=\"{}\" />", address.scheme(), address.host_str().unwrap());
+        assert!(include_str!("../gen/android/app/src/main/AndroidManifest.xml").contains(&filter), "{filter}");
+        assert!(include_str!("../../ui/src/features/sources/guides.ts").contains(&format!("'{redirect}'")));
     }
 
     #[test]

@@ -585,6 +585,7 @@ const he: Record<string, string> = {
   'Open the Spotify dashboard': 'פתיחת לוח Spotify',
   'Add the redirect address': 'הוספת כתובת ההפניה',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': 'תחת ״Redirect URIs״, הדביקו בדיוק את הכתובת הזו (בלי פורט), לחצו ״Add״ ואז ״Save״:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': 'תחת ״Redirect URIs״, הדביקו בדיוק את הכתובת הזו, לחצו ״Add״ ואז ״Save״:',
   'Paste your Client ID': 'הדביקו את ה-Client ID',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'ההגדרות של האפליקציה שלכם ‹ Client ID. אין צורך ב-Client secret.',
   'e.g. 3f9a…7c21e': 'לדוגמה: 3f9a…7c21e',

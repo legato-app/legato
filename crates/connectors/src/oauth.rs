@@ -9,6 +9,7 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
+use tokio::sync::mpsc::UnboundedReceiver;
 use url::{Url, form_urlencoded};
 
 /// Opens URL in user's browser.
@@ -37,6 +38,31 @@ pub struct OAuthTokens {
 
 fn now_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64
+}
+
+/// How long a sign-in waits for the user's answer.
+pub const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(300);
+
+/// A sign-in's own `state`: an answer without it is not its answer.
+fn new_state() -> String {
+    URL_SAFE_NO_PAD.encode(rand::random::<[u8; 16]>())
+}
+
+/// What an authorization answer says: the `name` it carries along with this sign-in's `state`, else why not.
+fn answered(answer: &Url, name: &str, state: &str) -> Result<String> {
+    let query: HashMap<String, String> = answer.query_pairs().into_owned().collect();
+    let value = query.get(name).filter(|_| query.get("state").is_some_and(|given| given == state));
+    value.cloned().ok_or_else(|| anyhow!(query.get("error").cloned().unwrap_or_else(|| "Invalid OAuth response".into())))
+}
+
+/// `link` as this sign-in's answer: the redirect address with its `state`. None: another link, or another sign-in's.
+fn answer_to(link: &str, redirect: &str, state: &str) -> Option<Url> {
+    let rest = link.strip_prefix(redirect)?;
+    if !(rest.starts_with('?') || rest.starts_with("/?")) {
+        return None;
+    }
+    let answer = Url::parse(link).ok()?;
+    answer.query_pairs().any(|(name, value)| name == "state" && value == state).then_some(answer)
 }
 
 pub fn pkce() -> (String, String) {
@@ -72,7 +98,7 @@ pub async fn loopback_on(
     open: impl FnOnce(&str) -> Result<()>,
     timeout: Duration,
 ) -> Result<(String, String)> {
-    let state = URL_SAFE_NO_PAD.encode(rand::random::<[u8; 16]>());
+    let state = new_state();
     let listener = TcpListener::bind(("127.0.0.1", port)).await.with_context(|| format!("Port {port} is busy: close what uses it and try again"))?;
     let redirect = format!("http://127.0.0.1:{}/callback", listener.local_addr()?.port());
     open(&build_url(&redirect, &state))?;
@@ -88,18 +114,14 @@ pub async fn loopback_on(
                 sock.write_all(b"HTTP/1.1 404 Not Found\r\ncontent-length: 0\r\nconnection: close\r\n\r\n").await?;
                 continue;
             }
-            let q: HashMap<String, String> = url.query_pairs().into_owned().collect();
-            let code = q.get(name).filter(|_| q.get("state") == Some(&state));
+            let code = answered(&url, name, &state);
             let (status, body) = match code {
-                Some(_) => ("200 OK", "<p>Account connected. You can close this tab.</p>"),
-                None => ("400 Bad Request", "<p>Connection failed.</p>"),
+                Ok(_) => ("200 OK", "<p>Account connected. You can close this tab.</p>"),
+                Err(_) => ("400 Bad Request", "<p>Connection failed.</p>"),
             };
             let head = format!("HTTP/1.1 {status}\r\ncontent-type: text/html; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n", body.len());
             sock.write_all(format!("{head}{body}").as_bytes()).await?;
-            return match code {
-                Some(c) => Ok((c.clone(), redirect)),
-                None => Err(anyhow!(q.get("error").cloned().unwrap_or_else(|| "Invalid OAuth response".into()))),
-            };
+            return code.map(|code| (code, redirect));
         }
     })
     .await
@@ -134,29 +156,49 @@ impl OAuthClient {
     /// `connect` with the callback on a fixed port (0 = any).
     pub async fn connect_on(&self, port: u16) -> Result<()> {
         let (verifier, challenge) = pkce();
-        let (code, redirect) = loopback_on(
-            port,
-            "code",
-            |redirect, state| {
-                let mut u = Url::parse(&self.cfg.auth_url).expect("static auth url");
-                u.query_pairs_mut()
-                    .extend_pairs([
-                        ("client_id", self.cfg.client_id.as_str()),
-                        ("response_type", "code"),
-                        ("redirect_uri", redirect),
-                        ("state", state),
-                        ("scope", self.cfg.scope),
-                        ("code_challenge_method", "S256"),
-                        ("code_challenge", &challenge),
-                    ])
-                    .extend_pairs(self.cfg.extra_auth_params);
-                u.into()
-            },
-            |url| (self.open)(url),
-            Duration::from_secs(300),
-        )
-        .await?;
-        let params = [("grant_type", "authorization_code"), ("code", &code), ("redirect_uri", &redirect), ("code_verifier", &verifier)];
+        let (code, redirect) = loopback_on(port, "code", |redirect, state| self.authorize_url(redirect, state, &challenge), |url| (self.open)(url), SIGN_IN_TIMEOUT).await?;
+        self.exchange(&code, &redirect, &verifier).await
+    }
+
+    /// `connect` whose answer comes back as a link to the app itself (`redirect`, a phone's): `answers` brings the links
+    /// the system opens the app with. Any but this sign-in's answer is waited past.
+    pub async fn connect_by_link(&self, redirect: &str, mut answers: UnboundedReceiver<String>, timeout: Duration) -> Result<()> {
+        let (verifier, challenge) = pkce();
+        let state = new_state();
+        (self.open)(&self.authorize_url(redirect, &state, &challenge))?;
+        let code = tokio::time::timeout(timeout, async {
+            loop {
+                let link = answers.recv().await.context("Another sign-in was started")?;
+                if let Some(answer) = answer_to(&link, redirect, &state) {
+                    return answered(&answer, "code", &state);
+                }
+            }
+        })
+        .await
+        .context("Sign-in timed out")??;
+        self.exchange(&code, redirect, &verifier).await
+    }
+
+    /// The provider's page where the user allows the app.
+    fn authorize_url(&self, redirect: &str, state: &str, challenge: &str) -> String {
+        let mut url = Url::parse(&self.cfg.auth_url).expect("static auth url");
+        url.query_pairs_mut()
+            .extend_pairs([
+                ("client_id", self.cfg.client_id.as_str()),
+                ("response_type", "code"),
+                ("redirect_uri", redirect),
+                ("state", state),
+                ("scope", self.cfg.scope),
+                ("code_challenge_method", "S256"),
+                ("code_challenge", challenge),
+            ])
+            .extend_pairs(self.cfg.extra_auth_params);
+        url.into()
+    }
+
+    /// The answer's code for tokens, kept in the store.
+    async fn exchange(&self, code: &str, redirect: &str, verifier: &str) -> Result<()> {
+        let params = [("grant_type", "authorization_code"), ("code", code), ("redirect_uri", redirect), ("code_verifier", verifier)];
         self.token_request(&params, None).await.map(drop)
     }
 
@@ -324,6 +366,64 @@ pub(crate) mod tests {
         token.assert_async().await;
         let saved: OAuthTokens = store.load("svc").unwrap();
         assert_eq!((saved.access_token.as_str(), saved.refresh_token.as_deref()), ("AT", Some("RT")));
+    }
+
+    /// A phone's browser: reads the page asked for, then opens links back (`answers` them with the page's own state).
+    fn phone_browser(links: fn(&str) -> Vec<String>) -> (Opener, UnboundedReceiver<String>) {
+        let (sender, receiver) = tokio::sync::mpsc::unbounded_channel();
+        let opener: Opener = Arc::new(move |page| {
+            let query: HashMap<String, String> = Url::parse(page)?.query_pairs().into_owned().collect();
+            assert_eq!(query["redirect_uri"], "legato://spotify-callback");
+            assert_eq!(query["code_challenge_method"], "S256");
+            for link in links(&query["state"]) {
+                sender.send(link)?;
+            }
+            Ok(())
+        });
+        (opener, receiver)
+    }
+
+    #[tokio::test]
+    async fn a_link_back_to_the_app_signs_in_with_the_same_exchange() {
+        let mut server = mockito::Server::new_async().await;
+        let token = server
+            .mock("POST", "/token")
+            .match_body(Matcher::AllOf(vec![
+                Matcher::UrlEncoded("code".into(), "CODE".into()),
+                Matcher::UrlEncoded("redirect_uri".into(), "legato://spotify-callback".into()),
+                Matcher::Regex("code_verifier=[\\w-]{43}".into()),
+            ]))
+            .with_body(r#"{"access_token":"AT","refresh_token":"RT","expires_in":3600}"#)
+            .create_async()
+            .await;
+        // Another app's link, another sign-in's answer and a look-alike address are waited past.
+        let (opener, answers) = phone_browser(|state| {
+            vec![
+                "legato://spotify-callback?code=OTHER&state=old".into(),
+                format!("legato://spotify-callback.example?code=OTHER&state={state}"),
+                format!("legato://spotify-callback?code=CODE&state={state}"),
+            ]
+        });
+        let store: Arc<dyn SecretStore> = Arc::new(MemoryStore::default());
+        let client = OAuthClient::new(cfg(&server, None), store.clone(), opener);
+        client.connect_by_link("legato://spotify-callback", answers, Duration::from_secs(5)).await.unwrap();
+        token.assert_async().await;
+        assert_eq!(store.load::<OAuthTokens>("svc").unwrap().access_token, "AT");
+    }
+
+    #[tokio::test]
+    async fn a_refusal_by_link_fails_the_sign_in_and_silence_times_out() {
+        let server = mockito::Server::new_async().await;
+        let store: Arc<dyn SecretStore> = Arc::new(MemoryStore::default());
+        let (opener, answers) = phone_browser(|state| vec![format!("legato://spotify-callback?error=access_denied&state={state}")]);
+        let refused = OAuthClient::new(cfg(&server, None), store.clone(), opener).connect_by_link("legato://spotify-callback", answers, Duration::from_secs(5)).await;
+        assert_eq!(refused.unwrap_err().to_string(), "access_denied");
+        let (opener, answers) = phone_browser(|_| vec![]);
+        // The browser keeps the sending end: nothing comes, until the time is up.
+        let client = OAuthClient::new(cfg(&server, None), store.clone(), opener);
+        let silent = client.connect_by_link("legato://spotify-callback", answers, Duration::from_millis(50)).await;
+        assert_eq!(silent.unwrap_err().to_string(), "Sign-in timed out");
+        assert!(store.get("svc").is_none());
     }
 
     #[tokio::test]

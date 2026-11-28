@@ -620,6 +620,7 @@ const it: Record<string, string> = {
   'Open the Spotify dashboard': 'Apri la dashboard di Spotify',
   'Add the redirect address': 'Aggiungi l\'indirizzo di reindirizzamento',
   'Under “Redirect URIs”, paste exactly this address (no port), click Add, then Save:': 'In «Redirect URIs», incolla esattamente questo indirizzo (senza porta), fai clic su Add, poi su Save:',
+  'Under “Redirect URIs”, paste exactly this address, click Add, then Save:': 'In «Redirect URIs», incolla esattamente questo indirizzo, fai clic su Add, poi su Save:',
   'Paste your Client ID': 'Incolla il tuo Client ID',
   'Your app’s Settings → Client ID. The Client secret is not needed.': 'Settings della tua app → Client ID. Il Client secret non serve.',
   'e.g. 3f9a…7c21e': 'es. 3f9a…7c21e',
