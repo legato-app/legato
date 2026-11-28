@@ -10,6 +10,7 @@ import { Dialog } from '../../shared/ui/Dialog'
 import { Card } from './Card'
 import { ListPick } from './ListPick'
 import { firstPageStep, PageReadDialogs, usePageRead, type PageStep } from './pageRead'
+import { offered } from '../../shared/liteCuts'
 
 // Liked Songs has no playlist of its own on Spotify (music_core::spotify_export::LIKED, spotify_page::LIKED).
 const LIKED = 'liked'
@@ -31,7 +32,11 @@ const TROUBLES: Record<Exclude<ExportTrouble, 'closed'>, string> = {
  * Spotify's own page read (against its rules, the dialog says so; src-tauri/src/spotify_web.rs), lists ticked here.
  * Its button goes wherever Spotify is offered: Add music, Settings › Accounts.
  */
-export function SpotifyImport({ label, className }: { label: string; className?: string }) {
+export function SpotifyImport(props: { label: string; className?: string }) {
+  return offered('playerPageImports') ? <SpotifyPageImport {...props} /> : null
+}
+
+function SpotifyPageImport({ label, className }: { label: string; className?: string }) {
   const [step, setStep] = useState<Step>()
   const [lists, setLists] = useState<SpotifyList[]>([])
   const [trouble, setTrouble] = useState<Exclude<ExportTrouble, 'closed'>>('down')

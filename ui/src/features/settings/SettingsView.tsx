@@ -46,7 +46,7 @@ import { LanguagePicker } from './LanguagePicker'
 import { ask } from '../../shared/ui/Ask'
 import { ROW, ROW_TEXT } from './rowStyle'
 import { notifyError } from '../../app/notifyError'
-import { isCutSetting, offered } from '../../shared/liteCuts'
+import { isCutSection, isCutSetting, offered } from '../../shared/liteCuts'
 
 const ICONS: Record<Category, ReactNode> = {
   general: <GearSix size={15} />,
@@ -215,9 +215,9 @@ function Appearance() {
       )}
       </Group>
       {/* Only Windows gives an accent to read: no Windows chip on the phone, and one synced from a PC shows the theme's. */}
-      <Group title={msg('Accent color')} hint={s.accent === 'system' && !phoneApp ? tr('from Windows') : s.accent === 'cover' ? tr('from the cover') : s.accent && s.accent !== 'system' ? s.accent : tr('from theme')}>
+      <Group title={msg('Accent color')} hint={s.accent === 'system' && !phoneApp && offered('systemAccent') ? tr('from Windows') : s.accent === 'cover' ? tr('from the cover') : s.accent && s.accent !== 'system' ? s.accent : tr('from theme')}>
         <div className="flex flex-wrap items-center gap-2">
-          {([['system', 'Windows'], [null, msg('Theme')], ['cover', msg('Cover')]] as const).filter(([value]) => !phoneApp || value !== 'system').map(([value, label]) => (
+          {([['system', 'Windows'], [null, msg('Theme')], ['cover', msg('Cover')]] as const).filter(([value]) => value !== 'system' || (!phoneApp && offered('systemAccent'))).map(([value, label]) => (
             <button key={label} onClick={() => update({ accent: value })} aria-pressed={s.accent === value} className={`rounded-full px-3 py-1.5 text-xs font-medium ${s.accent === value ? 'bg-ink text-bg' : 'border border-line'}`}>
               {tr(label)}
             </button>
@@ -1119,7 +1119,7 @@ export function SettingsView({ section }: { section: SettingsSection }) {
           {/* The phone: the sections in one row scrolled sideways, to the scroller's edges (they took four rows). Wider
               than its scroller (-mx-4) moved the whole page 8 px sideways. no-scrollbar plain: not a utility, no variant. */}
           <div className="no-scrollbar contents phone:-mx-2 phone:flex phone:w-[calc(100%+1rem)] phone:gap-1.5 phone:overflow-x-auto phone:px-2">
-            {sections.filter((s) => !phoneApp || !DESKTOP_ONLY_SECTIONS.has(s.id)).map((s) => (
+            {sections.filter((s) => (!phoneApp || !DESKTOP_ONLY_SECTIONS.has(s.id)) && !isCutSection(s.id)).map((s) => (
               <button key={s.id} aria-current={s.id === page ? 'page' : undefined} onClick={() => go({ name: 'settings', section: s.id })} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-start phone:min-h-10 phone:shrink-0 phone:gap-2 phone:rounded-full phone:whitespace-nowrap ${s.id === section ? 'bg-raised font-semibold' : 'text-ink-2 hover:text-ink'}`}>
                 {s.icon} <span className="flex-1">{tr(s.label)}</span>
                 {s.id === 'sources' && signIn && <span title={tr('A service needs you to sign in again')} className="size-2 rounded-full bg-danger" />}

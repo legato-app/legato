@@ -2,10 +2,11 @@ import { readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import type { Cut } from './liteCuts'
 
-// One edition per `load`: the cuts are worked out when the modules are first imported.
-async function load(lite: boolean) {
+// One build per `load`: the cuts are worked out when the modules are first imported.
+async function load(lite: boolean, linux = false) {
   vi.resetModules()
   vi.doMock('./edition', () => ({ LITE: lite }))
+  vi.doMock('./platform', async () => ({ ...(await vi.importActual<typeof import('./platform')>('./platform')), linuxApp: linux }))
   return {
     cuts: await import('./liteCuts'),
     keys: await import('../app/keys'),
@@ -13,6 +14,7 @@ async function load(lite: boolean) {
     search: await import('../features/settings/search'),
     menus: await import('./ui/menuShape'),
     theme: await import('./theme/theme'),
+    platform: await import('./platform'),
     books: await import('../features/books/books'),
   }
 }
@@ -87,6 +89,53 @@ describe('Legato Lite', () => {
     const saved = lite.theme.sanitize({ visualizer: true, podcasts: true, livingRoom: true, editor: true, shortcuts: { karaoke: { keys: 'KeyJ' } } })
     expect(saved).toMatchObject({ visualizer: true, podcasts: true, livingRoom: true, editor: true })
     expect(saved.shortcuts.karaoke?.keys).toBe('KeyJ')
+  })
+})
+
+describe('Legato on Linux', () => {
+  let linux: Edition
+  beforeAll(async () => {
+    linux = await load(false, true)
+  })
+
+  it('shows, finds and binds nothing that is missing there, and keeps the rest', () => {
+    const missing = Object.values<Cut>(linux.platform.MISSING_ON_LINUX)
+    const found = linux.search.SETTINGS_INDEX
+    for (const id of missing.flatMap((cut) => cut.settings ?? [])) {
+      expect(linux.catalog.categoryOf(id) ?? linux.catalog.groupDef(id), id).toBeDefined()
+      expect(linux.cuts.isCutSetting(id), id).toBe(true)
+      expect(found.some((entry) => entry.label === id), id).toBe(false)
+    }
+    for (const section of missing.flatMap((cut) => cut.sections ?? [])) {
+      expect(linux.catalog.CATEGORIES.some((category) => category.id === section), section).toBe(true)
+      expect(found.some((entry) => entry.section === section), section).toBe(false)
+    }
+    expect(linux.keys.OFFERED_ACTIONS.map((action) => action.id)).not.toContain('voice')
+    for (const feature of Object.keys(linux.platform.MISSING_ON_LINUX)) expect(linux.cuts.offered(feature as 'watchPage'), feature).toBe(false)
+    expect(linux.cuts.offered('podcasts')).toBe(true)
+    expect(found.some((entry) => entry.label === 'Podcasts')).toBe(true)
+  })
+
+  it('adds up with Lite', async () => {
+    const both = await load(true, true)
+    expect(both.cuts.offered('podcasts')).toBe(false)
+    expect(both.cuts.offered('voiceSearch')).toBe(false)
+  })
+
+  it('is told by WebKitGTK’s user agent only', async () => {
+    const isLinuxApp = async (userAgent: string) => {
+      vi.stubGlobal('navigator', { userAgent })
+      vi.resetModules()
+      const platform = await vi.importActual<typeof import('./platform')>('./platform')
+      vi.unstubAllGlobals()
+      return platform.linuxApp
+    }
+    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15')).toBe(true)
+    // Linux browsers (the website's demo), Android, Windows.
+    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36')).toBe(false)
+    expect(await isLinuxApp('Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0')).toBe(false)
+    expect(await isLinuxApp('Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 Chrome/140.0 Mobile')).toBe(false)
+    expect(await isLinuxApp('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Edg/140.0')).toBe(false)
   })
 })
 

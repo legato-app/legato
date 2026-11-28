@@ -59,6 +59,7 @@ import { addBookmark, bookmarkTime, goToBookmark, momentNow, removeBookmark, use
 import { artistBlocked } from './player/blockedArtists'
 import { notifyError } from '../app/notifyError'
 import { copyText } from '../app/copyText'
+import { isCutSection } from '../shared/liteCuts'
 
 const app = () => useStore.getState()
 const player = () => usePlayer.getState()
@@ -740,7 +741,7 @@ export function folderMenu(f: PlaylistFolder, playlists: LibraryPlaylist[]): Men
 
 /** Settings' sections and their names (the search bar's commands name them too). */
 // Privacy: reached from its own links, not a sidebar entry's menu.
-export const SETTINGS_SECTIONS: [SettingsSection, string][] = CATEGORIES.filter((c) => c.id !== 'privacy').map((c) => [c.id, c.label])
+export const SETTINGS_SECTIONS: [SettingsSection, string][] = CATEGORIES.filter((c) => c.id !== 'privacy' && !isCutSection(c.id)).map((c) => [c.id, c.label])
 
 /** Sidebar entries (Home, Songs, Settings…): open it; its songs when it has some; settings sections; counts on/off. */
 export function navMenu(to: View, tracks?: LibraryTrack[]): MenuEntry[] {

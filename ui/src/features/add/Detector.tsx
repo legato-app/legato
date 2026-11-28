@@ -13,6 +13,7 @@ import { Card } from './Card'
 import { msg, tr } from '../../shared/i18n/i18n'
 import { phoneApp } from '../../shared/platform'
 import { askMic, openAppInfo } from './phoneMic'
+import { offered } from '../../shared/liteCuts'
 
 const DASHBOARD = 'https://dashboard.audd.io/'
 const SECONDS = 10
@@ -109,10 +110,10 @@ export function Detector({ onFound }: { onFound: (t: Track) => void }) {
 
   // A phone listens through its microphone only (no loopback there).
   const stored = useSettings((s) => s.settings.detectorInput)
-  const input = phoneApp ? 'mic' : stored
+  const input = phoneApp || !offered('listenToThisPc') ? 'mic' : stored
   const listen = async () => {
     if (busy.current) return
-    const from = phoneApp ? 'mic' : useSettings.getState().settings.detectorInput
+    const from = phoneApp || !offered('listenToThisPc') ? 'mic' : useSettings.getState().settings.detectorInput
     if (!allowed(from)) return setPhase({ name: 'consent', input: from })
     busy.current = true
     // Android's dialog, once.
@@ -192,7 +193,7 @@ export function Detector({ onFound }: { onFound: (t: Track) => void }) {
           {phase.name === 'note' && (
             <p className="text-xs text-ink">
               {phase.text}{' '}
-              {phase.mic && !phoneApp && (
+              {phase.mic && !phoneApp && offered('windowsSettings') && (
                 <button onClick={() => void api.openWindowsSettings('microphone')} className="font-medium underline-offset-2 hover:underline">
                   {tr('Open Windows settings')}
                 </button>
@@ -205,7 +206,7 @@ export function Detector({ onFound }: { onFound: (t: Track) => void }) {
             </p>
           )}
           <div className="mt-auto flex flex-col items-start gap-3">
-            {!phoneApp && (
+            {!phoneApp && offered('listenToThisPc') && (
               <Segmented
                 label={tr('Listen to')}
                 value={input}

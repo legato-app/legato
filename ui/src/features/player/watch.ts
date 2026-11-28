@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { api, type WatchCmd, type WatchRect, type WatchReport } from '../../shared/api'
 import type { YtUpdate } from './youtube'
 import { tr } from '../../shared/i18n/i18n'
+import { offered } from '../../shared/liteCuts'
 
 /**
  * Videos whose owner turned embedding off (player errors 101 / 150) play from YouTube's own watch page, in a webview
@@ -61,6 +62,8 @@ export function physical(r: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>, 
 
 /** Opens `video` from `startS` over `rect` (CSS px), or hidden (null: cover mode). */
 export function openWatch(video: string, startS: number, rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'> | null) {
+  // No watch page here (Linux): told like one that failed to open, another upload is tried.
+  if (!offered('watchPage')) return Promise.reject(new Error('No watch page on this system'))
   useWatch.setState({ video })
   const r = rect && physical(rect, devicePixelRatio)
   placed = JSON.stringify(r)

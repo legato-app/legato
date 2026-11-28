@@ -166,7 +166,7 @@ function TopBar({ brand, bare, order, choice }: { brand: boolean; bare: boolean;
     search: (
       <div ref={searchBox} data-tauri-drag-region className={`flex h-full min-w-0 flex-1 items-center justify-center px-4 phone:px-1 *:translate-x-(--shift) ${snap ? '' : '*:transition-[translate] *:duration-300'}`} style={{ ['--shift' as string]: `${shift}px` }}>
         <SearchBar>
-          <VoiceSearch />
+          {(offered('voiceSearch') || offered('musicDetector')) && <VoiceSearch />}
         </SearchBar>
       </div>
     ),

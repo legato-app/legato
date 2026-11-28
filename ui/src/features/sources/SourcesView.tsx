@@ -818,9 +818,9 @@ export function SourcesView() {
       <div className="rounded-xl border border-line bg-raised">
         <GoogleAccounts />
         {/* An import in a window: none on the phone (FromPc). */}
-        {!phoneApp && <SpotifyWithoutKey />}
+        {!phoneApp && offered('playerPageImports') && <SpotifyWithoutKey />}
         <ServiceRow service="spotify" />
-        <AppleWeb />
+        {offered('playerPageImports') && <AppleWeb />}
         <LastfmRow />
         <ListenbrainzRow />
         {/* Discord's sign-in is the PC's only (the loopback page of its OAuth). */}

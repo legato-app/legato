@@ -62,6 +62,6 @@ export function useLiveSync() {
   useEffect(() => {
     // Bypassed edits keep processing attached: A / B switches at once. Levels alone (moving cover, early ends) only listen.
     const process = adaptiveSound || levelling !== 'off' || !neutral({ ...effects, on: true })
-    sendLive({ on: process || coverPulse || viz || meter, levels: process || coverPulse || meter, ends: earlyEnds || skipSilence, listen: !process, adaptive: adaptiveSound, targetLufs: adaptiveLevel, viz, fine, wave, youtube: liveYoutube, effects })
+    sendLive({ on: process || coverPulse || viz || meter, levels: process || coverPulse || meter, ends: earlyEnds || skipSilence, listen: !process, adaptive: adaptiveSound, targetLufs: adaptiveLevel, viz, fine, wave, youtube: liveYoutube && offered('youtubeSound'), effects })
   }, [levelling, adaptiveSound, adaptiveLevel, coverPulse, earlyEnds, skipSilence, liveYoutube, effects, viz, meter, fine, wave])
 }

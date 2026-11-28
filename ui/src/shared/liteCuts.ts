@@ -1,14 +1,19 @@
-// What Legato Lite leaves out (plan-v2 "A Lite build"), in one table: pages, shortcuts, settings, right-click items and
-// start-up modules read it. Saved settings, shortcuts and menu layouts keep their values: Lite only stops showing and
-// running what is listed here, so a full app's data comes back untouched. Pure: no `window`, imported by tests.
+// What this build leaves out: Legato Lite's cuts (plan-v2 "A Lite build", below) and what Linux lacks (`platform.ts`).
+// Pages, shortcuts, settings, right-click items and start-up modules read it. Saved settings, shortcuts and menu layouts
+// keep their values: nothing listed is shown or run, so the data of a build that has it comes back untouched. Pure: no
+// `window`, imported by tests.
 import type { ActionId } from '../app/keys'
+import type { SettingsSection } from '../app/store'
 import { LITE } from './edition'
+import { linuxApp, MISSING_ON_LINUX } from './platform'
 import type { MenuKind } from './ui/menuShape'
 
 export interface Cut {
   /** Keys of `app/pages.ts`' loaders (a view's name where it is a page). */
   pages?: string[]
   shortcuts?: ActionId[]
+  /** Whole pages of Settings. */
+  sections?: SettingsSection[]
   /** Ids of `features/settings/catalog.ts`: rows and groups. */
   settings?: string[]
   /** Item ids of `ui/menuShape.ts`, cut from every kind of menu. */
@@ -46,12 +51,12 @@ export const LITE_CUTS = {
   audiobooks: { pages: ['books'], menuItems: ['audiobooks'], settings: ['Audiobooks'] },
 } satisfies Record<string, Cut>
 
-export type Feature = keyof typeof LITE_CUTS
+export type Feature = keyof typeof LITE_CUTS | keyof typeof MISSING_ON_LINUX
 
-/** False in Lite for a cut feature: for the buttons and rules no table above reaches. */
-export const offered = (feature: Feature) => !(LITE && feature in LITE_CUTS)
+/** False for a feature Lite cuts or Linux lacks: for the buttons and rules no table reaches. */
+export const offered = (feature: Feature) => !(LITE && feature in LITE_CUTS) && !(linuxApp && feature in MISSING_ON_LINUX)
 
-const cuts: Cut[] = LITE ? Object.values(LITE_CUTS) : []
+const cuts: Cut[] = [...(LITE ? Object.values(LITE_CUTS) : []), ...(linuxApp ? Object.values(MISSING_ON_LINUX) : [])]
 const cutBy = (list: (cut: Cut) => readonly string[] | undefined) => {
   const names = new Set(cuts.flatMap((cut) => list(cut) ?? []))
   return (name: string) => names.has(name)
@@ -60,6 +65,7 @@ const cutBy = (list: (cut: Cut) => readonly string[] | undefined) => {
 export const isCutPage = cutBy((cut) => cut.pages)
 export const isCutShortcut = cutBy((cut) => cut.shortcuts)
 export const isCutSetting = cutBy((cut) => cut.settings)
+export const isCutSection = cutBy((cut) => cut.sections)
 export const isCutMenuItem = cutBy((cut) => cut.menuItems)
 export const isCutMenuKind = cutBy((cut) => cut.menuKinds)
 export const isCutStarter = cutBy((cut) => cut.starters)

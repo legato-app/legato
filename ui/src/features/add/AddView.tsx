@@ -285,7 +285,7 @@ export function AddView() {
           {phoneApp && <FromPc />}
           {phoneApp && <PhoneMusic />}
           <SpotifyConnect />
-          {!phoneApp && <AppleConnect />}
+          {!phoneApp && offered('playerPageImports') && <AppleConnect />}
           <ImportList />
           <AppFileImport />
           <ImportCode />
