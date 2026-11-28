@@ -1643,6 +1643,7 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
   it needs the account token, which is dropped at the pick on purpose (only the server's own token is kept). Keeping
   the account token longer widens what a keychain leak gives: not for a call we can't check. The privacy row already
   tells the user to remove the device at plex.tv.
+      (checked 2026-11-28: jellyfin.rs:300, plex.rs:483 and subsonic.rs:362 have search; src-tauri/src/catalog_search.rs does not call them)
 - [ ] `S` Plex's JWT sign-in (clients.plex.tv, a device key pair, the token refreshed each week) if Plex retires
   the legacy PIN's long-lived tokens.
 - [ ] `S` Your music server in the app's search (`Conn::search` built for the three kinds, not wired). Decided alone
