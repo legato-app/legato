@@ -47,6 +47,10 @@ src-tauri/              thin shell: commands, keychain, WebView2 hook, media pan
 ## Layout details (moved from CLAUDE.md, 2026-11-11)
 
 - `crates/core`: models, matching (ISRC, then title + artist + duration), the library (rusqlite), sync.
+- Sync: a PC that joins a sync takes the others' settings instead of writing its own over them (`crates/core/src/syncmode.rs`,
+  `src-tauri/src/devices.rs`, `bc5c271d`; `docs/sync-mode.md`).
+- Backups: `open_backup` (`crates/core/src/library.rs`) reads a backup file; Settings › General › Add from a backup merges it
+  into the library, removing nothing, with its settings if chosen (`src-tauri/src/backup.rs`, `7d32c78d`, `7723f222`).
 - `crates/connectors`: one module per service or site, the shared OAuth PKCE loopback.
 - `crates/player`: rodio/symphonia, gapless queue, server streams, Music Detector clips.
 - `crates/dsp`: live processing, loudness, visualizer bands. `crates/shield`: ad blocker and page scripts.
