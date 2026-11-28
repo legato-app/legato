@@ -7,12 +7,13 @@ const cleanOnce = (css: string) =>
     .replace(/@import[^;]*;?/gi, '')
     .replace(/url\(\s*(['"]?)(?!data:image\/)[^)]*\)/gi, 'none')
     .replace(/expression\s*\(|-moz-binding|behavior\s*:/gi, '')
-    .replace(/<\/?style/gi, '')
+    // One character, escaped as CSS reads it: no removal that could join its neighbors into the tag again.
+    .replace(/<(?=\/?style)/gi, '\\3C ')
 
 /**
  * CSS from outside the app (plugins, themes): comments, @import, links (url(), except data: images, and the app's
- * own image scheme when allowed), old script hooks and anything that could close the <style> taken out. Again until
- * nothing changes: a removal can join the pieces around it into a banned one. Set as text, never parsed as HTML. Pure.
+ * own image scheme when allowed) and old script hooks taken out, a `<` that would open or close a <style> escaped. Again
+ * until nothing changes: a removal can join the pieces around it into a banned one. Set as text, never parsed as HTML. Pure.
  */
 export function cleanCss(raw: unknown, max = 100_000): string {
   let css = typeof raw === 'string' ? raw.slice(0, max) : ''
