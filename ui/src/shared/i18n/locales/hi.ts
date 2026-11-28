@@ -2728,6 +2728,11 @@ const hi: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'कास्ट स्पीकर वेबकैम क्यूआर पेयर',
   'pages modes podcasts audiobooks blind test focus living room tv': 'पेज मोड पॉडकास्ट ऑडियोबुक ब्लाइंड टेस्ट फ़ोकस लिविंग रूम टीवी',
   'discord share profile': 'डिस्कॉर्ड शेयर प्रोफ़ाइल',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'इसे फ़ोन के कैमरे से स्कैन करें; फ़ोन इसी PC वाले नेटवर्क पर होना चाहिए।',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'एक ही Wi-Fi या नेटवर्क, बोलकर बताने के लिए 6 अंकों का कोड।',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': ऐप बैकग्राउंड या ट्रे में हो तब भी। बदलने के लिए किसी कुंजी पर क्लिक करें, Backspace उसे हटाता है।',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'माइक्रोफ़ोन नहीं खुल सका: जाँचें कि एक जुड़ा है और आपका सिस्टम ऐप्स को उसे इस्तेमाल करने देता है।',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'कैमरा नहीं खुल सका: जाँचें कि एक जुड़ा है और आपका सिस्टम ऐप्स को उसे इस्तेमाल करने देता है।',
 }
 
 export default hi

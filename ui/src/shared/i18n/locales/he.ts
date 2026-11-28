@@ -2668,6 +2668,11 @@ const he: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'שידור רמקולים מצלמה קוד צימוד',
   'pages modes podcasts audiobooks blind test focus living room tv': 'דפים מצבים פודקאסטים ספרי שמע מבחן ריכוז סלון טלוויזיה',
   'discord share profile': 'דיסקורד שיתוף פרופיל',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'סרקו אותו במצלמת הטלפון; הטלפון חייב להיות באותה רשת כמו המחשב הזה.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'אותו Wi-Fi או אותה רשת, וקוד בן 6 ספרות להקראה.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': גם כשהאפליקציה ברקע או במגש המערכת. לחצו על מקש כדי לשנות אותו, Backspace מסיר אותו.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'לא ניתן היה לפתוח את המיקרופון: בדקו שמחובר מיקרופון ושהמערכת מאפשרת לאפליקציות להשתמש בו.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'לא ניתן היה לפתוח את המצלמה: בדקו שמחוברת מצלמה ושהמערכת מאפשרת לאפליקציות להשתמש בה.',
 }
 
 export default he

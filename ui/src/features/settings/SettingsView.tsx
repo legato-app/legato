@@ -37,7 +37,7 @@ import { searchSettings, type SettingEntry } from './search'
 import { CATEGORIES, categoryOf, groupDef, labelOf, type Category } from './catalog'
 import { locale, msg, tr } from '../../shared/i18n/i18n'
 import { nextAlarm } from '../player/alarmTime'
-import { phoneApp } from '../../shared/platform'
+import { linuxApp, phoneApp } from '../../shared/platform'
 import { canKeepAwake } from '../../shared/awake'
 import { DESKTOP_ONLY, DESKTOP_ONLY_SECTIONS } from './desktopOnly'
 import { PHONE_FOLDED } from './phoneFold'
@@ -185,7 +185,7 @@ const fonts: { value: Settings['font']; label: string }[] = [
   { value: 'modern', label: msg('Modern') },
   { value: 'hifi', label: msg('Hi-Fi') },
   // Segoe UI: off Windows, the system's own font.
-  { value: 'neutral', label: phoneApp ? msg('System') : msg('Windows') },
+  { value: 'neutral', label: phoneApp || linuxApp ? msg('System') : msg('Windows') },
 ]
 
 // The menus' customising screen: loaded when opened (the table of items stays out of the launch).
@@ -721,7 +721,7 @@ function StorageRows() {
       <Row label={msg('Diagnostics log')} sub={tr('What Copy diagnostics reads, in Settings › About: 5 MB at most, the oldest lines go first')}>
         {size(s?.log, 'log')}
       </Row>
-      {s?.webview != null && (
+      {s?.webview != null && offered('webViewStorage') && (
         <Row label={msg('WebView2')} sub={tr('Windows’ browser engine inside Legato: your sign-ins and the pages’ caches. Windows trims it itself; not cleared here, so you stay signed in')}>
           {size(s.webview)}
         </Row>
@@ -1088,8 +1088,10 @@ function SettingsSearch({ onPick }: { onPick: (e: SettingEntry) => void }) {
 export function SettingsView({ section }: { section: SettingsSection }) {
   const go = useStore((s) => s.go)
   const focus = useStore((s) => (s.view.name === 'settings' ? s.view.focus : undefined))
-  // A setting opened by name lands on its page, wherever the caller thought it was (the catalog decides).
-  const page = (focus && categoryOf(focus)) || section
+  // A setting opened by name lands on its page, wherever the caller thought it was (the catalog decides). A page this
+  // build leaves out (a screen saved elsewhere): General.
+  const wanted = (focus && categoryOf(focus)) || section
+  const page = isCutSection(wanted) ? 'general' : wanted
   const content = useRef<HTMLDivElement>(null)
   // Set up once, signed out since (expired session): Accounts says so.
   const signIn = useStore((s) => Object.values(s.status).some((x) => x.configured && !x.connected))
@@ -1107,7 +1109,7 @@ export function SettingsView({ section }: { section: SettingsSection }) {
   }, [focus, page])
   return (
     <>
-      <PageHeader kicker={tr('Settings')} title={tr(sections.find((s) => s.id === section)!.label)} />
+      <PageHeader kicker={tr('Settings')} title={tr(sections.find((s) => s.id === (isCutSection(section) ? page : section))!.label)} />
       {/* Narrow (small window, or the connect wizard beside it): sections in rows above the page, not a squeezed column.
           The container is a wrapper: an element can't query its own width. */}
       <div className="@container flex min-h-0 flex-1 flex-col">
@@ -1120,7 +1122,7 @@ export function SettingsView({ section }: { section: SettingsSection }) {
               than its scroller (-mx-4) moved the whole page 8 px sideways. no-scrollbar plain: not a utility, no variant. */}
           <div className="no-scrollbar contents phone:-mx-2 phone:flex phone:w-[calc(100%+1rem)] phone:gap-1.5 phone:overflow-x-auto phone:px-2">
             {sections.filter((s) => (!phoneApp || !DESKTOP_ONLY_SECTIONS.has(s.id)) && !isCutSection(s.id)).map((s) => (
-              <button key={s.id} aria-current={s.id === page ? 'page' : undefined} onClick={() => go({ name: 'settings', section: s.id })} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-start phone:min-h-10 phone:shrink-0 phone:gap-2 phone:rounded-full phone:whitespace-nowrap ${s.id === section ? 'bg-raised font-semibold' : 'text-ink-2 hover:text-ink'}`}>
+              <button key={s.id} aria-current={s.id === page ? 'page' : undefined} onClick={() => go({ name: 'settings', section: s.id })} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-start phone:min-h-10 phone:shrink-0 phone:gap-2 phone:rounded-full phone:whitespace-nowrap ${s.id === (isCutSection(section) ? page : section) ? 'bg-raised font-semibold' : 'text-ink-2 hover:text-ink'}`}>
                 {s.icon} <span className="flex-1">{tr(s.label)}</span>
                 {s.id === 'sources' && signIn && <span title={tr('A service needs you to sign in again')} className="size-2 rounded-full bg-danger" />}
               </button>

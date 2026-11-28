@@ -10,6 +10,7 @@ import { usePlayer } from '../player/store'
 import { inRoom, openRoom, useRoom } from '../rooms/room'
 import { CopyField } from '../../app/CopyField'
 import { offered } from '../../shared/liteCuts'
+import { linuxApp } from '../../shared/platform'
 
 /** Listen together: this playlist plays here in a room friends on the network follow. */
 function Together({ id, onClose }: { id: number; onClose: () => void }) {
@@ -64,7 +65,7 @@ function Nearby({ id }: { id: number }) {
       </p>
       {!code || status?.state === 'failed' ? (
         <>
-          <p className="text-xs text-ink-2">{status?.state === 'failed' ? status.error : tr('Same Wi-Fi or network, a 6-digit code to read out. Windows may ask to allow Legato on private networks.')}</p>
+          <p className="text-xs text-ink-2">{status?.state === 'failed' ? status.error : linuxApp ? tr('Same Wi-Fi or network, a 6-digit code to read out.') : tr('Same Wi-Fi or network, a 6-digit code to read out. Windows may ask to allow Legato on private networks.')}</p>
           <Button variant="ghost" className="w-fit" onClick={start}>
             {code ? tr('New code') : tr('Get a code')}
           </Button>

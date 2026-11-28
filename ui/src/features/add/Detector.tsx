@@ -11,7 +11,7 @@ import { Dialog } from '../../shared/ui/Dialog'
 import { usePlayer } from '../player/store'
 import { Card } from './Card'
 import { msg, tr } from '../../shared/i18n/i18n'
-import { phoneApp } from '../../shared/platform'
+import { linuxApp, phoneApp } from '../../shared/platform'
 import { askMic, openAppInfo } from './phoneMic'
 import { offered } from '../../shared/liteCuts'
 
@@ -35,7 +35,8 @@ const MISSES: Record<DetectMiss, string> = {
 }
 /** The phone's own refusal (Android's permission). */
 const PHONE_BLOCKED = msg('Android keeps Legato away from the microphone. Allow it in Legato’s app info › Permissions › Microphone.')
-const missText = (miss: DetectMiss) => (miss === 'micBlocked' && phoneApp ? PHONE_BLOCKED : MISSES[miss])
+const LINUX_BLOCKED = msg('The microphone could not be opened: check that one is connected and that your system lets apps use it.')
+const missText = (miss: DetectMiss) => (miss === 'micBlocked' && (phoneApp || linuxApp) ? (phoneApp ? PHONE_BLOCKED : LINUX_BLOCKED) : MISSES[miss])
 
 type Input = 'mic' | 'pc'
 type Phase = { name: 'idle' } | { name: 'consent'; input: Input } | { name: 'listening'; seconds: number; level: number } | { name: 'note'; text: string; mic?: boolean }

@@ -4,6 +4,7 @@ import { Button } from '../../shared/ui/Button'
 import { Dialog } from '../../shared/ui/Dialog'
 import { useStore } from '../../app/store'
 import { readFrame, untilLeft, useWebcam } from './webcam'
+import { linuxApp } from '../../shared/platform'
 
 /** Frames read a second, and the widest one read (a code is big in a webcam's picture: smaller is faster). */
 const EVERY_MS = 150
@@ -77,7 +78,7 @@ function Scanner({ done }: { done: (text: string | null) => void }) {
     <Dialog title={tr('Scan with the webcam')} onClose={() => end(null)}>
       <div className="flex flex-col gap-4">
         {failed ? (
-          <p className="text-sm text-ink-2">{tr('The camera could not be opened: check that one is connected and that Windows lets apps use it.')}</p>
+          <p className="text-sm text-ink-2">{linuxApp ? tr('The camera could not be opened: check that one is connected and that your system lets apps use it.') : tr('The camera could not be opened: check that one is connected and that Windows lets apps use it.')}</p>
         ) : (
           <>
             <video ref={video} autoPlay muted playsInline className="aspect-video w-full rounded-lg bg-black object-cover" />

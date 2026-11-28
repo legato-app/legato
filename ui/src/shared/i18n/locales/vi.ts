@@ -2728,6 +2728,11 @@ const vi: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'truyền loa webcam qr ghép nối',
   'pages modes podcasts audiobooks blind test focus living room tv': 'trang chế độ podcast sách nói đoán nhạc tập trung phòng khách tv',
   'discord share profile': 'discord chia sẻ hồ sơ',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Quét bằng camera điện thoại; điện thoại phải cùng mạng với PC này.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Cùng Wi-Fi hoặc mạng, đọc to một mã 6 chữ số.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': cả khi ứng dụng chạy nền hoặc ở khay hệ thống. Nhấp vào phím để đổi, Backspace để xóa.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Không mở được micrô: hãy kiểm tra xem đã cắm micrô chưa và hệ thống có cho ứng dụng dùng nó không.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Không mở được máy ảnh: hãy kiểm tra xem đã cắm máy ảnh chưa và hệ thống có cho ứng dụng dùng nó không.',
 }
 
 export default vi

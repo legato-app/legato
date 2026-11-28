@@ -6,6 +6,7 @@ import { useGlobalShortcuts } from '../../app/shortcuts'
 import { Button } from '../../shared/ui/Button'
 import { RoundButton } from '../../shared/ui/controls'
 import { tr } from '../../shared/i18n/i18n'
+import { linuxApp } from '../../shared/platform'
 
 /**
  * One binding: click, then press the keys. Esc cancels, Backspace / Delete removes it. Global ones need a modifier (a
@@ -82,7 +83,7 @@ export function ShortcutsSection() {
       <p className="text-[0.8125rem] text-ink-2">
         <span className="font-medium text-ink">{tr('In the app')}</span>
         {tr(': anywhere but while typing.')} <span className="font-medium text-ink">{tr('Everywhere')}</span>
-        {tr(': with the app in the background or in the tray too. Click a key to change it, Backspace removes it. Media keys and the Windows media panel always work.')}
+        {linuxApp ? tr(': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.') : tr(': with the app in the background or in the tray too. Click a key to change it, Backspace removes it. Media keys and the Windows media panel always work.')}
       </p>
       <div className="rounded-xl border border-line bg-raised">
         <div className="flex items-center gap-4 border-b border-line-soft px-4 py-2">

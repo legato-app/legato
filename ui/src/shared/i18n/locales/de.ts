@@ -2728,6 +2728,11 @@ const de: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'streamen lautsprecher webcam qr koppeln',
   'pages modes podcasts audiobooks blind test focus living room tv': 'seiten modi podcasts hörbücher blindtest fokus wohnzimmer tv',
   'discord share profile': 'discord teilen profil',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Scanne ihn mit der Handykamera; das Handy muss im selben Netzwerk sein wie dieser PC.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Gleiches WLAN oder Netzwerk, ein 6-stelliger Code zum Vorlesen.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': auch wenn die App im Hintergrund oder im Infobereich ist. Klick auf eine Taste, um sie zu ändern, die Rücktaste entfernt sie.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Das Mikrofon ließ sich nicht öffnen: Prüfe, ob eines angeschlossen ist und dein System Apps den Zugriff erlaubt.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Die Kamera ließ sich nicht öffnen: Prüfe, ob eine angeschlossen ist und dein System Apps den Zugriff erlaubt.',
 }
 
 export default de

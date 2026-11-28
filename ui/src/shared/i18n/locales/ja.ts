@@ -2728,6 +2728,11 @@ const ja: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'キャスト スピーカー ウェブカメラ QR ペアリング',
   'pages modes podcasts audiobooks blind test focus living room tv': 'ページ モード ポッドキャスト オーディオブック イントロクイズ 集中 リビング テレビ',
   'discord share profile': 'Discord 共有 プロフィール',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'スマホのカメラで読み取ってください。スマホはこの PC と同じネットワークにある必要があります。',
+  'Same Wi-Fi or network, a 6-digit code to read out.': '同じWi-Fiまたはネットワークで、読み上げる6桁のコードを使います。',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': '：アプリがバックグラウンドやトレイにあるときも。キーをクリックして変更、Backspaceで削除します。',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'マイクを開けませんでした。接続されていること、アプリによる使用がシステムで許可されていることを確認してください。',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'カメラを開けませんでした。接続されていること、アプリによる使用がシステムで許可されていることを確認してください。',
 }
 
 export default ja

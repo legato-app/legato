@@ -2728,6 +2728,11 @@ const nl: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'casten speakers webcam qr koppelen',
   'pages modes podcasts audiobooks blind test focus living room tv': 'paginas modi podcasts luisterboeken blindtest focus woonkamer tv',
   'discord share profile': 'discord delen profiel',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Scan hem met de camera van je telefoon; de telefoon moet op hetzelfde netwerk zitten als deze pc.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Zelfde wifi of netwerk, een 6-cijferige code om voor te lezen.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': ook met de app op de achtergrond of in het systeemvak. Klik op een toets om hem te wijzigen, Backspace verwijdert hem.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'De microfoon kon niet worden geopend: controleer of er een is aangesloten en of je systeem apps toestaat hem te gebruiken.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'De camera kon niet worden geopend: controleer of er een is aangesloten en of je systeem apps toestaat hem te gebruiken.',
 }
 
 export default nl

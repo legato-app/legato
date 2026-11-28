@@ -2728,6 +2728,11 @@ const zh: Record<string, string> = {
   'cast dlna speakers webcam qr pair': '投放 扬声器 摄像头 二维码 配对',
   'pages modes podcasts audiobooks blind test focus living room tv': '页面 模式 播客 有声书 猜歌 专注 客厅 电视',
   'discord share profile': 'discord 分享 资料',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': '用手机相机扫描；手机必须与这台电脑在同一网络。',
+  'Same Wi-Fi or network, a 6-digit code to read out.': '同一 Wi-Fi 或网络，读出一个 6 位代码即可。',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': '：应用在后台或托盘中时也可用。点击按键可更改，Backspace 可删除。',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': '无法打开麦克风：请检查是否已连接，以及系统是否允许应用使用它。',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': '无法打开摄像头：请检查是否已连接，以及系统是否允许应用使用它。',
 }
 
 export default zh

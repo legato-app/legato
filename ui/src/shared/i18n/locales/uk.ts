@@ -2728,6 +2728,11 @@ const uk: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'трансляція колонки вебкамера qr підключення',
   'pages modes podcasts audiobooks blind test focus living room tv': 'сторінки режими подкасти аудіокниги вгадайка фокус вітальня тв',
   'discord share profile': 'discord поширити профіль',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Відскануй його камерою телефона; телефон має бути в тій самій мережі, що й цей ПК.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Та сама мережа Wi-Fi чи локальна мережа, 6-значний код, який треба продиктувати.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': і коли застосунок у фоні чи в треї. Клацни клавішу, щоб змінити її, Backspace видаляє.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Не вдалося відкрити мікрофон: перевірте, що він під’єднаний і що система дозволяє застосункам ним користуватися.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Не вдалося відкрити камеру: перевірте, що вона під’єднана і що система дозволяє застосункам нею користуватися.',
 }
 
 export default uk

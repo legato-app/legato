@@ -2,7 +2,7 @@ import { CaretDown, Check, Desktop, DeviceMobile, MagnifyingGlass } from '@phosp
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CATALOG, LANGUAGES, locale, resolveLang, tr } from '../../shared/i18n/i18n'
-import { phoneApp } from '../../shared/platform'
+import { linuxApp, phoneApp } from '../../shared/platform'
 
 // Noto Emoji's waving flags (Google, Apache-2.0; flag art public domain), 72 px: Windows draws flag emoji as two
 // letters and Apple's set can't ship. One file per catalogue country in shared/flags.
@@ -30,8 +30,9 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
   const system = LANGUAGES.find((l) => l.code === resolveLang('system', navigator.languages))!
   const here = new Intl.DisplayNames([locale()], { type: 'language' })
   const english = new Intl.DisplayNames(['en'], { type: 'language' })
+  const matchSystem = phoneApp ? tr('Match this phone') : linuxApp ? tr('System default') : tr('Match Windows')
   const rows: Row[] = [
-    { value: 'system', name: phoneApp ? tr('Match this phone') : tr('Match Windows'), sub: system.name, search: `windows phone system ${phoneApp ? tr('Match this phone') : tr('Match Windows')}` },
+    { value: 'system', name: matchSystem, sub: system.name, search: `windows phone system ${matchSystem}` },
     ...LANGUAGES.map((l) => {
       const local = here.of(l.code === 'pt' ? 'pt-BR' : l.code)
       return { value: l.code, name: l.name, sub: local && local.toLowerCase() !== l.name.toLowerCase() ? local : undefined, country: l.country, search: `${l.name} ${local} ${english.of(l.code)} ${l.code}` }
@@ -87,7 +88,7 @@ export function LanguagePicker({ value, onChange }: { value: string; onChange: (
     <>
       <button ref={button} type="button" aria-haspopup="listbox" aria-expanded={open} aria-label={tr('Language')} onClick={() => setOpen(!open)} className="flex h-9 w-fit min-w-64 items-center gap-2.5 rounded-full border border-line bg-raised px-3.5 text-[0.8125rem] font-medium hover:bg-panel">
         {current.country ? <Flag country={current.country} /> : <Here size={16} className="text-ink-2" />}
-        <span className="flex-1 text-start">{value === 'system' ? (phoneApp ? tr('This phone ({language})', { language: system.name }) : tr('Windows ({language})', { language: system.name })) : current.name}</span>
+        <span className="flex-1 text-start">{value === 'system' ? (phoneApp ? tr('This phone ({language})', { language: system.name }) : linuxApp ? `${tr('System default')} · ${system.name}` : tr('Windows ({language})', { language: system.name })) : current.name}</span>
         <CaretDown size={12} weight="bold" className={`text-ink-3 transition ${open ? 'rotate-180' : ''}`} />
       </button>
       {open &&

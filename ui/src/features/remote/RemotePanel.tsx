@@ -3,6 +3,7 @@ import { Button } from '../../shared/ui/Button'
 import { qrPath } from '../share/qr'
 import { remoteLink, useOverlay, useRemote } from './remote'
 import { copyText } from '../../app/copyText'
+import { linuxApp } from '../../shared/platform'
 
 /** Under Settings › Playback › Phone remote while it's on: the QR code to scan, the link, a new link. */
 export function RemotePanel() {
@@ -23,7 +24,7 @@ export function RemotePanel() {
         </svg>
       )}
       <div className="flex min-w-0 flex-col gap-2 text-xs text-ink-2">
-        <span>{tr('Scan it with the phone’s camera; the phone must be on the same network as this PC. Windows may ask once to let Legato on private networks: allow it.')}</span>
+        <span>{linuxApp ? tr('Scan it with the phone’s camera; the phone must be on the same network as this PC.') : tr('Scan it with the phone’s camera; the phone must be on the same network as this PC. Windows may ask once to let Legato on private networks: allow it.')}</span>
         <span className="truncate font-mono text-ink" title={url}>
           {url}
         </span>

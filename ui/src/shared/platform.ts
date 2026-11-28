@@ -21,6 +21,8 @@ export const MISSING_ON_LINUX = {
   // Windows' speech recognition and its settings pages.
   voiceSearch: { settings: ['Voice search'], shortcuts: ['voice'] },
   windowsSettings: {},
+  // Settings › Library and storage: the size of Windows' browser engine's folder.
+  webViewStorage: {},
   systemAccent: {},
   // Windows' device callbacks (unplug.rs), its media sessions (session.rs) and its loopback capture.
   deviceEvents: { settings: ['Pause during calls', 'Pause when headphones disconnect'] },

@@ -2728,6 +2728,11 @@ const tr: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'yayın hoparlör web kamerası qr eşleştir',
   'pages modes podcasts audiobooks blind test focus living room tv': 'sayfalar modlar podcast sesli kitap bilmece odak oturma odası tv',
   'discord share profile': 'discord paylaş profil',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Telefonun kamerasıyla tara; telefon bu bilgisayarla aynı ağda olmalı.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Aynı Wi-Fi veya ağ, sesli okunacak 6 haneli bir kod.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': uygulama arka planda veya bildirim alanındayken de. Değiştirmek için bir tuşa tıkla, Geri tuşu kaldırır.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofon açılamadı: birinin bağlı olduğunu ve sisteminin uygulamaların kullanmasına izin verdiğini kontrol et.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kamera açılamadı: birinin bağlı olduğunu ve sisteminin uygulamaların kullanmasına izin verdiğini kontrol et.',
 }
 
 export default tr

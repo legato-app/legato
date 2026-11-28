@@ -2728,6 +2728,11 @@ const id: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'cast speaker webcam qr pasangkan',
   'pages modes podcasts audiobooks blind test focus living room tv': 'halaman mode podcast buku audio tebak lagu fokus ruang tamu tv',
   'discord share profile': 'discord bagikan profil',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Pindai dengan kamera ponsel; ponsel harus di jaringan yang sama dengan PC ini.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Wi-Fi atau jaringan yang sama, kode 6 digit untuk dibacakan.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': juga saat aplikasi di latar belakang atau di tray. Klik tombol untuk menggantinya, Backspace menghapusnya.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofon tidak dapat dibuka: pastikan ada yang terhubung dan sistemmu mengizinkan aplikasi memakainya.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kamera tidak dapat dibuka: pastikan ada yang terhubung dan sistemmu mengizinkan aplikasi memakainya.',
 }
 
 export default id

@@ -2728,6 +2728,11 @@ const ko: Record<string, string> = {
   'cast dlna speakers webcam qr pair': '캐스트 스피커 웹캠 qr 페어링',
   'pages modes podcasts audiobooks blind test focus living room tv': '페이지 모드 팟캐스트 오디오북 블라인드 테스트 집중 거실 tv',
   'discord share profile': '디스코드 공유 프로필',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': '휴대폰 카메라로 스캔하세요. 휴대폰은 이 PC와 같은 네트워크에 있어야 합니다.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': '같은 Wi-Fi 또는 네트워크에서 6자리 코드를 불러 주면 됩니다.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': 앱이 백그라운드나 트레이에 있을 때도. 키를 클릭해 변경하고, Backspace로 삭제합니다.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': '마이크를 열 수 없습니다. 연결되어 있는지, 시스템에서 앱의 사용을 허용하는지 확인하세요.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': '카메라를 열 수 없습니다. 연결되어 있는지, 시스템에서 앱의 사용을 허용하는지 확인하세요.',
 }
 
 export default ko

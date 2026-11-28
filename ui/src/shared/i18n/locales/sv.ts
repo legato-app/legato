@@ -2728,6 +2728,11 @@ const sv: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'casta högtalare webbkamera qr parkoppla',
   'pages modes podcasts audiobooks blind test focus living room tv': 'sidor lägen poddar ljudböcker blindtest fokus vardagsrum tv',
   'discord share profile': 'discord dela profil',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'Skanna den med mobilens kamera; mobilen måste vara i samma nätverk som den här datorn.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'Samma wifi eller nätverk, en 6-siffrig kod att läsa upp.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': även när appen är i bakgrunden eller i meddelandefältet. Klicka på en tangent för att ändra den, Backsteg tar bort den.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'Mikrofonen kunde inte öppnas: kontrollera att en är ansluten och att systemet låter appar använda den.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'Kameran kunde inte öppnas: kontrollera att en är ansluten och att systemet låter appar använda den.',
 }
 
 export default sv

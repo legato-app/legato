@@ -2668,6 +2668,11 @@ const ar: Record<string, string> = {
   'cast dlna speakers webcam qr pair': 'بث سماعات كاميرا رمز إقران',
   'pages modes podcasts audiobooks blind test focus living room tv': 'صفحات أوضاع بودكاست كتب صوتية اختبار تركيز تلفاز',
   'discord share profile': 'ديسكورد مشاركة ملف شخصي',
+  'Scan it with the phone’s camera; the phone must be on the same network as this PC.': 'امسحه بكاميرا الهاتف؛ يجب أن يكون الهاتف على الشبكة نفسها التي عليها هذا الحاسوب.',
+  'Same Wi-Fi or network, a 6-digit code to read out.': 'الشبكة أو Wi-Fi نفسها، ورمز من 6 أرقام يُقرأ بصوت عالٍ.',
+  ': with the app in the background or in the tray too. Click a key to change it, Backspace removes it.': ': حتى والتطبيق في الخلفية أو في علبة النظام. انقر مفتاحًا لتغييره، وBackspace يزيله.',
+  'The microphone could not be opened: check that one is connected and that your system lets apps use it.': 'تعذّر فتح الميكروفون: تأكّد من أنّ ميكروفونًا موصول وأنّ نظامك يسمح للتطبيقات باستخدامه.',
+  'The camera could not be opened: check that one is connected and that your system lets apps use it.': 'تعذّر فتح الكاميرا: تأكّد من أنّ كاميرا موصولة وأنّ نظامك يسمح للتطبيقات باستخدامها.',
 }
 
 export default ar
