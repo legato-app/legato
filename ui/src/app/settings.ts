@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import { api } from '../shared/api'
 import { coverImage } from '../shared/art'
 import { BRAND_GUARD } from '../shared/css'
-import { cssVars, DEFAULTS, isVideo, resolveTheme, sanitize, type Settings, type SystemAccent, type Theme } from '../shared/theme/theme'
+import { cssVars, DEFAULTS, isVideo, resolveTheme, sanitize, withKeptScripts, type Settings, type SystemAccent, type Theme } from '../shared/theme/theme'
 import { effectiveFade } from '../features/player/fade'
 import { usePlayer } from '../features/player/store'
 import { useStore } from './store'
@@ -170,10 +170,14 @@ export const useSettings = create<SettingsState>((set, get) => ({
 
   async reload() {
     clearTimeout(saveTimer)
+    const held = get().settings.customThemes
     const s = sanitize(await api.loadSettings().catch(() => null))
     set({ settings: s })
     apply(s)
     sorts(s)
+    // Saved again at once, so the script travels back to the other PCs.
+    const customThemes = withKeptScripts(s.customThemes, held)
+    if (customThemes !== s.customThemes) get().update({ customThemes })
   },
 
   // Applied at once, saved after a short pause (sliders fire many updates).

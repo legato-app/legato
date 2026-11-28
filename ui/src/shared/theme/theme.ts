@@ -66,7 +66,8 @@ export type Look = Partial<Pick<Settings, LookKey>>
 
 /** Theme CSS kept in settings (synced, size-bounded): 20 KB. */
 export const MAX_THEME_CSS = 20_000
-/** A theme's code at most, and its whole `script` block as JSON: themes live in the settings, saved and synced whole. */
+/** A theme's code at most, and its whole `script` block as JSON, in UTF-8 bytes: themes live in the settings, saved
+ *  and synced whole. */
 export const MAX_THEME_SCRIPT_CODE = 65_536
 export const MAX_THEME_SCRIPT = 73_728
 
@@ -833,13 +834,15 @@ function alarmOf(v: unknown): Alarm {
   }
 }
 
+const utf8Bytes = (text: string) => new TextEncoder().encode(text).length
+
 /** A `script` block worth keeping: an object with its API number and its code, within the limits. */
 function keptScript(raw: unknown): ThemeScript | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
   const { api, code } = raw as Record<string, unknown>
   if (typeof api !== 'number' || !Number.isInteger(api) || api < 1) return undefined
-  if (typeof code !== 'string' || code.length > MAX_THEME_SCRIPT_CODE) return undefined
-  return JSON.stringify(raw).length <= MAX_THEME_SCRIPT ? (raw as ThemeScript) : undefined
+  if (typeof code !== 'string' || utf8Bytes(code) > MAX_THEME_SCRIPT_CODE) return undefined
+  return utf8Bytes(JSON.stringify(raw)) <= MAX_THEME_SCRIPT ? (raw as ThemeScript) : undefined
 }
 
 /** Trust boundary (file import, stored JSON): full palette or nothing. */
@@ -932,6 +935,22 @@ export function withAddedTheme(settings: Pick<Settings, 'customThemes' | 'homeSe
 export function undoAddedTheme(now: Pick<Settings, 'customThemes'>, before: Settings, joined: JoinedTheme): Partial<Settings> {
   const restored: Partial<Settings> = Object.fromEntries(Object.keys(joined.changes).map((key) => [key, before[key as keyof Settings]]))
   return { ...restored, ...(joined.added && { customThemes: now.customThemes.filter((own) => own.id !== joined.theme.id) }) }
+}
+
+/**
+ * Themes that arrived (a sync, a backup), each taking back the script this PC held for it when it comes without one: an
+ * app from before theme code drops the block as it saves. Nothing removes a script otherwise (a version that lets the
+ * user do it leaves the block, its code empty). `arrived` itself when none lacks one.
+ */
+export function withKeptScripts(arrived: Theme[], held: Theme[]): Theme[] {
+  let restored = false
+  const themes = arrived.map((theme) => {
+    const script = theme.script ? undefined : held.find((own) => own.id === theme.id)?.script
+    if (!script) return theme
+    restored = true
+    return { ...theme, script }
+  })
+  return restored ? themes : arrived
 }
 
 /** The look settings as they are now (to save into a theme). */

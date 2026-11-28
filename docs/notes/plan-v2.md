@@ -1159,6 +1159,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     tested through a save, a copy, adding, arranging and a `.theme` file. A version before this one still drops it.
     - Decided alone (2026-11-28): `permissions` is kept unchecked (for slice 2, in Rust); the import's own refusal of
       an oversized script waits for slice 3's review, since slice 1 adds no text.
+    - Review fixes (2026-11-28): the limits count UTF-8 bytes (Rust the same in slice 2); after a sync or a backup, a
+      theme that comes back without its script takes the one this PC held (`withKeptScripts`). Slice 1 must ship in a
+      Beta, then a Stable, before slice 3 makes scripts.
 - [x] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
       the layout (`askAboutLayout`, `themeLayoutImport.ts`, the drop handler in `PlayerBar.tsx`). The owner's word,
       2026-11-27: themes "dynamique et rapide", the app really user-friendly. Builder: Sonnet.

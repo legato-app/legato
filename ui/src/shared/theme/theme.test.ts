@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HIDEABLE_PARTS, HOME_SECTIONS, lookOf, MAX_THEME_SCRIPT, MAX_THEME_SCRIPT_CODE, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
+import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HIDEABLE_PARTS, HOME_SECTIONS, lookOf, MAX_THEME_SCRIPT, MAX_THEME_SCRIPT_CODE, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme, withKeptScripts } from './theme'
 import { PAGE_PARTS } from './layout'
 
 describe('sanitize', () => {
@@ -339,5 +339,27 @@ describe('a theme’s script', () => {
       expect([theme.name, theme.css, 'script' in theme], JSON.stringify(bad)?.slice(0, 40)).toEqual([older.name, older.css, false])
     }
     expect(kept({ api: 1, code: 'x'.repeat(MAX_THEME_SCRIPT_CODE) }).script).toBeDefined()
+  })
+
+  it('counts its limits in bytes, what saving it costs', () => {
+    // Two bytes each in UTF-8.
+    const half = MAX_THEME_SCRIPT_CODE / 2
+    expect(kept({ api: 1, code: 'é'.repeat(half) }).script).toBeDefined()
+    expect(kept({ api: 1, code: 'é'.repeat(half + 1) })).not.toHaveProperty('script')
+    expect(kept({ api: 1, code: 'x', notes: 'é'.repeat(MAX_THEME_SCRIPT / 2) })).not.toHaveProperty('script')
+  })
+
+  it('comes back to a theme an older app sent without it, and to no other', () => {
+    const held = [kept(script), sanitizeTheme({ ...older, id: 'custom-plain' })!]
+    // The older app renamed the theme as it dropped the block.
+    const stripped = { ...held[0], name: 'Renamed' }
+    delete stripped.script
+    const added = sanitizeTheme({ ...older, id: 'custom-new' })!
+    expect(withKeptScripts([stripped, held[1], added], held)).toEqual([{ ...stripped, script }, held[1], added])
+    // One that arrives with a script keeps its own, an emptied one included.
+    const emptied = [kept({ api: 1, code: '' })]
+    expect(withKeptScripts(emptied, held)).toBe(emptied)
+    // A theme deleted elsewhere stays deleted.
+    expect(withKeptScripts([], held)).toEqual([])
   })
 })
