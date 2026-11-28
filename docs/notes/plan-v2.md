@@ -720,6 +720,25 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       already); the privacy row already names Exportify. M: the user's own client ID (the desktop's app-key path,
       playlist scopes only), signed in through the browser with PKCE and a `legato://` redirect (Android deep link), the
       same Rust import. The page-reading path stays desktop only.
+  - Steps for S (Sonnet; not built yet). The URL is `https://exportify.app/` (`crates/core/src/spotify_export.rs:25`;
+    the privacy row says the same). Desktop keeps its Connect button and page reading.
+    1. `ui/src/shared/links.ts`: add `EXPORTIFY = 'https://exportify.app/'` beside `DISCUSSIONS`.
+    2. New `ui/src/features/add/spotifyOptions.ts`: a pure helper `spotifyOptions(phone: boolean)` returning the
+       buttons to show: desktop `['page', 'exportify', 'file']`, phone `['exportify', 'file']`. No page reading on phone.
+    3. `ui/src/features/add/SpotifyConnect.tsx` (`SpotifyConnect()`, line ~183): render from `spotifyOptions(phoneApp)`.
+       `exportify` = a button `Open Exportify` calling `openUrl(EXPORTIFY)` from `@tauri-apps/plugin-opener`, the same
+       import as `Detector.tsx:2`. `file` = the existing `SpotifyFile`, unchanged (its picker already takes the Exportify
+       export: `zip`, `json`, `csv`).
+    4. Texts, English through `tr()` (`shared/i18n`), then all 17 locales (`i18n.test.ts` fails on a missing one):
+       - `Open Exportify` (button)
+       - `Exportify is a free open-source tool, not ours. It opens in your browser: sign in with Spotify there, export
+         your lists to a file, then come back here and choose that file.` (hint under the buttons)
+       - `Choose the Exportify file…` (the file button's label on phone)
+    5. Website (Opus's files, not Sonnet's): `site/components/content.tsx:105` says Exportify opens "in an app window";
+       on phone it opens in the browser. Ask Opus to update that row when the lot lands.
+    6. Test: `ui/src/features/add/spotifyOptions.test.ts`: the phone list never holds `page`; the desktop list keeps all
+       three; `EXPORTIFY` is `https://exportify.app/`. No network in the test.
+    7. Done when: `pnpm vitest run` on those two files passes, the i18n test passes, the phone shows the two buttons.
 
 **Medium**
 - [ ] `S` Community: GitHub Discussions (on since 2026-11-07, with the "good first issue" label) linked from About, a
