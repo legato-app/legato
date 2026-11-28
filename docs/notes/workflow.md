@@ -39,8 +39,9 @@ need. The repository is public: nothing about a person, a machine, an account or
 - Locally: targeted tests only, one at a time: `cargo test -p <crate> <name>`, `pnpm vitest run <file>`,
   `cargo check -p <crate>`. Never the full suite, `pnpm e2e`, `clippy --workspace`, `pnpm build` or the site build,
   unless the owner asks for it in that conversation.
-- Before a heavy command, check that the owner's PC is not busy with something heavy. A check script kept outside the
-  repo says so. Use low CPU priority and 4 build jobs (`CARGO_BUILD_JOBS=4`, `RUST_TEST_THREADS=4`).
+- Before a heavy command the owner asked for (the full gate, `pnpm build`, `pnpm bench`), check that the machine is not
+  busy with other work. Use low CPU priority and 4 build jobs (`CARGO_BUILD_JOBS=4`, `RUST_TEST_THREADS=4`). Light local
+  checks use 2 (`CARGO_BUILD_JOBS=2`, see handoff.md).
 - The gate is CI: the `check` workflow runs everything, end-to-end included. A release job starts only when it is green.
 
 ## Commits
@@ -73,7 +74,7 @@ need. The repository is public: nothing about a person, a machine, an account or
 ## Pacing
 - Watch the plan's limits. Before the current usage window runs out, pause the workers so they end on a commit. A worker that
   hits the limit mid-turn dies, and the messages queued for it are lost: resend them after the reset.
-- Stop at the owner's weekly stop, and say so in the report.
+- Stop at the weekly usage limit, and say so in the report.
 - Keep the orchestrator conversation short. Every message re-reads all of it.
 
 ## Questions
