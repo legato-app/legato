@@ -724,9 +724,8 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - [x] S, 2026-11-28, not tried on a phone: the phone's card has `Open Exportify` (`EXPORTIFY` in `shared/links.ts`,
         Tauri's opener), a line saying to export there then come back, and `Choose the Exportify file…` (the existing
         `SpotifyFile`). Test: `SpotifyConnect.test.ts`.
-  - [ ] `S` The website's Connect Spotify privacy row (`site/components/content.tsx`) says Exportify opens "in an app
-        window" and that the app deletes its file: on the phone it opens in the browser and the file stays. To say before
-        this reaches `master`.
+  - [x] `S` The website's Connect Spotify privacy row says what differs on the phone (browser, file left where it is),
+        2026-11-28.
 
 **Medium**
 - [ ] `S` Community: GitHub Discussions (on since 2026-11-07, with the "good first issue" label) linked from About, a
