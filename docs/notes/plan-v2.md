@@ -1203,7 +1203,11 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     Playing only it and the top bar have handles.
     - Decided alone (2026-11-28): the art's size stays the theme file's (no handle, no menu entry); an album's own track
       table has no column to move; the bar shows again what is hidden on the page on screen only.
-  - [ ] Slice 6 `S`: size handles (`sizes`).
+  - [x] Slice 6 `S` (2026-11-28), not tried for real: the sidebar's and the side panel's edge towards the page, dragged
+    (drawn as it goes, one move at the end) or moved with the arrows; double-click, Delete or its menu give the usual
+    width back. The sidebar's own resize edge is away while arranging.
+    - Decided alone (2026-11-28): a width saved into the theme fixes it, as any theme's width does: the sidebar's own
+      edge comes back with the usual width.
   - [ ] Slice 7 `S`: docs (`docs/design.md` › Theme layout, the themes' help, Figma light and dark) and a line on the site.
 - [x] `S` The bundled Discord Presence copy is never refreshed: an install adopted before `8bda5716` still links "Source code" to `legato-app/legato`. Re-copy the bundled files (`discord_move::FILES`, `plugin_adopt_discord` in `src-tauri/src/plugins.rs`) when the bundled manifest's version is newer than the installed one, storage kept; bump the bundled version. 2026-11-26: done at launch (`discord_move::refresh` from `start_all`, bundled 1.0.1), storage and granted permissions untouched. Not tried in the app.
   - Decided alone (2026-11-26): refreshed in `start_all`, not `plugin_adopt_discord`, which the interface stops calling once the move is done; any installed copy of that id with an older plain-number version is refreshed (the app keeps no record of who installed it), another version text is left alone; a permission a later version adds stays ungranted until approved.

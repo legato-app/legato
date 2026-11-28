@@ -1,7 +1,7 @@
 /** The surfaces' names, and where one is now, as said to a screen reader. */
 import { isRtl, lang, msg, tr } from '../../shared/i18n/i18n'
 import { hiddenParts, mirroredSide, orderedParts, partGroup, type ArtPlace, type PartOwner } from '../../shared/theme/arrange'
-import { pluginOf, type BuiltinSurface, type HeaderChoice, type Placement, type Region, type Surface } from '../../shared/theme/layout'
+import { pluginOf, type BuiltinSurface, type HeaderChoice, type Placement, type Region, type SizedSurface, type Surface } from '../../shared/theme/layout'
 import { COLUMN_NAMES } from '../../shared/ui/columnNames'
 
 const NAMES: Record<BuiltinSurface, string> = { brand: msg('Logo'), topbar: msg('Top bar'), sidebar: msg('Sidebar'), sidePanel: msg('Side panel'), playerBar: msg('Player bar') }
@@ -77,4 +77,10 @@ export function whereIs(placement: Placement, surface: Surface, name: string): s
   const [region, surfaces] = entry as [Region, Surface[]]
   const side = tr(WHERE[mirroredSide(region, isRtl(lang()))], { part: name })
   return surfaces.length > 1 ? `${side}, ${tr('{position} of {count}', { position: surfaces.indexOf(surface) + 1, count: surfaces.length })}` : side
+}
+
+/** How wide a column is: the arrangement's own width, or the app's. */
+export function widthOf({ sizes }: Placement, surface: SizedSurface, name: string): string {
+  const width = sizes[surface]
+  return width === undefined ? tr('{part} at its usual width', { part: name }) : tr('{part} {n} px wide', { part: name, n: width })
 }

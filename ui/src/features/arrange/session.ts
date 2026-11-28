@@ -8,12 +8,12 @@ import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { isRtl, lang, tr } from '../../shared/i18n/i18n'
-import { artStep, mirroredSide, moveInGroup, moveSurface, partGroup, partStep, setHeader, stepPart, stepSurface, toggleHidden, type ArtPlace, type Direction, type PartOwner } from '../../shared/theme/arrange'
-import { DEFAULT_LAYOUT, resolveLayout, type HeaderChoice, type Placement, type Region, type Surface } from '../../shared/theme/layout'
+import { artStep, mirroredSide, moveInGroup, moveSurface, partGroup, partStep, setHeader, setSize, stepPart, stepSurface, toggleHidden, type ArtPlace, type Direction, type PartOwner } from '../../shared/theme/arrange'
+import { DEFAULT_LAYOUT, resolveLayout, type HeaderChoice, type Placement, type Region, type SizedSurface, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
 import { historyFrom, moved, redone, undone, type History } from './history'
-import { whereIs, whereIsHeader, whereIsPart } from './names'
+import { whereIs, whereIsHeader, whereIsPart, widthOf } from './names'
 
 /**
  * `said`: the last move in words, for screen readers (the bar's live region). `saidCount` grows each time, so the same
@@ -147,6 +147,17 @@ export const placeArt = (place: ArtPlace) => chooseHeader('art', { art: place })
 
 /** The art moved by an arrow key. */
 export const nudgeArt = (direction: Direction) => placeArt(artStep(direction, isRtl(lang())))
+
+/** A column's width while its edge is dragged: drawn, not yet a move. */
+export const previewSize = (surface: SizedSurface, width: number) => useArrangeDraft.setState({ draft: setSize(present(), surface, width) })
+
+/** A column given a width (undefined: the app's own again), as one move. */
+export function resizeSurface(surface: SizedSurface, name: string, width: number | undefined) {
+  const next = setSize(present(), surface, width)
+  // Dragged back to where it was: the preview goes.
+  if (next === present()) return void useArrangeDraft.setState({ draft: next })
+  say(next, (placement) => widthOf(placement, surface, name), '')
+}
 
 /** Leaves the mode, nothing saved. */
 export function discardArrangement() {

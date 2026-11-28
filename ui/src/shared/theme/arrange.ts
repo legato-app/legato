@@ -3,7 +3,7 @@
  * rules, and the placement written back as a theme's layout. A move the rules refuse returns the same placement. Pure.
  */
 import { moveToSlot } from '../order'
-import { arrangeParts, DEFAULT_LAYOUT, headerLayout, HIDEABLE, LAYOUT_API, MOVABLE_COLUMNS, PAGE_PARTS, pagePartIds, PART_GROUPS, placesOf, pluginOf, REGIONS, type HeaderChoice, type Layout, type Pages, type PartedPage, type PartedSurface, type PartsChoice, type Placement, type Region, type Surface } from './layout'
+import { arrangeParts, DEFAULT_LAYOUT, fitSize, headerLayout, HIDEABLE, LAYOUT_API, MOVABLE_COLUMNS, PAGE_PARTS, pagePartIds, PART_GROUPS, placesOf, pluginOf, REGIONS, type HeaderChoice, type Layout, type Pages, type PartedPage, type PartedSurface, type PartsChoice, type Placement, type Region, type SizedSurface, type Surface } from './layout'
 
 /** `surface` at slot `at` of `region` (a drop slot, the end by default). */
 export function moveSurface(placement: Placement, surface: Surface, region: Region, at = placement.regions[region].length): Placement {
@@ -175,6 +175,13 @@ export function toggleHidden(placement: Placement, target: HideTarget): Placemen
   const { surface } = target
   if (!placement.hidden.includes(surface) && !canHideSurface(placement.hidden, surface)) return placement
   return { ...placement, hidden: toggled(placement.hidden, surface) }
+}
+
+/** A column's width, within its bounds; undefined gives back the app's own (the user's setting, for the sidebar). */
+export function setSize(placement: Placement, surface: SizedSurface, width: number | undefined): Placement {
+  const size = width === undefined ? undefined : fitSize(surface, width)
+  if (placement.sizes[surface] === size) return placement
+  return { ...placement, sizes: withEntry(placement.sizes, surface, size) }
 }
 
 /** Where a page header's art goes. */

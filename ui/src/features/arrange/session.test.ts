@@ -5,7 +5,7 @@ import { COLUMNS, DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, type PartedPage, type
 import { MAX_CUSTOM_THEMES, PRESETS, sanitize, sanitizeTheme, type Settings } from '../../shared/theme/theme'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { PART_NAMES, surfaceName, whereIs } from './names'
-import { arrange, beginArranging, chooseHeader, discardArrangement, finishArranging, hidePart, hideSurface, nudgeArt, nudgePart, nudgeSurface, placePart, placeSurface, redoMove, undoMove, useArrange } from './session'
+import { arrange, beginArranging, chooseHeader, discardArrangement, finishArranging, hidePart, hideSurface, nudgeArt, nudgePart, nudgeSurface, previewSize, resizeSurface, placePart, placeSurface, redoMove, undoMove, useArrange } from './session'
 
 const notify = vi.fn()
 const settings = vi.hoisted(() => ({ now: {} as Settings, listeners: new Set<(state: { settings: Settings }) => void>() }))
@@ -183,6 +183,26 @@ it('passes the parts with nothing to show, and doesn’t count them', () => {
   // The next round measures anew.
   discardArrangement()
   expect(useArrange.getState().filled).toBeNull()
+})
+
+it('draws a width while it is dragged, makes one move of it, and says it', () => {
+  beginArranging()
+  const said = () => useArrange.getState().said
+  previewSize('sidebar', 330)
+  previewSize('sidebar', 352)
+  expect([draft()?.sizes.sidebar, useArrange.getState().history.past.length]).toEqual([352, 0])
+  resizeSurface('sidebar', 'Sidebar', 352)
+  expect([useArrange.getState().history.past.length, said()]).toEqual([1, 'Sidebar 352 px wide'])
+  // Dragged away and back: the preview goes, nothing moved.
+  previewSize('sidebar', 300)
+  resizeSurface('sidebar', 'Sidebar', 352)
+  expect([draft()?.sizes.sidebar, useArrange.getState().history.past.length]).toEqual([352, 1])
+  resizeSurface('sidebar', 'Sidebar', undefined)
+  expect(said()).toBe('Sidebar at its usual width')
+  undoMove()
+  expect(said()).toBe('Sidebar 352 px wide')
+  finishArranging()
+  expect(settings.now.customThemes[0].layout?.sizes).toEqual({ sidebar: 352 })
 })
 
 it('names every part of the bars, the pages and the lists', () => {

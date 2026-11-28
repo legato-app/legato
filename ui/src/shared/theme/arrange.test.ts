@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { artStep, canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, orderedParts, partAxis, partGroup, partStep, setHeader, stepPart, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
+import { artStep, canHideSurface, layoutFromPlacement, moveInGroup, moveSurface, neverHides, orderedParts, partAxis, partGroup, partStep, setHeader, setSize, stepPart, stepSurface, toggleHidden, type Direction, type HideTarget } from './arrange'
 import { DEFAULT_LAYOUT, PAGE_PARTS, PART_GROUPS, REGIONS, resolveLayout, sanitizeLayout, SURFACES, type PartedPage, type PartedSurface, type Placement, type Region, type Surface } from './layout'
 
 const start = DEFAULT_LAYOUT
@@ -223,5 +223,20 @@ describe('the page headers’ choice', () => {
   it('sends the art where the arrow points, as seen', () => {
     expect([artStep('left', false), artStep('right', false), artStep('up', false), artStep('down', false)]).toEqual(['start', 'end', 'top', 'start'])
     expect([artStep('left', true), artStep('right', true)]).toEqual(['end', 'start'])
+  })
+})
+
+describe('a column’s width', () => {
+  it('is kept within its bounds, and written into the layout', () => {
+    const wide = setSize(start, 'sidebar', 999)
+    expect([wide.sizes.sidebar, setSize(start, 'sidePanel', 10.4).sizes.sidePanel, setSize(start, 'sidebar', 300.6).sizes.sidebar]).toEqual([420, 260, 301])
+    expect(layoutFromPlacement(wide)?.sizes).toEqual({ sidebar: 420 })
+  })
+
+  it('goes back to the app’s own without one, and says when nothing changed', () => {
+    const wide = setSize(start, 'sidebar', 300)
+    expect(setSize(wide, 'sidebar', 300)).toBe(wide)
+    expect(setSize(start, 'sidebar', undefined)).toBe(start)
+    expect(layoutFromPlacement(setSize(wide, 'sidebar', undefined))).toBeUndefined()
   })
 })

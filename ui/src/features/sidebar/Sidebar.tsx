@@ -1,5 +1,6 @@
 import { ArrowDownLeft, ArrowUpRight, ChartBar, ClockCounterClockwise, Disc, DotsThree, FolderSimple, FolderSimpleDashed, FolderSimplePlus, House, Lightning, MagnifyingGlass, MusicNotes, Plus, PlusCircle, PushPin, Radio, SortAscending } from '@phosphor-icons/react'
 import { ArrangePart } from '../../app/ArrangePart'
+import { useArrangeDraft } from '../../app/arrangeDraft'
 import { artistName } from '../../shared/artistName'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useShallow } from 'zustand/react/shallow'
@@ -171,6 +172,7 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
   const phone = usePhone()
   const grid = wide && !phone
   const saved = useSettings((s) => s.settings.sidebarWidth)
+  const arranging = useArrangeDraft((state) => state.draft !== null)
   const [drag, setDrag] = useState<number | null>(null)
   const start = useRef<{ x: number; w: number } | null>(null)
   const width = fixedWidth ?? drag ?? saved
@@ -284,7 +286,8 @@ export function Sidebar({ side, fixedWidth, choice }: { side: 'left' | 'right'; 
         </ArrangePart>
       ))}
       {/* Edge: drag (or arrows) to resize, double-click for the default width. */}
-      {!wide && fixedWidth === undefined && (
+      {/* While arranging, the arranging mode's own edge sets the theme's width. */}
+      {!wide && fixedWidth === undefined && !arranging && (
         <div
           role="separator"
           aria-orientation="vertical"

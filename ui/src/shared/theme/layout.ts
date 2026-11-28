@@ -29,8 +29,15 @@ export const SIDEBAR_MAX = 420
 /** The right panel's: its video stays over YouTube's 200 px at the least. */
 export const SIDE_PANEL_MIN = 260
 export const SIDE_PANEL_MAX = 420
-const SIZE_LIMITS = { sidebar: [SIDEBAR_MIN, SIDEBAR_MAX], sidePanel: [SIDE_PANEL_MIN, SIDE_PANEL_MAX] } as const
+export const SIZE_LIMITS = { sidebar: [SIDEBAR_MIN, SIDEBAR_MAX], sidePanel: [SIDE_PANEL_MIN, SIDE_PANEL_MAX] } as const
 export type SizedSurface = keyof typeof SIZE_LIMITS
+export const isSized = (surface: string): surface is SizedSurface => surface in SIZE_LIMITS
+
+/** A column's width within its bounds, in whole px. */
+export function fitSize(surface: SizedSurface, width: number): number {
+  const [min, max] = SIZE_LIMITS[surface]
+  return Math.min(max, Math.max(min, Math.round(width)))
+}
 
 /** Where each surface can go: a bar runs across, a column down. The top bar holds the window's buttons and the search's
  *  list opens under it, so it stays on top. */
@@ -170,9 +177,9 @@ function sanitizeRegions(raw: unknown): Layout['regions'] {
 
 function sanitizeSizes(raw: unknown): Layout['sizes'] {
   const given = record(raw)
-  const sizes = Object.entries(SIZE_LIMITS).flatMap(([surface, [min, max]]) => {
+  const sizes = (Object.keys(SIZE_LIMITS) as SizedSurface[]).flatMap((surface) => {
     const size = given?.[surface]
-    return typeof size === 'number' && Number.isFinite(size) ? [[surface, Math.min(max, Math.max(min, Math.round(size)))]] : []
+    return typeof size === 'number' && Number.isFinite(size) ? [[surface, fitSize(surface, size)]] : []
   })
   return sizes.length ? Object.fromEntries(sizes) : undefined
 }

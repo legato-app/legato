@@ -1,15 +1,17 @@
 import { DotsSixVertical } from '@phosphor-icons/react'
-import { useEffect } from 'react'
+import { Fragment, useEffect } from 'react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
+import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { isRtl, useLang } from '../../shared/i18n/i18n'
 import { canHideSurface, neverHides, type Direction } from '../../shared/theme/arrange'
-import { placesOf, type Surface } from '../../shared/theme/layout'
+import { isSized, placesOf, type Surface } from '../../shared/theme/layout'
 import { useDrag } from '../../shared/ui/drag'
 import { usePlayer } from '../player/store'
 import { usePlugins } from '../plugins/host'
 import { ArrangeHeader } from './ArrangeHeader'
 import { ArrangeParts } from './ArrangeParts'
+import { ArrangeSize } from './ArrangeSize'
 import { useDrawnBoxes } from './boxes'
 import { DropZone, handleProps, PILL } from './handles'
 import { surfaceName } from './names'
@@ -69,6 +71,8 @@ export function ArrangeSurfaces() {
   const dragged = drag?.kind === 'arrange' && drag.scope === 'surface' ? drag.id : null
   const rightToLeft = useLang((state) => isRtl(state.lang))
   const view = useStore((state) => state.view.name)
+  // Open wide, the library takes the page's place: its width is the window's.
+  const libraryWide = useSettings((state) => state.settings.libraryWide)
   const nowPlaying = usePlayer((state) => state.full)
   const screen = { view, nowPlaying, hidden: draft.hidden }
   const name = (surface: Surface) => surfaceName(surface, plugins)
@@ -89,7 +93,10 @@ export function ArrangeSurfaces() {
       {(Object.entries(boxes.surfaces) as [Surface, Box][])
         .filter(([surface]) => surfaceHasHandle(surface, screen))
         .map(([surface, box]) => (
-          <SurfaceHandle key={surface} surface={surface} name={name(surface)} box={box} underDrag={drag?.kind === 'arrange'} />
+          <Fragment key={surface}>
+            {isSized(surface) && !(surface === 'sidebar' && libraryWide) && <ArrangeSize surface={surface} name={name(surface)} box={box} width={draft.sizes[surface]} underDrag={drag?.kind === 'arrange'} />}
+            <SurfaceHandle surface={surface} name={name(surface)} box={box} underDrag={drag?.kind === 'arrange'} />
+          </Fragment>
         ))}
       <p role="status" aria-live="polite" className="sr-only">
         {/* A new node each time: the same words are read again. */}
