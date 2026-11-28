@@ -356,7 +356,7 @@ pub struct Edit {
 }
 
 /// Whole consistent copy of an open library (`VACUUM INTO`), written aside then renamed: never a half file.
-fn copy_to(db: &Connection, to: &Path) -> Result<()> {
+pub(crate) fn copy_to(db: &Connection, to: &Path) -> Result<()> {
     let part = to.with_extension("db.part");
     let _ = std::fs::remove_file(&part);
     db.execute("VACUUM INTO ?1", [part.to_string_lossy()])?;
@@ -383,6 +383,16 @@ pub fn back_up(path: &Path, to: &Path) -> Result<()> {
 }
 
 const NOT_A_BACKUP: &str = "Not a Legato library backup";
+
+/// The file at `from`, read only, once it proves to be a backup: its tables, a schema this app knows.
+pub(crate) fn open_backup(from: &Path) -> Result<Connection> {
+    let source = Connection::open_with_flags(from, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
+    let tables: i64 = source.query_row("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name IN ('tracks', 'playlists', 'settings')", [], |r| r.get(0)).context(NOT_A_BACKUP)?;
+    anyhow::ensure!(tables == 3, NOT_A_BACKUP);
+    let found: i64 = source.query_row("PRAGMA user_version", [], |r| r.get(0))?;
+    anyhow::ensure!(found <= SCHEMA_VERSION, NewerLibrary(found));
+    Ok(source)
+}
 
 /// Silence and loudness rows kept (caches by path), and how long a SponsorBlock answer stays in its table, s.
 const SILENCE_KEEP: i64 = 20_000;
@@ -417,11 +427,7 @@ impl Library {
     /// this app knows. This one is kept beside it first (`library-before-restore.db`). Restart after: an older backup's
     /// migrations run at the next open, and nothing cached knows the new rows.
     pub fn restore(&mut self, from: &Path) -> Result<()> {
-        let src = Connection::open_with_flags(from, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
-        let tables: i64 = src.query_row("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name IN ('tracks', 'playlists', 'settings')", [], |r| r.get(0)).context(NOT_A_BACKUP)?;
-        anyhow::ensure!(tables == 3, NOT_A_BACKUP);
-        let found: i64 = src.query_row("PRAGMA user_version", [], |r| r.get(0))?;
-        anyhow::ensure!(found <= SCHEMA_VERSION, NewerLibrary(found));
+        let src = open_backup(from)?;
         if let Some(path) = self.db.path().filter(|p| !p.is_empty()) {
             copy_to(&self.db, &Path::new(path).with_file_name("library-before-restore.db"))?;
         }

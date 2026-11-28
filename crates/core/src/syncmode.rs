@@ -6,7 +6,7 @@
 //! ChaCha20-Poly1305). Secrets travel only sealed; otherwise other PCs get the account list and sign in again.
 //! Local files stay per PC: their songs are matched by title, artist and length on the other side.
 
-use crate::library::{Library, is_made_up_mix, now_ms};
+use crate::library::{Library, is_made_up_mix, now_ms, copy_to, open_backup};
 use crate::model::{Source, Track};
 use anyhow::{Context, Result, anyhow, bail, ensure};
 use chacha20poly1305::aead::{Aead, KeyInit};
@@ -562,6 +562,40 @@ impl Library {
     }
 
     /// Takes another PC's snapshot in: newest change wins per item, deletions spread.
+    /// A backup added to this library (Settings › General › Add from a backup): what it holds that this one doesn't comes
+    /// in as another PC's would (Sync Mode's merge), nothing here goes, and a list both hold stays as it is here, the
+    /// songs added to it joining. What this PC removed stays removed, and made-up mixes stay out. `settings`: its
+    /// interface settings replace these (this PC's own excepted), stamped `now` so they travel. The backup is only read:
+    /// an older one is brought up to date in a copy.
+    pub fn merge_backup(&self, from: &std::path::Path, settings: bool, now: i64) -> Result<Merged> {
+        let source = open_backup(from)?;
+        let folder = std::env::temp_dir().join(format!("legato-add-backup-{}-{now}", std::process::id()));
+        std::fs::create_dir_all(&folder)?;
+        let taken = (|| -> Result<Snapshot> {
+            let copy = folder.join("library.db");
+            copy_to(&source, &copy)?;
+            Library::open(&copy)?.snapshot("backup", "backup", Accounts::default(), None)
+        })();
+        let _ = std::fs::remove_dir_all(&folder);
+        let mut added = taken?;
+        // Its removals and the song it was playing stay in it.
+        added.gone.clear();
+        added.removed.clear();
+        added.now = None;
+        for list in &mut added.playlists {
+            let Some((kind, id)) = list.key.split_once(':') else { continue };
+            let here: Option<i64> = self.db.query_row("SELECT updated FROM playlists WHERE source = ?1 AND source_id = ?2", params![kind, id], |r| r.get(0)).optional()?;
+            if let Some(updated) = here {
+                list.updated = updated;
+            }
+        }
+        added.settings.retain(|key, _| settings && key.starts_with("ui."));
+        for setting in added.settings.values_mut() {
+            setting.at = now;
+        }
+        self.merge(&added)
+    }
+
     pub fn merge(&self, s: &Snapshot) -> Result<Merged> {
         ensure!(s.format == FORMAT, "Sync file from a newer version of the app: update this PC");
         self.tx(|| self.merge_in(s))
@@ -1669,6 +1703,56 @@ mod tests {
         assert_eq!(settings_by_code(true, false, false), Keep);
         assert_eq!(settings_by_code(false, true, false), Keep);
         assert_eq!(settings_by_code(false, false, true), Keep);
+    }
+
+    #[test]
+    fn adding_a_backup_brings_what_it_holds_and_takes_nothing_away() -> Result<()> {
+        let dir = std::env::temp_dir().join(format!("legato-add-backup-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dir)?;
+        let file = dir.join("old.legato");
+        {
+            let old = Library::open(&file)?;
+            let kept = old.upsert_track(&song("Kept", "k1"))?;
+            old.record_play(&Play { track_id: kept, started_at: 1_000, listened_ms: 60_000, completed: true })?;
+            old.record_play(&Play { track_id: kept, started_at: 2_000, listened_ms: 60_000, completed: true })?;
+            old.save_playlist(Source::Youtube, "PLshared", "Shared", &[song("Kept", "k1")])?;
+            old.save_playlist(Source::Youtube, "PLold", "Only in the backup", &[song("Old", "o1")])?;
+            old.save_playlist(Source::Youtube, "RDmix", "A made-up mix", &[song("Mixed", "m1")])?;
+            old.save_ui_settings(&serde_json::json!({ "theme": "custom-night", "customThemes": [{ "id": "custom-night" }], "zoom": 150 }), 10)?;
+            // An older app's schema (v25): brought up to date in a copy only.
+            old.db.execute_batch("DROP TRIGGER temp.song_set; ALTER TABLE tracks DROP COLUMN chapters; PRAGMA user_version = 25;")?;
+        }
+        let before = std::fs::read(&file)?;
+
+        let library = Library::in_memory()?;
+        let here = library.upsert_track(&song("Here", "h1"))?;
+        library.record_play(&Play { track_id: here, started_at: 5_000, listened_ms: 60_000, completed: true })?;
+        // Older here than in the backup, and shorter on purpose: it stays as it is.
+        library.save_playlist(Source::Youtube, "PLshared", "Shared, renamed here", &[song("Here", "h1")])?;
+        library.db.execute("UPDATE playlists SET updated = 1", [])?;
+        library.save_ui_settings(&serde_json::json!({ "theme": "light", "customThemes": [], "zoom": 100 }), 20)?;
+
+        let merged = library.merge_backup(&file, false, 1_000)?;
+        assert_eq!((merged.plays, merged.settings, merged.deleted, merged.removed), (2, 0, 0, 0));
+        assert_eq!(names(&library), ["Only in the backup", "Shared, renamed here"]);
+        let titles: Vec<String> = library.tracks()?.into_iter().map(|row| row.track.title).collect();
+        assert!(titles.contains(&"Here".into()) && titles.contains(&"Old".into()) && !titles.contains(&"Mixed".into()), "{titles:?}");
+        let shared = library.playlists()?.into_iter().find(|list| list.name == "Shared, renamed here").unwrap().id;
+        assert_eq!(library.playlist_tracks(shared)?.len(), 1);
+        assert_eq!(library.setting("ui")?.unwrap()["theme"], "light");
+
+        // With its settings: its themes back, this PC's own kept, stamped now so they travel.
+        let merged = library.merge_backup(&file, true, 2_000)?;
+        assert_eq!((merged.plays, merged.deleted), (0, 0));
+        let ui = library.setting("ui")?.unwrap();
+        assert_eq!((ui["theme"].as_str(), ui["customThemes"][0]["id"].as_str(), ui["zoom"].as_i64()), (Some("custom-night"), Some("custom-night"), Some(100)));
+        assert_eq!(snap(&library).settings["ui.theme"].at, 2_000);
+        assert_eq!(std::fs::read(&file)?, before);
+
+        std::fs::write(dir.join("not.legato"), "hello")?;
+        assert!(library.merge_backup(&dir.join("not.legato"), false, 3_000).is_err());
+        std::fs::remove_dir_all(&dir)?;
+        Ok(())
     }
 
     #[test]
