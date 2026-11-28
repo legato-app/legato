@@ -103,7 +103,7 @@ the order; a line leaves only when it ships or the user drops it.
       the user pastes or drops an exact Discord link, so no off-by-default switch; easiest to undo = delete the listener
       in `PlayerBar.tsx`. (5) A picture is only read for a share card's link (`share_read_image`), never kept as a cover.
 
-- [ ] `M` Android: the sound sometimes crackles or sounds saturated (the owner, 2026-11-18, cause unknown to them, "maybe
+- [x] `M` Android: the sound sometimes crackles or sounds saturated (the owner, 2026-11-18, cause unknown to them, "maybe
       the connection"). Their answers: a YouTube song, Bluetooth earphones, the screen off or the app in the background, no
       effect on. Not reproduced. The owner's word (2026-11-18): fix the live processing so it holds up there; never
       switch it off to dodge the problem. Suspect first (read in the code, not proven): by default every YouTube song is
@@ -138,6 +138,7 @@ the order; a line leaves only when it ships or the user drops it.
       (offline render in Chromium: all on then off = the neutral level), desktop too. NOT ticked: the cause is likely,
       not certain. To try on the phone: (1) Live Editor used on a song then reset, YouTube song, Bluetooth, screen off:
       no crackle = the idle parts were it. (2) Same with crossfade on, across a song change. (3) 8D (Space) and reverb on:
+      Done 2026-11-28 (390e82fe, 306de9a3, c0245823), not tried on a phone: see "Check live in the real app".
       crackles only then = those parts alone are too heavy (next: a lighter reverb on Android). (4) Speed or pitch changed.
 - [x] `M` The devices sync heard sooner on the network (the owner, 2026-11-18, from the phone: "que ça se détecte plus
       rapidement sur le réseau"). Today (`src-tauri/src/devices.rs`): listening starts 20 s after launch (`FIRST`), the
@@ -1364,6 +1365,7 @@ Most useful first; the tag is the effort.
 
 ## Check live in the real app (built and unit-tested, never driven for real)
 
+- [ ] Android crackle gone: a YouTube song on the phone, Bluetooth earphones, screen off or app in background, crossfade and 8D each on (fixes 390e82fe, 306de9a3, c0245823).
 - [ ] Connect Apple Music on the owner's account (the owner's ask to keep it in mind, 2026-10-31): All Playlists read with
       covers, a long library playlist and Favorite Songs read to their end, the `media-user-token` cookie ending the
       sign-in step, a second import updating the lists. If it breaks, `apple.js`'s selectors are the first suspect (only a
