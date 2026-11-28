@@ -507,13 +507,8 @@ What the services allow, read on 2026-10-31 (specs in [ideas/catch-up.md](ideas/
 
 - [ ] `S` Connect Spotify, not tried yet: playlists inside a library folder, a collapsed library column, an expired
       session, the window covering Legato while it reads (Cancel in the toast may be behind it), a list with local files.
-- [ ] `M` Likes and adds sent to Spotify (Send only, Both ways): official API only, so a key and a Premium account, also
-      to test it. No way without them: Exportify only reads, and pressing hearts in Spotify's page would be a bot on the account.
 - [ ] `S` per service: public playlist links from more services (TIDAL, Qobuz, Amazon Music), same flow as Deezer. Nothing
       checked yet.
-- [ ] `L` SoundCloud playback in its official embedded widget (no audio taken). User's call first: see its terms above.
-- [ ] `M` SoundCloud search beside YouTube's (widget playback, its terms checked first). The only keyless way is the
-      site's own client id, which its API terms rule out: not advised.
 
 ### Features, sorted (user's ask 2026-10-31)
 
@@ -1549,9 +1544,8 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
 
 **Spotify** (no keys; the user chose link import)
 - [ ] Keep or remove the Spotify app-key path (Settings › Accounts). User's call.
-- [ ] Real playback in the web player window (user signs in first).
 - [ ] Only if the user asks: ad blocking (ToS / account risk first).
-- [ ] Needs paid accounts: Spotify Connect for real (Premium), MusicKit (Apple Developer).
+- [ ] Needs paid accounts: MusicKit (Apple Developer).
 
 **Housekeeping**
 - [ ] Playlist `trackCount` vs rows mismatch (Workout Mix).
