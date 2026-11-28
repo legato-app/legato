@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HIDEABLE_PARTS, HOME_SECTIONS, lookOf, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
+import { contrast, contrastReport, duplicateTheme, coverGlow, cssVars, DEFAULTS, glowVars, HIDEABLE_PARTS, HOME_SECTIONS, lookOf, MAX_THEME_SCRIPT, MAX_THEME_SCRIPT_CODE, moveHome, placeHome, onAccentFor, paletteFrom, pickTheme, PRESETS, resolveTheme, sanitize, sanitizeHome, sanitizeTheme } from './theme'
 import { PAGE_PARTS } from './layout'
 
 describe('sanitize', () => {
@@ -311,5 +311,33 @@ describe('glow', () => {
     expect(glowVars(light, 'strong')['--glow-on']).toBe('none')
     expect(glowVars(dark, 'soft')['--glow-on']).not.toBe('none')
     expect(glowVars({ ...dark, glow: false }, 'soft')['--led-glow']).toBe('none')
+  })
+})
+
+describe('a theme’s script', () => {
+  // As a version before theme code saved one.
+  const older = { id: 'custom-older', name: 'Older', dark: true, font: 'modern', glow: false, radius: 'soft', bg: '#101014', panel: '#17171C', raised: '#1F1F26', recess: '#0B0B0E', line: '#2A2A33', lineSoft: '#202028', ink: '#F4F4F6', ink2: '#B6B6C0', ink3: '#82828E', ink4: '#4A4A55', accent: '#3AA8FF', onAccent: '#06121F', ledOff: '#35353F', css: '.kicker { letter-spacing: 0.2em; }', layout: { v: 1, hidden: ['sidePanel'] } }
+  const script = { api: 1, permissions: ['theme:events'], code: 'theme.vars({ "--glow": "1" })', later: { anything: [1, 2] } }
+  const kept = (given: unknown) => sanitizeTheme({ ...older, script: given })!
+
+  it('leaves a theme without one as it was', () => {
+    expect(sanitizeTheme(older)).toEqual(older)
+  })
+
+  it('is kept as it came, keys this version doesn’t know too, through a save and a copy', () => {
+    expect(kept(script).script).toEqual(script)
+    expect(sanitizeTheme(JSON.parse(JSON.stringify(kept(script))))!.script).toEqual(script)
+    expect(duplicateTheme(kept(script), 'Copy')!.script).toEqual(script)
+    expect(kept({ api: 9, code: '' }).script).toEqual({ api: 9, code: '' })
+  })
+
+  it('is left out, the theme kept, when it isn’t one or is too big', () => {
+    const tooLong = 'x'.repeat(MAX_THEME_SCRIPT_CODE + 1)
+    const tooBig = { api: 1, code: 'x', notes: 'x'.repeat(MAX_THEME_SCRIPT) }
+    for (const bad of ['run()', 7, null, [script], { code: 'x' }, { api: 0, code: 'x' }, { api: 1.5, code: 'x' }, { api: '1', code: 'x' }, { api: 1 }, { api: 1, code: ['x'] }, { api: 1, code: tooLong }, tooBig]) {
+      const theme = kept(bad)
+      expect([theme.name, theme.css, 'script' in theme], JSON.stringify(bad)?.slice(0, 40)).toEqual([older.name, older.css, false])
+    }
+    expect(kept({ api: 1, code: 'x'.repeat(MAX_THEME_SCRIPT_CODE) }).script).toBeDefined()
   })
 })

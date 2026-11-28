@@ -31,6 +31,13 @@ describe('withAddedTheme', () => {
     expect(other.changes.customThemes).toHaveLength(2)
   })
 
+  it('takes two themes that differ by their script alone for two, and the same script for one', () => {
+    const own = theme('Night', { script: { api: 1, code: 'theme.style("a")' } })
+    expect(withAddedTheme(settings({ customThemes: [own] }), theme('Night', { script: { code: 'theme.style("a")', api: 1 } }))!.added).toBe(false)
+    const other = withAddedTheme(settings({ customThemes: [own] }), theme('Night', { script: { api: 1, code: 'theme.style("b")' } }))!
+    expect(other.changes.customThemes?.map((added) => added.script?.code)).toEqual(['theme.style("a")', 'theme.style("b")'])
+  })
+
   it('knows the same file again when a newer layout’s keys come back in another order', () => {
     const own = theme('Later', { layout: { v: 99, regions: { left: ['sidebar'], right: [] } } as unknown as Theme['layout'] })
     const reordered = theme('Later', { layout: { regions: { right: [], left: ['sidebar'] }, v: 99 } as unknown as Theme['layout'] })

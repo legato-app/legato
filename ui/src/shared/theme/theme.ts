@@ -29,6 +29,19 @@ export interface Theme extends Palette {
   css?: string
   /** Where the app's parts go (`layout.ts`). */
   layout?: Layout
+  /** The theme's own code: kept, never run by this version. */
+  script?: ThemeScript
+}
+
+/**
+ * A theme's `script` block (plan-v2 "Theme code"), kept as it came, keys a later version adds among them. Only its shape
+ * and size are checked: nothing here runs it, and what it may do is for the version that does to check.
+ */
+export interface ThemeScript {
+  api: number
+  code: string
+  permissions?: unknown
+  [key: string]: unknown
 }
 
 export const RADII = ['sharp', 'soft', 'round'] as const
@@ -53,6 +66,9 @@ export type Look = Partial<Pick<Settings, LookKey>>
 
 /** Theme CSS kept in settings (synced, size-bounded): 20 KB. */
 export const MAX_THEME_CSS = 20_000
+/** A theme's code at most, and its whole `script` block as JSON: themes live in the settings, saved and synced whole. */
+export const MAX_THEME_SCRIPT_CODE = 65_536
+export const MAX_THEME_SCRIPT = 73_728
 
 /** modern = Roboto (YouTube's UI font), hifi = Schibsted Grotesk, neutral = Segoe UI. */
 export const FONTS = ['modern', 'hifi', 'neutral'] as const
@@ -817,6 +833,15 @@ function alarmOf(v: unknown): Alarm {
   }
 }
 
+/** A `script` block worth keeping: an object with its API number and its code, within the limits. */
+function keptScript(raw: unknown): ThemeScript | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined
+  const { api, code } = raw as Record<string, unknown>
+  if (typeof api !== 'number' || !Number.isInteger(api) || api < 1) return undefined
+  if (typeof code !== 'string' || code.length > MAX_THEME_SCRIPT_CODE) return undefined
+  return JSON.stringify(raw).length <= MAX_THEME_SCRIPT ? (raw as ThemeScript) : undefined
+}
+
 /** Trust boundary (file import, stored JSON): full palette or nothing. */
 export function sanitizeTheme(raw: unknown): Theme | null {
   if (!raw || typeof raw !== 'object') return null
@@ -831,6 +856,7 @@ export function sanitizeTheme(raw: unknown): Theme | null {
   const look = sanitizeLook(r.look)
   const css = cleanCss(r.css, MAX_THEME_CSS).trim()
   const layout = sanitizeLayout(r.layout)
+  const script = keptScript(r.script)
   return {
     id,
     name,
@@ -843,6 +869,7 @@ export function sanitizeTheme(raw: unknown): Theme | null {
     ...(look && { look }),
     ...(css && { css }),
     ...(layout && { layout }),
+    ...(script && { script }),
   }
 }
 

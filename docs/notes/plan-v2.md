@@ -1155,6 +1155,10 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
     - Brief, slice 1 (`S`): `sanitizeTheme` keeps a valid `script` (`{ api, code, permissions? }`, within the limits) unrun,
       and drops a bad or oversized one while keeping the theme. Tests: an old fixture unchanged; a script kept, unknown keys
       too; duplicate, add and arrange keep it; `pack` and `unpack` keep it (`themefile.rs`).
+  - [x] Slice 1 (2026-11-28), nothing in the interface: `script` kept as it came (`theme.ts` `keptScript`), never run;
+    tested through a save, a copy, adding, arranging and a `.theme` file. A version before this one still drops it.
+    - Decided alone (2026-11-28): `permissions` is kept unchecked (for slice 2, in Rust); the import's own refusal of
+      an oversized script waits for slice 3's review, since slice 1 adds no text.
 - [x] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
       the layout (`askAboutLayout`, `themeLayoutImport.ts`, the drop handler in `PlayerBar.tsx`). The owner's word,
       2026-11-27: themes "dynamique et rapide", the app really user-friendly. Builder: Sonnet.

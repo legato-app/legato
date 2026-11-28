@@ -101,6 +101,13 @@ mod tests {
     }
 
     #[test]
+    fn a_theme_file_carries_its_script_as_written() {
+        let theme = json!({ "name": "Coded", "script": { "api": 1, "code": "theme.style('')\n", "permissions": ["theme:events"], "later": { "kept": true } } });
+        assert_eq!(unpack(&pack(&theme, None).unwrap()).unwrap().0, theme);
+        assert_eq!(unpack(&pack(&theme, Some(PNG)).unwrap()).unwrap().0, theme);
+    }
+
+    #[test]
     fn a_theme_file_carries_its_picture() {
         let theme = json!({ "name": "Night", "bg": "#000000", "background": { "image": "bg-0000000000000000.png" } });
         let text = pack(&theme, Some(PNG)).unwrap();

@@ -32,6 +32,20 @@ describe('saving an arrangement made by hand', () => {
     expect(saved.undo(now)).toEqual({ customThemes: [edited, other, later], themeLayouts: false })
   })
 
+  it('keeps a theme’s script, in the theme itself and in a copy of it', () => {
+    const script = { api: 1, code: 'theme.style("")' }
+    const edited = own('custom-a', { script })
+    const saved = saveArrangement(settingsWith([edited], edited.id), edited, moved, 'Copy')
+    expect(saved.kind === 'saved' && saved.theme.script).toEqual(script)
+    // A newer app's layout is kept as it is: the moves go into a copy, which keeps the script.
+    const newer = own('custom-b', { script, layout: { v: 99 } })
+    const copied = saveArrangement(settingsWith([newer], newer.id), newer, moved, 'Copy')
+    expect(copied.kind === 'saved' && [copied.theme.id === newer.id, copied.theme.script]).toEqual([false, script])
+    // A preset has none, nor does its copy.
+    const fromPreset = saveArrangement(settingsWith([], preset.id), preset, moved, 'Copy')
+    expect(fromPreset.kind === 'saved' && 'script' in fromPreset.theme).toBe(false)
+  })
+
   it('drops the layout of a theme put back to the app’s own', () => {
     const edited = own('custom-a', { layout: { v: 1, hidden: ['sidePanel'] } })
     const saved = saveArrangement(settingsWith([edited], edited.id), edited, DEFAULT_LAYOUT, 'Copy')
