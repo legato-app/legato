@@ -16,7 +16,7 @@ changes; older versions are in git. Updated 2026-11-27, end of window 2 on the s
     `ce87dc3e`), the interface hides what Linux lacks (`5950c1fd`);
   - a Stable release cleaned up: CodeQL, release notes that leave out what only the code's readers care about
     (`11aed31b`, `7419231c`);
-  - the Lite sync fix: a PC that joins a sync keeps its own settings (`bc5c271d`, `a53064da`);
+  - the Lite sync fix: a PC that joins others' sync takes their settings instead of overwriting them (`bc5c271d`);
   - security pass fixes landed, details in private notes.
 - **Local, not reviewed**: `40060f24` (resuming a stopped sync keeps this PC's settings), `7d32c78d` (a backup can be
   added to the library, removing nothing), `7723f222` (Add from a backup, with its settings if wanted), `bddcee60`
@@ -29,7 +29,7 @@ changes; older versions are in git. Updated 2026-11-27, end of window 2 on the s
 ## Next, in order
 1. **Opus reviews** the four local commits above, then the pushed batch if not yet reviewed.
 2. **Swapped titles**: the fix is `merge_in` plus `backwardsTitles3` (a swapped title came back on Beta v1.2.456).
-3. **Rest of `51276a5a`** (release workflow hardening, signing key and pinned actions): the part not yet landed.
+3. **Rest of `51276a5a`** (release workflow hardening; the actions are pinned): the part not yet landed, in private notes.
 4. **Linux, slices 2 and 3** (plan-v2, Linux line).
 5. **Spotify on the phone** (plan-v2, `S` then `M`): Exportify in the phone's browser, then the user's own client ID
    with PKCE over a `legato://` redirect.
