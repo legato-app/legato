@@ -1,7 +1,7 @@
 import { DotsSixVertical } from '@phosphor-icons/react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { isRtl, useLang } from '../../shared/i18n/i18n'
-import { canHidePart, hiddenParts, mirrorsParts, orderedContainers, orderedParts, partAxis, partGroup, type PartOwner } from '../../shared/theme/arrange'
+import { canHidePart, hiddenParts, holdsParts, mirrorsParts, orderedContainers, orderedParts, partAxis, partGroup, type PartOwner } from '../../shared/theme/arrange'
 import type { Placement } from '../../shared/theme/layout'
 import { useDrag } from '../../shared/ui/drag'
 import type { DrawnBoxes } from './boxes'
@@ -11,40 +11,47 @@ import { hidePart, nudgePart, placePart } from './session'
 import { partZones, type Box } from './zones'
 
 /** A page's big blocks: outlined, the pointer passing through (the page still scrolls), their handle a pill in a corner.
- *  The other parts are small: the handle covers them. */
+ *  A part that holds others has its pill above it, theirs covering most of it. The other parts are small: the handle
+ *  covers them. */
 const BLOCKS: readonly PartOwner[] = ['album', 'artist', 'songs', 'albums', 'artists', 'home', 'nowPlayingColumns']
+
+/** A pill's height: above a part at the window's top, it stays inside. */
+const PILL_HEIGHT = 28
 
 interface PartProps {
   owner: PartOwner
   part: string
   box: Box
-  /** The parts of its container that have a box. */
-  onScreen: string[]
   underDrag: boolean
 }
 
 /** A part's handle, with an eye on its corner for the ones that can hide. */
-function PartHandle({ owner, part, box, onScreen, underDrag }: PartProps) {
+function PartHandle({ owner, part, box, underDrag }: PartProps) {
   const name = partName(owner, part)
   const id = `part:${owner}:${part}`
   const hiding = canHidePart(owner, part)
     ? { allowed: () => true, hide: () => hidePart(owner, part, name), isHidden: () => isHidden(owner, part) }
     : undefined
   const through = underDrag ? 'pointer-events-none' : ''
+  const holds = holdsParts(owner, part)
   const props = handleProps({
     id,
     name,
     drag: { kind: 'arrange', scope: 'part', owner, id: part },
     directions: partAxis(owner, part) === 'down' ? ['up', 'down'] : ['left', 'right'],
-    move: (direction) => nudgePart(owner, part, name, direction, onScreen),
+    move: (direction) => nudgePart(owner, part, name, direction),
     hiding,
   })
   return (
     <>
-      {BLOCKS.includes(owner) ? (
+      {BLOCKS.includes(owner) || holds ? (
         <>
           <div aria-hidden style={box} className="pointer-events-none fixed z-35 rounded-md border border-dashed border-ink-3" />
-          <button {...props} style={{ left: box.left + 4, top: box.top + 4 }} className={`fixed z-37 ${PILL} ${through} ${underDrag ? 'opacity-50' : ''}`}>
+          <button
+            {...props}
+            style={holds ? { left: box.left, top: Math.max(box.top, PILL_HEIGHT) } : { left: box.left + 4, top: box.top + 4 }}
+            className={`fixed z-37 ${PILL} ${holds ? '-translate-y-full' : ''} ${through} ${underDrag ? 'opacity-50' : ''}`}
+          >
             <DotsSixVertical size={14} weight="bold" /> {name}
           </button>
         </>
@@ -77,10 +84,7 @@ export function ArrangeParts({ draft, owners, boxes }: { draft: Placement; owner
       )
     : []
   const shown = owners.flatMap((owner) =>
-    orderedContainers(draft, owner).flatMap((group) => {
-      const onScreen = group.filter((part) => boxOf(owner, part))
-      return onScreen.map((part) => ({ owner, part, box: boxOf(owner, part)!, onScreen }))
-    }),
+    orderedContainers(draft, owner).flatMap((group) => group.filter((part) => boxOf(owner, part)).map((part) => ({ owner, part, box: boxOf(owner, part)! }))),
   )
   return (
     <>

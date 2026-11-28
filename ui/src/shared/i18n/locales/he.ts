@@ -1301,6 +1301,7 @@ const he: Record<string, string> = {
   'Play controls': 'פקדי ההשמעה',
   'Back and forward': 'אחורה וקדימה',
   'Hide {part}': 'הסתרת {part}',
+  'Middle': 'החלק האמצעי',
   'More albums': 'אלבומים נוספים',
   'Filters': 'מסננים',
   'Sections': 'מקטעים',

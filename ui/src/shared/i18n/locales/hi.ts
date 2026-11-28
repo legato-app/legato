@@ -1337,6 +1337,7 @@ const hi: Record<string, string> = {
   'Play controls': 'प्लेबैक नियंत्रण',
   'Back and forward': 'पीछे और आगे',
   'Hide {part}': '{part} छिपाएँ',
+  'Middle': 'बीच का हिस्सा',
   'More albums': 'और एल्बम',
   'Filters': 'फ़िल्टर',
   'Sections': 'अनुभाग',

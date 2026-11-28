@@ -11,6 +11,8 @@ export interface DrawnBoxes {
   surfaces: Partial<Record<Surface, Box>>
   /** By `data-part` (`owner:part`, `app/ArrangePart`); a part with nothing to show, or scrolled away, has none. */
   parts: Record<string, Box>
+  /** The parts with something to show, scrolled away or not. */
+  filled: string[]
   /** The page's header (`PageHeader`), and its art when it draws one. */
   header?: { box: Box; art?: Box }
 }
@@ -29,14 +31,14 @@ function shownBox(element: Element, box: Box | null): Box | null {
   return clip && boxWithin(box, clip)
 }
 
-/** The box around what stands between a part's two marks. */
+/** The box around what stands between a part's two marks, whether the page shows it or not. */
 function markedBox(mark: Element): Box | null {
   const boxes: Box[] = []
   for (let element = mark.nextElementSibling; element && !element.matches('[data-part-end]'); element = element.nextElementSibling) {
     const box = boxOf(element)
     if (box) boxes.push(box)
   }
-  return shownBox(mark, boxAround(boxes))
+  return boxAround(boxes)
 }
 
 function measureHeader(): DrawnBoxes['header'] {
@@ -48,7 +50,7 @@ function measureHeader(): DrawnBoxes['header'] {
 }
 
 function measure(): DrawnBoxes {
-  const drawn: DrawnBoxes = { surfaces: {}, parts: {}, header: measureHeader() }
+  const drawn: DrawnBoxes = { surfaces: {}, parts: {}, filled: [], header: measureHeader() }
   for (const element of document.querySelectorAll<HTMLElement>('[data-surface]')) {
     const box = boxOf(element)
     if (box) drawn.surfaces[element.dataset.surface as Surface] = box
@@ -56,14 +58,18 @@ function measure(): DrawnBoxes {
   for (const mark of document.querySelectorAll<HTMLElement>('[data-part]')) {
     // A page with several lists marks their columns in each: the first on screen has the handles.
     const part = mark.dataset.part!
-    const box = !drawn.parts[part] && markedBox(mark)
-    if (box) drawn.parts[part] = box
+    if (drawn.parts[part]) continue
+    const whole = markedBox(mark)
+    if (!whole) continue
+    if (!drawn.filled.includes(part)) drawn.filled.push(part)
+    const shown = shownBox(mark, whole)
+    if (shown) drawn.parts[part] = shown
   }
   return drawn
 }
 
 export function useDrawnBoxes(draft: Placement) {
-  const [boxes, setBoxes] = useState<DrawnBoxes>({ surfaces: {}, parts: {} })
+  const [boxes, setBoxes] = useState<DrawnBoxes>({ surfaces: {}, parts: {}, filled: [] })
   useEffect(() => {
     const read = () => {
       const measured = measure()

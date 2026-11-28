@@ -1337,6 +1337,7 @@ const tr: Record<string, string> = {
   'Play controls': 'Oynatma denetimleri',
   'Back and forward': 'Geri ve ileri',
   'Hide {part}': '{part} öğesini gizle',
+  'Middle': 'Orta bölüm',
   'More albums': 'Diğer albümler',
   'Filters': 'Filtreler',
   'Sections': 'Bölümler',

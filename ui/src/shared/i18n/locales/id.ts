@@ -1337,6 +1337,7 @@ const id: Record<string, string> = {
   'Play controls': 'Kontrol pemutaran',
   'Back and forward': 'Mundur dan maju',
   'Hide {part}': 'Sembunyikan {part}',
+  'Middle': 'Bagian tengah',
   'More albums': 'Album lainnya',
   'Filters': 'Filter',
   'Sections': 'Bagian',

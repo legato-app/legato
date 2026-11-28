@@ -1337,6 +1337,7 @@ const sv: Record<string, string> = {
   'Play controls': 'Uppspelningskontroller',
   'Back and forward': 'Bakåt och framåt',
   'Hide {part}': 'Dölj {part}',
+  'Middle': 'Mitten',
   'More albums': 'Fler album',
   'Filters': 'Filter',
   'Sections': 'Avsnitt',

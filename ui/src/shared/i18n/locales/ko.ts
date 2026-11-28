@@ -1337,6 +1337,7 @@ const ko: Record<string, string> = {
   'Play controls': '재생 컨트롤',
   'Back and forward': '뒤로 및 앞으로',
   'Hide {part}': '{part} 숨기기',
+  'Middle': '가운데 영역',
   'More albums': '다른 앨범',
   'Filters': '필터',
   'Sections': '섹션',

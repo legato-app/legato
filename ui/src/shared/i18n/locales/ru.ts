@@ -1337,6 +1337,7 @@ const ru: Record<string, string> = {
   'Play controls': 'Управление воспроизведением',
   'Back and forward': 'Назад и вперёд',
   'Hide {part}': 'Скрыть: {part}',
+  'Middle': 'Середина',
   'More albums': 'Другие альбомы',
   'Filters': 'Фильтры',
   'Sections': 'Разделы',

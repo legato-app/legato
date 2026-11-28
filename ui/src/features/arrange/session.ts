@@ -8,7 +8,7 @@ import { notifyError } from '../../app/notifyError'
 import { useSettings } from '../../app/settings'
 import { useStore } from '../../app/store'
 import { isRtl, lang, tr } from '../../shared/i18n/i18n'
-import { artStep, mirroredSide, moveInGroup, moveSurface, partStep, setHeader, stepPart, stepSurface, toggleHidden, type ArtPlace, type Direction, type PartOwner } from '../../shared/theme/arrange'
+import { artStep, mirroredSide, moveInGroup, moveSurface, partGroup, partStep, setHeader, stepPart, stepSurface, toggleHidden, type ArtPlace, type Direction, type PartOwner } from '../../shared/theme/arrange'
 import { DEFAULT_LAYOUT, resolveLayout, type HeaderChoice, type Placement, type Region, type Surface } from '../../shared/theme/layout'
 import { saveArrangement } from '../../shared/theme/saveArrangement'
 import { PRESETS, type Theme } from '../../shared/theme/theme'
@@ -17,9 +17,16 @@ import { whereIs, whereIsHeader, whereIsPart } from './names'
 
 /**
  * `said`: the last move in words, for screen readers (the bar's live region). `saidCount` grows each time, so the same
- * words twice in a row are said twice.
+ * words twice in a row are said twice. `filled`: the parts (`owner:part`) with something to show, on screen or scrolled
+ * away; null until they are measured.
  */
-export const useArrange = create<{ history: History; said: string; saidCount: number }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '', saidCount: 0 }))
+export const useArrange = create<{ history: History; said: string; saidCount: number; filled: readonly string[] | null }>(() => ({ history: historyFrom(DEFAULT_LAYOUT), said: '', saidCount: 0, filled: null }))
+
+/** The parts of `part`'s container with something to show; every one while nothing is measured. */
+function filledParts(owner: PartOwner, part: string): string[] {
+  const { filled } = useArrange.getState()
+  return partGroup(owner, part).filter((other) => !filled || filled.includes(`${owner}:${other}`))
+}
 
 /** Where what was moved is, in any placement. */
 type Whereabouts = (placement: Placement) => string
@@ -95,7 +102,7 @@ function say(next: Placement, whereabouts: Whereabouts, refused: string) {
 
 // `name`, here and below: as the user reads it.
 const ofSurface = (surface: Surface, name: string): Whereabouts => (placement) => whereIs(placement, surface, name)
-const ofPart = (owner: PartOwner, part: string, name: string): Whereabouts => (placement) => whereIsPart(placement, owner, part, name)
+const ofPart = (owner: PartOwner, part: string, name: string): Whereabouts => (placement) => whereIsPart(placement, owner, part, name, filledParts(owner, part))
 
 const present = () => useArrange.getState().history.present
 const cannotGo = (name: string) => tr('{part} can’t go there', { part: name })
@@ -120,10 +127,10 @@ export function placePart(owner: PartOwner, part: string, name: string, at: numb
   if (next !== present()) say(next, ofPart(owner, part, name), '')
 }
 
-/** A part moved by an arrow key, past the next of the parts `onScreen`. */
-export function nudgePart(owner: PartOwner, part: string, name: string, direction: Direction, onScreen: readonly string[]) {
+/** A part moved by an arrow key, past the next one with something to show. */
+export function nudgePart(owner: PartOwner, part: string, name: string, direction: Direction) {
   const step = partStep(owner, part, direction, isRtl(lang()))
-  say(step ? stepPart(present(), owner, part, step, onScreen) : present(), ofPart(owner, part, name), cannotGo(name))
+  say(step ? stepPart(present(), owner, part, step, filledParts(owner, part)) : present(), ofPart(owner, part, name), cannotGo(name))
 }
 
 /** A part hidden, or shown again. */
@@ -144,6 +151,7 @@ export const nudgeArt = (direction: Direction) => placeArt(artStep(direction, is
 /** Leaves the mode, nothing saved. */
 export function discardArrangement() {
   stopWatching()
+  useArrange.setState({ filled: null })
   useArrangeDraft.setState({ draft: null })
 }
 

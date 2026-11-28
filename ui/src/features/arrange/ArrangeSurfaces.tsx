@@ -1,4 +1,5 @@
 import { DotsSixVertical } from '@phosphor-icons/react'
+import { useEffect } from 'react'
 import { useArrangeDraft } from '../../app/arrangeDraft'
 import { useStore } from '../../app/store'
 import { isRtl, useLang } from '../../shared/i18n/i18n'
@@ -60,6 +61,10 @@ export function ArrangeSurfaces() {
   const saidCount = useArrange((state) => state.saidCount)
   const plugins = usePlugins((state) => state.list)
   const boxes = useDrawnBoxes(draft)
+  // A step passes the parts with nothing to show, and they are not counted when a move is said.
+  useEffect(() => {
+    if (boxes.filled.length) useArrange.setState({ filled: boxes.filled })
+  }, [boxes])
   const drag = useDrag((state) => state.data)
   const dragged = drag?.kind === 'arrange' && drag.scope === 'surface' ? drag.id : null
   const rightToLeft = useLang((state) => isRtl(state.lang))

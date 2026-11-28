@@ -1337,6 +1337,7 @@ const zh: Record<string, string> = {
   'Play controls': '播放控件',
   'Back and forward': '后退和前进',
   'Hide {part}': '隐藏{part}',
+  'Middle': '中间区域',
   'More albums': '更多专辑',
   'Filters': '筛选器',
   'Sections': '版块',

@@ -11,7 +11,7 @@ const WHERE: Record<Region, string> = { left: msg('{part} on the left'), right: 
 export const PART_NAMES: Record<PartOwner, Record<string, string>> = {
   playerBar: {
     song: msg('Song'),
-    center: msg('Center'),
+    center: msg('Middle'),
     actions: msg('Buttons'),
     transport: msg('Play controls'),
     progress: msg('Progress bar'),
@@ -39,11 +39,11 @@ export const PART_NAMES: Record<PartOwner, Record<string, string>> = {
 
 export const partName = (owner: PartOwner, part: string) => tr(PART_NAMES[owner][part] ?? part)
 
-/** Where a part is: hidden, or its place among those its container shows. */
-export function whereIsPart(placement: Placement, owner: PartOwner, part: string, name: string): string {
+/** Where a part is: hidden, or its place among its container's parts that show: those `filled`, all by default. */
+export function whereIsPart(placement: Placement, owner: PartOwner, part: string, name: string, filled: readonly string[] = partGroup(owner, part)): string {
   const hidden = hiddenParts(placement, owner)
   if (hidden.includes(part)) return tr('{part} hidden', { part: name })
-  const shown = orderedParts(placement, owner, partGroup(owner, part)).filter((other) => !hidden.includes(other))
+  const shown = orderedParts(placement, owner, partGroup(owner, part)).filter((other) => other === part || (!hidden.includes(other) && filled.includes(other)))
   return `${name}, ${tr('{position} of {count}', { position: shown.indexOf(part) + 1, count: shown.length })}`
 }
 

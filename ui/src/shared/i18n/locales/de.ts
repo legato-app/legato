@@ -1337,6 +1337,7 @@ const de: Record<string, string> = {
   'Play controls': 'Wiedergabesteuerung',
   'Back and forward': 'Zurück und vorwärts',
   'Hide {part}': '{part} ausblenden',
+  'Middle': 'Mitte',
   'More albums': 'Weitere Alben',
   'Filters': 'Filter',
   'Sections': 'Abschnitte',

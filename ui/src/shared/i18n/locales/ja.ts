@@ -1337,6 +1337,7 @@ const ja: Record<string, string> = {
   'Play controls': '再生コントロール',
   'Back and forward': '戻る・進む',
   'Hide {part}': '{part}を隠す',
+  'Middle': '中央部分',
   'More albums': 'ほかのアルバム',
   'Filters': 'フィルター',
   'Sections': 'セクション',

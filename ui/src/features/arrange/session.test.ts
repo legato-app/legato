@@ -152,9 +152,9 @@ it('keeps the mode open when My themes is full', () => {
 it('moves and hides a bar’s parts, saying where each is, and saves them into the theme', () => {
   beginArranging()
   const said = () => useArrange.getState().said
-  nudgePart('sidebar', 'library', 'Library', 'up', ['nav', 'library'])
+  nudgePart('sidebar', 'library', 'Library', 'up')
   expect([draft()?.parts.sidebar?.order, said()]).toEqual([['library', 'nav'], 'Library, 1 of 2'])
-  nudgePart('sidebar', 'library', 'Library', 'up', ['library', 'nav'])
+  nudgePart('sidebar', 'library', 'Library', 'up')
   expect(said()).toBe('Library can’t go there')
   hidePart('playerBar', 'volume', 'Volume')
   expect([draft()?.parts.playerBar?.hidden, said()]).toEqual([['volume'], 'Volume hidden'])
@@ -170,6 +170,21 @@ it('moves and hides a bar’s parts, saying where each is, and saves them into t
   expect(settings.now.customThemes[0].layout?.parts).toEqual({ sidebar: { order: ['library', 'nav'] } })
 })
 
+it('passes the parts with nothing to show, and doesn’t count them', () => {
+  beginArranging()
+  // No listening room and no sleep timer: five buttons show.
+  useArrange.setState({ filled: ['lyrics', 'upNext', 'volume', 'more', 'fullScreen'].map((part) => `playerBar:${part}`) })
+  nudgePart('playerBar', 'volume', 'Volume', 'left')
+  expect(useArrange.getState().said).toBe('Volume, 2 of 5')
+  nudgePart('playerBar', 'volume', 'Volume', 'left')
+  expect(useArrange.getState().said).toBe('Volume, 1 of 5')
+  nudgePart('playerBar', 'volume', 'Volume', 'left')
+  expect(useArrange.getState().said).toBe('Volume can’t go there')
+  // The next round measures anew.
+  discardArrangement()
+  expect(useArrange.getState().filled).toBeNull()
+})
+
 it('names every part of the bars, the pages and the lists', () => {
   const named = (owner: keyof typeof PART_NAMES) => Object.keys(PART_NAMES[owner]).sort()
   for (const bar of Object.keys(PART_GROUPS) as PartedSurface[]) expect(named(bar)).toEqual([...PART_GROUPS[bar].flat()].sort())
@@ -180,7 +195,7 @@ it('names every part of the bars, the pages and the lists', () => {
 it('arranges a page and its header, saying what each change left, and saves them into the theme', () => {
   beginArranging()
   const said = () => useArrange.getState().said
-  nudgePart('album', 'more', 'More albums', 'up', ['tracks', 'more'])
+  nudgePart('album', 'more', 'More albums', 'up')
   expect(said()).toBe('More albums, 1 of 2')
   hidePart('album', 'more', 'More albums')
   expect(said()).toBe('More albums hidden')

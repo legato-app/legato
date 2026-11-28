@@ -1337,6 +1337,7 @@ const vi: Record<string, string> = {
   'Play controls': 'Điều khiển phát',
   'Back and forward': 'Quay lại và tiến tới',
   'Hide {part}': 'Ẩn {part}',
+  'Middle': 'Phần giữa',
   'More albums': 'Album khác',
   'Filters': 'Bộ lọc',
   'Sections': 'Các mục',

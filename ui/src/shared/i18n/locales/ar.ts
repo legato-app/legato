@@ -1301,6 +1301,7 @@ const ar: Record<string, string> = {
   'Play controls': 'أزرار التشغيل',
   'Back and forward': 'رجوع وتقدّم',
   'Hide {part}': 'إخفاء {part}',
+  'Middle': 'الوسط',
   'More albums': 'ألبومات أخرى',
   'Filters': 'عوامل التصفية',
   'Sections': 'الأقسام',

@@ -1337,6 +1337,7 @@ const uk: Record<string, string> = {
   'Play controls': 'Керування відтворенням',
   'Back and forward': 'Назад і вперед',
   'Hide {part}': 'Сховати: {part}',
+  'Middle': 'Середина',
   'More albums': 'Інші альбоми',
   'Filters': 'Фільтри',
   'Sections': 'Розділи',

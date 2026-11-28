@@ -1337,6 +1337,7 @@ const nl: Record<string, string> = {
   'Play controls': 'Afspeelknoppen',
   'Back and forward': 'Terug en vooruit',
   'Hide {part}': '{part} verbergen',
+  'Middle': 'Midden',
   'More albums': 'Meer albums',
   'Filters': 'Filters',
   'Sections': 'Secties',

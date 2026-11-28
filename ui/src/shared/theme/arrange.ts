@@ -116,13 +116,16 @@ export function partStep(owner: PartOwner, part: string, direction: Direction, r
   return seen === (down ? 'down' : 'right') ? 1 : null
 }
 
+/** A part that is itself a container of others, drawn over most of it. */
+export const holdsParts = (owner: PartOwner, part: string) => owner === 'playerBar' && (part === 'center' || part === 'actions')
+
 /**
- * One step in the part's container, past the next of the parts `onScreen` (a hidden one, or one with nothing to show,
+ * One step in the part's container, past the next of the parts `filled` (a hidden one, or one with nothing to show,
  * counts for nothing). The same placement at the container's end.
  */
-export function stepPart(placement: Placement, owner: PartOwner, part: string, step: -1 | 1, onScreen: readonly string[]): Placement {
+export function stepPart(placement: Placement, owner: PartOwner, part: string, step: -1 | 1, filled: readonly string[]): Placement {
   const order = orderedParts(placement, owner, partGroup(owner, part))
-  const seen = order.filter((other) => other === part || onScreen.includes(other))
+  const seen = order.filter((other) => other === part || filled.includes(other))
   const neighbor = seen[seen.indexOf(part) + step]
   if (neighbor === undefined) return placement
   // `moveInGroup`'s slot: before what sits there now, so after the neighbor is one further.
