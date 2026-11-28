@@ -1,36 +1,52 @@
-//! The shield on Linux (WebKitGTK), the twin of `shield.rs`. WebKit asks no one before a request: the rules are compiled
-//! into one of its content filters, and each resource it loads is noted (Settings › Privacy). What the filter stops is
-//! never loaded, so it is neither noted nor counted.
+//! The shield on Linux (WebKitGTK), the twin of `shield.rs`. WebKit asks no one before a request: the lists are compiled
+//! into one of its content filters, once for each version of them (kept on disk for the next launches), and every view
+//! the shield covers gets that one. Each request WebKit sends is noted (Settings › Privacy); what the filter stops is
+//! never sent, so it is neither noted nor counted.
 
 use music_core::netlog::{self, Via};
 use music_shield::Shield;
+use std::cell::RefCell;
 use std::ffi::{CStr, CString};
-use std::path::Path;
-use std::sync::atomic::Ordering;
+use std::hash::{DefaultHasher, Hash, Hasher};
+use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Manager};
+use webkit2gtk::glib::object::ObjectExt;
 use webkit2gtk::glib::translate::{ToGlibPtr, from_glib_full};
-use webkit2gtk::{URIRequestExt, UserContentManager, WebResourceExt, WebViewExt, ffi, gio, glib};
+use webkit2gtk::{URIRequest, URIRequestExt, WebViewExt, ffi, gio, glib};
 
-/// The filter's name in WebKit's store: compiled again under it each time the rules are given.
+/// The filter's name in its version's store.
 const FILTER_NAME: &CStr = c"legato-shield";
 
 /// The views `install` covers, by label.
 static SHIELDED: Mutex<Vec<String>> = Mutex::new(Vec::new());
-/// None until the lists are converted.
-static RULES: Mutex<Option<Rules>> = Mutex::new(None);
+/// The version of the rules asked for last: older ones ready after it are dropped.
+static WANTED: AtomicU64 = AtomicU64::new(0);
 
-/// The lists as WebKit's store compiles them, and the folder it keeps the result in.
-#[derive(Clone)]
-struct Rules {
-    json: glib::Bytes,
-    store: CString,
+thread_local! {
+    /// The compiled rules every shielded view gets, none until the first are ready. WebKit's: the main thread's only.
+    static FILTER: RefCell<Option<Filter>> = const { RefCell::new(None) };
 }
 
-/// What a compilation under way is for.
-struct Waiting {
-    manager: UserContentManager,
+/// A compiled filter, one reference of ours.
+struct Filter(*mut ffi::WebKitUserContentFilter);
+
+impl Drop for Filter {
+    fn drop(&mut self) {
+        // SAFETY: the reference taken from WebKit; a view's manager holds its own.
+        unsafe { ffi::webkit_user_content_filter_unref(self.0) }
+    }
+}
+
+/// Rules on their way into WebKit.
+struct Pending {
+    app: AppHandle,
     shield: Arc<Shield>,
+    json: glib::Bytes,
+    version: u64,
+    /// This version's own folder: its compiled copy.
+    folder: PathBuf,
 }
 
 pub fn install(webview: &tauri::Webview, shield: Arc<Shield>) -> tauri::Result<()> {
@@ -46,32 +62,39 @@ pub fn install(webview: &tauri::Webview, shield: Arc<Shield>) -> tauri::Result<(
 /// A sign-in or Connect window: its requests noted (Settings › Privacy), none blocked (their pages stay as they are).
 pub fn watch(webview: &tauri::Webview) -> tauri::Result<()> {
     webview.with_webview(|platform| {
-        platform.inner().connect_resource_load_started(|_, resource, request| {
-            note(request.uri());
-            // A redirect changes the resource's address.
-            resource.connect_uri_notify(|resource| note(resource.uri()));
+        platform.inner().connect_resource_load_started(|_, resource, _| {
+            // When the request leaves, redirects too: one the filter stops never does. By name: the bindings' own
+            // signal takes the redirecting answer for always there.
+            resource.connect_local("sent-request", false, |values| {
+                if let Some(address) = values.get(1).and_then(|request| request.get::<URIRequest>().ok()).and_then(|request| request.uri()) {
+                    netlog::note_url(&address, Via::Window, false);
+                }
+                None
+            });
         });
     })
 }
 
-fn note(address: Option<glib::GString>) {
-    if let Some(address) = address {
-        netlog::note_url(&address, Via::Window, false);
+/// The first lists, or fresh ones: converted for WebKit (a moment's work: not on the main thread), then loaded or
+/// compiled and given to the shielded views. `lists_dir`: where the downloaded lists are.
+pub fn rules_changed(app: &AppHandle, shield: &Arc<Shield>, lists_dir: &Path, lists: &str) {
+    let version = version_of(lists);
+    WANTED.store(version, Ordering::Relaxed);
+    let json = match music_shield::content_blocker(lists) {
+        Ok(json) => glib::Bytes::from_owned(json.into_bytes()),
+        Err(error) => return crate::diag::warn("shield", "rules not converted for WebKit", &format!("{error:#}")),
+    };
+    let pending = Pending { app: app.clone(), shield: shield.clone(), json, version, folder: lists_dir.join("webkit").join(format!("{version:016x}")) };
+    if let Err(error) = app.run_on_main_thread(move || load(pending)) {
+        crate::diag::warn("shield", "rules not given to WebKit", &error.to_string());
     }
 }
 
-/// The first lists, or fresh ones: converted for WebKit (a moment's work: not on the main thread), then given to the
-/// shielded views. `lists_dir`: where the downloaded lists are.
-pub fn rules_changed(app: &AppHandle, shield: &Arc<Shield>, lists_dir: &Path, lists: &str) {
-    let store = lists_dir.join("webkit");
-    let rules = music_shield::content_blocker(lists).and_then(|json| Ok(Rules { json: glib::Bytes::from_owned(json.into_bytes()), store: CString::new(store.to_string_lossy().as_ref())? }));
-    match rules {
-        Ok(rules) => {
-            *RULES.lock().unwrap() = Some(rules);
-            refresh(app, shield);
-        }
-        Err(error) => crate::diag::warn("shield", "rules not converted for WebKit", &format!("{error:#}")),
-    }
+/// One version of the rules: the lists' text, as this version of the app converts it.
+fn version_of(lists: &str) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    (env!("CARGO_PKG_VERSION"), lists).hash(&mut hasher);
+    hasher.finish()
 }
 
 /// The switch moved, or the rules did: every shielded view follows.
@@ -84,38 +107,74 @@ pub fn refresh(app: &AppHandle, shield: &Arc<Shield>) {
     }
 }
 
-/// The view's filter as the switch says: the rules, or none.
+/// The view's filter as the switch says: the compiled rules, or none.
 fn give_filter(webview: &tauri::Webview, shield: Arc<Shield>) -> tauri::Result<()> {
     webview.with_webview(move |platform| {
         let Some(manager) = platform.inner().user_content_manager() else { return };
-        if !shield.enabled.load(Ordering::Relaxed) {
-            // SAFETY: a live manager, on the main thread (`with_webview`).
-            unsafe { ffi::webkit_user_content_manager_remove_all_filters(manager.to_glib_none().0) };
-            return;
-        }
-        let rules = RULES.lock().unwrap().clone();
-        if let Some(rules) = rules {
-            compile(rules, Waiting { manager, shield });
+        // SAFETY: a live manager and filter, on the main thread (`with_webview`).
+        unsafe {
+            ffi::webkit_user_content_manager_remove_all_filters(manager.to_glib_none().0);
+            if shield.enabled.load(Ordering::Relaxed) {
+                FILTER.with_borrow(|filter| {
+                    if let Some(filter) = filter {
+                        ffi::webkit_user_content_manager_add_filter(manager.to_glib_none().0, filter.0);
+                    }
+                });
+            }
         }
     })
 }
 
-/// WebKit compiles on its own thread and answers on the main one (`compiled`). The bindings leave its filters out:
-/// called by hand.
-fn compile(rules: Rules, waiting: Waiting) {
-    // SAFETY: the strings and bytes outlive the call (WebKit copies what it keeps); the pending save holds its own
-    // reference to the store; `compiled` is called once and takes the box back.
+/// WebKit's store in `folder`, one reference of ours. The bindings leave the content filters out: called by hand, here
+/// and below. None for a path with a zero byte, which no file system gives.
+fn open_store(folder: &Path) -> Option<*mut ffi::WebKitUserContentFilterStore> {
+    let path = CString::new(folder.to_string_lossy().as_ref()).ok()?;
+    // SAFETY: WebKit copies the path.
+    Some(unsafe { ffi::webkit_user_content_filter_store_new(path.as_ptr()) })
+}
+
+/// The copy compiled at an earlier launch; none yet: `compile`.
+fn load(pending: Pending) {
+    let Some(store) = open_store(&pending.folder) else { return };
+    let pending = Box::into_raw(Box::new(pending));
+    // SAFETY: the pending load holds its own reference to the store; `loaded` is called once and takes the box back.
     unsafe {
-        let store = ffi::webkit_user_content_filter_store_new(rules.store.as_ptr());
-        let waiting = Box::into_raw(Box::new(waiting));
-        ffi::webkit_user_content_filter_store_save(store, FILTER_NAME.as_ptr(), rules.json.to_glib_none().0, std::ptr::null_mut(), Some(compiled), waiting.cast());
+        ffi::webkit_user_content_filter_store_load(store, FILTER_NAME.as_ptr(), std::ptr::null_mut(), Some(loaded), pending.cast());
+        glib::gobject_ffi::g_object_unref(store.cast());
+    }
+}
+
+unsafe extern "C" fn loaded(store: *mut glib::gobject_ffi::GObject, result: *mut gio::ffi::GAsyncResult, data: glib::ffi::gpointer) {
+    // SAFETY: `data` is the box `load` gave this one call.
+    let pending = *unsafe { Box::from_raw(data.cast::<Pending>()) };
+    let mut error = std::ptr::null_mut();
+    // SAFETY: the store and the result are this call's own.
+    let filter = unsafe { ffi::webkit_user_content_filter_store_load_finish(store.cast(), result, &mut error) };
+    if filter.is_null() {
+        // SAFETY: no filter, so WebKit set the error, ours to free. Not compiled yet, most often.
+        drop::<glib::Error>(unsafe { from_glib_full(error) });
+        compile(pending);
+    } else {
+        ready(pending, Filter(filter));
+    }
+}
+
+/// WebKit compiles on a thread of its own and answers on the main one (`compiled`).
+fn compile(pending: Pending) {
+    let Some(store) = open_store(&pending.folder) else { return };
+    let json = pending.json.clone();
+    let pending = Box::into_raw(Box::new(pending));
+    // SAFETY: the bytes outlive the call (WebKit copies what it keeps); the pending save holds its own reference to the
+    // store; `compiled` is called once and takes the box back.
+    unsafe {
+        ffi::webkit_user_content_filter_store_save(store, FILTER_NAME.as_ptr(), json.to_glib_none().0, std::ptr::null_mut(), Some(compiled), pending.cast());
         glib::gobject_ffi::g_object_unref(store.cast());
     }
 }
 
 unsafe extern "C" fn compiled(store: *mut glib::gobject_ffi::GObject, result: *mut gio::ffi::GAsyncResult, data: glib::ffi::gpointer) {
     // SAFETY: `data` is the box `compile` gave this one call.
-    let waiting = unsafe { Box::from_raw(data.cast::<Waiting>()) };
+    let pending = *unsafe { Box::from_raw(data.cast::<Pending>()) };
     let mut error = std::ptr::null_mut();
     // SAFETY: the store and the result are this call's own.
     let filter = unsafe { ffi::webkit_user_content_filter_store_save_finish(store.cast(), result, &mut error) };
@@ -123,16 +182,25 @@ unsafe extern "C" fn compiled(store: *mut glib::gobject_ffi::GObject, result: *m
         // SAFETY: no filter, so WebKit set the error, ours to free.
         let error: glib::Error = unsafe { from_glib_full(error) };
         crate::diag::warn("shield", "WebKit did not compile the rules", &error.to_string());
+    } else {
+        ready(pending, Filter(filter));
+    }
+}
+
+/// Kept for the views to come, given to those there, unless newer rules were asked for meanwhile.
+fn ready(pending: Pending, filter: Filter) {
+    if WANTED.load(Ordering::Relaxed) != pending.version {
         return;
     }
-    // SAFETY: a live manager and the new filter, which the manager references before ours is dropped.
-    unsafe {
-        // Switched off while WebKit worked: nothing to add.
-        if waiting.shield.enabled.load(Ordering::Relaxed) {
-            let manager = waiting.manager.to_glib_none().0;
-            ffi::webkit_user_content_manager_remove_all_filters(manager);
-            ffi::webkit_user_content_manager_add_filter(manager, filter);
-        }
-        ffi::webkit_user_content_filter_unref(filter);
+    FILTER.set(Some(filter));
+    forget_older(&pending.folder);
+    refresh(&pending.app, &pending.shield);
+}
+
+/// Older versions' compiled copies, beside the one kept: removed (best effort).
+fn forget_older(kept: &Path) {
+    let Some(Ok(versions)) = kept.parent().map(std::fs::read_dir) else { return };
+    for version in versions.flatten().filter(|version| version.path() != kept) {
+        let _ = std::fs::remove_dir_all(version.path());
     }
 }
