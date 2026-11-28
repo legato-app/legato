@@ -284,7 +284,7 @@ the order; a line leaves only when it ships or the user drops it.
       and takes the left side): grouping, Like seeds and the artist name a mix may show; no song renamed.
 - [x] `S` A video-only title saved swapped that a sync from an older PC brings after the one-time turn stays swapped:
       `turn_video_only` on the songs a merge inserts, never on one already there; the one-time turn runs once more
-      (`backwardsTitles3`). 2026-11-28, not tried.
+      (`backwardsTitles3`). Built 2026-11-28 (`f0ef47ba`), not tried for real.
 
 ## The owner's asks of 2026-11-07, evening
 
@@ -690,9 +690,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         as the APK; a failure does not block Windows.
       - Slices (S = 1, M = 2, L = 3), 15 points. Order: 0, then 1, then 2-3-4 in any order, then 5-6-7. After the Windows
         and Android Lite (the owner's decision).
-        0 `M` Trial: the shell built in CI, a debug AppImage as an artifact. The owner runs it (WSLg or a VM, their own
+        0 `M` [x] Trial, built 2026-11-28 (`1374f868`, `ce87dc3e`), not tried for real: the owner has not run the AppImage. The shell built in CI, a debug AppImage as an artifact. The owner runs it (WSLg or a VM, their own
           setup): the embed plays, `live.js` runs, the Google sign-in, `cookies_for_url`. Go on or stop there.
-        1 `M` Linux cfgs, the table of what is missing in the UI, clippy Linux in CI.
+        1 `M` [x] Built 2026-11-28 (`5950c1fd`, `d2101957`, `ad105d23`, `e6f2409e`): the table of what is missing in the UI, clippy Linux in CI (green), Linux told by the build. Not tried for real.
         2 `M` MPRIS + `session.rs` on Linux.
         3 `M` Secret Service (a message when there is no daemon), tray / `closeToTray`, XDG autostart, `legato://`,
           single instance (D-Bus), `PULSE_PROP`.
@@ -1387,6 +1387,11 @@ Most useful first; the tag is the effort.
 
 ## Check live in the real app (built and unit-tested, never driven for real)
 
+- [ ] Ajouter depuis une sauvegarde, with the settings box and without it (`7d32c78d`, `7723f222`, `f467e661`, `8dbf6d6e`): the 37 shared settings come back, the 935 songs stay out.
+- [ ] A new Lite joining an existing sync takes the others' settings without overwriting them (`bc5c271d`, the Lite sync fix).
+- [ ] Resuming a stopped sync keeps this PC's settings (`40060f24`).
+- [ ] A swapped title turned the right way round after a merge (`f0ef47ba`), e.g. « like that - doja cat *slowed* ».
+- [ ] Connect Spotify on the phone: « Open Exportify » opens the phone's browser, then the saved file is taken (`d93f0c82`).
 - [ ] Right-click customising screen (tick, reorder, Reset per kind, 4a6ba10c, MenuCustomize.tsx): not driven in the
       app.
 - [ ] Adaptive Sound as one steady gain per song, from its integrated loudness (4173b567, c74d9eb9, bdd3e3ba, 362dd86b):
@@ -1620,8 +1625,7 @@ video ahead, no Spotify previews, Android as the APK with its own updates (no Pl
       `playOnWatchPage`, not reproduced).
 - [ ] `S` Share page: no covers and no player yet (covers would load from YouTube's host for the visitor).
 - [x] `S` Stats recap cards. Ticked 2026-11-18 (lot 63, audit of the line): the recap shipped (`812a8d96` a year or a month as cards to share, `d725d9fe` the profile card; `features/stats/RecapView.tsx`, `recapCards.ts`, `recapDraw.ts`, tested in `recap.test.ts`). What the line still asked is a try by hand (the card from the web page, the QR's look and size): Check live.
-- [ ] `M` Whole-app security pass (for Opus).
-      (to check: 353d301f says the night's security pass landed; what is left is not listed)
+- [x] `M` Whole-app security pass (for Opus): read-only pass done 2026-11-28, fixes landed; details in the owner's private notes. Not tried for real.
 - [ ] `S` Signed-out YouTube search: check it on the owner's PC; if it still fails, read the error under the search.
 - [ ] `S` Settings labels: review the descriptions' length and read the labels in the app in every language; the JSX per group is optional.
 - [x] `S` Server songs levelled: Jellyfin's `NormalizationGain` and Plex's loudness (other scales).
