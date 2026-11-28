@@ -569,7 +569,7 @@ impl Library {
     /// an older one is brought up to date in a copy.
     pub fn merge_backup(&self, from: &std::path::Path, settings: bool, now: i64) -> Result<Merged> {
         let source = open_backup(from)?;
-        let folder = std::env::temp_dir().join(format!("legato-add-backup-{}-{now}", std::process::id()));
+        let folder = self.backup_work_folder(now);
         std::fs::create_dir_all(&folder)?;
         let taken = (|| -> Result<Snapshot> {
             let copy = folder.join("library.db");
@@ -594,6 +594,13 @@ impl Library {
             setting.at = now;
         }
         self.merge(&added)
+    }
+
+    /// Where `merge_backup` brings its copy up to date: beside the library, the folder every system lets the app write
+    /// in (Android refuses the system's temporary one). A library held in memory has no such folder.
+    fn backup_work_folder(&self, now: i64) -> std::path::PathBuf {
+        let beside = self.db.path().filter(|path| !path.is_empty()).and_then(|path| std::path::Path::new(path).parent());
+        beside.map_or_else(std::env::temp_dir, std::path::Path::to_path_buf).join(format!("legato-add-backup-{}-{now}", std::process::id()))
     }
 
     pub fn merge(&self, s: &Snapshot) -> Result<Merged> {
@@ -814,33 +821,40 @@ impl Library {
         let mut ui = self.setting("ui")?.and_then(|v| v.as_object().cloned()).unwrap_or_default();
         let here_keys: HashMap<String, String> = self.playlist_keys()?.into_iter().map(|(id, key)| (key, format!("custom:{id}"))).collect();
         let mut ui_changed = false;
-        let stamps = times.len();
+        let mut times_changed = false;
         for (k, st) in &s.settings {
             let mine = times.get(k).and_then(Value::as_i64).unwrap_or(0);
             if st.at <= mine {
                 continue;
             }
-            if let Some(name) = k.strip_prefix("ui.") {
+            // The same value with a newer time: its time is taken, nothing to tell.
+            let differs = if let Some(name) = k.strip_prefix("ui.") {
                 if LOCAL_SETTINGS.contains(&name) {
                     continue;
                 }
                 let value = if PLAYLIST_KEYED.contains(&name) { swap_playlist_keys(&st.value, &here_keys) } else { st.value.clone() };
-                ui.insert(name.to_string(), value);
-                ui_changed = true;
+                let differs = ui.insert(name.to_string(), value.clone()) != Some(value);
+                ui_changed |= differs;
+                differs
             } else if SHARED_ROWS.contains(&k.as_str()) {
-                self.set_setting(k, &st.value)?;
+                let differs = self.setting(k)?.as_ref() != Some(&st.value);
+                if differs {
+                    self.set_setting(k, &st.value)?;
+                }
+                differs
             } else {
                 continue;
-            }
+            };
             times.insert(k.clone(), st.at.into());
-            m.settings += 1;
+            times_changed = true;
+            m.settings += usize::from(differs);
         }
         if ui_changed {
             let ui = Value::Object(ui);
             ensure!(ui.to_string().len() <= 256 * 1024, "Bad sync file (settings too big)");
             self.set_setting("ui", &ui)?;
         }
-        if m.settings > 0 || times.len() != stamps {
+        if times_changed {
             self.set_setting(TIMES, &Value::Object(times))?;
         }
         // Last: what this file brought of the user's (plays, ratings, lists) holds its songs.
@@ -1803,7 +1817,7 @@ mod tests {
         }
         let before = std::fs::read(&file)?;
 
-        let library = Library::in_memory()?;
+        let library = Library::open(dir.join("library.db"))?;
         let here = library.upsert_track(&song("Here", "h1"))?;
         library.record_play(&Play { track_id: here, started_at: 5_000, listened_ms: 60_000, completed: true })?;
         // Older here than in the backup, and shorter on purpose: it stays as it is.
@@ -1822,14 +1836,24 @@ mod tests {
 
         // With its settings: its themes back, this PC's own kept, stamped now so they travel.
         let merged = library.merge_backup(&file, true, 2_000)?;
-        assert_eq!((merged.plays, merged.deleted), (0, 0));
+        // The theme and the themes change; the zoom is this PC's own.
+        assert_eq!((merged.plays, merged.settings, merged.deleted), (0, 2, 0));
         let ui = library.setting("ui")?.unwrap();
         assert_eq!((ui["theme"].as_str(), ui["customThemes"][0]["id"].as_str(), ui["zoom"].as_i64()), (Some("custom-night"), Some("custom-night"), Some(100)));
         assert_eq!(snap(&library).settings["ui.theme"].at, 2_000);
+        // Again: nothing changes, and nothing is said to; the newer time is still taken.
+        assert_eq!(library.merge_backup(&file, true, 2_500)?.settings, 0);
+        assert_eq!(snap(&library).settings["ui.theme"].at, 2_500);
         assert_eq!(std::fs::read(&file)?, before);
 
         std::fs::write(dir.join("not.legato"), "hello")?;
         assert!(library.merge_backup(&dir.join("not.legato"), false, 3_000).is_err());
+        // The copy is made beside the library (a phone refuses the temporary folder), and leaves with the merge.
+        let work = library.backup_work_folder(4_000);
+        assert_eq!(std::fs::canonicalize(work.parent().unwrap())?, std::fs::canonicalize(&dir)?);
+        assert!(std::fs::read_dir(&dir)?.all(|entry| !entry.unwrap().file_name().to_string_lossy().starts_with("legato-add-backup")));
+        assert_eq!(Library::in_memory()?.backup_work_folder(4_000).parent().map(std::path::Path::to_path_buf), Some(std::env::temp_dir().components().collect()));
+        drop(library);
         std::fs::remove_dir_all(&dir)?;
         Ok(())
     }
