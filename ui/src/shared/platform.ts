@@ -24,9 +24,8 @@ export const MISSING_ON_LINUX = {
   // Settings › Library and storage: the size of Windows' browser engine's folder.
   webViewStorage: {},
   systemAccent: {},
-  // Windows' device callbacks (unplug.rs), its media sessions (session.rs) and its loopback capture.
+  // Windows' device callbacks (unplug.rs) and its loopback capture.
   deviceEvents: { settings: ['Pause during calls', 'Pause when headphones disconnect'] },
-  mediaSessionLookup: { settings: ['Ask this PC’s media players first'] },
   listenToThisPc: {},
   // Pages in a window read through WebView2's message channel: Spotify's, Exportify's and Apple Music's.
   playerPageImports: { settings: ['Connect Spotify'] },
