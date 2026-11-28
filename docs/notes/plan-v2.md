@@ -458,7 +458,7 @@ copies, downloads for offline), their accounts, limits and paid plan.
       forbid rebuilding its sets on YouTube without a registered app of theirs. Today's way, untried: Tune My Music's
       CSV export through Add music › song list.
 - [ ] 16. `M` Reach: left, microsoft/winget-pkgs#474341 merged by Microsoft's moderators (submitted 2026-11-07; then
-      a manifest per Stable, `packaging/README.md`). Done: the website in 18 languages, README screens, Discussions;
+      a manifest per Stable, `packaging/README.md`). Done: the website in 18 languages, README screens, Discussions; (to check: is winget-pkgs#474341 merged? ad435198 says submitted only)
       no Scoop (decided alone).
 - [ ] 17. `L` Listening rooms over the internet, no server of ours: sealed control messages through a public relay (the
       owner's call), or the LAN. Takes in "Listen together on the local network".
