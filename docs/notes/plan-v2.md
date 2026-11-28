@@ -1138,6 +1138,23 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
   - Backward compatible: a theme without `script` is unchanged; a newer `api` runs no code (colours, CSS and layout
     still apply, the card says it needs a newer Legato), like `LAYOUT_API`. Desktop only (rquickjs has no Android
     bindings); absent from Lite (plugins are cut).
+  - Updated 2026-11-28 (Opus):
+    - Arrange mode wins: while its draft is on, the script's `layout`, `classes` and `style` pause and resume at Done.
+      If the script placed parts, the bar says so (slice 4, with a test).
+    - Arranging a preset or System theme copies it first (`duplicateTheme`, new id). The copy keeps `script`, and its
+      review is redone, since the plugin id changes (an unknown id counts as pending review, slice 3).
+    - Size: `code` 64 KB at most, the whole `script` 72 KB (not 2 MB: 24 themes would be 48 MB on every save). Over the
+      limit, import refuses; `sanitizeTheme` drops `script` and keeps the theme.
+    - `theme.slot` parts become layout surfaces `theme:<slot>`, like plugin panels: arrange moves and hides them
+      (`surfaceName`, `neverHides`).
+    - Linux: `art:` is `art://localhost/…`, not `http://art.localhost/…`. The CSS `url()` rule accepts both, local names
+      only (`cover/`, `local/`, `plugin/`), never `remoteArt`. The CSP already covers both. rquickjs builds on Linux.
+    - Lite and phone: "Let themes run code" goes in the `plugins` cut of `liteCuts.ts` and in `DESKTOP_ONLY`. A synced
+      theme keeps its `script` there, unrun (slice 1).
+    - Consent for a script, and its 256 KB storage, live at the root (per PC), not in a profile's folder.
+    - Brief, slice 1 (`S`): `sanitizeTheme` keeps a valid `script` (`{ api, code, permissions? }`, within the limits) unrun,
+      and drops a bad or oversized one while keeping the theme. Tests: an old fixture unchanged; a script kept, unknown keys
+      too; duplicate, add and arrange keep it; `pack` and `unpack` keep it (`themefile.rs`).
 - [x] `S-M` A theme file dropped on the app applies at once and joins My themes; a small warning only when it changes
       the layout (`askAboutLayout`, `themeLayoutImport.ts`, the drop handler in `PlayerBar.tsx`). The owner's word,
       2026-11-27: themes "dynamique et rapide", the app really user-friendly. Builder: Sonnet.
@@ -1304,7 +1321,7 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
       - Slices (S = 1, M = 2; each with tests and i18n in 17 locales), 11 points, order 1 to 6; 1 and 3 can run in parallel:
         1 `M` `crates/core/src/profiles.rs`, pure: tolerant read and write of `Profiles`, `ProfilePaths` (Main = today),
           `hash_code` / `check_code`. Tests: no file gives Main, a damaged fixture, unknown keys kept, Main's paths unchanged.
-        2 `M` Launch: `profile::dirs` at the eight calls, one helper for every web window, `--profile`, `profile_switch`
+        2 `M` Launch: `profile::dirs` at the fifteen calls (see Updated 2026-11-28), one helper for every web window, `--profile`, `profile_switch`
           (writes `last`, then `app.restart()`), single-instance, the source-reading test. First check: WebView2 accepts
           another folder at each launch, and all windows of one launch share it.
         3 `M` `SHARED_KEYS`, `shared.json`, `SharedSecrets`. Tests: the overlay, the round trip, and a full profile
@@ -1318,6 +1335,30 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
         without a photo; Main's default name "Me" through `tr`, renamable.
       - Not verified: nothing run. The WebView2 rule "one folder per launch" and `app.restart()` with an argument are to
         confirm in slice 2.
+      - Updated 2026-11-28 (Opus):
+        - Fifteen folder calls, not eight. Per profile: `lib.rs:797` (library and base folder), `backup.rs` x3,
+          `plugins.rs:102`, `storage.rs:44-45`. Shared at the root: `diag.rs:205`, `covers/`, the art cache, the shield
+          lists and the WebKit filter, and the `app_cache_dir` items (`discord_drop`, `picked`, `media/linux`,
+          `mobile/update`, `spotify_export`). Line numbers from the 2026-11-28 reading; they may drift.
+        - `covers/` stays shared at the root: playlist pictures and theme backgrounds both live there. Removing a profile
+          deletes no cover (at worst an orphan file).
+        - A ninth web view: `ytwatch.rs:229` carries the YouTube session. A test forbids `WebviewWindowBuilder::new`,
+          `WebviewWindowBuilder::from_config` and `WebviewBuilder::new` outside `profile::web_folder`.
+        - Main passes no `data_directory`: byte for byte on Windows, Linux and Android. The others use
+          `app_local_data_dir/profiles/<id>/webview`. On Linux `app_data_dir` and `app_local_data_dir` are one folder, so a
+          test checks that no two profiles collide.
+        - Sync: only Main's snapshot carries `SHARED_KEYS` into `shared.json`; the other profiles strip them on send and
+          ignore them on arrival. Added to slice 4, with a test.
+        - The avatar stays outside the arrangeable top-bar parts (after Settings, like the window buttons): no layout v1
+          change.
+        - Rearranging in profile B also changes Main's look, since the theme is shared. Say so in slice 6's docs.
+        - Linux: check that `app.restart()` relaunches the AppImage (Tauri reads `APPIMAGE`). The single-instance guard
+          passes `--profile` over D-Bus. Autostart still starts on `last`.
+        - Lite keeps profiles under its own identifier. "Add a profile" is `DESKTOP_ONLY`; nothing in `liteCuts.ts`.
+        - Brief, slice 1 (`M`): `crates/core/src/profiles.rs`, pure Rust, no callers: the model, tolerant read and write,
+          `ProfilePaths::of` (Main = today's paths), salted `hash_code` / `check_code`, `add`. Tests: no file gives Main; a
+          damaged file gives Main with a warning that names nothing; unknown keys survive; Main's paths are unchanged; on
+          Linux (`data == local`) no two profiles overlap; bad codes and `../x` ids are refused.
 - [ ] `L` Exclusive WASAPI output / bit-perfect for local files (foobar's audiophiles).
 - [ ] `L` Podcasts by RSS (open feeds only: no platform audio taken), resume per episode, speed.
       2026-11-13, the first slice: Settings › Playback › Podcasts (off) adds Podcasts to the app menu: type an open feed's address, keep
