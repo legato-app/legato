@@ -711,9 +711,9 @@ Importance is a first estimate (2026-10-31), the user moves lines as they like.
           Blocked requests are neither counted nor listed there (WebKit does not say them). To see at the first run: that
           WebKit compiles the whole list, and the compile time on a small machine (once per version of the lists).
         5 `M` [x] Built 2026-11-28, never run (a workflow change runs at the first push to master): release.yml `linux` and
-          `linux-attach`, `scripts/linux-feed.mjs`, the .deb that only says a new version is out. Left: a `.lmix`
-          double-click on Linux (a MIME type of ours, full app only). To see at the first run: the arm runner’s build time,
-          the files’ names, the packages installed.
+          `linux-attach`, `scripts/linux-feed.mjs`, the .deb that only says a new version is out, the `.lmix` double-click
+          (full app: a MIME type of ours). To see at the first run: the arm runner’s build time, the files’ names, the
+          packages installed.
         6 `S` [x] Built 2026-11-28, the site not seen with Linux files (none released yet): downloads per edition and
           processor once the latest Stable release lists them, privacy rows, architecture, development, CONTRIBUTING.
         7 `S` Measure the Lite on a small aarch64 machine (RAM, CPU while playing) against the Windows target.

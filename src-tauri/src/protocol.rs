@@ -7,8 +7,10 @@
 //! removes it only when it still names Lite's exe (`windows/hooks-lite.nsh`).
 //! A `.lmix` file double-clicked comes the same way, as its path (`file_of`): the installer registers that file type
 //! (`tauri.windows.conf.json`), never the running app, and its uninstaller removes it.
-//! Linux: a .deb's own entry names the type (`linux/legato.desktop`); an AppImage installs nothing, so the app writes
-//! its entry for this user and asks for the type (`xdg-mime`), by the same rule between the two editions (`takes_link`).
+//! Linux: a .deb's own entry names the types (`linux/legato.desktop`, the `.lmix` one declared by
+//! `linux/legato-remix.xml`; Lite's `legato-lite.desktop` takes the link only); an AppImage installs nothing, so the app
+//! writes its entry and that declaration for this user and asks for the types (`xdg-mime`), by the same rule between the
+//! two editions (`takes_over`).
 
 // Windows and Linux register; the argument parsing below is tested on every system.
 #![cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
@@ -23,15 +25,27 @@ pub fn arg_of(args: &[String]) -> Option<String> {
     args.iter().skip(1).find(|a| a.get(..9).is_some_and(|p| p.eq_ignore_ascii_case("legato://"))).filter(|a| a.len() <= MAX && !a.chars().any(char::is_control)).cloned()
 }
 
-/// A `.lmix` file double-clicked (the installer's file type, `tauri.windows.conf.json`: Windows starts `legato.exe "<path>"`):
-/// its path, absolute, that extension, not a folder, no control characters. Only a path: `lmix_read` checks its size and
-/// content as for a dropped file; nothing runs it.
+/// A `.lmix` file double-clicked (the installer's file type, `tauri.windows.conf.json`: Windows starts `legato.exe "<path>"`;
+/// a Linux desktop passes the path or its `file://` address): its path, absolute, that extension, not a folder, no control
+/// characters. Only a path: `lmix_read` checks its size and content as for a dropped file; nothing runs it.
 pub fn file_of(args: &[String]) -> Option<String> {
     use std::path::Path;
-    args.iter().skip(1).find(|a| {
-        let p = Path::new(a.as_str());
-        a.len() <= MAX && !a.chars().any(char::is_control) && p.is_absolute() && p.extension().is_some_and(|e| e.eq_ignore_ascii_case("lmix")) && !p.is_dir()
-    }).cloned()
+    args.iter().skip(1).filter_map(|argument| local_path(argument)).find(|path| {
+        let p = Path::new(path.as_str());
+        path.len() <= MAX && !path.chars().any(char::is_control) && p.is_absolute() && p.extension().is_some_and(|e| e.eq_ignore_ascii_case("lmix")) && !p.is_dir()
+    })
+}
+
+/// The path an argument names: a `file://` address of this computer's own read, anything else as it is.
+fn local_path(argument: &str) -> Option<String> {
+    if !argument.starts_with("file://") {
+        return Some(argument.to_string());
+    }
+    let address = tauri::Url::parse(argument).ok()?;
+    if address.host_str().is_some() {
+        return None;
+    }
+    address.to_file_path().ok()?.into_os_string().into_string().ok()
 }
 
 static PENDING: Mutex<Option<String>> = Mutex::new(None);
@@ -78,10 +92,17 @@ pub fn register() {
 #[cfg(any(target_os = "linux", test))]
 const LITE_ENTRY: &str = "app.legato.lite.desktop";
 
-/// Whether the entry holding the link type (`current`, none: nobody) gives way to `mine`: nobody's or ours does, and a
-/// Lite's to the full app. Anything else was the user's choice.
+/// A `.lmix` file's type, as `linux/legato-remix.xml` declares it.
 #[cfg(any(target_os = "linux", test))]
-fn takes_link(current: Option<&str>, mine: &str, this_is_lite: bool) -> bool {
+const REMIX_TYPE: &str = "application/x-legato-remix";
+/// The .deb installs this file; an AppImage's app writes it.
+#[cfg(any(target_os = "linux", test))]
+const REMIX_DECLARATION: &str = include_str!("../linux/legato-remix.xml");
+
+/// Whether the entry holding a type (`current`, none: nobody) gives way to `mine`: nobody's or ours does, and a Lite's
+/// to the full app. Anything else was the user's choice.
+#[cfg(any(target_os = "linux", test))]
+fn takes_over(current: Option<&str>, mine: &str, this_is_lite: bool) -> bool {
     current.is_none_or(|name| name.is_empty() || name == mine || (name == LITE_ENTRY && !this_is_lite))
 }
 
@@ -92,20 +113,46 @@ mod linux {
     use std::process::Command;
 
     const SCHEME: &str = "x-scheme-handler/legato";
+    /// What this edition opens: the Lite has no remixes.
+    const OPENS: &[&str] = if cfg!(feature = "lite") { &[SCHEME] } else { &[SCHEME, super::REMIX_TYPE] };
 
     pub fn register(appimage: &Path) -> anyhow::Result<()> {
         let mine = format!("{}.desktop", crate::identity::INSTALLED);
-        let current = Command::new("xdg-mime").args(["query", "default", SCHEME]).output()?;
-        if !super::takes_link(Some(String::from_utf8_lossy(&current.stdout).trim()), &mine, cfg!(feature = "lite")) {
+        let mut free = Vec::new();
+        for &kind in OPENS {
+            let current = Command::new("xdg-mime").args(["query", "default", kind]).output()?;
+            if super::takes_over(Some(String::from_utf8_lossy(&current.stdout).trim()), &mine, cfg!(feature = "lite")) {
+                free.push(kind);
+            }
+        }
+        if free.is_empty() {
             return Ok(());
         }
         let data = xdg_folder(std::env::var_os("XDG_DATA_HOME"), std::env::var_os("HOME"), ".local/share").ok_or_else(|| anyhow::anyhow!("No home folder"))?;
+        if OPENS.contains(&super::REMIX_TYPE) {
+            declare_remix(&data)?;
+        }
         let applications = data.join("applications");
         std::fs::create_dir_all(&applications)?;
-        let text = entry(crate::identity::PRODUCT, crate::identity::INSTALLED, appimage, Some("%u"), &[("MimeType", &format!("{SCHEME};"))]);
+        let types: String = OPENS.iter().map(|kind| format!("{kind};")).collect();
+        let text = entry(crate::identity::PRODUCT, crate::identity::INSTALLED, appimage, Some("%u"), &[("MimeType", &types)]);
         std::fs::write(applications.join(&mine), text)?;
-        let set = Command::new("xdg-mime").args(["default", &mine, SCHEME]).status()?;
-        anyhow::ensure!(set.success(), "xdg-mime refused");
+        for kind in free {
+            let set = Command::new("xdg-mime").args(["default", &mine, kind]).status()?;
+            anyhow::ensure!(set.success(), "xdg-mime refused");
+        }
+        Ok(())
+    }
+
+    /// Tells this user's desktop what a `.lmix` file is.
+    fn declare_remix(data: &Path) -> anyhow::Result<()> {
+        let mime = data.join("mime");
+        std::fs::create_dir_all(mime.join("packages"))?;
+        std::fs::write(mime.join("packages").join(format!("{}.xml", crate::identity::INSTALLED)), super::REMIX_DECLARATION)?;
+        // Missing on some desktops: the type stays unknown there, the link still registers.
+        if let Err(error) = Command::new("update-mime-database").arg(&mime).status() {
+            crate::diag::warn("protocol", "remix files not declared", &error.to_string());
+        }
         Ok(())
     }
 }
@@ -200,6 +247,11 @@ mod tests {
             assert_eq!(file_of(&args(&["legato.exe", bad])), None, "{bad}");
         }
         assert_eq!(file_of(&args(&[&spaced])), None);
+        // The same file by its `file://` address; another computer's is not read.
+        let address = tauri::Url::from_file_path(&spaced).unwrap().to_string();
+        // As paths: the address comes back with this system's separators only.
+        assert_eq!(file_of(&args(&["legato.exe", &address])).map(std::path::PathBuf::from), Some(std::path::PathBuf::from(&spaced)));
+        assert_eq!(file_of(&args(&["legato.exe", "file://elsewhere/share/mix.lmix"])), None);
         let folder = dir.join("legato-test-folder.lmix");
         std::fs::create_dir_all(&folder).unwrap();
         assert_eq!(file_of(&args(&["legato.exe", &folder.to_string_lossy()])), None);
@@ -240,13 +292,28 @@ mod tests {
     fn on_linux_the_link_leaves_another_choice_alone() {
         let (full, lite) = ("app.legato.desktop.desktop", LITE_ENTRY);
         for nobody_or_ours in [None, Some(""), Some(full)] {
-            assert!(takes_link(nobody_or_ours, full, false), "{nobody_or_ours:?}");
+            assert!(takes_over(nobody_or_ours, full, false), "{nobody_or_ours:?}");
         }
-        assert!(takes_link(Some(lite), full, false) && takes_link(Some(lite), lite, true));
-        assert!(!takes_link(Some(full), lite, true) && !takes_link(Some("other.desktop"), full, false));
+        assert!(takes_over(Some(lite), full, false) && takes_over(Some(lite), lite, true));
+        assert!(!takes_over(Some(full), lite, true) && !takes_over(Some("other.desktop"), full, false));
         // The names the two configs give.
         let identifier = |json: &str| serde_json::from_str::<serde_json::Value>(json).unwrap()["identifier"].as_str().unwrap().to_string();
         assert_eq!(format!("{}.desktop", identifier(include_str!("../tauri.lite.conf.json"))), LITE_ENTRY);
+    }
+
+    #[test]
+    fn only_the_full_apps_deb_opens_remix_files() {
+        let json = |text: &str| serde_json::from_str::<serde_json::Value>(text).unwrap();
+        let full = json(include_str!("../tauri.linux.conf.json"));
+        assert_eq!(full["bundle"]["linux"]["deb"]["files"], serde_json::json!({ "/usr/share/mime/packages/app.legato.desktop.xml": "./linux/legato-remix.xml" }));
+        assert!(REMIX_DECLARATION.contains(&format!("type=\"{REMIX_TYPE}\"")) && REMIX_DECLARATION.contains("pattern=\"*.lmix\""));
+        assert!(include_str!("../linux/legato.desktop").contains(&format!("{REMIX_TYPE};")));
+        // Lite's own entry, and no declaration: two packages can't own the same file.
+        let lite = json(include_str!("../tauri.lite-linux.conf.json"));
+        assert_eq!(lite["bundle"]["linux"]["deb"]["desktopTemplate"], "./linux/legato-lite.desktop");
+        assert!(lite["bundle"]["linux"]["deb"]["files"].is_null());
+        let entry = include_str!("../linux/legato-lite.desktop");
+        assert!(entry.contains("MimeType=x-scheme-handler/legato;") && !entry.contains(REMIX_TYPE));
     }
 
     #[test]
@@ -254,7 +321,7 @@ mod tests {
         let config: serde_json::Value = serde_json::from_str(include_str!("../tauri.linux.conf.json")).unwrap();
         assert_eq!(config["bundle"]["linux"]["deb"]["desktopTemplate"], "./linux/legato.desktop");
         let template = include_str!("../linux/legato.desktop");
-        assert!(template.contains("\nExec={{exec}} %u\n") && template.contains("\nMimeType=x-scheme-handler/legato;\n"));
+        assert!(template.contains("\nExec={{exec}} %u\n") && template.contains("\nMimeType=x-scheme-handler/legato;"));
     }
 
     #[test]
